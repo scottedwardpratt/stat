@@ -1,1 +1,1 @@
-submodule - stat
+stat submodule
