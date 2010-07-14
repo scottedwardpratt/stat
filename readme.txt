@@ -1,1 +1,1 @@
-init module stat
+initialize module
