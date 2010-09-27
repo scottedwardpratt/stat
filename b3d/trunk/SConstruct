@@ -18,5 +18,5 @@ b3denv = Environment( \
 	#ENV = \{'PATH':os.environ['PATH']\}\
 )
 
-SConscript('src/b3d/SConscript', exports='b3denv', build_dir='#build/b3d', duplicate=0)
-SConscript('src/analyze/SConscript', exports='b3denv', build_dir='#build/analyze', duplicate=0)
+SConscript('src/b3d/SConscript', exports='b3denv', variant_dir='#build/b3d', duplicate=0)
+SConscript('src/analyze/SConscript', exports='b3denv', variant_dir='#build/analyze', duplicate=0)

@@ -29,8 +29,8 @@ options = opts,\
 
 if coralenv['debug']: coralenv['CCFLAGS'] += " -Wall -g -DTNT_BOUNDS_CHECK"
 
-SConscript('src/coralutils/SConscript', exports='coralenv', build_dir='#build/coralutils', duplicate=0)
-SConscript('src/coral/SConscript', exports='coralenv', build_dir='#build/coral', duplicate=0)
+SConscript('src/coralutils/SConscript', exports='coralenv', variant_dir='#build/coralutils', duplicate=0)
+SConscript('src/coral/SConscript', exports='coralenv', variant_dir='#build/coral', duplicate=0)
 
 if coralenv['X11']: 
     coralenv[ 'CPPPATH' ] += [ x11path+'include' ]
@@ -38,7 +38,7 @@ if coralenv['X11']:
     coralenv[ 'LIBS' ]    += [ 'X11']  # for some reason, adding to this list on MacOSX messes up CheckLib calls later
 
     # --------------- Build XGraph ---------------
-    SConscript('src/xgraph/SConscript', exports='coralenv', build_dir='#build/xgraph', duplicate=0)
+    SConscript('src/xgraph/SConscript', exports='coralenv', variant_dir='#build/xgraph', duplicate=0)
 
 Help(opts.GenerateHelpText(coralenv))
 
@@ -50,11 +50,11 @@ conf = Configure(coralenv)
 #        coralenv = conf.Finish()
 
 # --------------- Build CorAL & Friends ---------------
-SConscript('src/coralutils/SConscript', exports='coralenv', build_dir='#build/coralutils', duplicate=0)
-SConscript('src/coral/SConscript', exports='coralenv', build_dir='#build/coral', duplicate=0)
-SConscript('src/xgraph/SConscript', exports='coralenv', build_dir='#build/xgraph', duplicate=0)
+SConscript('src/coralutils/SConscript', exports='coralenv', variant_dir='#build/coralutils', duplicate=0)
+SConscript('src/coral/SConscript', exports='coralenv', variant_dir='#build/coral', duplicate=0)
+SConscript('src/xgraph/SConscript', exports='coralenv', variant_dir='#build/xgraph', duplicate=0)
 
 # --------------- Build regression tests ---------------
 #if coralenv['tests']: 
-#    SConscript( 'codetests/SConscript', exports = 'coralenv', build_dir = '#build/tests', duplicate = 0 )
+#    SConscript( 'codetests/SConscript', exports = 'coralenv', variant_dir = '#build/tests', duplicate = 0 )
 
