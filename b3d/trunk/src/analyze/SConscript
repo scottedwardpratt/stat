@@ -1,0 +1,12 @@
+import sys,os
+Import('b3denv')
+
+inclist = Split('analyze.h ../b3d/resonances.h')
+
+srclist = Split('analyze.cc')
+
+b3denv.Install('#include', inclist)
+
+analyze_lib=b3denv.Library('b3d_analyze', source = srclist)
+
+b3denv.Install('#lib',[analyze_lib])

@@ -1,0 +1,12 @@
+import sys,os
+Import('oscarmakerenv')
+
+inclist = Split('oscarmaker.h')
+
+srclist = Split('oscarmaker.cc')
+
+oscarmakerenv.Install('#include', inclist)
+
+oscarmaker_lib=oscarmakerenv.Library('oscarmaker', source = srclist)
+
+oscarmakerenv.Install('#lib',[oscarmaker_lib])

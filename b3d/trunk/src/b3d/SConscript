@@ -1,0 +1,12 @@
+import sys,os
+Import('b3denv')
+
+inclist = Split('b3d.h resonances.h bjmaker.h')
+
+srclist = Split('part.cc  event.cc  cell.cc  hydrotob3d.cc event_perform.cc  event_perform_decay.cc  event_perform_activate.cc  event_perform_collide.cc  event_perform_exitcell.cc  resonances.cc  b3d.cc  decay.cc  findcollision.cc  collide.cc bjmaker.cc')
+
+b3denv.Install('#include', inclist)
+
+b3d_lib=b3denv.Library('b3d', source = srclist)
+
+b3denv.Install('#lib',[b3d_lib])
