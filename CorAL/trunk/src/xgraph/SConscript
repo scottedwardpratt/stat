@@ -1,0 +1,8 @@
+import sys,os
+Import('coralenv')
+
+coralenv.Install('#include', 'xgraph.h')
+
+xgraph_lib = coralenv.Library('xgraph', source = 'xgraph.cc')
+
+coralenv.Install('#lib',xgraph_lib)

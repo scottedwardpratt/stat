@@ -1,0 +1,65 @@
+import sys,os
+Import('coralenv')
+
+inclist = Split('\
+coral.h \
+CF2Source/sfit.h \
+CF2Source/minimization.h \
+CFCalc/cfcalc.h \
+Kernel/kernel.h \
+Source2CF/source2cf.h \
+SourceCalc/sourcecalc.h \
+WaveFunctions/wavefunction.h \
+')
+
+srclist = Split('CF2Source/sfit.cc \
+CF2Source/sfit_3dgaussian.cc \
+CF2Source/sfit_blast.cc \
+CF2Source/sfit_GX1d.cc \
+CF2Source/minimization.cc \
+CFCalc/cfcalc.cc \
+Kernel/kernel.cc \
+Source2CF/source2cf.cc \
+SourceCalc/sourcecalc.cc \
+SourceCalc/sourcecalc_blast.cc \
+SourceCalc/sourcecalc_gauss.cc \
+SourceCalc/sourcecalc_GX1d.cc \
+SourceCalc/sourcecalc_OSCAR.cc \
+WaveFunctions/wfcommon/kpi_phaseshifts.cc \
+WaveFunctions/wfcommon/pipi_phaseshifts.cc \
+WaveFunctions/wfcommon/reid93.cc \
+WaveFunctions/wf/wf_generic.cc \
+WaveFunctions/wf/wf_pipluspiplus_nostrong.cc \
+WaveFunctions/wf/wf_pipluspiminus_nostrong.cc \
+WaveFunctions/wf/wf_kpluspiminus_phaseshift.cc \
+WaveFunctions/wf/wf_kpluspiminus_sqwell.cc \
+WaveFunctions/wf/wf_kpluspiplus_sqwell.cc \
+WaveFunctions/wf/wf_lambdalambda_phaseshift.cc \
+WaveFunctions/wf/wf_lambdalambdaantiparspin_phaseshift.cc \
+WaveFunctions/wf/wf_lambdalambdaparspin_phaseshift.cc \
+WaveFunctions/wf/wf_nn_phaseshift.cc \
+WaveFunctions/wf/wf_pipluspiminus_phaseshift.cc \
+WaveFunctions/wf/wf_pipluspiminus_sqwell.cc \
+WaveFunctions/wf/wf_pipluspiplus_phaseshift.cc \
+WaveFunctions/wf/wf_pipluspiplus_sqwell.cc \
+WaveFunctions/wf/wf_pkplus_phaseshift.cc \
+WaveFunctions/wf/wf_pkplus_sqwell.cc \
+WaveFunctions/wf/wf_plambda_phaseshift.cc \
+WaveFunctions/wf/wf_pn_phaseshift.cc \
+WaveFunctions/wf/wf_pp_phaseshift.cc \
+WaveFunctions/wf/wf_pp_schrod.cc \
+WaveFunctions/wf/wf_ppiminus_sqwell.cc \
+WaveFunctions/wf/wf_ppiplus_phaseshift.cc \
+WaveFunctions/wf/wf_ppiplus_sqwell.cc \
+WaveFunctions/wf/wf_Xipi_phaseshift.cc \
+WaveFunctions/wfcommon/partwave.cc \
+WaveFunctions/wfcommon/planewave.cc \
+WaveFunctions/wfcommon/wfcommon.cc \
+WaveFunctions/wfcommon/wfsquarewell.cc \
+' )
+
+coralenv.Install('#include', inclist)
+
+coral_lib=coralenv.Library('coral', source = srclist)
+
+coralenv.Install('#lib',[coral_lib])

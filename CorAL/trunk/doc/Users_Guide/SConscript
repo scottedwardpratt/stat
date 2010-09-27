@@ -1,0 +1,14 @@
+import os
+
+Import('env','cwd')
+
+thisTarget='users_guide'
+
+def test(x):return x[-3:] in ['tex']
+inputfiles = filter(test, os.listdir(cwd+os.sep+'doc'+os.sep+'Users_Guide'))
+
+d=env.DVI(thisTarget+'.dvi', inputfiles)
+#d1=env.PostScript(thisTarget+'.ps', inputfiles)
+#d2=env.PDF(thisTarget+'.pdf', inputfiles)
+#env.Install('#doc/Users_Guide',d1)
+#env.Install('#doc/Users_Guide',d2)
