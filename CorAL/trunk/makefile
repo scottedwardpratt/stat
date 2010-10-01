@@ -1,112 +1,114 @@
 #!/usr/bin/bash
-export CORAL_HFILES = minimization.h \
-sfit.h \
-cfcalc.h \
-coral.h \
-kernel.h \
-source2cf.h \
-sourcecalc.h \
-wavefunction.h \
-arrays.h \
-gslmatrix.h \
-misc.h \
-constants.h \
-random.h \
-parametermap.h \
-chebyshev.h \
-chebyshev_fit.h \
-sf.h \
-utilities.h \
-xgraph.h
+export CORAL_HFILES = src/coral/CF2Source/minimization.h\
+src/coral/CF2Source/minuitstuff/sfit_minuit.h\
+src/coral/CF2Source/sfit.h\
+src/coral/CFCalc/cfcalc.h\
+src/coral/coral.h\
+src/coral/Kernel/kernel.h\
+src/coral/Source2CF/source2cf.h\
+src/coral/SourceCalc/sourcecalc.h\
+src/coral/WaveFunctions/wavefunction.h\
+src/coralutils/Arrays/arrays.h\
+src/coralutils/GSLMatrix/gslmatrix.h\
+src/coralutils/Misc/misc.h\
+src/coralutils/NumMath/constants.h\
+src/coralutils/NumMath/random.h\
+src/coralutils/ParameterMap/parametermap.h\
+src/coralutils/SpecialFunctions/Chebyshev/chebyshev.h\
+src/coralutils/SpecialFunctions/Chebyshev/chebyshev_fit.h\
+src/coralutils/SpecialFunctions/sf.h\
+src/coralutils/utilities.h\
+src/xgraph/xgraph.h
 
-export CORAL_CCFILES = minimization.cc\
-sfit.cc\
-sfit_3dgaussian.cc\
-sfit_blast.cc\
-sfit_GX1d.cc\
-cfcalc.cc\
-kernel.cc\
-kernel_chooser.cc\
-source2cf.cc\
-sourcecalc.cc\
-sourcecalc_blast.cc\
-sourcecalc_ellipticblast.cc\
-sourcecalc_gauss.cc\
-sourcecalc_GX1d.cc\
-sourcecalc_OSCAR.cc\
-reid93.cc\
-wf_generic.cc\
-wf_kpluspiminus_phaseshift.cc\
-wf_kpluspiminus_sqwell.cc\
-wf_kpluspiplus_sqwell.cc\
-wf_lambdalambda_phaseshift.cc\
-wf_lambdalambdaantiparspin_phaseshift.cc\
-wf_lambdalambdaparspin_phaseshift.cc\
-wf_nn_phaseshift.cc\
-wf_pipluspiminus_nostrong.cc\
-wf_pipluspiminus_phaseshift.cc\
-wf_pipluspiminus_sqwell.cc\
-wf_pipluspiplus_nostrong.cc\
-wf_pipluspiplus_phaseshift.cc\
-wf_pipluspiplus_sqwell.cc\
-wf_pkplus_phaseshift.cc\
-wf_pkplus_sqwell.cc\
-wf_plambda_phaseshift.cc\
-wf_pn_phaseshift.cc\
-wf_pp_phaseshift.cc\
-wf_pp_schrod.cc\
-wf_ppiminus_sqwell.cc\
-wf_ppiplus_phaseshift.cc\
-wf_ppiplus_sqwell.cc\
-wf_Xipi_phaseshift.cc\
-kpi_phaseshifts.cc\
-partwave.cc\
-pipi_phaseshifts.cc\
-planewave.cc\
-reid93.cc\
-wfcommon.cc\
-wfsquarewell.cc
 
-export CORAL_UTILS_CC = arraycalc.cc\
-charray.cc\
-mclist.cc\
-threed.cc\
-ylmarray.cc\
-gslmatrix.cc\
-misc.cc\
-random.cc\
-parametermap.cc\
-bess.cc\
-chcalc.cc\
-chebyshev.cc\
-chebyshev_fit.cc\
-coulwave.cc\
-ylm.cc
+export CORAL_CCFILES = src/coral/CF2Source/minimization.cc\
+src/coral/CF2Source/sfit.cc\
+src/coral/CF2Source/sfit_3dgaussian.cc\
+src/coral/CF2Source/sfit_blast.cc\
+src/coral/CF2Source/sfit_GX1d.cc\
+src/coral/CFCalc/cfcalc.cc\
+src/coral/Kernel/kernel.cc\
+src/coral/Source2CF/source2cf.cc\
+src/coral/SourceCalc/sourcecalc.cc\
+src/coral/SourceCalc/sourcecalc_blast.cc\
+src/coral/SourceCalc/sourcecalc_ellipticblast.cc\
+src/coral/SourceCalc/sourcecalc_gauss.cc\
+src/coral/SourceCalc/sourcecalc_GX1d.cc\
+src/coral/SourceCalc/sourcecalc_OSCAR.cc\
+src/coral/WaveFunctions/wf/reid93.cc\
+src/coral/WaveFunctions/wf/wf_generic.cc\
+src/coral/WaveFunctions/wf/wf_kpluspiminus_phaseshift.cc\
+src/coral/WaveFunctions/wf/wf_kpluspiminus_sqwell.cc\
+src/coral/WaveFunctions/wf/wf_kpluspiplus_sqwell.cc\
+src/coral/WaveFunctions/wf/wf_lambdalambda_phaseshift.cc\
+src/coral/WaveFunctions/wf/wf_lambdalambdaantiparspin_phaseshift.cc\
+src/coral/WaveFunctions/wf/wf_lambdalambdaparspin_phaseshift.cc\
+src/coral/WaveFunctions/wf/wf_nn_phaseshift.cc\
+src/coral/WaveFunctions/wf/wf_pipluspiminus_nostrong.cc\
+src/coral/WaveFunctions/wf/wf_pipluspiminus_phaseshift.cc\
+src/coral/WaveFunctions/wf/wf_pipluspiminus_sqwell.cc\
+src/coral/WaveFunctions/wf/wf_pipluspiplus_nostrong.cc\
+src/coral/WaveFunctions/wf/wf_pipluspiplus_phaseshift.cc\
+src/coral/WaveFunctions/wf/wf_pipluspiplus_sqwell.cc\
+src/coral/WaveFunctions/wf/wf_pkplus_phaseshift.cc\
+src/coral/WaveFunctions/wf/wf_pkplus_sqwell.cc\
+src/coral/WaveFunctions/wf/wf_plambda_phaseshift.cc\
+src/coral/WaveFunctions/wf/wf_pn_phaseshift.cc\
+src/coral/WaveFunctions/wf/wf_pp_phaseshift.cc\
+src/coral/WaveFunctions/wf/wf_pp_schrod.cc\
+src/coral/WaveFunctions/wf/wf_ppiminus_sqwell.cc\
+src/coral/WaveFunctions/wf/wf_ppiplus_phaseshift.cc\
+src/coral/WaveFunctions/wf/wf_ppiplus_sqwell.cc\
+src/coral/WaveFunctions/wf/wf_Xipi_phaseshift.cc\
+src/coral/WaveFunctions/wfcommon/kpi_phaseshifts.cc\
+src/coral/WaveFunctions/wfcommon/partwave.cc\
+src/coral/WaveFunctions/wfcommon/pipi_phaseshifts.cc\
+src/coral/WaveFunctions/wfcommon/planewave.cc\
+src/coral/WaveFunctions/wfcommon/reid93.cc\
+src/coral/WaveFunctions/wfcommon/wfcommon.cc\
+src/coral/WaveFunctions/wfcommon/wfsquarewell.cc
 
-CC=/usr/bin/g++
-OPT="-fast"
+export CORAL_UTILS_CCFILES = src/coralutils/Arrays/arraycalc.cc\
+src/coralutils/Arrays/charray.cc\
+src/coralutils/Arrays/mclist.cc\
+src/coralutils/Arrays/threed.cc\
+src/coralutils/Arrays/ylmarray.cc\
+src/coralutils/GSLMatrix/gslmatrix.cc\
+src/coralutils/Misc/misc.cc\
+src/coralutils/NumMath/random.cc\
+src/coralutils/ParameterMap/parametermap.cc\
+src/coralutils/SpecialFunctions/Bessel/bess.cc\
+src/coralutils/SpecialFunctions/CartesianHarmonics/chcalc.cc\
+src/coralutils/SpecialFunctions/CoulWave/coulwave.cc\
+src/coralutils/SpecialFunctions/Ylm/ylm.cc
 
-all:
+CPP=/usr/bin/g++
+OPT=${CORAL_CCFLAGS}
+
+coral: headers lib/libcoralutils.a lib/libcoral.a lib/libxgraph.a
+
+headers: ${CORAL_HFILES}
 	for filename in ${CORAL_HFILES};\
-	do if [ -e include/$${filename} ];\
-	then find src -newer include/$${filename} -name $${filename} -exec cp {} include/  \; ;\
-	else find src -name $${filename} -exec cp {} include/ \; ;\
-	fi;\
-	done; \
-	for filename in ${CORAL_CCFILES};\
-	do if [ -e include/$${filename} ];\
-	then find src -newer include/$${filename} -name $${filename} -exec cp {} include/  \; ;\
-	else find src -name $${filename} -exec cp {} include/ \; ;\
-	fi;\
-	done; \
-	for filename in ${CORAL_UTILS_CCFILES};\
-	do if [ -e include/$${filename} ];\
-	then find src -newer include/$${filename} -name $${filename} -exec cp {} include/  \; ;\
-	else find src -name $${filename} -exec cp {} include/ \; ;\
-	fi;\
-	done; \
+	do cp $${filename} include/ ; done;
 	
+lib/libcoralutils.a : ${CORAL_HFILES} ${CORAL_UTILS_CCFILES}
+	rm *.o build/coralutils/*.o;\
+	${CPP} -c -I ${CORAL_GSLPATH}include -I include -O ${OPT} ${CORAL_UTILS_CCFILES};\
+	mv *.o build/coralutils/;\
+	ar -ru lib/libcoralutils.a build/coralutils/*.o;
+
+lib/libcoral.a : ${CORAL_HFILES} ${CORAL_CCFILES}
+	rm *.o build/coral/*.o;\
+	${CPP} -c -I ${CORAL_GSLPATH}include -I include -O ${OPT}  ${CORAL_CCFILES};\
+	mv *.o build/coral/;\
+	ar -ru lib/libcoral.a build/coral/*.o;
 	
+lib/libxgraph.a : src/xgraph/xgraph.cc
+	rm *.o build/xgraph/*.o;\
+	${CPP} -c -I ${CORAL_GSLPATH}include -I include -I /usr/X11R6/include -O ${OPT}  ${CORAL_CCFILES};\
+	mv *.o build/xgraph/;\
+	ar -ru lib/libxgraph.a build/xgraph/*.o;
+
 
 	
 
