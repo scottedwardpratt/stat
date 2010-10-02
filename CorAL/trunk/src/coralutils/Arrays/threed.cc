@@ -734,7 +734,7 @@ void C3DArray::CalcMoments(double roff[3],double r2[3][3]){
 					for(isz=0;isz<nsz;isz++){
 						for(iz=0;iz<NZMAX;iz++){
 							r[2]=(iz+0.5)*DELZ;
-							if(isz==0) r[3]=-r[3];
+							if(isz==0) r[2]=-r[2];
 							norm+=F[isx][ix][isy][iy][isz][iz];
 							for(i=0;i<3;i++){
 								roff[i]+=r[i]*F[isx][ix][isy][iy][isz][iz];
@@ -793,7 +793,7 @@ void C3DArray::PrintMoments(){
 					for(isz=0;isz<nsz;isz++){
 						for(iz=0;iz<NZMAX;iz++){
 							r[2]=(iz+0.5)*DELZ;
-							if(isz==0) r[3]=-r[3];
+							if(isz==0) r[2]=-r[2];
 							norm+=F[isx][ix][isy][iy][isz][iz];
 							for(i=0;i<3;i++){
 								roff[i]+=r[i]*F[isx][ix][isy][iy][isz][iz];

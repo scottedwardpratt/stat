@@ -1,7 +1,7 @@
 #ifndef parameterMap_CC
 #define parameterMap_CC
 
-#include "parameterMap.h" 
+#include "parametermap.h" 
 #include <iostream>
 
 //Returns an integer from the map.

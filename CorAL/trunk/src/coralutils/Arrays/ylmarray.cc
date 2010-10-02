@@ -82,7 +82,7 @@ void CYlmArray::ZeroArray(int ir){
 void CYlmArray::PrintArrayFixedIR(int ir){
   int L,M;
 
-  printf("\n______________________________________\n",ir);
+  printf("\n______________________________________\n");
   printf(" L \\ M :");
   for(M=0;M<=LMAX;M++) printf("         %2d             ",M);
   printf("\n");
