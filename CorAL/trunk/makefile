@@ -20,7 +20,6 @@ src/coralutils/SpecialFunctions/sf.h\
 src/coralutils/utilities.h\
 src/xgraph/xgraph.h
 
-
 export CORAL_CCFILES = src/coral/CF2Source/minimization.cc\
 src/coral/CF2Source/sfit.cc\
 src/coral/CF2Source/sfit_3dgaussian.cc\
@@ -104,6 +103,6 @@ lib/libcoral.a : ${CORAL_HFILES} ${CORAL_CCFILES}
 
 lib/libxgraph.a : src/xgraph/xgraph.cc
 	rm *.o build/xgraph/*.o;\
-	${CPP} -c -I ${MADAI_GSLPATH}include -I include -I ${MADAI_X11PATH}include -O ${OPT}  ${CORAL_CCFILES};\
+	${CPP} -c -I ${MADAI_GSLPATH}include -I include -I ${MADAI_X11PATH}include -O ${OPT} src/xgraph/xgraph.cc;\
 	mv *.o build/xgraph/;\
 	ar -ru lib/libxgraph.a build/xgraph/*.o;
