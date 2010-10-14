@@ -61,13 +61,13 @@ int main (int argc, char * const argv[]) {
   
 //  parameter::PrintPars(*pMap);
   
-  mDataRoot = parameter::getS(*pMap,"HYDRO_OUTPUT_DATAROOT");
+  mDataRoot = parameter::getS(*pMap,"HYDRO_OUTPUT_DATAROOT","");
   
   int sLength = mDataRoot.size();
   if (mDataRoot[sLength-1] != '/') mDataRoot.append("/");
 //  printf("%s\n",mDataRoot.c_str());
   
-  bool mDebug = parameter::getB(*pMap,"HYDRO_DEBUG");
+  bool mDebug = parameter::getB(*pMap,"HYDRO_DEBUG",false);
   bool mIoIntegrals, mIoSlices, mIoSpots, mIoTechqm, mIoOscarFull, mIoOscarHyper, mIoFull, mIoSpectra;
   mIoIntegrals = parameter::getB(*pMap,"HYDRO_IO_INTEGRALS", false);
   mIoSlices = parameter::getB(*pMap,"HYDRO_IO_SLICES",false);
@@ -87,10 +87,10 @@ int main (int argc, char * const argv[]) {
   mLogSinhT = parameter::getB(*pMap,"HYDRO_LOGSINHT",false);
 
   int mTStep, mXSize, mYSize, mNSize, mIoSliceTStep, mIoTechqmTStep, mIoOscarTStep, mPrintStep, mPrintX, mPrintY, mPrintN;
-  mTStep = parameter::getI(*pMap,"HYDRO_TSTEP");
-  mXSize = parameter::getI(*pMap,"HYDRO_XSIZE");
-  mYSize = parameter::getI(*pMap,"HYDRO_YSIZE");
-  mNSize = parameter::getI(*pMap,"HYDRO_NSIZE");
+  mTStep = parameter::getI(*pMap,"HYDRO_TSTEP",100);
+  mXSize = parameter::getI(*pMap,"HYDRO_XSIZE",60);
+  mYSize = parameter::getI(*pMap,"HYDRO_YSIZE",60);
+  mNSize = parameter::getI(*pMap,"HYDRO_NSIZE",20);
   mIoSliceTStep = parameter::getI(*pMap,"HYDRO_IO_SLICE_TSTEP",1);
   mIoTechqmTStep = parameter::getI(*pMap,"HYDRO_IO_TECHQM_TSTEP",1);
   mIoOscarTStep = parameter::getI(*pMap,"HYDRO_IO_OSCAR_TSTEP",1);
@@ -101,7 +101,7 @@ int main (int argc, char * const argv[]) {
 
   bool mBjorken, mPureBjorken, mHalving;
   mBjorken = parameter::getB(*pMap,"HYDRO_BJORKEN",true);
-  mPureBjorken = parameter::getB(*pMap,"HYDRO_PURE_BJORKEN");
+  mPureBjorken = parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false);
   mHalving = parameter::getB(*pMap, "HYDRO_HALVING", false);
 
   double mInitNS, mInitFlow;
@@ -112,10 +112,10 @@ int main (int argc, char * const argv[]) {
   string mOldFileName = parameter::getS(*pMap,"HYDRO_OLD_FILENAME","");
   
   double mFoTemp, mT0, mDt, mE0;
-  mFoTemp = parameter::getD(*pMap,"HYDRO_FOTEMP");
-  mT0 = parameter::getD(*pMap,"HYDRO_T0");
-  mDt = parameter::getD(*pMap,"HYDRO_DT");
-  mE0 = parameter::getD(*pMap,"HYDRO_E0");
+  mFoTemp = parameter::getD(*pMap,"HYDRO_FOTEMP",0.13);
+  mT0 = parameter::getD(*pMap,"HYDRO_T0",1.0);
+  mDt = parameter::getD(*pMap,"HYDRO_DT",0.03);
+  mE0 = parameter::getD(*pMap,"HYDRO_E0",1.0);
   
   if (mIoIntegrals) openFileIntegrals();
   if (mIoSpots) openFileSpots();
@@ -393,13 +393,13 @@ void printE(CMesh* lMesh, int lT) {
 	time(&now);
 	printf("\nAt Time: [%0.6g] (elapsed time %0.6g sec) .",lMesh->getTau(),difftime(now,start)); fflush(stdout);
 
-	int nPrintX = min(parameter::getI(*pMap,"HYDRO_PRINTX"),lMesh->getXSize()-1);
-	int nPrintY = min(parameter::getI(*pMap,"HYDRO_PRINTY"),lMesh->getYSize()-1);
-	double mDx = parameter::getD(*pMap,"HYDRO_DX");
-	double mDy = parameter::getD(*pMap,"HYDRO_DY");
-	double mDn = parameter::getD(*pMap,"HYDRO_DN");
+	int nPrintX = min(parameter::getI(*pMap,"HYDRO_PRINTX",0),lMesh->getXSize()-1);
+	int nPrintY = min(parameter::getI(*pMap,"HYDRO_PRINTY",0),lMesh->getYSize()-1);
+	double mDx = parameter::getD(*pMap,"HYDRO_DX",0.1);
+	double mDy = parameter::getD(*pMap,"HYDRO_DY",0.1);
+	double mDn = parameter::getD(*pMap,"HYDRO_DN",0.1);
 
-    if (!parameter::getB(*pMap,"HYDRO_PURE_BJORKEN"))
+    if (!parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false))
  	  for (int i=-1;i<=lMesh->getNSize();i++) {
 /*
 	  if (parameter::getB(*pMap,"HYDRO_BJORKEN"))  
@@ -430,7 +430,7 @@ void printE(CMesh* lMesh, int lT) {
 //	  fprintf(fTIS, "%0.9g %0.9g\n", lMesh->getYL(i,nPrintX,nPrintY), lMesh->getTIS(i,nPrintX,nPrintY));
 //	  fprintf(fTISB,"%0.9g %0.9g\n", lMesh->getYL(i,nPrintX,nPrintY), lMesh->getTISB(i,nPrintX,nPrintY));
 */
-	  if (parameter::getB(*pMap,"HYDRO_BJORKEN"))  
+	  if (parameter::getB(*pMap,"HYDRO_BJORKEN",true))  
 	    fprintf(fEN,"%0.9g %0.9g\n", mDn*i, pow(lMesh->getTau(),(4./3.)) * lMesh->getS(i,nPrintX,nPrintY,4));
 	  else			
 	    fprintf(fEN,"%0.9g %0.9g\n", mDn*i, lMesh->getS(i,nPrintX,nPrintY,4));
@@ -467,7 +467,7 @@ void printE(CMesh* lMesh, int lT) {
 	for (int i=0;i<fosSize;i++)
 	    fprintf(fFOS,"%0.6g %0.6g\n", mFOS[i][0], mFOS[i][1]);
 
-	int lPrintY = nPrintY, lPrintN = min(parameter::getI(*pMap,"HYDRO_PRINTN"),lMesh->getNSize()-1);
+	int lPrintY = nPrintY, lPrintN = min(parameter::getI(*pMap,"HYDRO_PRINTN",0),lMesh->getNSize()-1);
 	for (int i=0;i<lMesh->getXSize();i++) {
 	  fprintf(fEX,"%0.9g %0.9g\n", mDx*i, lMesh->getS(lPrintN,i,lPrintY,4));
 	  fprintf(fS,"%0.9g %0.9g\n", mDx*i, lMesh->getS(lPrintN,i,lPrintY));
@@ -498,7 +498,7 @@ void printE(CMesh* lMesh, int lT) {
   	  fprintf(fTIS, "%0.9g %0.9g\n", mDx*i, lMesh->getTIS(lPrintN,i,lPrintY));
 	  fprintf(fTISB,"%0.9g %0.9g\n", mDx*i, lMesh->getTISB(lPrintN,i,lPrintY));
 
-	  if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN")) 
+	  if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false)) 
 	    fprintf(fUz,"%0.9g %0.9g\n", mDy*(double) i, lMesh->getS(lPrintN,i,lPrintY,3));
 	}
 	
@@ -535,7 +535,7 @@ void printE(CMesh* lMesh, int lT) {
 	  fprintf(fTpr,"%0.9g %0.9g\n",ROOT2*mDx*i, lMesh->getTRPhi(lPrintN,i,i)/P);
 	}
 
-    if (!parameter::getB(*pMap,"HYDRO_OCTANT"))
+    if (!parameter::getB(*pMap,"HYDRO_OCTANT",true))
 	  for (int i=-lMesh->getNSize();i<=lMesh->getNSize();i++) {
 	  fprintf(fIEN,"%0.9g %0.9g\n", lMesh->getYL(i,nPrintX,nPrintY), lMesh->integralE(i));
 	  fprintf(fISN,"%0.9g %0.9g\n", lMesh->getYL(i,nPrintX,nPrintY), lMesh->integralS(i));  
@@ -1741,10 +1741,10 @@ void printTQM(CMesh* lMesh) {
 void openOscarHyper() {
   // 1
 //  fOscarHyper = fopen("fOscarHyper.OSCAR2008H","w");
-  string fn = parameter::getS(*pMap,"HYDRO_IO_OSCARHYPER_FN");
+  string fn = parameter::getS(*pMap,"HYDRO_IO_OSCARHYPER_FN","");
   fOscarHyper = fopen( fn.c_str(),"w");
   fprintf(fOscarHyper,"OSCAR2008H  ");
-  if ( parameter::getD(*pMap,"HYDRO_SVRATIO") > 0. || parameter::getD(*pMap,"HYDRO_BVRATIO") > 0.) 
+  if ( parameter::getD(*pMap,"HYDRO_SVRATIO",0.0) > 0. || parameter::getD(*pMap,"HYDRO_BVRATIO",0.0) > 0.) 
     fprintf(fOscarHyper,"viscous     ");
   else 
     fprintf(fOscarHyper,"ideal       ");
@@ -1752,14 +1752,14 @@ void openOscarHyper() {
   
   // 2
   fprintf(fOscarHyper,"INIT: ");
-  int mA = parameter::getD(*pMap,"GLAUBER_A"); int mB = parameter::getD(*pMap,"GLAUBER_B");
+  int mA = parameter::getD(*pMap,"GLAUBER_A",197.); int mB = parameter::getD(*pMap,"GLAUBER_B",0.);
   fprintf(fOscarHyper," Glauber - rho = %g Gev/fm^3, xi = %g, sigma = %fb, A = %f, b = %f fm\n",
-			parameter::getD(*pMap,"GLAUBER_Rho0")*1.,parameter::getD(*pMap,"GLAUBER_Xi")*1.,
-			parameter::getD(*pMap,"GLAUBER_Sigma")*10.,parameter::getD(*pMap,"GLAUBER_A"),parameter::getD(*pMap,"GLAUBER_B"));
+			parameter::getD(*pMap,"GLAUBER_Rho0",0.16)*1.,parameter::getD(*pMap,"GLAUBER_Xi",0.3)*1.,
+			parameter::getD(*pMap,"GLAUBER_Sigma",0.4)*10.,parameter::getD(*pMap,"GLAUBER_A",197.),parameter::getD(*pMap,"GLAUBER_B",0.0));
 
   // 3
   fprintf(fOscarHyper,"EOS: ");
-  if ( parameter::getB(*pMap,"EQOFST_LATEOS"))
+  if ( parameter::getB(*pMap,"EQOFST_LATEOS",true))
     fprintf(fOscarHyper," Lat-HRG interpolated, 0 Mev Shift, p4 action\n");
   else 
     fprintf(fOscarHyper," ideal gas of massless pions\n");
@@ -1769,18 +1769,18 @@ void openOscarHyper() {
   fprintf(fOscarHyper,"none\n");
   
   // 5
-  double temp = parameter::getD(*pMap,"HYDRO_FOTEMP");
+  double temp = parameter::getD(*pMap,"HYDRO_FOTEMP",0.13);
   fprintf(fOscarHyper,"HYPER:  hyper T=%g MeV isotherm \n",temp);
   
   // 6
   fprintf(fOscarHyper,"GEOM: ");
   if ( parameter::getB(*pMap,"HYDRO_BJORKEN",true)) 
-    if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN")) 
+    if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false)) 
 	  fprintf(fOscarHyper,"scaling2d\n");
 	else 
 	  fprintf(fOscarHyper,"3d\n");
   else 
-    if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN")) 
+    if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false)) 
 	  fprintf(fOscarHyper,"2d\n");
 	else 
 	  fprintf(fOscarHyper,"3d-cart");
@@ -1789,28 +1789,28 @@ void openOscarHyper() {
   fprintf(fOscarHyper,"GRID:  Euler\n");
   if (parameter::getB(*pMap,"HYDRO_OCTANT",true)) {
     fprintf(fOscarHyper,"%d %d %d %d 0 5 3\n",
-			parameter::getI(*pMap,"HYDRO_TSTEP"),parameter::getI(*pMap,"HYDRO_XSIZE")+1,
-			parameter::getI(*pMap,"HYDRO_YSIZE")+1,parameter::getI(*pMap,"HYDRO_NSIZE")+1);
-    fprintf(fOscarHyper,"%f ",parameter::getD(*pMap,"HYDRO_T0"));
+			parameter::getI(*pMap,"HYDRO_TSTEP",100),parameter::getI(*pMap,"HYDRO_XSIZE",60)+1,
+			parameter::getI(*pMap,"HYDRO_YSIZE",60)+1,parameter::getI(*pMap,"HYDRO_NSIZE",20)+1);
+    fprintf(fOscarHyper,"%f ",parameter::getD(*pMap,"HYDRO_T0",1.0));
     if (parameter::getB(*pMap,"HYDRO_LINT",false)) 
-	  fprintf(fOscarHyper,"%f ",parameter::getI(*pMap,"HYDRO_TSTEP")*parameter::getD(*pMap,"HYDRO_DT")+parameter::getD(*pMap,"HYDRO_T0"));
+	  fprintf(fOscarHyper,"%f ",parameter::getI(*pMap,"HYDRO_TSTEP",100)*parameter::getD(*pMap,"HYDRO_DT",0.1)+parameter::getD(*pMap,"HYDRO_T0",1.0));
     // else FIXME
   
-    fprintf(fOscarHyper,"0. %f 0. %f 0. %f\n",parameter::getD(*pMap,"HYDRO_DX")*parameter::getI(*pMap,"HYDRO_XSIZE"),
-											  parameter::getD(*pMap,"HYDRO_DY")*parameter::getI(*pMap,"HYDRO_YSIZE"),
-											  parameter::getD(*pMap,"HYDRO_DN")*parameter::getI(*pMap,"HYDRO_NSIZE"));
+    fprintf(fOscarHyper,"0. %f 0. %f 0. %f\n",parameter::getD(*pMap,"HYDRO_DX",0.1)*parameter::getI(*pMap,"HYDRO_XSIZE",60),
+											  parameter::getD(*pMap,"HYDRO_DY",0.1)*parameter::getI(*pMap,"HYDRO_YSIZE",60),
+											  parameter::getD(*pMap,"HYDRO_DN",0.1)*parameter::getI(*pMap,"HYDRO_NSIZE",20));
   }
   else {printf("!!!!!!!!!! OSCAR OUTPUT FAILING !!!!!!!!!!"); return;}
   
   // 8
   fprintf(fOscarHyper,"VISCOSITY:  ");
-  if ( parameter::getD(*pMap,"HYDRO_SVRATIO") > 0.)
-    if (parameter::getD(*pMap,"HYDRO_BVRATIO") > 0.) 
+  if ( parameter::getD(*pMap,"HYDRO_SVRATIO",0.0) > 0.)
+    if (parameter::getD(*pMap,"HYDRO_BVRATIO",0.0) > 0.) 
 	  fprintf(fOscarHyper,"shear and bulk viscosity\n");
 	else 
 	  fprintf(fOscarHyper,"shear viscosity only\n");
   else 
-    if (parameter::getD(*pMap,"HYDRO_BVRATIO") > 0.) 
+    if (parameter::getD(*pMap,"HYDRO_BVRATIO",0.0) > 0.) 
 	  fprintf(fOscarHyper,"bulk viscosity only\n");
 	else 
 	  fprintf(fOscarHyper,"none");
@@ -1825,7 +1825,7 @@ void openOscarFull() {
   // 1
   fOscarFull = fopen("fOscarFull.OSCAR2008H","w");
   fprintf(fOscarFull,"OSCAR2008H  ");
-  if ( parameter::getD(*pMap,"HYDRO_SVRATIO") > 0. || parameter::getD(*pMap,"HYDRO_BVRATIO") > 0.) 
+  if ( parameter::getD(*pMap,"HYDRO_SVRATIO",0.0) > 0. || parameter::getD(*pMap,"HYDRO_BVRATIO",0.0) > 0.) 
     fprintf(fOscarFull,"viscous     ");
   else 
     fprintf(fOscarFull,"ideal       ");
@@ -1833,14 +1833,14 @@ void openOscarFull() {
   
   // 2
   fprintf(fOscarFull,"INIT: ");
-  int mA = parameter::getD(*pMap,"GLAUBER_A"); int mB = parameter::getD(*pMap,"GLAUBER_B");
+  int mA = parameter::getD(*pMap,"GLAUBER_A",197.); int mB = parameter::getD(*pMap,"GLAUBER_B",197.);
   fprintf(fOscarFull," Glauber - rho = %g Gev/fm^3, xi = %g, sigma = %fb, A = %f, b = %f fm\n",
-			parameter::getD(*pMap,"GLAUBER_Rho0")*1.,parameter::getD(*pMap,"GLAUBER_Xi")*1.,
-			parameter::getD(*pMap,"GLAUBER_Sigma")*10.,parameter::getD(*pMap,"GLAUBER_A"),parameter::getD(*pMap,"GLAUBER_B"));
+			parameter::getD(*pMap,"GLAUBER_Rho0",0.16)*1.,parameter::getD(*pMap,"GLAUBER_Xi",0.3)*1.,
+			parameter::getD(*pMap,"GLAUBER_Sigma",0.4)*10.,parameter::getD(*pMap,"GLAUBER_A",197.),parameter::getD(*pMap,"GLAUBER_B",0.0));
   
   // 3
   fprintf(fOscarFull,"EOS: ");
-  if (parameter::getB(*pMap,"EQOFST_LATEOS"))
+  if (parameter::getB(*pMap,"EQOFST_LATEOS",true))
     fprintf(fOscarFull," Lat-HRG interpolated, 0 Mev Shift, p4 action\n");
   else 
     fprintf(fOscarFull," ideal gas of quarks and gluons\n");
@@ -1854,41 +1854,41 @@ void openOscarFull() {
 
   // 6
   fprintf(fOscarFull,"GEOM: ");
-  if (parameter::getB(*pMap,"HYDRO_BJORKEN")) 
-    if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN")) 
+  if (parameter::getB(*pMap,"HYDRO_BJORKEN",true)) 
+    if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false)) 
 	  fprintf(fOscarFull,"scaling2d\n");
 	else 
 	  fprintf(fOscarFull,"3d\n");
   else 
-    if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN")) 
+    if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false)) 
 	  fprintf(fOscarFull,"2d\n");
 	else fprintf(fOscarFull,"3d-cart");
  
   // 7
   fprintf(fOscarFull,"GRID:  Euler\n");
-  if (parameter::getB(*pMap,"HYDRO_OCTANT")) {
+  if (parameter::getB(*pMap,"HYDRO_OCTANT",true)) {
 	fprintf(fOscarFull,"%d %d %d %d 0 5 3\n",
-			parameter::getI(*pMap,"HYDRO_TSTEP"),parameter::getI(*pMap,"HYDRO_XSIZE")+1,
-			parameter::getI(*pMap,"HYDRO_YSIZE")+1,parameter::getI(*pMap,"HYDRO_NSIZE")+1);
-    fprintf(fOscarFull,"%f ",parameter::getD(*pMap,"HYDRO_T0"));
+			parameter::getI(*pMap,"HYDRO_TSTEP",100),parameter::getI(*pMap,"HYDRO_XSIZE",60)+1,
+			parameter::getI(*pMap,"HYDRO_YSIZE",60)+1,parameter::getI(*pMap,"HYDRO_NSIZE",20)+1);
+    fprintf(fOscarFull,"%f ",parameter::getD(*pMap,"HYDRO_T0",1.0));
     if (parameter::getB(*pMap,"HYDRO_LINT",false)) 
-	  fprintf(fOscarFull,"%f ",parameter::getI(*pMap,"HYDRO_TSTEP")*parameter::getD(*pMap,"HYDRO_DT")+parameter::getD(*pMap,"HYDRO_T0"));
+	  fprintf(fOscarFull,"%f ",parameter::getI(*pMap,"HYDRO_TSTEP",100)*parameter::getD(*pMap,"HYDRO_DT",0.1)+parameter::getD(*pMap,"HYDRO_T0",1.0));
     // else FIXME
   
-	fprintf(fOscarFull,"0. %f 0. %f 0. %f\n",parameter::getD(*pMap,"HYDRO_DX")*parameter::getI(*pMap,"HYDRO_XSIZE"),
-											 parameter::getD(*pMap,"HYDRO_DY")*parameter::getI(*pMap,"HYDRO_YSIZE"),
-											 parameter::getD(*pMap,"HYDRO_DN")*parameter::getI(*pMap,"HYDRO_NSIZE"));
+	fprintf(fOscarFull,"0. %f 0. %f 0. %f\n",parameter::getD(*pMap,"HYDRO_DX",0.1)*parameter::getI(*pMap,"HYDRO_XSIZE",60),
+											 parameter::getD(*pMap,"HYDRO_DY",0.1)*parameter::getI(*pMap,"HYDRO_YSIZE",60),
+											 parameter::getD(*pMap,"HYDRO_DN",0.1)*parameter::getI(*pMap,"HYDRO_NSIZE",20));
   }
   else {printf("!!!!!!!!!! OSCAR OUTPUT FAILING !!!!!!!!!!"); return;}
   
   // 8
   fprintf(fOscarFull,"VISCOSITY:  ");
-  if (parameter::getD(*pMap,"HYDRO_SVRATIO") > 0.)
-    if (parameter::getD(*pMap,"HYDRO_BVRATIO") > 0.) 
+  if (parameter::getD(*pMap,"HYDRO_SVRATIO",0.0) > 0.)
+    if (parameter::getD(*pMap,"HYDRO_BVRATIO",0.0) > 0.) 
 	  fprintf(fOscarFull,"shear and bulk viscosity\n");
 	else fprintf(fOscarFull,"shear viscosity only\n");
   else 
-    if (parameter::getD(*pMap,"HYDRO_BVRATIO") > 0.) 
+    if (parameter::getD(*pMap,"HYDRO_BVRATIO",0.0) > 0.) 
 	  fprintf(fOscarFull,"bulk viscosity only\n");
 	else fprintf(fOscarFull,"none");
   
@@ -1905,10 +1905,10 @@ void printOscarFull(CMesh* lMesh, int mT) {
   int mY = lMesh->getYSize();
   int mN = lMesh->getNSize();
   
-  double mSVRatio = parameter::getD(*pMap,"HYDRO_SVRATIO");
-  double mBVRatio = parameter::getD(*pMap,"HYDRO_BVRATIO");
+  double mSVRatio = parameter::getD(*pMap,"HYDRO_SVRATIO",0.0);
+  double mBVRatio = parameter::getD(*pMap,"HYDRO_BVRATIO",0.0);
   
-  if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN"))
+  if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false))
     for (int i=0;i<mX;i++)
       for (int j=0;j<mY;j++) {
 	    lMesh->update(0,i,j);
@@ -1966,14 +1966,14 @@ void printOscarFull(CMesh* lMesh, int mT) {
 
 void printOscarHyper(CMesh* lMesh, int mT, CEos *mEos) {
 // it ix [iy iz] e p T R_qgp vx [vy y_L] [n(1)...n(C)] [mu(1)...mu(C)] dsig_t dsig_x [dsig_y dsig_eta] [Diss(1)...Diss(D)]  [Tr(1)...Tr(T)]
-  if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN")) {
+  if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false)) {
   	double mFOS[XSIZE+YSIZE][2];
 	double mFOSigma[XSIZE+YSIZE][2];
 	double mFOVelo[XSIZE+YSIZE][2];
 	double mFODiss[XSIZE+YSIZE][5];
 	int fosSize;
 	lMesh->getFOS(mFOS,mFOSigma,mFOVelo,mFODiss,fosSize);
-	double temp = parameter::getD(*pMap,"HYDRO_FOTEMP");
+	double temp = parameter::getD(*pMap,"HYDRO_FOTEMP",0.13);
 	double ed = mEos->getEGivenT(temp);
 
 	fprintf(fOscarHyper,"time:  %g\n",lMesh->getTau());

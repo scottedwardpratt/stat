@@ -14,9 +14,9 @@
 CEos::CEos(parameterMap* pM) {
  lastAccess=0;
  pMap = pM;
- mLatEos  = parameter::getB(*pMap,"EQOFST_LATEOS");
- mSVRatio = parameter::getD(*pMap,"HYDRO_SVRATIO");
- mBVRatio = parameter::getD(*pMap,"HYDRO_BVRATIO");
+ mLatEos  = parameter::getB(*pMap,"EQOFST_LATEOS",true);
+ mSVRatio = parameter::getD(*pMap,"HYDRO_SVRATIO",0.0);
+ mBVRatio = parameter::getD(*pMap,"HYDRO_BVRATIO",0.0);
 
  if (mLatEos) {
   temp = new double[1200];
@@ -27,7 +27,7 @@ CEos::CEos(parameterMap* pM) {
   cs2  = new double[1200];
 
 //  std::ifstream mFile("hrg000p4_0MeV_eos.dat");
-  std::ifstream mFile(parameter::getS(*pMap,"EQOFST_LATDATA").c_str());
+  std::ifstream mFile(parameter::getS(*pMap,"EQOFST_LATDATA","").c_str());
   char test;
   mFile >> test;
   mFile.ignore(1000,'\n');

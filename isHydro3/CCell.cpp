@@ -29,27 +29,27 @@ CCell::~CCell() {
 void CCell::paramFill(parameterMap* pM) {
   pMap = pM;
   
-  mDebug  = parameter::getB(*pMap,"HYDRO_DEBUG");
-  mSVTrim = parameter::getB(*pMap,"HYDRO_SVTRIM");
-  mViscNS = parameter::getB(*pMap,"HYDRO_VISCNS");
-  mPureBjorken = parameter::getB(*pMap,"HYDRO_PURE_BJORKEN");
-  mBjorken = parameter::getB(*pMap,"HYDRO_BJORKEN");
-  mLinT = parameter::getB(*pMap,"HYDRO_LINT");
-  mLogT = parameter::getB(*pMap,"HYDRO_LOGT");
-  mLogSinhT = parameter::getB(*pMap,"HYDRO_LOGSINHT");
-  mISVort = parameter::getB(*pMap,"HYDRO_IS_VORT");
-  mISMax = parameter::getB(*pMap,"HYDRO_IS_MAX");
+  mDebug  = parameter::getB(*pMap,"HYDRO_DEBUG",false);
+  mSVTrim = parameter::getB(*pMap,"HYDRO_SVTRIM",false);
+  mViscNS = parameter::getB(*pMap,"HYDRO_VISCNS",false);
+  mPureBjorken = parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false);
+  mBjorken = parameter::getB(*pMap,"HYDRO_BJORKEN",true);
+  mLinT = parameter::getB(*pMap,"HYDRO_LINT",false);
+  mLogT = parameter::getB(*pMap,"HYDRO_LOGT",false);
+  mLogSinhT = parameter::getB(*pMap,"HYDRO_LOGSINHT",true);
+  mISVort = parameter::getB(*pMap,"HYDRO_IS_VORT",false);
+  mISMax = parameter::getB(*pMap,"HYDRO_IS_MAX",false);
 
-  mT0 = parameter::getD(*pMap,"HYDRO_T0");
-  mSVRatio = parameter::getD(*pMap,"HYDRO_SVRATIO");
-  mBVRatio = parameter::getD(*pMap,"HYDRO_BVRATIO");
-  mISAMax  = parameter::getD(*pMap,"HYDRO_IS_AMAX");
-  mISBMax  = parameter::getD(*pMap,"HYDRO_IS_BMAX");
+  mT0 = parameter::getD(*pMap,"HYDRO_T0",1.0);
+  mSVRatio = parameter::getD(*pMap,"HYDRO_SVRATIO",0.0);
+  mBVRatio = parameter::getD(*pMap,"HYDRO_BVRATIO",0.0);
+  mISAMax  = parameter::getD(*pMap,"HYDRO_IS_AMAX",0.0);
+  mISBMax  = parameter::getD(*pMap,"HYDRO_IS_BMAX",0.0);
   
 //  dx[0] = parameter::getD(*pMap,"DT");
-  dx[1] = parameter::getD(*pMap,"HYDRO_DX");
-  dx[2] = parameter::getD(*pMap,"HYDRO_DY");
-  dx[3] = parameter::getD(*pMap,"HYDRO_DN");
+  dx[1] = parameter::getD(*pMap,"HYDRO_DX",0.1);
+  dx[2] = parameter::getD(*pMap,"HYDRO_DY",0.1);
+  dx[3] = parameter::getD(*pMap,"HYDRO_DN",0.1);
 }
 
 void CCell::calcDeriv() {
