@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+# Could be fixed up in future
 export CORAL_HFILES = src/coral/CF2Source/minimization.h\
 src/coral/CF2Source/minuitstuff/sfit_minuit.h\
 src/coral/CF2Source/sfit.h\
