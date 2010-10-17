@@ -15,14 +15,6 @@ using namespace H5;
 
 using namespace std;
 
-/*
-class CPartH5{
-public:
-	int listid,ID;
-	double px,py,rapidity,mass,x,y,eta,tau;
-};
-*/
-
 class CAnalyze{
 public:
 	string qualifier;
