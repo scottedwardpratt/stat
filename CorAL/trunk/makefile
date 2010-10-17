@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+# Could be fixed up in future
 export CORAL_HFILES = src/coral/CF2Source/minimization.h\
 src/coral/CF2Source/minuitstuff/sfit_minuit.h\
 src/coral/CF2Source/sfit.h\
@@ -83,26 +84,32 @@ src/coralutils/SpecialFunctions/Ylm/ylm.cc
 
 CPP=${MADAI_CPP}
 OPT=${MADAI_CFLAGS}
-coral: headers lib/libcoralutils.a lib/libcoral.a lib/libxgraph.a
+
+coral: headers ${MADAI_LIB}/libcoralutils.a ${MADAI_LIB}/libcoral.a ${MADAI_LIB}/libxgraph.a
+	for filename in ${CORAL_HFILES};\
+	do cp $${filename} ${MADAI_INCLUDE}/ ; done;
 
 headers: ${CORAL_HFILES}
 	for filename in ${CORAL_HFILES};\
 	do cp $${filename} include/ ; done;
 
-lib/libcoralutils.a : ${CORAL_HFILES} ${CORAL_UTILS_CCFILES}
+${MADAI_LIB}/libcoralutils.a : ${CORAL_HFILES} ${CORAL_UTILS_CCFILES}
 	rm *.o build/coralutils/*.o;\
-	${CPP} -c -I ${MADAI_GSLPATH}include -I include -O ${OPT} ${CORAL_UTILS_CCFILES};\
+	${CPP} -c -I ${MADAI_GSLPATH}/include -I include -O ${OPT} ${CORAL_UTILS_CCFILES};\
 	mv *.o build/coralutils/;\
-	ar -ru lib/libcoralutils.a build/coralutils/*.o;
+	ar -ru lib/libcoralutils.a build/coralutils/*.o;\
+	mv -f lib/libcoralutils.a ${MADAI_LIB}/
 
-lib/libcoral.a : ${CORAL_HFILES} ${CORAL_CCFILES}
+${MADAI_LIB}/libcoral.a : ${CORAL_HFILES} ${CORAL_CCFILES}
 	rm *.o build/coral/*.o;\
-	${CPP} -c -I ${MADAI_GSLPATH}include -I include -O ${OPT}  ${CORAL_CCFILES};\
+	${CPP} -c -I ${MADAI_GSLPATH}/include -I include -O ${OPT}  ${CORAL_CCFILES};\
 	mv *.o build/coral/;\
-	ar -ru lib/libcoral.a build/coral/*.o;	
+	ar -ru lib/libcoral.a build/coral/*.o;\
+	mv -f lib/libcoral.a ${MADAI_LIB}/
 
-lib/libxgraph.a : src/xgraph/xgraph.cc
+${MADAI_LIB}/libxgraph.a : src/xgraph/xgraph.cc
 	rm *.o build/xgraph/*.o;\
-	${CPP} -c -I ${MADAI_GSLPATH}include -I include -I ${MADAI_X11PATH}include -O ${OPT} src/xgraph/xgraph.cc;\
+	${CPP} -c -I ${MADAI_GSLPATH}/include -I include -I ${MADAI_X11PATH}/include -O ${OPT} src/xgraph/xgraph.cc;\
 	mv *.o build/xgraph/;\
-	ar -ru lib/libxgraph.a build/xgraph/*.o;
+	ar -ru lib/libxgraph.a build/xgraph/*.o;\
+	mv -f lib/libxgraph.a ${MADAI_LIB}/
