@@ -14,44 +14,44 @@ CMesh::CMesh(parameterMap* pM){
  CCell* dummyCell = new CCell(pMap);
  delete dummyCell;
 
- mE0 = parameter::getD(*pMap,"HYDRO_E0");
+ mE0 = parameter::getD(*pMap,"HYDRO_E0",1.0);
 
- mOctant = parameter::getB(*pMap,"HYDRO_OCTANT");
- mPureBjorken = parameter::getB(*pMap,"HYDRO_PURE_BJORKEN");
- mBjorken = parameter::getB(*pMap,"HYDRO_BJORKEN");
- mPrintMs = parameter::getB(*pMap,"HYDRO_PRINTMS");
- mSVTrimInit = parameter::getB(*pMap,"HYDRO_SVTRIMINIT");
- mSVTrim = parameter::getB(*pMap,"HYDRO_SVTRIM");
- mFOTemp = parameter::getD(*pMap,"HYDRO_FOTEMP");
- mDeadT = parameter::getD(*pMap,"HYDRO_DEADT");
+ mOctant = parameter::getB(*pMap,"HYDRO_OCTANT",true);
+ mPureBjorken = parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false);
+ mBjorken = parameter::getB(*pMap,"HYDRO_BJORKEN",true);
+ mPrintMs = parameter::getB(*pMap,"HYDRO_PRINTMS",false);
+ mSVTrimInit = parameter::getB(*pMap,"HYDRO_SVTRIMINIT",false);
+ mSVTrim = parameter::getB(*pMap,"HYDRO_SVTRIM",false);
+ mFOTemp = parameter::getD(*pMap,"HYDRO_FOTEMP",0.13);
+ mDeadT = parameter::getD(*pMap,"HYDRO_DEADT",0.1);
 
- mNSize = parameter::getI(*pMap,"HYDRO_NSIZE");
- mXSize = parameter::getI(*pMap,"HYDRO_XSIZE");
- mYSize = parameter::getI(*pMap,"HYDRO_YSIZE");
+ mNSize = parameter::getI(*pMap,"HYDRO_NSIZE",20);
+ mXSize = parameter::getI(*pMap,"HYDRO_XSIZE",60);
+ mYSize = parameter::getI(*pMap,"HYDRO_YSIZE",60);
  mNSizeOrig = mNSize;
  mXSizeOrig = mXSize;
  mYSizeOrig = mYSize;
  
- mPrintN = parameter::getI(*pMap,"HYDRO_PRINTN");
- mPrintX = parameter::getI(*pMap,"HYDRO_PRINTX");
- mPrintY = parameter::getI(*pMap,"HYDRO_PRINTY");
+ mPrintN = parameter::getI(*pMap,"HYDRO_PRINTN",0);
+ mPrintX = parameter::getI(*pMap,"HYDRO_PRINTX",0);
+ mPrintY = parameter::getI(*pMap,"HYDRO_PRINTY",0);
 
- mT0 = parameter::getD(*pMap,"HYDRO_T0");
- mDn = parameter::getD(*pMap,"HYDRO_DN");
- mDx = parameter::getD(*pMap,"HYDRO_DX");
- mDy = parameter::getD(*pMap,"HYDRO_DY");
+ mT0 = parameter::getD(*pMap,"HYDRO_T0",1.0);
+ mDn = parameter::getD(*pMap,"HYDRO_DN",0.1);
+ mDx = parameter::getD(*pMap,"HYDRO_DX",0.1);
+ mDy = parameter::getD(*pMap,"HYDRO_DY",0.1);
 
- wnRho0 = parameter::getD(*pMap,"GLAUBER_Rho0");
- wnRAu  = parameter::getD(*pMap,"GLAUBER_RAu");
- wnXi   = parameter::getD(*pMap,"GLAUBER_Xi");
- wnSigma= parameter::getD(*pMap,"GLAUBER_Sigma");
- wnA    = parameter::getD(*pMap,"GLAUBER_A");
- wnB    = parameter::getD(*pMap,"GLAUBER_B");
- wnK    = parameter::getD(*pMap,"GLAUBER_K");
+ wnRho0 = parameter::getD(*pMap,"GLAUBER_Rho0",0.16);
+ wnRAu  = parameter::getD(*pMap,"GLAUBER_RAu",6.3);
+ wnXi   = parameter::getD(*pMap,"GLAUBER_Xi",0.3);
+ wnSigma= parameter::getD(*pMap,"GLAUBER_Sigma",0.4);
+ wnA    = parameter::getD(*pMap,"GLAUBER_A",197.);
+ wnB    = parameter::getD(*pMap,"GLAUBER_B",0.);
+ wnK    = parameter::getD(*pMap,"GLAUBER_K",4.3);
 
- mWnBinRatio = parameter::getD(*pMap,"GLAUBER_WNBIN_RATIO");
- mInitFlow = parameter::getD(*pMap,"HYDRO_INIT_FLOW");
- mInitNS = parameter::getD(*pMap,"HYDRO_INIT_NS");
+ mWnBinRatio = parameter::getD(*pMap,"GLAUBER_WNBIN_RATIO",1.0);
+ mInitFlow = parameter::getD(*pMap,"HYDRO_INIT_FLOW",0.0);
+ mInitNS = parameter::getD(*pMap,"HYDRO_INIT_NS",0.0);
 
  if (!mOctant) {
 	// make cells
