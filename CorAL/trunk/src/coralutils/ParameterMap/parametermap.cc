@@ -198,40 +198,6 @@ void parameter::set(parameterMap& m, string key, vector< vector< double > > val)
 // int nqmax 50
 // A # sign denotes a comment line
 void parameter::ReadParsFromFile(parameterMap& m,const char *filename){
-<<<<<<< HEAD
-	ifstream parsfile;
-	char line[150];
-	string type,key,value;
-	stringstream ss;
-	parsfile.open(filename);
-	if(! parsfile){
-		printf("attempting to read non-existent parameter file %s\n",filename);
-		exit(1);
-	}
-
-	while(parsfile.getline(line,150)){
-		if(line[0]!='#' && strlen(line)>4){
-			ss << line;
-			ss >> type >> key >> value;
-			//cout << "type=" << type << ", key=" 
-			//<< key << ", value=" << value << endl;
-			if(type=="int"){
-				set(m,key,atoi(value.c_str()));
-			}
-			if(type=="double"){
-				set(m,key,atof(value.c_str()));
-			}
-			if(type=="bool"){
-				set(m,key,bool(atoi(value.c_str())));
-			}
-			if(type=="string"){
-				set(m,key,value);
-			}
-			ss.clear();
-		}
-	}
-	parsfile.close();
-=======
   ifstream parsfile;
   char line[150];
   string type,key,value;
@@ -268,7 +234,6 @@ void parameter::ReadParsFromFile(parameterMap& m,const char *filename){
     }
   }
   parsfile.close();
->>>>>>> 46f911ce44427f0f5d6c3487a1669fb2796c2277
 }
 
 void parameter::ReadParsFromFile(parameterMap& m,string filename){
