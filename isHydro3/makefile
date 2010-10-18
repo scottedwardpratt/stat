@@ -1,4 +1,12 @@
 OPT=${MADAI_CFLAGS}
+<<<<<<< HEAD
+=======
+CH=${CORAL_HOME}
+CORALINCLUDE=${MADAI_INCLUDE}
+CORALLIB=${MADAI_LIB}
+GSLINC=${GSL_HOME}/include
+GSLLIB=${GSL_HOME}/lib
+>>>>>>> 46f911ce44427f0f5d6c3487a1669fb2796c2277
 
 #HPM = -L{GSLLIB} -I{GSLINC} -L{CORALLIB} -lcoralutils 
 # libraries needed for parameter map
