@@ -215,7 +215,11 @@ void parameter::ReadParsFromFile(parameterMap& m,const char *filename){
 	set(m,key,atof(value.c_str()));
       }
       if(type=="bool"){
-	set(m,key,bool(atoi(value.c_str())));
+//	set(m,key,bool(atoi(value.c_str())));
+	    if (value == "true")
+		  set(m,key,true);
+		else 
+		  set(m,key,false);
       }
       if(type=="string"){
 	set(m,key,value);

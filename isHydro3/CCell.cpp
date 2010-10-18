@@ -17,9 +17,12 @@ CCell::CCell(double t0,double n0, double x0, double y0) {
   if (mLinT) x[0] = t0;
   else if (mLogT) x[0] = log(t0/mT0);
   else if (mLogSinhT) x[0] = log( sinh(t0));
+//  else printf("whoa!!!\n");
   x[3] = n0;
   x[1] = x0;
   x[2] = y0;
+  
+//  printf("%f %f %f %f\n",x[0],x[1],x[2],x[3]);
 }
 
 CCell::~CCell() {

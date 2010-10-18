@@ -1,5 +1,5 @@
 bool HYDRO_DEBUG false
-string HYDRO_OUTPUT_DATAROOT /Users/cleverless/programs/GitRoot/isHydro3/data/
+string HYDRO_OUTPUT_DATAROOT /Users/cleverless/programs/GitRoot/hydroData/
 bool HYDRO_IO_SLICES true
 bool HYDRO_IO_SPOTS false
 bool HYDRO_IO_FULL true
@@ -15,7 +15,7 @@ int HYDRO_PRINTSTEP 100
 int HYDRO_IO_TECHQM_TSTEP 1
 int HYDRO_IO_OSCAR_TSTEP 5
 int HYDRO_IO_SLICE_TSTEP 1
-string EQOFST_LATDATA /Users/cleverless/programs/GitRoot/isHydro3/LatData/fromPasi/s95p-v1/s95p-v1_Teosdens.dat
+string EQOFST_LATDATA /Users/cleverless/programs/GitRoot/rhic/isHydro3/LatData/fromPasi/s95p-v1/s95p-v1_Teosdens.dat
 double EQOFST_NDOF 47.5
 string HYDRO_OLD_FILENAME fFull5.txt
 bool HYDRO_OLD_FILE false

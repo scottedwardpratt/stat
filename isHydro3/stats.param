@@ -1,9 +1,9 @@
-double HYDRO_FOTEMP 0.16  ! freeze-out temperature (GeV)
-double HYDRO_T0 0.6  ! thermalization time (fm/c)
-bool EQOFST_LATEOS true  ! use lattice equation of state; to be parameterized
-double GLAUBER_WNBIN_RATIO 1.0 ! ratio of wn to bin scaling (1.=wn; 0.=bin)
-double GLAUBER_B 0. ! impact parameter (fm)
-double GLAUBER_K 4.61788 ! sets energy scale
-double HYDRO_INIT_NS 0. ! % of NS viscosity in initial state
-double HYDRO_INIT_FLOW 0. ! % of initial flow in initial state
-double HYDRO_SVRATIO 0.08 ! eta/s ratio (h_bar c)
+double HYDRO_FOTEMP 0.16
+double HYDRO_T0 0.6  
+bool EQOFST_LATEOS true
+double GLAUBER_WNBIN_RATIO 1.0
+double GLAUBER_B 0. 
+double GLAUBER_K 4.61788
+double HYDRO_INIT_NS 0. 
+double HYDRO_INIT_FLOW 0.
+double HYDRO_SVRATIO 0.08
