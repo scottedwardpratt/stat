@@ -3,11 +3,14 @@ OPT=${MADAI_CFLAGS}
 CH=${CORAL_HOME}
 CORALINCLUDE=${MADAI_INCLUDE}
 CORALLIB=${MADAI_LIB}
-GSLINC=${GSL_HOME}include
-GSLLIB=${GSL_HOME}lib
+GSLINC=${GSL_HOME}/include
+GSLLIB=${GSL_HOME}/lib
 
 # libraries needed for parameter map
-HPM = -I${MADAI_INCLUDE} -I${MADAI_GSLPATH}include -L${MADAI_GSLPATH}lib -L${MADAI_LIB}
+HPM = -I${MADAI_INCLUDE} -I${MADAI_GSLPATH}/include -L${MADAI_GSLPATH}/lib -L${MADAI_LIB}
+
+isHydro3 : ${MADAI_LIB}libishydro3.a def.h main.cpp
+	${MADAI_CPP} main.cpp -o isHydro3 ${OPT} ${HPM} -lishydro3 -lcoralutils
 
 clean:
 	-rm -f *.o
@@ -28,9 +31,6 @@ ${MADAI_LIB}libishydro3.a : CHydro.o CMesh.o CCell.o CEos.o
 	ar -ru libishydro3.a *.o;\
 	rm *.o;\
 	mv -f libishydro3.a ${MADAI_LIB}
-
-isHydro3 : ${MADAI_LIB}libishydro3.a def.h main.cpp
-	${MADAI_CPP} main.cpp -o isHydro3 ${OPT} ${HPM} -lishydro3 -lcoralutils
 
 eos_test : CEos.o def.h eos_test.cpp
 	${MADAI_CPP} -o eos_test -I./ ${OPT} ${HPM} eos_test.cpp CEos.o

@@ -74,7 +74,6 @@ int CHydro::runHydro() {
 		fTQMR = fopen(temp.c_str(),"w");
 	}
   
-// midpoint method... 
 	if (mOldFile) {
 		onMesh   = new CMesh(mOldFileName.c_str());
 		offMesh  = new CMesh(onMesh);
@@ -85,6 +84,7 @@ int CHydro::runHydro() {
 		onMesh  = new CMesh(pMap); 
 		offMesh = new CMesh(onMesh);
 		tempMesh = new CMesh(onMesh);
+		if (mRK4) {k1 = new CMesh(onMesh); k2 = new CMesh(onMesh);}
 	}
 	
 	mEos = new CEos(pMap);
