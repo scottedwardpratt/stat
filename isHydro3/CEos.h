@@ -5,7 +5,7 @@
  *  CEosIdeal.h
  *  Created by Joshua Vredevoogd on 3/4/09.
  */
-#include "coral.h"
+#include <coral.h>
 
 class CEos{
   private:
