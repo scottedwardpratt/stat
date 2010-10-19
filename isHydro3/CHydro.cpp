@@ -1859,14 +1859,14 @@ void CHydro::printOscarFull(CMesh* lMesh, int mT) {
 
 void CHydro::printOscarHyper(CMesh* lMesh, int mT) {
 // it ix [iy iz] e p T R_qgp vx [vy y_L] [n(1)...n(C)] [mu(1)...mu(C)] dsig_t dsig_x [dsig_y dsig_eta] [Diss(1)...Diss(D)]  [Tr(1)...Tr(T)]
-  if (parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false)) {
+  if (mPureBjorken) {
   	double mFOS[XSIZE+YSIZE][2];
 	double mFOSigma[XSIZE+YSIZE][2];
 	double mFOVelo[XSIZE+YSIZE][2];
 	double mFODiss[XSIZE+YSIZE][5];
 	int fosSize;
 	lMesh->getFOS(mFOS,mFOSigma,mFOVelo,mFODiss,fosSize);
-	double temp = parameter::getD(*pMap,"HYDRO_FOTEMP",0.13);
+	double temp = mFoTemp;
 	double ed = mEos->getEGivenT(temp);
 
 	fprintf(fOscarHyper,"time:  %g\n",lMesh->getTau());
