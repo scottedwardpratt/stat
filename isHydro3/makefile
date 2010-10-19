@@ -6,6 +6,8 @@ CORALLIB=${MADAI_LIB}
 GSLINC=${GSL_HOME}/include
 GSLLIB=${GSL_HOME}/lib
 
+export HYDRO_HEADERS = CHydro.h CEos.h CCell.h CMesh.h
+
 # libraries needed for parameter map
 HPM = -I${MADAI_INCLUDE} -I${MADAI_GSLPATH}/include -L${MADAI_GSLPATH}/lib -L${MADAI_LIB}
 
@@ -27,10 +29,12 @@ CMesh.o : CMesh.cpp CMesh.h CCell.o CEos.o
 CHydro.o : CHydro.cpp CHydro.h CMesh.o CCell.o CEos.o
 	${MADAI_CPP} ${OPT} ${HPM} -c CHydro.cpp -o CHydro.o
 
-${MADAI_LIB}libishydro3.a : CHydro.o CMesh.o CCell.o CEos.o
+${MADAI_LIB}/libishydro3.a : CHydro.o CMesh.o CCell.o CEos.o
 	ar -ru libishydro3.a *.o;\
 	rm *.o;\
-	mv -f libishydro3.a ${MADAI_LIB}
+	for filename in ${HYDRO_HEADERS};\
+	do cp $${filename} ${MADAI_INCLUDE}/; done;\
+	mv -f libishydro3.a ${MADAI_LIB}/
 
 eos_test : CEos.o def.h eos_test.cpp
 	${MADAI_CPP} -o eos_test -I./ ${OPT} ${HPM} eos_test.cpp CEos.o
