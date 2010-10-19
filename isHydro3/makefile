@@ -11,7 +11,7 @@ export HYDRO_HEADERS = CHydro.h CEos.h CCell.h CMesh.h hydroDef.h
 # libraries needed for parameter map
 HPM = -I${MADAI_INCLUDE} -I${MADAI_GSLPATH}/include -L${MADAI_GSLPATH}/lib -L${MADAI_LIB}
 
-isHydro3 : ${MADAI_LIB}/libishydro3.a def.h main.cpp
+isHydro3 : ${MADAI_LIB}/libishydro3.a hydroDef.h main.cpp
 	${MADAI_CPP} main.cpp -o isHydro3 ${OPT} ${HPM} -lishydro3 -lcoralutils
 
 clean:
