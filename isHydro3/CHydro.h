@@ -10,7 +10,7 @@
 #include <string.h>
 #include <parametermap.h>
 
-#include "def.h"
+#include "hydroDef.h"
 #include "CMesh.h"
 #include "CEos.h"
 

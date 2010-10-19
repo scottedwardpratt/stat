@@ -4,7 +4,7 @@
  */
 
 #include "CEos.h"
-#include "def.h"
+#include "hydroDef.h"
 #include <cmath>
 #include <iostream>
 #include <fstream>

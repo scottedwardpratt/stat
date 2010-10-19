@@ -6,7 +6,7 @@
  */
 
 #include "CCell.h"
-#include "def.h"
+#include "hydroDef.h"
 #include "CEos.h"
 #include <cstdio>
 #include "coral.h"

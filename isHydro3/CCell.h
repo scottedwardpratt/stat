@@ -21,7 +21,7 @@
  
 #include <cstdlib>
 #include <cmath>
-#include "def.h"
+#include "hydroDef.h"
 #include <cstdio>
 #include "coral.h" 
 #include "CEos.h"
