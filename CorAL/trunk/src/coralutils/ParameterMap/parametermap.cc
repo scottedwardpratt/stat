@@ -24,7 +24,7 @@ bool parameter::getB(parameterMap m,string key,bool def)
 {
 	bool param;
 	string pstring;
-	map<string,string>::iterator itr; 
+	map<string,string>::iterator itr;
 	itr = m.find(key); 
 	if(itr!=m.end()){
 		pstring=itr->second;

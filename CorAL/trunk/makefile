@@ -88,12 +88,17 @@ OPT=${MADAI_CFLAGS}
 coral: headers ${MADAI_LIB}/libcoralutils.a ${MADAI_LIB}/libcoral.a ${MADAI_LIB}/libxgraph.a
 	for filename in ${CORAL_HFILES};\
 	do cp $${filename} ${MADAI_INCLUDE}/ ; done;
+	
+clean:
+	rm ${MADAI_LIB}/libxgraph.a ${MADAI_LIB}/libcoral.a ${MADAI_LIB}/libcoralutils.a
 
 headers: ${CORAL_HFILES}
 	for filename in ${CORAL_HFILES};\
 	do cp $${filename} include/ ; done;
 
 ${MADAI_LIB}/libcoralutils.a : ${CORAL_HFILES} ${CORAL_UTILS_CCFILES}
+	mkdir -p build/coralutils;\
+	mkdir -p lib;\
 	rm *.o build/coralutils/*.o;\
 	${CPP} -c -I ${MADAI_GSLPATH}/include -I include -O ${OPT} ${CORAL_UTILS_CCFILES};\
 	mv *.o build/coralutils/;\
@@ -101,6 +106,8 @@ ${MADAI_LIB}/libcoralutils.a : ${CORAL_HFILES} ${CORAL_UTILS_CCFILES}
 	mv -f lib/libcoralutils.a ${MADAI_LIB}/
 
 ${MADAI_LIB}/libcoral.a : ${CORAL_HFILES} ${CORAL_CCFILES}
+	mkdir -p build/coral;\
+	mkdir -p lib;\
 	rm *.o build/coral/*.o;\
 	${CPP} -c -I ${MADAI_GSLPATH}/include -I include -O ${OPT}  ${CORAL_CCFILES};\
 	mv *.o build/coral/;\
@@ -108,6 +115,8 @@ ${MADAI_LIB}/libcoral.a : ${CORAL_HFILES} ${CORAL_CCFILES}
 	mv -f lib/libcoral.a ${MADAI_LIB}/
 
 ${MADAI_LIB}/libxgraph.a : src/xgraph/xgraph.cc
+	mkdir -p build/xgraph;\
+	mkdir -p lib;
 	rm *.o build/xgraph/*.o;\
 	${CPP} -c -I ${MADAI_GSLPATH}/include -I include -I ${MADAI_X11PATH}/include -O ${OPT} src/xgraph/xgraph.cc;\
 	mv *.o build/xgraph/;\
