@@ -7,8 +7,10 @@ using namespace std;
 CB3D *CResList::b3d=NULL;
 
 CResList::CResList(){
-	parmap=&(b3d->parmap);
-	ReadResInfo();
+	if(b3d!=NULL){
+		parmap=&(b3d->parmap);
+		ReadResInfo();
+	}
 }
 
 CRandom *CResInfo::ranptr=new CRandom(-1234);
@@ -55,6 +57,7 @@ void CResInfo::DecayGetResInfoptr(int &nbodies,CResInfo **&daughterresinfoptr){
 	}
 
 }
+
 void CResInfo::DecayGetResInfoptr_minmass(int &nbodies,CResInfo **&daughterresinfoptr){
 	nbodies=bptr_minmass->nbodies;
 	for(int ibody=0;ibody<nbodies;ibody++){
@@ -225,6 +228,62 @@ void CResList::PrintYields(){
 	while(resinfoptr!=NULL){
 		cout << resinfoptr->name << ": " << resinfoptr->count << endl;
 		resinfoptr=resinfoptr->nextResInfoptr;
+	}
+}
+
+void CResList::CalcEoS(double T0,double Tf,double delT){
+	CResInfo *resinfoptr;
+	cout << "#_____________________\n#  T       s         P        epsilon\n";
+	double T,P,epsilon,s,m,degen;
+	double pi,epsiloni,densi,sigma2i,dedti,si;
+	for(T=T0;T<Tf+0.00000001;T+=delT){
+		P=epsilon=s=0.0;
+		resinfoptr=GfirstResInfoptr;
+		while(resinfoptr!=NULL){
+			if(resinfoptr->code!=22){
+				degen=2.0*resinfoptr->spin+1.0;
+				m=resinfoptr->mass;
+				freegascalc_onespecies(m,T,pi,epsiloni,densi,sigma2i,dedti);
+				P+=pi*degen;
+				epsilon+=epsiloni*degen;
+				s+=(pi+epsiloni)*degen/T;
+			}
+			resinfoptr=resinfoptr->nextResInfoptr;
+		}
+		printf("%6.2f %15.10e %15.10e %15.10e\n",T,s,P,epsilon);
+	}
+}
+
+void CResList::freegascalc_onespecies(double m,double t,double &p,double &e,double &dens,double &sigma2,double &dedt){
+	const double prefactor=1.0/(2.0*PI*PI*pow(HBARC,3));
+	double k0,k1,z,k0prime,k1prime,m2,m3,m4,t2,t3,I1,I2,Iomega;
+	m2=m*m;
+	m3=m2*m;
+	m4=m2*m2;
+	t2=t*t;
+	t3=t2*t;
+	z=m/t;
+	if(z>1000.0){
+		p=e=dens=dedt=0.0;
+		printf("z is huge=%g, m=%g, t=%g\n",z,m,t);
+	}
+	else{
+		if(z<0.0){
+			printf("___z=%g,m=%g,T=%g ___\n",z,m,t);
+			exit(1);
+		}
+		k0=Bessel::K0(z);
+		k1=Bessel::K1(z);
+		p=prefactor*(m2*t2*k0+2.0*m*t3*k1);
+		e=prefactor*(3.0*m2*t2*k0+(m3*t+6.0*m*t3)*k1);
+		dens=p/t;
+		k0prime=-k1;
+		k1prime=-k0-k1/z;
+		dedt=prefactor*(6.0*m2*t*k0+(m3+18.0*m*t2)*k1-3.0*m3*k0prime-((m4/t)+6.0*m2*t)*k1prime);
+		Iomega=exp(-m/t)/(30.0*PI*PI*HBARC*HBARC*HBARC);
+		I1=pow(m,1.5)*pow(t,3.5)*7.5*sqrt(2.0*PI);
+		I2=24.0*pow(t,5);
+		sigma2=Iomega*(I1+I2+0.5*sqrt(I1*I2));  // this is an approximation (+/-2%) to messy integral
 	}
 }
 
