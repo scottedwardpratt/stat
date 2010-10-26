@@ -6,6 +6,7 @@
 using namespace std;
 
 class CResInfo;
+
 class CB3D;
 
 class CBranchInfo{
@@ -48,6 +49,8 @@ public:
 	void GetResInfoptr(int code,CResInfo *&resinfoptr);
 	void ReadResInfo();
 	void PrintYields();
+	void CalcEoS(double T_0,double T_F,double delT);
+	void freegascalc_onespecies(double m,double t,double &p,double &e,double &dens,double &sigma2,double &dedt);
 	parameterMap *parmap;
 	CMerge ***MergeArray;
 	static CB3D *b3d;
