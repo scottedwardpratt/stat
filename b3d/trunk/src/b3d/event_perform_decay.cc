@@ -4,8 +4,8 @@
 
 void CAction::PerformDecay(){
 	CPart *mother;
-	CPart **daughter=new CPart *[3],*dptr;
-	CResInfo **daughterresinfo=new CResInfo *[3];
+	CPart **daughter=new CPart *[5],*dptr;
+	CResInfo **daughterresinfo=new CResInfo *[5];
 	CPartMap::iterator ppos,p1,plast,pend;
 	int ibody,nbodies;
 	long long int pkey,prevkey,nextkey;
@@ -25,6 +25,7 @@ void CAction::PerformDecay(){
 	if(mothermass<mother->resinfo->minmass){
 		printf("FATAL: decaying mother has mass below minimum\n");
 		mother->Print();
+		mother->resinfo->Print();
 		exit(1);
 	}
 	if(!mother->active){
@@ -59,7 +60,9 @@ void CAction::PerformDecay(){
 		mtot=0.0;
 		if(ntry<25) mother->resinfo->DecayGetResInfoptr(nbodies,daughterresinfo);
 		else mother->resinfo->DecayGetResInfoptr_minmass(nbodies,daughterresinfo);
-		for(ibody=0;ibody<nbodies;ibody++) mtot+=daughterresinfo[ibody]->mass;
+		for(ibody=0;ibody<nbodies;ibody++){
+			mtot+=daughterresinfo[ibody]->mass;
+		}
 		if(ntry>25){
 			printf("FATAL: action_perform_decay, ntry too big, mothermass=%g\n",mother->GetMass());
 			mother->Print();
@@ -67,7 +70,7 @@ void CAction::PerformDecay(){
 		}
 		ntry++;
 	}while(mtot>mothermass);
-
+	
 	ppos=b3d->DeadPartMap.begin();
 	for(ibody=0;ibody<nbodies;ibody++){
 		daughter[ibody]=ppos->second;
@@ -79,7 +82,7 @@ void CAction::PerformDecay(){
 	// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	b3d->Decay(mother,nbodies,daughter);
 	// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	if(nbodies>3){
+	if(nbodies>4){
 		printf("FATAL: Action.Perform(), In decay, nbodies=%d\n",nbodies);
 		exit(1);
 	}

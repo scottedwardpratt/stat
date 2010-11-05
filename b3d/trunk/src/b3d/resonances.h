@@ -13,7 +13,7 @@ class CBranchInfo{
 public:
 	CBranchInfo *nextbptr;
 	int nbodies;
-	CResInfo *resinfoptr[3];
+	CResInfo *resinfoptr[5];
 	double branching;
 	CBranchInfo();
 };
@@ -35,6 +35,7 @@ public:
 	bool decay;
 	CResInfo *nextResInfoptr;
 	CBranchInfo *firstbptr,*bptr_minmass;
+	void Print();
 	void DecayGetResInfoptr(int &nbodies,CResInfo **&daughterresinfoptr);
 	void DecayGetResInfoptr_minmass(int &nbodies,CResInfo **&daughterresinfoptr);
 	CResInfo();

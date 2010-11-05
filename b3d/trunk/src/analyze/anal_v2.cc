@@ -4,7 +4,7 @@
 void CAnalyze::CalcV2(){
 	const int NSPECIES=4;
 	int ievent=1,ipart,nparts,nevents,ispecies,ID;
-	double v21bar[NSPECIES]={0.0},v22bar[NSPECIES]={0.0},v23bar[NSPECIES]={0.0},v24bar[NSPECIES]={0.0};
+	double v21bar[NSPECIES]={0.0},v22bar[NSPECIES]={0.0},v23bar[NSPECIES]={0.0},v24bar[NSPECIES]={0.0},v2bar[NSPECIES]={0.0};
 	double v2norm[NSPECIES]={0.0},v2norm1[NSPECIES]={0,0},v2norm2[NSPECIES]={0,0},v2norm3[NSPECIES]={0,0},v2norm4[NSPECIES]={0,0};
 	double pt,v2;
 	CPartH5 *ph5;

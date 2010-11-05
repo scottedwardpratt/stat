@@ -70,6 +70,11 @@ CBranchInfo::CBranchInfo(){
 	nextbptr=NULL;
 }
 
+void CResInfo::Print(){
+	printf("++++++++++++++++++++++++++++++++++++++++++++++\n");
+	printf("code=%d, mass=%g, minmass=%g, width=%g, spin=%g, charge=%d, baryon=%d, strange=%d, decay=%d\n",code,mass,minmass,width,spin,charge,baryon,strange,decay);
+}
+
 void CResList::ReadResInfo(){
 	CMerge *merge;
 	int mothercode,code,decay,strange,charge,baryon;
@@ -160,6 +165,7 @@ void CResList::ReadResInfo(){
 			for(ibody=0;ibody<bptr->nbodies;ibody++){
 				decayinfofile >> code;
 				GetResInfoptr(code,bptr->resinfoptr[ibody]);
+				//printf("checking decay info for decay of %d, nbodies=%d\n",mothercode,bptr->nbodies);
 				netq+=bptr->resinfoptr[ibody]->charge;
 				netb+=bptr->resinfoptr[ibody]->baryon;
 				nets+=bptr->resinfoptr[ibody]->strange;
@@ -170,18 +176,11 @@ void CResList::ReadResInfo(){
 				resinfoptr->bptr_minmass=bptr;
 			}
 			if(netq!=0 || netb!=0 || abs(nets)>1){
-				cout << "Charge conservation failure while reading decay info,\nnetq=" << netq 
-					<< ", netb=" << netb <<", nets=" << nets <<endl;
-				cout << "mother=" << resinfoptr->name 
-					<< "(" << resinfoptr->code << "), "
-					<< "strangeness=" << resinfoptr->strange << ", ichannel="
-					<< ichannel << endl;
-				cout << "DAUGHTERS: ";
-				for(ibody=0;ibody<bptr->nbodies;ibody++){
-					cout << bptr->resinfoptr[ibody]->name << ", s=" 
-						<< bptr->resinfoptr[ibody]->strange << endl;
-				}
-				cout << endl;
+				printf("Charge conservation failure while reading decay info,\nnetq=%d, netb=%d, nets=%d\n",netq,netb,nets);
+				printf("MOTHER (ichannel=%d, nbodies=%d):\n",ichannel,bptr->nbodies);
+				resinfoptr->Print();
+				printf("DAUGHTERS:\n");
+				for(ibody=0;ibody<bptr->nbodies;ibody++) bptr->resinfoptr[ibody]->Print();
 				if(netq!=0 || netb!=0) exit(1);
 			}
 			decayinfofile >> bptr->branching;
@@ -243,6 +242,7 @@ void CResList::CalcEoS(double T0,double Tf,double delT){
 			if(resinfoptr->code!=22){
 				degen=2.0*resinfoptr->spin+1.0;
 				m=resinfoptr->mass;
+				//printf("ID=%d, degen=%g, m=%g, q=%d, s=%d, b=%d\n",resinfoptr->code,degen,m,resinfoptr->charge,resinfoptr->strange,resinfoptr->baryon);
 				freegascalc_onespecies(m,T,pi,epsiloni,densi,sigma2i,dedti);
 				P+=pi*degen;
 				epsilon+=epsiloni*degen;

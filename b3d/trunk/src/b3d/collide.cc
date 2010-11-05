@@ -177,7 +177,7 @@ void CB3D::Merge(CPart *part1,CPart *part2,CResInfo *resinfo){
 	for(alpha=0;alpha<4;alpha++) ptot[alpha]=part1->p[alpha]+part2->p[alpha];
 	minv=sqrt(ptot[0]*ptot[0]-ptot[1]*ptot[1]-ptot[2]*ptot[2]-ptot[3]*ptot[3]);
 	if(minv<resinfo->minmass){
-		printf("CB3D::Merge cancel merge for resonance with ID=%d and nominal mass of %g. No sense with masses, minv=%g, minmass=%g\n",resinfo->code,resinfo->mass,minv,resinfo->minmass);
+		//printf("CB3D::Merge cancel merge for resonance with ID=%d and nominal mass of %g. No sense with masses, minv=%g, minmass=%g\n",resinfo->code,resinfo->mass,minv,resinfo->minmass);
 		part1->actionmother=part2->actionmother=nactions;
 	}
 	else{

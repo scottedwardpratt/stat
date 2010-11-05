@@ -33,6 +33,7 @@ public:
 	void CalcSpectra();
 	void CalcV2();
 	void CalcHBT();
+	void GetHBTpars(CPartH5 *pH5,double &tau,double &rout,double &rside,double &rlong);
 	void CalcGamma();
 	void CalcGamma_BothSigns();
 	void CalcBalance();

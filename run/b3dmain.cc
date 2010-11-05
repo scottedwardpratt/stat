@@ -15,11 +15,10 @@ int main(int argc, char *argv[]){
 	CB3D *b3d=new CB3D("parameters",qualifier);
 	//b3d->randy->reset(-time(NULL));
 	b3d->randy->reset(-123);
-	b3d->bjmaker.Init();
+	b3d->hydrotob3d->Init();
 	for(ievent=0;ievent<neventsmax;ievent++){
-		//b3d->KillAllParts();
 		//printf("eventlist size=%d, deadparts=%d, liveparts=%d\n",int(b3d->DeadEventMap.size()),int(b3d->DeadPartMap.size()),int(b3d->PartMap.size()));
-		nparts=b3d->bjmaker.MakeEvent();
+		nparts=b3d->hydrotob3d->MakeEvent();
 		b3d->PerformAllActions();
 		dnchdy=b3d->WriteDataH5();
 		N=double(b3d->nactivate);
