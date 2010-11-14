@@ -3,10 +3,25 @@
 
 #include "analyze.h"
 
-CAnalyze::CAnalyze(string qualifier_set,string analpars_filename){
+CAnalyze::CAnalyze(string parameter_root_dir,string qualifier_set){
+	qualifier=qualifier_set;
+	string parsfilename,dirname;
+	int ll=parameter_root_dir.size();
+	char lchar=(parameter_root_dir.c_str())[ll-1];
+	if(lchar=='/'){
+		dirname=parameter_root_dir+qualifier;
+	}
+	else dirname=parameter_root_dir+"/"+qualifier;
+	parsfilename=dirname+"/fixed.param";
+	printf("reading %s\n",parsfilename.c_str());
+	parameter::ReadParsFromFile(parmap,parsfilename);
+	parsfilename=dirname+"/stats.param";
+	printf("reading %s\n",parsfilename.c_str());
+	parameter::ReadParsFromFile(parmap,parsfilename);
 	ptype=new CompType(sizeof(CPartH5));
 	qualifier=qualifier_set;
-	parameter::ReadParsFromFile(parmap,analpars_filename);
+	parameter::ReadParsFromFile(parmap,parsfilename);
+	
 	neventsmax=parameter::getI(parmap,"B3D_NEVENTS",40000);
 	npartsmax=parameter::getI(parmap,"B3D_NPARTSMAX",3000);
 	nsample=parameter::getI(parmap,"B3D_NSAMPLE",1);
@@ -14,6 +29,7 @@ CAnalyze::CAnalyze(string qualifier_set,string analpars_filename){
 	input_dataroot=parameter::getS(parmap,"B3D_INPUT_DATAROOT","data/b3d");
 	output_dataroot=parameter::getS(parmap,"B3D_OUTPUT_DATAROOT","data/b3d");
 	h5_infilename=parameter::getS(parmap,"B3D_H5_INFILENAME","b3d.h5");	
+	vizfilename=parameter::getS(parmap,"B3D_VIZ_INFILENAME","b3dviz.h5");	
 	partH5=new CPartH5[npartsmax];
 	STAR_ACCEPTANCE=parameter::getB(parmap,"B3D_STAR_ACCEPTANCE","false");
 	CALCGARRAYS=false;
@@ -51,6 +67,65 @@ int CAnalyze::ReadDataH5(int ievent){
 	dataset->read(partH5,*ptype);
 	delete dataset;
 	//printf("READ IN %d PARTS\n",nparts);
+	return nparts;
+}
+
+int CAnalyze::ReadVizData(double tau){
+	int nparts,ipart,rank;
+	string infilename=input_dataroot+"/"+qualifier+"/"+vizfilename;
+	printf("will read %s for viz data\n",infilename.c_str());
+	vizfile = new H5File(infilename,H5F_ACC_RDONLY);
+
+	char setname[40];
+	H5D_space_status_t status;
+	sprintf(setname,"px_tau%g",tau);
+	hsize_t pdim[1];
+	DataSet *dataset = new DataSet (vizfile->openDataSet(setname));
+	//dataset->getSpaceStatus(status);
+	//hsize_t datasetsize=dataset->getStorageSize();
+	//printf("ievent=%d, status=%d, size=%d\n",ievent,int(status),int(datasetsize));
+	DataSpace filespace = dataset->getSpace();
+	rank=filespace.getSimpleExtentDims(pdim);
+	nparts=pdim[0];
+	printf("For px: nparts=%d\n",nparts);
+	double *px=new double[nparts];
+	if(nparts>npartsmax){
+		printf("Increase NPARTSMAX, nparts=%d\n",nparts);
+		exit(1);
+	}
+	dataset->read(px,PredType::NATIVE_DOUBLE);
+	delete dataset;
+	
+	
+	printf("------------------\n");
+	sprintf(setname,"xyz_tau%g",tau);
+	DataSet *xyzdataset = new DataSet (vizfile->openDataSet(setname));
+	//dataset->getSpaceStatus(status);
+	//hsize_t datasetsize=dataset->getStorageSize();
+	//printf("ievent=%d, status=%d, size=%d\n",ievent,int(status),int(datasetsize));
+	hsize_t xyzdim[]={nparts,3};
+	DataSpace xyzfilespace = xyzdataset->getSpace();
+	rank=xyzfilespace.getSimpleExtentDims(xyzdim);
+	printf("xyz rank=%d\n",rank);
+	nparts=xyzdim[0];
+	printf("For Reading set %s, nparts=%d, dimension=%d\n",setname,nparts,int(xyzdim[1]));
+	double (*xyz)[3]=new double[nparts][3];
+	if(nparts>npartsmax){
+		printf("Increase NPARTSMAX, nparts=%d\n",nparts);
+		exit(1);
+	}
+	xyzdataset->read(xyz,PredType::NATIVE_DOUBLE);
+	delete xyzdataset;
+	
+	
+	printf("READ IN %d PARTS\n",nparts);
+	for(ipart=0;ipart<nparts;ipart++){
+		printf("ipart=%d: px=%g, xyz=(%g,%g,%g)\n",ipart,px[ipart],xyz[ipart][0],xyz[ipart][1],xyz[ipart][2]);
+	}
+	
+	delete vizfile;
+	delete [] px;
+	delete [] xyz;
 	return nparts;
 }
 

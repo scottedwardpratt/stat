@@ -15,10 +15,11 @@ src/b3d/event_perform_activate.cc\
 src/b3d/event_perform_collide.cc\
 src/b3d/event_perform_decay.cc\
 src/b3d/event_perform_exitcell.cc\
+src/b3d/event_perform_vizwrite.cc\
 src/b3d/findcollision.cc\
 src/b3d/hydrotob3d.cc\
 src/b3d/part.cc\
-src/b3d/resonances.cc\
+src/b3d/resonances.cc
 
 export ANALYZE_HFILES = src/b3d/b3d.h\
 src/analyze/analyze.h

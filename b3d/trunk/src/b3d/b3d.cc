@@ -25,10 +25,12 @@ CB3D::CB3D(string parameter_root_dir,string qualifier_set){
 	NACTIONSMAX=parameter::getI(parmap,"B3D_NACTIONSMAX",5000);
 	NPARTSMAX=parameter::getI(parmap,"B3D_NPARTSMAX",2000);
 	TAUCOLLMAX=parameter::getD(parmap,"B3D_TAUCOLLMAX",50.0);
+	VIZWRITE=parameter::getB(parmap,"B3D_VIZWRITE",false);
 	input_dataroot=parameter::getS(parmap,"B3D_INPUT_DATAROOT","data/b3d");
 	output_dataroot=parameter::getS(parmap,"B3D_OUTPUT_DATAROOT","data/b3d");
 	h5_infilename=parameter::getS(parmap,"B3D_H5_INFILENAME","hydro.h5");
 	h5_outfilename=parameter::getS(parmap,"B3D_H5_OUTFILENAME","b3d.h5");
+	h5_vizfilename=parameter::getS(parmap,"B3D_H5_VIZFILENAME","b3dviz.h5");
 	//NxExVxExNxTxS=parameter::getI(parmap,"B3D_NACTIONS",1);
 	NSAMPLE=parameter::getI(parmap,"B3D_NSAMPLE",1);
 	ERROR_PRINT=parameter::getB(parmap,"B3D_ERROR_PRINT",true);
@@ -41,7 +43,7 @@ CB3D::CB3D(string parameter_root_dir,string qualifier_set){
 	COLLISIONS=parameter::getB(parmap,"B3D_COLLISIONS",true);
 	BJORKEN=parameter::getB(parmap,"B3D_BJORKEN",false);
 	SIGMADEFAULT=parameter::getD(parmap,"B3D_SIGMADEFAULT",1.5);
-	
+
 	SIGMAMAX=SIGMAMAX/double(NSAMPLE);
 	NPARTSMAX*=NSAMPLE;
 	NACTIONSMAX*=NSAMPLE;
@@ -153,9 +155,11 @@ CB3D::CB3D(string parameter_root_dir,string qualifier_set){
 	reslist=new CResList();
 
 	string outfilename=output_dataroot+"/"+qualifier+"/"+h5_outfilename;
+	string vizfilename=output_dataroot+"/"+qualifier+"/"+h5_vizfilename;
 	printf("will write to %s\n",outfilename.c_str());
 	h5outfile = new H5File(outfilename,H5F_ACC_TRUNC);
-	
+	if(VIZWRITE) h5vizfile = new H5File(vizfilename,H5F_ACC_TRUNC);
+
 	h5infile=NULL;
 
 	ptype=new CompType(sizeof(CPartH5));
@@ -229,12 +233,12 @@ int CB3D::WriteDataH5(){
 			}
 		}
 	}
-	
+
 	ievent_write+=1;
 	int nparts=int(FinalPartMap.size());
 	CPartH5 *partH5=new CPartH5[nparts];
 	hsize_t dim[] = {nparts};   /* Dataspace dimensions */
-  DataSpace space(1,dim );
+	DataSpace space(1,dim );
 
 	ppos=FinalPartMap.begin();
 	ipart=0;
@@ -263,17 +267,17 @@ int CB3D::WriteDataH5(){
 	}
 
 /*
-	CompType ptype( sizeof(CPartH5) );
-  ptype.insertMember("listid", HOFFSET(CPartH5,listid), PredType::NATIVE_INT);
-  ptype.insertMember("ID", HOFFSET(CPartH5,ID), PredType::NATIVE_INT);
-  ptype.insertMember("px", HOFFSET(CPartH5,px), PredType::NATIVE_DOUBLE);
-  ptype.insertMember("py", HOFFSET(CPartH5,py), PredType::NATIVE_DOUBLE);
-  ptype.insertMember("rapidity", HOFFSET(CPartH5,rapidity), PredType::NATIVE_DOUBLE);
-  ptype.insertMember("mass", HOFFSET(CPartH5,mass), PredType::NATIVE_DOUBLE);
-  ptype.insertMember("x", HOFFSET(CPartH5,x), PredType::NATIVE_DOUBLE);
-  ptype.insertMember("y", HOFFSET(CPartH5,y), PredType::NATIVE_DOUBLE);
-  ptype.insertMember("eta", HOFFSET(CPartH5,eta), PredType::NATIVE_DOUBLE);
-  ptype.insertMember("tau", HOFFSET(CPartH5,tau), PredType::NATIVE_DOUBLE);
+//CompType ptype( sizeof(CPartH5) );
+//ptype.insertMember("listid", HOFFSET(CPartH5,listid), PredType::NATIVE_INT);
+//ptype.insertMember("ID", HOFFSET(CPartH5,ID), PredType::NATIVE_INT);
+//ptype.insertMember("px", HOFFSET(CPartH5,px), PredType::NATIVE_DOUBLE);
+//ptype.insertMember("py", HOFFSET(CPartH5,py), PredType::NATIVE_DOUBLE);
+//ptype.insertMember("rapidity", HOFFSET(CPartH5,rapidity), PredType::NATIVE_DOUBLE);
+//ptype.insertMember("mass", HOFFSET(CPartH5,mass), PredType::NATIVE_DOUBLE);
+//ptype.insertMember("x", HOFFSET(CPartH5,x), PredType::NATIVE_DOUBLE);
+//ptype.insertMember("y", HOFFSET(CPartH5,y), PredType::NATIVE_DOUBLE);
+//ptype.insertMember("eta", HOFFSET(CPartH5,eta), PredType::NATIVE_DOUBLE);
+//ptype.insertMember("tau", HOFFSET(CPartH5,tau), PredType::NATIVE_DOUBLE);
 */
 
 	DataSet* dataset;
@@ -282,10 +286,10 @@ int CB3D::WriteDataH5(){
 	printf("ievent_write=%d, writing data set %s\n",ievent_write,event_number);
 	dataset = new DataSet(h5outfile->createDataSet(event_number,*ptype, space));
 	dataset->write(partH5,*ptype);
-	
+
 	delete dataset;
 	delete [] partH5;
-	
+
 	return dnchdy/(2.0*ETAMAX);
 }
 
@@ -295,7 +299,7 @@ void CB3D::PerformAllActions(){
 	nscatter=ndecay=npass=nmerge=nswallow=npass=nexit=nactivate=ncheck=0;
 	tau=0.0;
 	nactions=0;
-	
+
 	while(epos!=ActionMap.end()){
 		action=epos->second;
 		action->Perform();
@@ -316,34 +320,34 @@ void CB3D::KillAllActions(){
 
 void CB3D::KillAllParts(){
 	CPartMap *partmap=&PartMap;
-        CPart *part;
+	CPart *part;
 	CPartMap::iterator ppos=partmap->begin();
-        while(ppos!=partmap->end()){
-                part=ppos->second;
-                part->Kill();
-                ppos=partmap->begin();
+	while(ppos!=partmap->end()){
+		part=ppos->second;
+		part->Kill();
+		ppos=partmap->begin();
 	}
-        partmap=&FinalPartMap;
-        ppos=partmap->begin();
-        while(ppos!=partmap->end()){
-                part=ppos->second;
-                part->Kill();
-                ppos=partmap->begin();
-        }
-        int ix,iy,ieta;
-        for(ix=0;ix<2*NXY;ix++){
-                for(iy=0;iy<2*NXY;iy++){
-                        for(ieta=0;ieta<2*NETA;ieta++){
-                                partmap=&(cell[ix][iy][ieta]->partmap);
-                                ppos=partmap->begin();
-                                while(ppos!=partmap->end()){
-                                        part=ppos->second;
-	                                part->Kill();
+	partmap=&FinalPartMap;
+	ppos=partmap->begin();
+	while(ppos!=partmap->end()){
+		part=ppos->second;
+		part->Kill();
+		ppos=partmap->begin();
+	}
+	int ix,iy,ieta;
+	for(ix=0;ix<2*NXY;ix++){
+		for(iy=0;iy<2*NXY;iy++){
+			for(ieta=0;ieta<2*NETA;ieta++){
+				partmap=&(cell[ix][iy][ieta]->partmap);
+				ppos=partmap->begin();
+				while(ppos!=partmap->end()){
+					part=ppos->second;
+					part->Kill();
 					ppos=partmap->begin();
-                                }
-	                }
+				}
+			}
 		}
-        }
+	}
 }
 
 void CB3D::AddAction_Activate(CPart *part){
@@ -370,6 +374,25 @@ void CB3D::AddAction_Activate(CPart *part){
 		exit(1);
 	}
 	part->actionmap.insert(CActionPair(action->key,action));
+}
+
+void CB3D::AddAction_VizWrite(double tauwrite){
+	CAction *action;
+	if(DeadActionMap.size()==0){
+		printf("MUST INCREASE NACTIONS_MAX\n");
+		exit(1);
+	}
+	CActionMap::iterator epos=DeadActionMap.begin();
+	action=epos->second;
+	action->DeleteFromCurrentMap();
+	action->type=3;
+	action->tau=tauwrite;
+	action->AddToMap(&ActionMap);
+	action->CleanPartMap();
+	if(action->tau<tau){
+		printf("trying to AddAction_VizWrite at earler time!!! action->tau=%g, tau=%g\n",action->tau,tau);
+		exit(1);
+	}
 }
 
 void CB3D::AddAction_Decay(CPart *part){
@@ -429,7 +452,7 @@ void CB3D::AddAction_ExitCell(CPart *part){
 		action->type=6;
 		action->tau=part->tauexit;
 		action->SetKey();
-		
+
 	//printf("added action at tau=%g, key=%lld\n",action->tau,action->key);
 		action->partmap.insert(CPartPair(part->key,part));
 		action->AddToMap(&ActionMap);
@@ -644,6 +667,7 @@ void CB3D::freegascalc_onespecies(double m,double t,double &p,double &e,double &
 
 CB3D::~CB3D(){
 	delete h5outfile;
+	if(VIZWRITE) delete h5vizfile;
 }
 
 #endif

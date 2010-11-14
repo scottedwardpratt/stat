@@ -20,9 +20,8 @@ void CAction::Perform(){
 	//printf("performing action: type=%d\n",type);
 	if(type==0) PerformActivate();
 	else if(type==1) PerformDecay();
-	else if(type==2){
-		PerformCollide();
-	}
+	else if(type==2) PerformCollide();
+	else if(type==3) PerformVizWrite();
 	//else if(type==3) PerformResetCollisions();
 	//else if(type==4) PerformSwallowParticles();
 	else if(type==6) PerformExitCell();

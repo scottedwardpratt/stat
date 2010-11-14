@@ -38,7 +38,7 @@ public:
 	double XYMAX,ETAMAX,DXY,DETA;
 	CHYDROtoB3D *hydrotob3d;
 	CBjMaker bjmaker;
-	bool BJORKEN,COLLISIONS;
+	bool BJORKEN,COLLISIONS,VIZWRITE;
 	CCell ****cell;
 	
 	CB3D(string parameter_root_dir,string qualifier_set);
@@ -56,8 +56,8 @@ public:
 	string qualifier;
 	CompType *ptype;
 	
-	H5File *h5outfile, *h5infile;
-	string h5_infilename,h5_outfilename;
+	H5File *h5outfile, *h5infile, *h5vizfile;
+	string h5_infilename,h5_outfilename,h5_vizfilename;
 	int NACTIONS;
 	int NSAMPLE;
 	//
@@ -75,6 +75,7 @@ public:
 	void AddAction_ResetCollisions(double taureset);
 	//void AddAction_SwallowParticles(double tau_breakup);
 	void AddAction_ExitCell(CPart *part);
+	void AddAction_VizWrite(double tauwrite);
 	
 	void ListFutureCollisions();
 	void PrintPartList();
@@ -177,6 +178,7 @@ public:
 	void PerformDecay();
 	void PerformCollide();
 	void PerformResetCollisions();
+	void PerformVizWrite();
 	//void PerformSwallowParticles();
 	CAction(CB3D *b3dset);
 	~CAction();

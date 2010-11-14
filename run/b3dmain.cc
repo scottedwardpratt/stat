@@ -19,6 +19,9 @@ int main(int argc, char *argv[]){
 	for(ievent=0;ievent<neventsmax;ievent++){
 		//printf("eventlist size=%d, deadparts=%d, liveparts=%d\n",int(b3d->DeadEventMap.size()),int(b3d->DeadPartMap.size()),int(b3d->PartMap.size()));
 		nparts=b3d->hydrotob3d->MakeEvent();
+		if(b3d->VIZWRITE){
+			for(double tau=1.0;tau<20.1;tau+=0.5) b3d->AddAction_VizWrite(tau);
+		}
 		b3d->PerformAllActions();
 		dnchdy=b3d->WriteDataH5();
 		N=double(b3d->nactivate);
