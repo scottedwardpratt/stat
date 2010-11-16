@@ -56,7 +56,7 @@ public:
 	string qualifier;
 	CompType *ptype;
 	
-	H5File *h5outfile, *h5infile, *h5vizfile;
+	H5File *h5outfile, *h5infile;// *h5vizfile;
 	string h5_infilename,h5_outfilename,h5_vizfilename;
 	int NACTIONS;
 	int NSAMPLE;
@@ -66,6 +66,7 @@ public:
 	void FindAllCollisions();
 	void FindAllCellExits();
 	void PerformAllActions();
+	void Reset();
 	void KillAllActions();
 	void KillAllParts();
 	
@@ -97,6 +98,10 @@ public:
 	
 	long long int nscatter,ndecay,nmerge,nswallow,npass,nexit,nactivate,ncheck;
 	long long int nactions;
+	
+	// These are used for VizWrite
+	hid_t viz_file_id;
+	//
 	
 	void freegascalc_onespecies(double m,double t,double &p,double &e,double &dens,double &sigma2,double &dedt);
 	

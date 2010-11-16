@@ -158,7 +158,38 @@ CB3D::CB3D(string parameter_root_dir,string qualifier_set){
 	string vizfilename=output_dataroot+"/"+qualifier+"/"+h5_vizfilename;
 	printf("will write to %s\n",outfilename.c_str());
 	h5outfile = new H5File(outfilename,H5F_ACC_TRUNC);
-	if(VIZWRITE) h5vizfile = new H5File(vizfilename,H5F_ACC_TRUNC);
+	if(VIZWRITE){
+			//Retrieve current default error printing info.
+			//herr_t (*err_stack_traverse_func)(void*);
+		H5E_auto2_t err_stack_traverse_func;
+		void *err_stack_client_data;
+		H5Eget_auto2(H5E_DEFAULT, &err_stack_traverse_func, &err_stack_client_data);
+			//Turn off automatic error printing
+		if(H5Eset_auto2(H5E_DEFAULT, NULL, NULL)<0){
+			printf("(-) Cannot turn off automatic HDF5 error printing.\n");
+		}
+
+			//----Create a new HDF5 file----
+		hid_t pList_H5Faccess_id = H5P_DEFAULT;
+		hid_t pList_H5Dwrite_id = H5P_DEFAULT;
+		herr_t   status;
+		printf("vizfilename=%s\n",vizfilename.c_str());
+		viz_file_id = H5Fcreate(vizfilename.c_str(), H5F_ACC_DEBUG | H5F_ACC_TRUNC, H5P_DEFAULT, pList_H5Faccess_id);
+		if(viz_file_id<0){
+			printf("(X) Error in H5Fcreate(%s). Aborting...\n", h5_vizfilename.c_str());
+			exit(-1);
+		}
+			//----Create a new HDF5 file----
+
+		//H5Fflush(viz_file_id, H5F_SCOPE_LOCAL);//redundant with H5Fclose()
+		//H5Fclose(viz_file_id);
+			//----Write to HDF5 format----
+
+			//Restore the default automatic error trav
+		//if(H5Eset_auto2(H5E_DEFAULT, err_stack_traverse_func, err_stack_client_data)<0){
+		//	printf("(-) Cannot restore automatic HDF5 error printing. Abort...\n");
+		//}
+	}
 
 	h5infile=NULL;
 
@@ -665,9 +696,20 @@ void CB3D::freegascalc_onespecies(double m,double t,double &p,double &e,double &
 	}
 }
 
+void CB3D::Reset(){
+	tau=0.0;
+	KillAllActions();
+	nactions=0;
+	KillAllParts();
+}
+
 CB3D::~CB3D(){
 	delete h5outfile;
-	if(VIZWRITE) delete h5vizfile;
+	if(VIZWRITE){
+		H5Fflush(viz_file_id, H5F_SCOPE_LOCAL);//redundant with H5Fclose()
+		H5Fclose(viz_file_id);
+		//delete h5vizfile;
+	}
 }
 
 #endif

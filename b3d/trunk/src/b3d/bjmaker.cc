@@ -45,10 +45,7 @@ void CBjMaker::Init(){
 
 int CBjMaker::MakeEvent(){
 	int nparts;
-	b3d->tau=0.0;
-	b3d->KillAllActions();
-	b3d->nactions=0;
-	b3d->KillAllParts();
+	b3d->Reset();
 	nwrite=0;
 	if(gaussian){
 		nparts=b3d->NPARTSMAX;

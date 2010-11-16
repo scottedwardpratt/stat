@@ -54,10 +54,7 @@ void CHYDROtoB3D::Init(){
 }
 
 int CHYDROtoB3D::MakeEvent(){
-	b3d->tau=0.0;
-	b3d->KillAllActions();
-	b3d->nactions=0;
-	b3d->KillAllParts();
+	b3d->Reset();
 	int nparts=0,iring;
 	MC_NWrite=0;
 	MC_Nbar=0.0;
