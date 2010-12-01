@@ -41,7 +41,7 @@ void CHYDROtoB3D::Init(){
 
 void CHYDROtoB3D::ReadInput(){
 	if(!initialization) Init();
-	inputfilename="output/"+b3d->run_name+"/"+b3d->qualifier+"/freezeout.dat";
+	string inputfilename="output/"+b3d->run_name+"/"+b3d->qualifier+"/freezeout.dat";
 	printf("freezeout info from %s\n",inputfilename.c_str());
 	input=fopen(inputfilename.c_str(),"r");
 	ReadHeader(input);
