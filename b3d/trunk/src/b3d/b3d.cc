@@ -7,15 +7,14 @@ using namespace H5;
 #endif
 using namespace std;
 
-CB3D::CB3D(string parameter_root_dir,string qualifier_set){
-	qualifier=qualifier_set;
+CB3D::CB3D(string run_name_set){
+	run_name=run_name_set;
 	string parsfilename,dirname;
 	int ll=parameter_root_dir.size();
 	char lchar=(parameter_root_dir.c_str())[ll-1];
 	if(lchar=='/'){
-		dirname=parameter_root_dir+qualifier;
+		dirname="parameters/"+run_name;
 	}
-	else dirname=parameter_root_dir+"/"+qualifier;
 	parsfilename=dirname+"/fixed.param";
 	printf("reading %s\n",parsfilename.c_str());
 	parameter::ReadParsFromFile(parmap,parsfilename);
@@ -28,9 +27,6 @@ CB3D::CB3D(string parameter_root_dir,string qualifier_set){
 	VIZWRITE=parameter::getB(parmap,"B3D_VIZWRITE",false);
 	input_dataroot=parameter::getS(parmap,"B3D_INPUT_DATAROOT","data/b3d");
 	output_dataroot=parameter::getS(parmap,"B3D_OUTPUT_DATAROOT","data/b3d");
-	h5_infilename=parameter::getS(parmap,"B3D_H5_INFILENAME","hydro.h5");
-	h5_outfilename=parameter::getS(parmap,"B3D_H5_OUTFILENAME","b3d.h5");
-	h5_vizfilename=parameter::getS(parmap,"B3D_H5_VIZFILENAME","b3dviz.h5");
 	//NxExVxExNxTxS=parameter::getI(parmap,"B3D_NACTIONS",1);
 	NSAMPLE=parameter::getI(parmap,"B3D_NSAMPLE",1);
 	ERROR_PRINT=parameter::getB(parmap,"B3D_ERROR_PRINT",true);
@@ -48,7 +44,7 @@ CB3D::CB3D(string parameter_root_dir,string qualifier_set){
 	NPARTSMAX*=NSAMPLE;
 	NACTIONSMAX*=NSAMPLE;
 
-	string command="mkdir -p "+output_dataroot+"/"+qualifier;
+	string command="mkdir -p output/"+run_name;
 	system(command.c_str());
 	double xmin,xmax,ymin,ymax,etamin,etamax;
 	DXY=XYMAX/double(NXY);
@@ -59,6 +55,7 @@ CB3D::CB3D(string parameter_root_dir,string qualifier_set){
 	CPart::b3d=this;
 	hydrotob3d=new CHYDROtoB3D();
 	hydrotob3d->b3d=this;
+	hydrotob3d->initialization=false;
 	bjmaker.b3d=this;
 	CResList::b3d=this;
 	tau=0.0;
@@ -154,8 +151,35 @@ CB3D::CB3D(string parameter_root_dir,string qualifier_set){
 //
 	reslist=new CResList();
 
-	string outfilename=output_dataroot+"/"+qualifier+"/"+h5_outfilename;
-	string vizfilename=output_dataroot+"/"+qualifier+"/"+h5_vizfilename;
+	h5infile=NULL;
+	h5outfile=NULL;
+	viz_file_id=-1;
+
+	ptype=new CompType(sizeof(CPartH5));
+	ptype->insertMember("listid", HOFFSET(CPartH5,listid), PredType::NATIVE_INT);
+	ptype->insertMember("ID", HOFFSET(CPartH5,ID), PredType::NATIVE_INT);
+	ptype->insertMember("x", HOFFSET(CPartH5,x), PredType::NATIVE_DOUBLE);
+	ptype->insertMember("y", HOFFSET(CPartH5,y), PredType::NATIVE_DOUBLE);
+	ptype->insertMember("eta", HOFFSET(CPartH5,eta), PredType::NATIVE_DOUBLE);
+	ptype->insertMember("tau", HOFFSET(CPartH5,tau), PredType::NATIVE_DOUBLE);
+	ptype->insertMember("px", HOFFSET(CPartH5,px), PredType::NATIVE_DOUBLE);
+	ptype->insertMember("py", HOFFSET(CPartH5,py), PredType::NATIVE_DOUBLE);
+	ptype->insertMember("rapidity", HOFFSET(CPartH5,rapidity), PredType::NATIVE_DOUBLE);
+	ptype->insertMember("mass", HOFFSET(CPartH5,mass), PredType::NATIVE_DOUBLE);
+}
+
+void CB3D::SetQualifier(string qualifier_set){
+	qualifier=qualifier_set;
+	if(h5outfile!=NULL) delete h5outfile;
+	if(h5infile!=NULL) delete h5infile;
+	if(VIZWRITE && viz_file_id>0){
+		H5Fflush(viz_file_id, H5F_SCOPE_LOCAL);//redundant with H5Fclose()
+		H5Fclose(viz_file_id);
+				//delete h5vizfile;
+	}
+
+	string outfilename="output/"+run_name+"/"+qualifier+"/b3d.h5";
+	string vizfilename="output/"+run_name+"/"+qualifier+"/b3dviz.h5";
 	printf("will write to %s\n",outfilename.c_str());
 	h5outfile = new H5File(outfilename,H5F_ACC_TRUNC);
 	if(VIZWRITE){
@@ -192,26 +216,15 @@ CB3D::CB3D(string parameter_root_dir,string qualifier_set){
 	}
 
 	h5infile=NULL;
-
-	ptype=new CompType(sizeof(CPartH5));
-	ptype->insertMember("listid", HOFFSET(CPartH5,listid), PredType::NATIVE_INT);
-	ptype->insertMember("ID", HOFFSET(CPartH5,ID), PredType::NATIVE_INT);
-	ptype->insertMember("x", HOFFSET(CPartH5,x), PredType::NATIVE_DOUBLE);
-	ptype->insertMember("y", HOFFSET(CPartH5,y), PredType::NATIVE_DOUBLE);
-	ptype->insertMember("eta", HOFFSET(CPartH5,eta), PredType::NATIVE_DOUBLE);
-	ptype->insertMember("tau", HOFFSET(CPartH5,tau), PredType::NATIVE_DOUBLE);
-	ptype->insertMember("px", HOFFSET(CPartH5,px), PredType::NATIVE_DOUBLE);
-	ptype->insertMember("py", HOFFSET(CPartH5,py), PredType::NATIVE_DOUBLE);
-	ptype->insertMember("rapidity", HOFFSET(CPartH5,rapidity), PredType::NATIVE_DOUBLE);
-	ptype->insertMember("mass", HOFFSET(CPartH5,mass), PredType::NATIVE_DOUBLE);
 }
+
 
 int CB3D::ReadDataH5(int ievent){
 	KillAllActions();
 	nactions=0;
 	KillAllParts();
 	if(h5infile==NULL){
-		string infilename=input_dataroot+"/"+qualifier+"/"+h5_infilename;
+		string infilename="output/"+run_name+"/"+qualifier+"/hydro.h5";
 		h5infile = new H5File(infilename,H5F_ACC_RDONLY);
 	}
 
@@ -242,6 +255,7 @@ int CB3D::ReadDataH5(int ievent){
 	//printf("READ IN %d PARTS\n",nparts);
 	return nparts;
 }
+
 
 int CB3D::WriteDataH5(){
 	double v,pperp,eperp,dnchdeta=0.0,t,tauwrite,eta;

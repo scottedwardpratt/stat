@@ -41,7 +41,7 @@ public:
 	bool BJORKEN,COLLISIONS,VIZWRITE;
 	CCell ****cell;
 	
-	CB3D(string parameter_root_dir,string qualifier_set);
+	CB3D(string string run_name_set);
 	~CB3D();
 	double tau,TAUCOLLMAX;
 	int itau;
@@ -53,14 +53,14 @@ public:
 	double SIGMAMAX,SIGMADEFAULT; // cross sections in sq. fm
 	string input_dataroot;
 	string output_dataroot;
-	string qualifier;
+	string run_name,qualifier;
 	CompType *ptype;
 	
 	H5File *h5outfile, *h5infile;// *h5vizfile;
-	string h5_infilename,h5_outfilename,h5_vizfilename;
 	int NACTIONS;
 	int NSAMPLE;
 	//
+	void SetQualifier(string qualifier_set);
 	int ReadDataH5(int ievent);
 	int WriteDataH5();
 	void FindAllCollisions();
@@ -231,6 +231,7 @@ public:
 	// where pi_ij is the shear tensor in matter frame and lambda_ij tells how the momenta are scaled 
 	// during collision time  p_i = ptilde_i + lambda_ij ptilde_j, where ptilde is generated isotropically
 	double T,ETAMAX;
+	bool initialization;
 	// will generate particles with -eta_max < eta < eta_max
 	CResList *reslist;
 	double epsilon,P,lambdafact;
@@ -238,6 +239,7 @@ public:
 	int GenerateParticles(int iring1,int iring2);
 	void freegascalc_onespecies(double m,double t,double &p,double &e,double &dens,double &sigma2,double &dedt);
 	void Init();
+	void ReadInput();
 	CB3D *b3d;
 	double GetLambdaFact();
 protected:

@@ -9,8 +9,6 @@ void CHYDROtoB3D::Init(){
 	int ires,iring;
 	string inputfilename;
 	double pi,ei,sigma2i,dedti,degen;
-	inputfilename=b3d->input_dataroot+"/"+b3d->qualifier+"/freezeout.dat";
-	printf("freezeout info from %s\n",inputfilename.c_str());
 	T=parameter::getD(b3d->parmap,"HYDRO_TF",160.0);
 	ETAMAX=b3d->ETAMAX;
 	randy=b3d->randy;
@@ -38,6 +36,13 @@ void CHYDROtoB3D::Init(){
 		resinfo=resinfo->nextResInfoptr;
 	}
 	GetLambdaFact();
+	initialization=true;
+}
+
+void CHYDROtoB3D::ReadInput(){
+	if(!initialization) Init();
+	inputfilename="output/"+b3d->run_name+"/"+b3d->qualifier+"/freezeout.dat";
+	printf("freezeout info from %s\n",inputfilename.c_str());
 	input=fopen(inputfilename.c_str(),"r");
 	ReadHeader(input);
 	nrings=0;
