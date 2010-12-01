@@ -1630,12 +1630,13 @@ void CHydro::printTQM(CMesh* lMesh) {
 }
 
 void CHydro::openOscarHyper() {
-
   // 1
 //  fOscarHyper = fopen("fOscarHyper.OSCAR2008H","w");
-  string fn = parameter::getS(*pMap,"HYDRO_IO_OSCARHYPER_FN","");
-  fOscarHyper = fopen( fn.c_str(),"w");
-  fprintf(fOscarHyper,"OSCAR2008H  ");
+	string fn = parameter::getS(*pMap,"HYDRO_IO_OSCARHYPER_FN","");
+	fn = mDataRoot + fn;
+	fOscarHyper = fopen( fn.c_str(),"w");
+	fprintf(fOscarHyper,"OSCAR2008H  ");
+	
   if ( parameter::getD(*pMap,"HYDRO_SVRATIO",0.0) > 0. || parameter::getD(*pMap,"HYDRO_BVRATIO",0.0) > 0.) 
     fprintf(fOscarHyper,"viscous     ");
   else 

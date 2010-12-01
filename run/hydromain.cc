@@ -1,20 +1,54 @@
 #include "CHydro.h"
 
 int main (int argc, char * const argv[]) {
-	string qualifier;
+	string run_name;
 	if(argc!=2){
-		printf("USAGE: hydromain qualifier\n");
+		printf("USAGE: hydromain run_name\n");
 		exit(1);
 	}
-	qualifier=argv[1];
+	run_name=string(argv[1]);
+	string command = "mkdir -p output";
+	system(command.c_str());
+	command = "mkdir -p output/" + run_name;
+	system(command.c_str());
+	
+	const int bListSize = 5;
+	double bList[bListSize] = {0.35, 2.2, 3.7, 5.2, 7.0};
+	
 	parameterMap* pMap = new parameterMap();
-	string parsfilename="parameters/"+qualifier+"/fixed.param";
+	
+	string parsfilename="parameters/"+run_name+"/fixed.param";
 	parameter::ReadParsFromFile(*pMap,parsfilename);
-	parsfilename="parameters/"+qualifier+"/stats.param";
+	parsfilename="parameters/"+run_name+"/stats.param";
 	parameter::ReadParsFromFile(*pMap,parsfilename);
-//	parameter::PrintPars(*pMap);
-	CHydro* mHydro = new CHydro(pMap);
-	int status = mHydro->runHydro();
-	return status;
+	
+	CHydro* mHydro;
+	int status;
+	
+	for (int i=0;i<bListSize;i++) {
+		
+		char bName[7];
+		sprintf(bName,"/b%2.2g/",bList[i]);
+
+		string dataRoot = string("output/") + run_name + string(bName);
+		command = "mkdir -p " + dataRoot;
+		system(command.c_str());		
+		
+		parameter::set(*pMap,"HYDRO_OUTPUT_DATAROOT",dataRoot);
+		parameter::set(*pMap,"GLAUBER_B",bList[i]);
+		
+		mHydro = new CHydro(pMap);
+		status = mHydro->runHydro();
+		
+		if (status != 0) {
+			printf("\n\n*******crash generating %s.....\n\n*******aborting with %d unfinished runs!!!!!!\n\n",
+				   dataRoot.c_str(),bListSize-i);
+			return 1;
+		}
+			
+		delete mHydro;
+	}
+	
+	return 0;
 }
 

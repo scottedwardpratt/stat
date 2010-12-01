@@ -29,7 +29,7 @@ CMesh.o : CMesh.cpp CMesh.h CCell.o CEos.o
 CHydro.o : CHydro.cpp CHydro.h CMesh.o CCell.o CEos.o
 	${MADAI_CPP} ${OPT} ${HPM} -c CHydro.cpp -o CHydro.o
 
-${MADAI_LIB}/libishydro3.a : CHydro.o CMesh.o CCell.o CEos.o
+${MADAI_LIB}/libishydro3.a : CHydro.o CMesh.o CCell.o CEos.o hydroDef.h
 	ar -ru libishydro3.a *.o;\
 	rm *.o;\
 	for filename in ${HYDRO_HEADERS};\

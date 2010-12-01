@@ -12,45 +12,111 @@
 
 //constructor - read from EOS interpolation
 CEos::CEos(parameterMap* pM) {
- lastAccess=0;
+ lastAccess=10;
  pMap = pM;
  mLatEos  = parameter::getB(*pMap,"EQOFST_LATEOS",true);
  mSVRatio = parameter::getD(*pMap,"HYDRO_SVRATIO",0.0);
  mBVRatio = parameter::getD(*pMap,"HYDRO_BVRATIO",0.0);
 
  if (mLatEos) {
-  temp = new double[1200];
-  tA   = new double[1200];
-  ed   = new double[1200]; 
-  pr   = new double[1200]; 
-  sd   = new double[1200]; 
-  cs2  = new double[1200];
+ 
+  const int size=2400;
+  
+  temp = new double[size];
+  tA   = new double[size];
+  ed   = new double[size]; 
+  pr   = new double[size]; 
+  sd   = new double[size]; 
+  cs2  = new double[size];
 
-//  std::ifstream mFile("hrg000p4_0MeV_eos.dat");
-  std::ifstream mFile(parameter::getS(*pMap,"EQOFST_LATDATA","").c_str());
+  std::ifstream latFile(parameter::getS(*pMap,"EQOFST_LATDATA","").c_str());
+  std::ifstream hrgFile(parameter::getS(*pMap,"EQOFST_HRGDATA","").c_str());
+  
+  double lowT  = parameter::getD(*pMap,"EQOFST_LOW_CROSS_T",0.15);
+  double highT = parameter::getD(*pMap,"EQOFST_HIGH_CROSS_T",0.2);
+  
+  double lT[size], lE[size], lP[size], lS[size];
+  double hT[size], hE[size], hP[size], hS[size];
+  int lSize=0;
+  int hSize=0;
+  
   char test;
-  mFile >> test;
-  mFile.ignore(1000,'\n');
+  latFile >> test;
+  latFile.ignore(1000,'\n');
   
   if (test == 'e') { // EOS from Pasi
     double junk;
     int i;
-    for(i=0; !mFile.eof() && i<1200; i++) {
-	  mFile >> ed[i] >> pr[i] >> sd[i] >> junk;
-      temp[i] = (ed[i] + pr[i])/sd[i];
-	  tA[i] = (ed[i] - 3*pr[i])/pow(temp[i],4);
+    for(i=0; !latFile.eof() && i<size; i++) {
+	  latFile >> lE[i] >> lP[i] >> lS[i] >> junk;
+      lT[i] = (lE[i] + lP[i])/lS[i];
 	}
-	aSize = i-1;
-	for (int j=1;j+1<aSize;j++)
-	  cs2[j] = (pr[j+1] - pr[j-1])/(ed[j+1] - ed[j-1]);
+	lSize = i-1;
+	
+	lowT  += (lT[1] - lT[0])/10.;
+	highT += (lT[1] - lT[0])/10.;
+	
+  	for (int j=0;j<8;j++) 
+		hrgFile.ignore(1000,'\n');
+		
+	for(i=0; !hrgFile.eof() && i<size; i++) {
+		hrgFile >> hT[i] >> hS[i] >> hP[i] >> hE[i];
+		hT[i] /= 1000.; hP[i] /= 1000.; hE[i] /= 1000.;
+		if (hT[i] < 0.02) i--;
+	}
+	hSize = i-1;	
+
+	int hlowTIndex=0, llowTIndex=0, highTIndex=0;
+	while (hT[hlowTIndex] < lowT ) hlowTIndex++;
+	while (lT[llowTIndex] < lowT ) llowTIndex++; 
+	while (lT[highTIndex] < highT) highTIndex++;
+//	highTIndex--;
+	
+	aSize=0;
+	for (int j=0; j<=hlowTIndex; j++) {
+		sd[j] = hS[j];
+		temp[j] = hT[j];
+		aSize++;
+	}
+
+	for (int j=1;;j++) {
+		temp[aSize] = lT[llowTIndex+j];
+		if (temp[aSize] >= highT) break;
+		double w = (tanh( tan((PI/2.)*( 2.*(highT-temp[aSize])/(highT-lowT) - 1.)))+1.)/2. ;
+		sd[aSize] = w*hS[hlowTIndex+j] + (1.-w)*lS[llowTIndex+j];
+		aSize++;
+	}
+	aSize--;
+	
+	for (int j=highTIndex;j<lSize;j++) {
+		sd[aSize] = lS[j];
+		temp[aSize] = lT[j];
+		aSize++;
+	}
+	aSize--;
+
+	for (int j=0;j<=aSize;j++) 
+		if (j<= hlowTIndex)
+			pr[j] = hP[j];
+		else 
+			pr[j] = pr[j-1] + 0.5*(temp[j]-temp[j-1])*(sd[j]+sd[j-1]);
+	
+	for (int j=0;j<=aSize;j++) 
+		ed[j] = temp[j]*sd[j] - pr[j];
+		
+	for (int j=1;j<aSize;j++)
+		cs2[j] = (sd[j]/temp[j])*(temp[j+1]-temp[j-1])/(sd[j+1]-sd[j-1]);
 	cs2[0] = 2*cs2[1] - cs2[2];
-	cs2[aSize-1] = 2*cs2[aSize-2] - cs2[aSize-3];
+	cs2[aSize] = 2*cs2[aSize-1] - cs2[aSize-2];
+	
+//	for (int j=0;j<=aSize;j++)
+//		printf("%0.6g %0.6g %0.6g %0.6g %0.6g\n",temp[j],ed[j],sd[j],pr[j],cs2[j]);
   } 
   else { // EOS from Ron
     double junk;
     int i;
-    for(i=0; !mFile.eof() && i<1200; i++) {
-      mFile >> temp[i] >>  tA[i] >> ed[i] >> pr[i] >> sd[i] >> junk >> cs2[i];
+    for(i=0; !latFile.eof() && i<1200; i++) {
+      latFile >> temp[i] >>  tA[i] >> ed[i] >> pr[i] >> sd[i] >> junk >> cs2[i];
 	  tA[i]   *= pow(temp[i],4.)/pow(JHBARC,3.);
 	  ed[i]   *= pow(temp[i],4.)/pow(JHBARC,3.);
 	  pr[i]   *= pow(temp[i],4.)/pow(JHBARC,3.);
@@ -73,8 +139,8 @@ double CEos::getCs2(double e){
   else {
     if (e < ed[0]) {
       lastAccess = 0;
-      return cs2[0];
-//	  return pr[0]/ed[0];
+//      return cs2[0];
+	  return pr[0]/ed[0];
     }
 
     if (e > ed[lastAccess]) {
@@ -154,12 +220,12 @@ double CEos::getT(double e) {
     }
 
     if (e > ed[lastAccess]) {
-      for (;lastAccess<aSize;lastAccess++) if (ed[lastAccess] > e) break;
+	  for (;lastAccess<aSize;lastAccess++) 	if (ed[lastAccess] > e) break;
       return ((ed[lastAccess]-e)*temp[lastAccess-1] 
 			+ (e-ed[lastAccess-1])*temp[lastAccess])/(ed[lastAccess] - ed[lastAccess-1]);
 	}
 	else {
-	  for (;lastAccess>0;lastAccess--)     if (ed[lastAccess] < e) break;
+	  for (;lastAccess>0;lastAccess--) 	if (ed[lastAccess] < e) break;
       return ((ed[lastAccess+1]-e)*temp[lastAccess] 
 			+ (e-ed[lastAccess])*temp[lastAccess+1])/(ed[lastAccess+1] - ed[lastAccess]);
 	}

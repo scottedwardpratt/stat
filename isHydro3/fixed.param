@@ -15,6 +15,9 @@ int HYDRO_PRINTSTEP 100
 int HYDRO_IO_TECHQM_TSTEP 1
 int HYDRO_IO_OSCAR_TSTEP 5
 int HYDRO_IO_SLICE_TSTEP 1
+string EQOFST_HRGDATA /Users/cleverless/programs/LatticeEOS/eosTest/josh.dat
+double EQOFST_LOW_CROSS_T 0.165
+double EQOFST_HIGH_CROSS_T 0.2
 string EQOFST_LATDATA /Users/cleverless/programs/GitRoot/rhic/isHydro3/LatData/fromPasi/s95p-v1/s95p-v1_Teosdens.dat
 double EQOFST_NDOF 47.5
 string HYDRO_OLD_FILENAME fFull5.txt
