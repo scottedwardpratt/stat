@@ -1,0 +1,3 @@
+double HYDRO_T0 240 300
+double HYDRO_SVRATIO 0.05 0.4
+double HYDRO_BVRATIO 0.0 0.2
