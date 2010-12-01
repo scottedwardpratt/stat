@@ -218,7 +218,6 @@ void CB3D::SetQualifier(string qualifier_set){
 	h5infile=NULL;
 }
 
-
 int CB3D::ReadDataH5(int ievent){
 	KillAllActions();
 	nactions=0;
@@ -255,7 +254,6 @@ int CB3D::ReadDataH5(int ievent){
 	//printf("READ IN %d PARTS\n",nparts);
 	return nparts;
 }
-
 
 int CB3D::WriteDataH5(){
 	double v,pperp,eperp,dnchdeta=0.0,t,tauwrite,eta;

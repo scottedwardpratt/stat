@@ -36,6 +36,7 @@ int main (int argc, char * const argv[]) {
 		
 		parameter::set(*pMap,"HYDRO_OUTPUT_DATAROOT",dataRoot);
 		parameter::set(*pMap,"GLAUBER_B",bList[i]);
+		parameter::PrintPars(*pMap);
 		
 		mHydro = new CHydro(pMap);
 		status = mHydro->runHydro();

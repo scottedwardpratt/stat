@@ -7,16 +7,18 @@ int main(int argc, char *argv[]){
 		exit(-1);
 	}
 	char qchar[120],rchar[120];
+	const int bListSize = 5;
+	double bList[bListSize] = {0.35, 2.2, 3.7, 5.2, 7.0};
 	double dnchdy,N,nparts;
 	bool filealive;
-	int ievent=0;
+	int ievent=0,ib;
 	string run_name=argv[1];
 	string qualifier=argv;
 	CB3D *b3d=new CB3D(run_name);
 	b3d->randy->reset(-time(NULL));
 
-	for(double b=0.5;b<6;b+=0.5){
-		qualifier="b"+string(b);
+	for(ib=0;ib<bListSize;ib++){
+		qualifier="b"+string(bList[ib]);
 		b3d->SetQualifier(qualifier);
 		b3d->hydrotob3d->ReadInput();
 		for(ievent=0;ievent<b3d->B3D_NEVENTSMAX;ievent++){

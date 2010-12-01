@@ -58,7 +58,6 @@ int CBjMaker::MakeEvent(){
 	return nparts;
 }
 
-
 // \lambda_{ij}=\delta T_{ij}/(\epsilon+P) \frac{1}{\lambda_{\rm fact}}
 
 int CBjMaker::GenerateParticles(){
