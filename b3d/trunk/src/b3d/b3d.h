@@ -41,7 +41,7 @@ public:
 	bool BJORKEN,COLLISIONS,VIZWRITE;
 	CCell ****cell;
 
-	CB3D(string string run_name_set);
+	CB3D(string run_name_set);
 	~CB3D();
 	double tau,TAUCOLLMAX;
 	int itau;

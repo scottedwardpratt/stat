@@ -10,11 +10,7 @@ using namespace std;
 CB3D::CB3D(string run_name_set){
 	run_name=run_name_set;
 	string parsfilename,dirname;
-	int ll=parameter_root_dir.size();
-	char lchar=(parameter_root_dir.c_str())[ll-1];
-	if(lchar=='/'){
-		dirname="parameters/"+run_name;
-	}
+	dirname="parameters/"+run_name;
 	parsfilename=dirname+"/fixed.param";
 	printf("reading %s\n",parsfilename.c_str());
 	parameter::ReadParsFromFile(parmap,parsfilename);
@@ -200,7 +196,7 @@ void CB3D::SetQualifier(string qualifier_set){
 		printf("vizfilename=%s\n",vizfilename.c_str());
 		viz_file_id = H5Fcreate(vizfilename.c_str(), H5F_ACC_DEBUG | H5F_ACC_TRUNC, H5P_DEFAULT, pList_H5Faccess_id);
 		if(viz_file_id<0){
-			printf("(X) Error in H5Fcreate(%s). Aborting...\n", h5_vizfilename.c_str());
+			printf("(X) Error in H5Fcreate(%s). Aborting...\n", vizfilename.c_str());
 			exit(-1);
 		}
 			//----Create a new HDF5 file----
