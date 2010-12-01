@@ -30,23 +30,27 @@ int main(int argc, char *argv[]){
 	}
 	fclose(input);
 	printf("npars=%d\n",npars);
-	sprintf(dummy1,"./latin3.sh %d %d\n",npars,nruns);
+	for(ipar=0;ipar<npars;ipar++)
+		printf("%s %s: min=%g, max=%g\n",type[ipar],name[ipar],MINPAR[ipar],MAXPAR[ipar]);
+	sprintf(dummy1,"${MADAI_BIN}/latin3.sh %d %d\n",npars,nruns);
 	system(dummy1);	
 	latin3=fopen("latin3.dat","r");
 
-	for(irun=0;irun<nruns;irun++){
+	for(irun=1;irun<=nruns;irun++){
 		for(ipar=0;ipar<npars;ipar++){
 			fscanf(latin3,"%lf",&x[ipar]);
 		}
-		sprintf(dirname,"parameters/pars%d",irun);
-		printf("making directory %s\n",dirname);
+		sprintf(dirname,"parameters/run%d",irun);
+		//printf("making directory %s\n",dirname);
 		command="mkdir -p "+string(dirname);
+		system(command.c_str());
+		command="cp parameters/default/fixed.param "+string(dirname)+"/";
 		system(command.c_str());
 		statsfilename=string(dirname)+"/stats.param";
 		output=fopen(statsfilename.c_str(),"w");
 		for(ipar=0;ipar<npars;ipar++){
 			value=MINPAR[ipar]+x[ipar]*(MAXPAR[ipar]-MINPAR[ipar]);
-			printf("%s %s=value=%g; min=%g, max=%g\n",type[ipar],name[ipar],value,MINPAR[ipar],MAXPAR[ipar]);
+			//printf("%s %s=value=%g; min=%g, max=%g\n",type[ipar],name[ipar],value,MINPAR[ipar],MAXPAR[ipar]);
 			fprintf(output,"%s %s %g\n",type[ipar],name[ipar],value);
 		}
 		fclose(output);
