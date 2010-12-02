@@ -32,7 +32,7 @@ public:
 	CResList *reslist;
 	CPart **part;
 	CAction **action;
-	
+
 	int NXY,NETA; // will make meshes of size (2NXmesh+1,2NYmesh+1,2NETAmesh+1)
 	int NRINGSMAX;
 	double XYMAX,ETAMAX,DXY,DETA;
@@ -40,8 +40,8 @@ public:
 	CBjMaker bjmaker;
 	bool BJORKEN,COLLISIONS,VIZWRITE;
 	CCell ****cell;
-	
-	CB3D(string parameter_root_dir,string qualifier_set);
+
+	CB3D(string run_name_set);
 	~CB3D();
 	double tau,TAUCOLLMAX;
 	int itau;
@@ -53,14 +53,14 @@ public:
 	double SIGMAMAX,SIGMADEFAULT; // cross sections in sq. fm
 	string input_dataroot;
 	string output_dataroot;
-	string qualifier;
+	string run_name,qualifier;
 	CompType *ptype;
-	
+
 	H5File *h5outfile, *h5infile;// *h5vizfile;
-	string h5_infilename,h5_outfilename,h5_vizfilename;
 	int NACTIONS;
 	int NSAMPLE;
 	//
+	void SetQualifier(string qualifier_set);
 	int ReadDataH5(int ievent);
 	int WriteDataH5();
 	void FindAllCollisions();
@@ -69,7 +69,7 @@ public:
 	void Reset();
 	void KillAllActions();
 	void KillAllParts();
-	
+
 	void AddAction_Activate(CPart *part);
 	void AddAction_Decay(CPart *part);
 	void AddAction_Collision(CPart *part1,CPart *part2,double tau);
@@ -77,34 +77,34 @@ public:
 	//void AddAction_SwallowParticles(double tau_breakup);
 	void AddAction_ExitCell(CPart *part);
 	void AddAction_VizWrite(double tauwrite);
-	
+
 	void ListFutureCollisions();
 	void PrintPartList();
-	
+
 	bool FindCollision(CPart *part1,CPart *part2,double &taucoll);
 	void Decay(CPart *&mother,int &nbodies, CPart **&daughter);
-	
+
 	CRandom *randy;
 
 	void PrintActionMap(CActionMap *actionmap);
-	
+
 	double GetPiBsquared(CPart *part1,CPart *part2);
 	int Collide(CPart *part1,CPart *part2,double scompare);// will collide if sigma>scompare
 	void Scatter(CPart *part1,CPart *part2);
 	void Merge(CPart *part1,CPart *part2,CResInfo *resinfo);
-	
+
 	void CheckActions();
 	bool ERROR_PRINT;
-	
+
 	long long int nscatter,ndecay,nmerge,nswallow,npass,nexit,nactivate,ncheck;
 	long long int nactions;
-	
+
 	// These are used for VizWrite
 	hid_t viz_file_id;
 	//
-	
+
 	void freegascalc_onespecies(double m,double t,double &p,double &e,double &dens,double &sigma2,double &dedt);
-	
+
 };
 
 class CPart{
@@ -117,7 +117,7 @@ public:
 	int listid;
 	int actionmother; //refers to action from which particle was created
 	CResInfo *resinfo;
-	
+
 	void Propagate(double tau);
 	void FindCellExit();
 	void Init(int ID,double x,double y,double tau,double eta,double px,double py,double mass,double rapidity);
@@ -128,7 +128,7 @@ public:
 	void CyclicReset();
 	int key;
 	void SetInitialKey();
-	
+
 	void Kill();
 	void Reset();
 	void SubtractAction(CAction *actionptr);
@@ -138,21 +138,21 @@ public:
 	void CheckMap(CPartMap *expectedpartmap);
 	void ChangeMap(CPartMap *newmap);
 	//~CPart();
-	
+
 	// These are the actions involving these particles
 	CActionMap actionmap;
-	
+
 	CPartMap *currentmap; // PartList for a Cell, or b3d->DeadPartList
 	CCell *FindCell();
 
-	
+
 	static CB3D *b3d;
 	double GetEta(double tau);
 	double GetMT();
 	void SetY();
 	void SetEta(double neweta);
 	void FindCollisions();
-	
+
 	CPartMap::iterator GetPos(CPartMap *pmap);
 	CPartMap::iterator DeleteFromMap(CPartMap *partmap);
 	void ChangePartMap(CPartMap *newmap);
@@ -171,12 +171,12 @@ public:
 	int type; // =0 for activation, 1 for collision, 2 for decay, ....  6 for ExitCell
 	// These are the particles in the action
 	CPartMap partmap;
-		
+
 	void Kill();
 	void CleanPartMap();
 	void AddPart(CPart *partptr);
 	void Print();
-	
+
 	void Perform();
 	void PerformActivate();
 	void PerformExitCell();
@@ -189,7 +189,7 @@ public:
 	~CAction();
 
 	static CB3D *b3d;
-	
+
 	CActionMap::iterator GetPos(CActionMap *actionmap);
 	void ChangeMap(CActionMap *newmap);
 	CActionMap::iterator DeleteFromCurrentMap();
@@ -231,6 +231,7 @@ public:
 	// where pi_ij is the shear tensor in matter frame and lambda_ij tells how the momenta are scaled 
 	// during collision time  p_i = ptilde_i + lambda_ij ptilde_j, where ptilde is generated isotropically
 	double T,ETAMAX;
+	bool initialization;
 	// will generate particles with -eta_max < eta < eta_max
 	CResList *reslist;
 	double epsilon,P,lambdafact;
@@ -238,6 +239,7 @@ public:
 	int GenerateParticles(int iring1,int iring2);
 	void freegascalc_onespecies(double m,double t,double &p,double &e,double &dens,double &sigma2,double &dedt);
 	void Init();
+	void ReadInput();
 	CB3D *b3d;
 	double GetLambdaFact();
 protected:
