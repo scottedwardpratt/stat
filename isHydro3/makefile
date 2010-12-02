@@ -15,7 +15,7 @@ isHydro3 : ${MADAI_LIB}/libishydro3.a hydroDef.h main.cpp
 	${MADAI_CPP} main.cpp -o isHydro3 ${OPT} ${HPM} -lishydro3 -lcoralutils
 
 clean:
-	-rm -f *.o
+	rm -f *.o
 
 CEos.o : CEos.cpp CEos.h hydroDef.h
 	${MADAI_CPP} ${OPT} ${HPM} -c CEos.cpp -o CEos.o
