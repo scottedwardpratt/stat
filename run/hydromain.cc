@@ -13,7 +13,7 @@ int main (int argc, char * const argv[]) {
 	system(command.c_str());
 	
 	const int bListSize = 5;
-	double bList[bListSize] = {0.35, 2.2, 3.7, 5.2, 7.0};
+	double bList[bListSize] = {0., 2.2, 3.7, 5.2, 7.0};
 	
 	parameterMap* pMap = new parameterMap();
 	
@@ -28,9 +28,11 @@ int main (int argc, char * const argv[]) {
 	for (int i=0;i<bListSize;i++) {
 		
 		char bName[7];
-		sprintf(bName,"/b%2.2g/",bList[i]);
+		sprintf(bName,"/b%1.3g/",bList[i]);
 
 		string dataRoot = string("output/") + run_name + string(bName);
+		printf("\n\nmkdir -p %s\n\n",dataRoot.c_str());
+		
 		command = "mkdir -p " + dataRoot;
 		system(command.c_str());		
 		
@@ -45,7 +47,8 @@ int main (int argc, char * const argv[]) {
 				   dataRoot.c_str(),bListSize-i);
 			return 1;
 		}
-			
+		else 
+			printf("\nSuccessfully processed %s....\n",dataRoot.c_str());
 		delete mHydro;
 	}
 	
