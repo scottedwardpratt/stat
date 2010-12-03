@@ -2,26 +2,28 @@
 using namespace std;
 
 int main(int argc, char *argv[]){
-	if (argc != 3) {
+	if (argc != 2) {
 		printf("Usage: b3d run_name\n");
 		exit(-1);
 	}
 	char qchar[120],rchar[120];
 	const int bListSize = 5;
 	double bList[bListSize] = {0.35, 2.2, 3.7, 5.2, 7.0};
-	double dnchdy,N,nparts;
+	double dnchdy,N;
+	int nparts;
 	bool filealive;
-	int ievent=0,ib;
-	string run_name=argv[1];
-	string qualifier=argv;
+	int ievent=0,ib,neventsmax;
+	string run_name=argv[1],qualifier;
 	CB3D *b3d=new CB3D(run_name);
-	b3d->randy->reset(-time(NULL));
+	neventsmax=parameter::getI(b3d->parmap,"B3D_NEVENTSMAX",1000);
+	//b3d->randy->reset(-time(NULL));
 
 	for(ib=0;ib<bListSize;ib++){
-		qualifier="b"+string(bList[ib]);
+		sprintf(qchar,"%g",bList[ib]);
+		qualifier="b"+string(qchar);
 		b3d->SetQualifier(qualifier);
 		b3d->hydrotob3d->ReadInput();
-		for(ievent=0;ievent<b3d->B3D_NEVENTSMAX;ievent++){
+		for(ievent=0;ievent<neventsmax;ievent++){
 		//printf("eventlist size=%d, deadparts=%d, liveparts=%d\n",int(b3d->DeadEventMap.size()),int(b3d->DeadPartMap.size()),int(b3d->PartMap.size()));
 			nparts=b3d->hydrotob3d->MakeEvent();
 			if(b3d->VIZWRITE){

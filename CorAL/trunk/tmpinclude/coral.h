@@ -1,6 +1,6 @@
 #ifndef CORAL_H_INCLUDE_
 #define CORAL_H_INCLUDE_
-// This includes all headers indljgq
+// This includes all headers
 
 #include <cstdio>
 #include <cstdlib>

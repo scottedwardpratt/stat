@@ -53,7 +53,6 @@ void CAction::PerformDecay(){
 			mother->r[3]=tau*sinh(mother->eta);
 		}
 	}
-
 	mother->KillActions();
 	int ntry=0;
 	do{

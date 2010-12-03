@@ -31,7 +31,7 @@ int main (int argc, char * const argv[]) {
 		sprintf(bName,"/b%1.3g/",bList[i]);
 
 		string dataRoot = string("output/") + run_name + string(bName);
-		printf("mkdir -p %s\n",dataRoot.c_str());
+			//printf("\n\nmkdir -p %s\n\n",dataRoot.c_str());
 		
 		command = "mkdir -p " + dataRoot;
 		system(command.c_str());		
@@ -41,7 +41,9 @@ int main (int argc, char * const argv[]) {
 			//		parameter::PrintPars(*pMap);
 		
 		mHydro = new CHydro(pMap);
+		printf("check a\n");
 		status = mHydro->runHydro();
+		printf("check b\n");
 		
 		if (status != 0) {
 			printf("\n\n*******crash generating %s.....\n\n*******aborting with %d unfinished runs!!!!!!\n\n",
