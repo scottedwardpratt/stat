@@ -39,7 +39,6 @@ CB3D::CB3D(string run_name_set){
 	SIGMAMAX=SIGMAMAX/double(NSAMPLE);
 	NPARTSMAX*=NSAMPLE;
 	NACTIONSMAX*=NSAMPLE;
-
 	string command="mkdir -p output/"+run_name;
 	system(command.c_str());
 	double xmin,xmax,ymin,ymax,etamin,etamax;
@@ -175,10 +174,13 @@ void CB3D::SetQualifier(string qualifier_set){
 	}
 
 	string outfilename="output/"+run_name+"/"+qualifier+"/b3d.h5";
-	string vizfilename="output/"+run_name+"/"+qualifier+"/b3dviz.h5";
 	printf("will write to %s\n",outfilename.c_str());
+	string command="mkdir -p output/"+run_name+"/"+qualifier;
+	system(command.c_str());
 	h5outfile = new H5File(outfilename,H5F_ACC_TRUNC);
 	if(VIZWRITE){
+		string vizfilename="output/"+run_name+"/"+qualifier+"/b3dviz.h5";
+		printf("vizfilename=%s\n",vizfilename.c_str());
 			//Retrieve current default error printing info.
 			//herr_t (*err_stack_traverse_func)(void*);
 		H5E_auto2_t err_stack_traverse_func;
@@ -193,7 +195,6 @@ void CB3D::SetQualifier(string qualifier_set){
 		hid_t pList_H5Faccess_id = H5P_DEFAULT;
 		hid_t pList_H5Dwrite_id = H5P_DEFAULT;
 		herr_t   status;
-		printf("vizfilename=%s\n",vizfilename.c_str());
 		viz_file_id = H5Fcreate(vizfilename.c_str(), H5F_ACC_DEBUG | H5F_ACC_TRUNC, H5P_DEFAULT, pList_H5Faccess_id);
 		if(viz_file_id<0){
 			printf("(X) Error in H5Fcreate(%s). Aborting...\n", vizfilename.c_str());

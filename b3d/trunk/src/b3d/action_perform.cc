@@ -11,8 +11,7 @@ void CAction::Perform(){
 	DeleteFromCurrentMap();
 	b3d->tau=tau;
 	//if(type==1) printf("tau=%g, nactions=%lld, type=%d\n",tau,b3d->nactions,type);
-	printf("tau=%g, nactions=%lld, type=%d\n",tau,b3d->nactions,type);
-	printf("nparts=%d\n",)
+	//printf("tau=%g, nactions=%lld, type=%d\n",tau,b3d->nactions,type);
 
 	if(tau+1.0E-4<b3d->tau){
 		printf("FATAL:: action earlier than tau!!!!, b3d->tau=%15.10e, action tau=%15.10e\n",b3d->tau,tau);
@@ -36,7 +35,7 @@ void CAction::Perform(){
 	tau=0.0;
 	AddToMap(&(b3d->DeadActionMap));
 	currentmap=&(b3d->DeadActionMap);
-	printf("action finished\n");
+	//printf("action finished\n");
 }
 
 
