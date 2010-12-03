@@ -20,20 +20,29 @@ CEos::CEos(parameterMap* pM) {
 
  if (mLatEos) {
  
-  const int size=2400;
+	 const int size=2400;
   
-  temp = new double[size];
-  tA   = new double[size];
-  ed   = new double[size]; 
-  pr   = new double[size]; 
-  sd   = new double[size]; 
-  cs2  = new double[size];
-
-  std::ifstream latFile(parameter::getS(*pMap,"EQOFST_LATDATA","").c_str());
-  std::ifstream hrgFile(parameter::getS(*pMap,"EQOFST_HRGDATA","").c_str());
+	 temp = new double[size];
+	 tA   = new double[size];
+	 ed   = new double[size]; 
+	 pr   = new double[size]; 
+	 sd   = new double[size]; 
+	 cs2  = new double[size];
+	 
+	 if (parameter::getS(*pMap,"EQOFST_LATDATA","null") == string("null")){
+		 printf("\n** CEos requires parameterMap variable EQOFST_LATDATA if EQOFST_LATEOS == true **\nAborting...\n\n");
+		 exit(1);
+	 }
+		 
+	 std::ifstream latFile(parameter::getS(*pMap,"EQOFST_LATDATA","none").c_str());
+	 
+	 string hrgFileName = parameter::getS(*pMap,"EQOFST_HRGDATA","none");
+	 std::ifstream hrgFile;
+	 if (hrgFileName != string("none"))
+		 hrgFile.open(hrgFileName.c_str());
   
-  double lowT  = parameter::getD(*pMap,"EQOFST_LOW_CROSS_T",0.15);
-  double highT = parameter::getD(*pMap,"EQOFST_HIGH_CROSS_T",0.2);
+	 double lowT  = parameter::getD(*pMap,"EQOFST_LOW_CROSS_T",0.15);
+	 double highT = parameter::getD(*pMap,"EQOFST_HIGH_CROSS_T",0.2);
   
   double lT[size], lE[size], lP[size], lS[size];
   double hT[size], hE[size], hP[size], hS[size];
@@ -44,15 +53,27 @@ CEos::CEos(parameterMap* pM) {
   latFile >> test;
   latFile.ignore(1000,'\n');
   
-  if (test == 'e') { // EOS from Pasi
-    double junk;
-    int i;
-    for(i=0; !latFile.eof() && i<size; i++) {
-	  latFile >> lE[i] >> lP[i] >> lS[i] >> junk;
-      lT[i] = (lE[i] + lP[i])/lS[i];
-	}
-	lSize = i-1;
+	 if (test == 'e') { // EOS from Pasi
+		 double junk;
+		 int i;
+		 for(i=0; !latFile.eof() && i<size; i++) {
+			 latFile >> lE[i] >> lP[i] >> lS[i] >> junk;
+			 lT[i] = (lE[i] + lP[i])/lS[i];
+		 }
+		 lSize = i-1;
 	
+		 if (hrgFileName == string("none")) {
+			 aSize = lSize;
+			 for (int j=0;j<aSize;j++) {
+				 temp[j] = lT[j]; 
+				 sd[j] = lS[j];
+				 ed[j] = lE[j];
+				 pr[j] = lP[j];
+			 } 
+			 return;
+		 }
+	  
+	  
 	lowT  += (lT[1] - lT[0])/10.;
 	highT += (lT[1] - lT[0])/10.;
 	

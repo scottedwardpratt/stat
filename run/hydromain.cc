@@ -31,14 +31,14 @@ int main (int argc, char * const argv[]) {
 		sprintf(bName,"/b%1.3g/",bList[i]);
 
 		string dataRoot = string("output/") + run_name + string(bName);
-		printf("\n\nmkdir -p %s\n\n",dataRoot.c_str());
+		printf("mkdir -p %s\n",dataRoot.c_str());
 		
 		command = "mkdir -p " + dataRoot;
 		system(command.c_str());		
 		
 		parameter::set(*pMap,"HYDRO_OUTPUT_DATAROOT",dataRoot);
 		parameter::set(*pMap,"GLAUBER_B",bList[i]);
-		parameter::PrintPars(*pMap);
+			//		parameter::PrintPars(*pMap);
 		
 		mHydro = new CHydro(pMap);
 		status = mHydro->runHydro();

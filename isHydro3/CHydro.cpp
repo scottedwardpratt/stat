@@ -217,12 +217,8 @@ int CHydro::runHydro() {
 	time(&now);
 	printf("\nHydro Finished...... (Total Time: %0.6g sec)\n",difftime(now,start)); fflush(stdout);
   
-		//	printf("\n on=%d off=%d temp=%d k1=%d k2=%d\n\n",(int)onMesh,(int)offMesh,(int)tempMesh,(int)k1,(int)k2); fflush(stdout);
-		//	printf("on\n"); fflush(stdout);
 	onMesh->~CMesh(); 
-		//	printf("off\n"); fflush(stdout);
 	offMesh->~CMesh(); 
-		//	printf("skipping rk4s...\n"); fflush(stdout);
 	if (mRK4) {
 		k1->~CMesh();
 		k2->~CMesh();
@@ -233,7 +229,6 @@ int CHydro::runHydro() {
 		printDNs(tempMesh,mNSize,mXSize,mYSize);
 	}
 	
-		//	printf("temp\n"); fflush(stdout);
 	tempMesh->~CMesh();
   
   return 0;
