@@ -1,2 +1,0 @@
-file /Users/scottepratt/git/rhic/CorAL/trunk/SConstruct,line 45:
-	Configure(confdir = .sconf_temp)
