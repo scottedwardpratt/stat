@@ -41,9 +41,7 @@ int main (int argc, char * const argv[]) {
 			//		parameter::PrintPars(*pMap);
 		
 		mHydro = new CHydro(pMap);
-		printf("check a\n");
 		status = mHydro->runHydro();
-		printf("check b\n");
 		
 		if (status != 0) {
 			printf("\n\n*******crash generating %s.....\n\n*******aborting with %d unfinished runs!!!!!!\n\n",

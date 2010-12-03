@@ -63,6 +63,7 @@ CEos::CEos(parameterMap* pM) {
 		 lSize = i-1;
 	
 		 if (hrgFileName == string("none")) {
+			 printf(" *** No HRG EOS data provided for merging - continuity not ensured... ***\n *** Proceeding with lattice data only... ***\n\n");
 			 aSize = lSize;
 			 for (int j=0;j<aSize;j++) {
 				 temp[j] = lT[j]; 
