@@ -25,6 +25,12 @@ CCell::CCell(double t0,double n0, double x0, double y0) {
 //  printf("%f %f %f %f\n",x[0],x[1],x[2],x[3]);
 }
 
+CCell::CCell(CCell* cell) {
+	for (int i=0;i<4;i++) x[i] = cell->x[i];
+	for (int i=0;i<11;i++) s[i] = cell->s[i];
+	active = cell->active;
+}  
+
 CCell::~CCell() {
 	//noop
 }

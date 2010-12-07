@@ -53,8 +53,7 @@ CHydro::CHydro(parameterMap* pM) {
 	mDt = parameter::getD(*pMap,"HYDRO_DT",0.03);
 	mE0 = parameter::getD(*pMap,"HYDRO_E0",1.0);
 
-	
-	zeroPointers();
+		//	zeroPointers();
 }
 
 void CHydro::zeroPointers(){
@@ -147,8 +146,14 @@ int CHydro::runHydro() {
 		fprintf(fTxxNSML,"%0.6g %0.6g\n", mTau, onMesh->getPixyNSMesh(0,mPrintX,0,1,1));
 		fprintf(fDzz,"%0.6g %0.6g\n",mTau, mTau*onMesh->getDULocal(0,0,0,3,3)-1.);
 	}	
-	if (mIoOscarFull) openOscarFull();
-	if (mIoOscarHyper) openOscarHyper();
+	if (mIoOscarFull) {
+		openOscarFull();
+		printOscarFull(onMesh,0);
+	}
+	if (mIoOscarHyper) {
+		openOscarHyper();
+		printOscarHyper(onMesh,0);
+	}
 
     time(&now);
 	if (!mPureBjorken) 
@@ -162,6 +167,8 @@ int CHydro::runHydro() {
 
 		if (mSawtooth) onMesh->forward(tempMesh,offMesh,mDt);
 		else if (mRK2) {
+			copyCellActive(onMesh,offMesh);
+			copyCellActive(onMesh,tempMesh);
 			onMesh->forward(offMesh,mDt/2.);
 			onMesh->forward(tempMesh,offMesh,mDt);
 		}
@@ -1455,7 +1462,7 @@ void CHydro::printIntegrals(int t) {
 				pLoss[i] += mDt * onMesh->getPLoss(tempMesh,i+1);
 		}
 
-	if (t%mIoSliceTStep == 0) {
+	if (t%mIoSliceTStep == 0 && mIoSlices) {
 		double mTau = tempMesh->getTau();
 		fprintf(fIE,"%0.9g %0.9g\n", mTau, (intE+eLoss)/intE0 - 1.);
 		if (intP0[0] != 0.) fprintf(fIPX,"%0.9g %0.9g\n", mTau, (intP[0]+pLoss[0])/intP0[0] - 1.);
@@ -1644,16 +1651,26 @@ void CHydro::printMesh(CMesh* lMesh) {
 	  for (int i=-1;i<=mN;i++) 
 	    for (int j=-1;j<=mX;j++) 
 	      for (int k=-1;k<=mY;k++) {
-		    for (int l=1;l<4;l++)  fprintf(fFull,"%0.6g ",lMesh->getX(i,j,k,l));
-		    for (int l=0;l<11;l++) fprintf(fFull,"%0.9g ",lMesh->getS(i,j,k,l));
-		    fprintf(fFull,"\n");
+			  if (!lMesh->getActive(i,j,k)) {
+				  fprintf(fFull,"0\n");
+				  break;
+			  }
+			  fprintf(fFull,"1 ");
+			  for (int l=1;l<4;l++)  fprintf(fFull,"%0.6g ",lMesh->getX(i,j,k,l));
+			  for (int l=0;l<11;l++) fprintf(fFull,"%0.9g ",lMesh->getS(i,j,k,l));
+			  fprintf(fFull,"\n");
 		  }
 	else 
 	  for (int j=-1;j<=mX;j++) 
 	      for (int k=-1;k<=mY;k++) {
-		    for (int l=1;l<4;l++)  fprintf(fFull,"%0.6g ",lMesh->getX(0,j,k,l));
-		    for (int l=0;l<11;l++) fprintf(fFull,"%0.9g ",lMesh->getS(0,j,k,l));
-		    fprintf(fFull,"\n");
+			  if (!lMesh->getActive(0,j,k)) {
+				  fprintf(fFull,"0 \n");
+				  break;
+			  }
+			  fprintf(fFull,"1 ");
+			  for (int l=1;l<4;l++)  fprintf(fFull,"%0.6g ",lMesh->getX(0,j,k,l));
+			  for (int l=0;l<11;l++) fprintf(fFull,"%0.9g ",lMesh->getS(0,j,k,l));
+			  fprintf(fFull,"\n");
 		  }
 }
 
@@ -2075,6 +2092,13 @@ void CHydro::printDNs(CMesh* lMesh, int mNSize, int mXSize, int mYSize) {
  
 // fPiDNDPt= fopen("fPiDNDPt.txt","w");
 
+}
+
+void CHydro::copyCellActive(CMesh* m1, CMesh* m2) {
+	for (int i=-1;i<=m2->getNSizeOrig();i++)
+		for (int j=-1;j<=m2->getXSizeOrig();j++)
+			for (int k=-1;k<=m2->getYSizeOrig();k++)
+				m2->setActive(i,j,k,m1->getActive(i,j,k));
 }
 
 void CHydro::testFileOpen() {

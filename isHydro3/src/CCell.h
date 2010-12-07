@@ -74,6 +74,7 @@ public:
 		// constructors
 	CCell(parameterMap* pMap);
 	CCell(double,double,double,double);	// set positions
+	CCell(CCell* cell);
 	
 		// destructor
 	~CCell();

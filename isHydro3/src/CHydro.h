@@ -66,6 +66,8 @@ private:
 	void printOscarFull(CMesh* lMesh, int mT);
 	void printDNs(CMesh* lMesh,int,int,int);
 
+	void copyCellActive(CMesh*, CMesh*);
+
 	void testFileOpen();
 	void zeroPointers();
 	

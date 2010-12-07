@@ -71,7 +71,9 @@ class CMesh {
 	void setTau(double);
 	
 	inline void update(int eta, int x, int y) 
-	  { if (mOctant) mCells[eta+1][x+1][y+1]->update(); else mCells[eta+mNSizeOrig][x+mXSizeOrig][y+mYSizeOrig];}
+	{ if (mOctant) mCells[eta+1][x+1][y+1]->update(); else mCells[eta+mNSizeOrig][x+mXSizeOrig][y+mYSizeOrig]->update();}
+	inline bool getActive(int eta, int x, int y) 
+	{if (mOctant) return mCells[eta+1][x+1][y+1]->getActive(); else return mCells[eta+mNSizeOrig][x+mXSizeOrig][y+mYSizeOrig]->getActive();}
 	inline double getS(int eta, int x, int y, int s)
 	  {if (!mOctant) return mCells[eta+mNSizeOrig][x+mXSizeOrig][y+mYSizeOrig]->getS(s); else return mCells[eta+1][x+1][y+1]->getS(s);}
 	inline double getDS(int eta, int x, int y, int m, int n) 
@@ -141,6 +143,10 @@ class CMesh {
 	inline int getNSize() {return mNSize;}
 	inline int getXSize() {return mXSize;}
 	inline int getYSize() {return mYSize;}
+	inline int getNSizeOrig() {return mNSizeOrig;}
+	inline int getXSizeOrig() {return mXSizeOrig;}
+	inline int getYSizeOrig() {return mYSizeOrig;}
+	
 	inline void setNSize(int i) {mNSize = i;}
 	inline void setXSize(int i) {mXSize = i;}
 	inline void setYSize(int i) {mYSize = i;}
@@ -176,6 +182,14 @@ class CMesh {
 	void deaden();
 	bool detectCrash();
 
+	inline void setActive(int eta, int x, int y, bool v) 
+	{if (mOctant) mCells[eta+1][x+1][y+1]->setActive(v); else mCells[eta+mNSizeOrig][x+mXSizeOrig][y+mYSizeOrig]->setActive(v);}
+	inline void deactivate(int eta, int x, int y) 
+	{if (mOctant) mCells[eta+1][x+1][y+1]->deactivate(); else mCells[eta+mNSizeOrig][x+mXSizeOrig][y+mYSizeOrig]->deactivate();}
+	
+	void deaden(CMesh*);
+	void checkAzimuthalSymmetry();
+	
 };
 //#include "CMesh.cpp"
 #endif // __CMESH_h_INCLUDE__
