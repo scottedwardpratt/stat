@@ -486,6 +486,17 @@ void CCell::update(int ii) {
   fillEosVar();
 }
 
+void CCell::initNS() {
+	update();
+	
+	s[5] = - (getSV()/getISAlpha()) * (dULocal[1][1] - dULocal[2][2]);
+	s[6] = - getSV()/(ROOT3*getISAlpha()) * (dULocal[1][1] + dULocal[2][2] - 2.*dULocal[3][3]);
+	s[7] = - (getSV()/getISAlpha()) * (dULocal[1][2] + dULocal[2][1]);
+	s[8] = - (getSV()/getISAlpha()) * (dULocal[1][3] + dULocal[3][1]);
+	s[9] = - (getSV()/getISAlpha()) * (dULocal[3][2] + dULocal[2][3]);
+	
+}
+
 double CCell::getTxy(int x, int y) {
 #ifdef DEBUG
   if (x<1 || x>3 || y<1 || y>3) {
@@ -1452,5 +1463,5 @@ double CCell::alphaIS, CCell::gammaIS, CCell::betaIS, CCell::aIS, CCell::bIS;
 double CCell::dAlphaISDE, CCell::dGammaISDE;
 bool CCell::mDebug, CCell::mSVTrim, CCell::mViscNS, CCell::mPureBjorken, CCell::mBjorken;
 bool CCell::mLinT, CCell::mLogT, CCell::mLogSinhT, CCell::mISVort, CCell::mISMax;
-double CCell::mT0, CCell::mSVRatio, CCell::mBVRatio, CCell::mISAMax, CCell::mISBMax;
+double CCell::mT0, CCell::mSVRatio, CCell::mBVRatio, CCell::mISAMax, CCell::mISBMax, CCell::mInitNS;
 parameterMap* CCell::pMap;

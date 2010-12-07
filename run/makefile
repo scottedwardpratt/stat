@@ -4,13 +4,13 @@ thisdir = ${PWD}
 
 all: b3d analyze isHydro3
 
-isHydro3 :  hydromain.cc hydroLibs
+isHydro3 :  hydromain.cc hydroLib
 	${MADAI_CPP} -o isHydro3 hydromain.cc ${OPT} ${HPM} -lcoralutils -lishydro3
 
 libs :
 	make -C ${MADAI_HOME}/rhic/b3d/trunk -f ${MADAI_HOME}/rhic/b3d/trunk/makefile all
 
-hydroLibs :
+hydroLib : ${MADAI_LIB}/libishydro3.a
 	make -C ${MADAI_HOME}/rhic/isHydro3 -f ${MADAI_HOME}/rhic/isHydro3/makefile isHydro3
 
 eoscalc : eoscalc.cc libs

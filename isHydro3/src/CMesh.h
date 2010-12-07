@@ -23,7 +23,7 @@ class CMesh {
 	static int mNSize, mXSize, mYSize, mNSizeOrig, mXSizeOrig, mYSizeOrig;
 	static int mPrintX, mPrintY, mPrintN;
 	
-	static double wnRho0, wnRAu, wnXi, wnSigma, wnA, wnB, wnK;
+	static double wnRho0, wnRAu, wnXi, wnSigma, wnA, wnB, wnKTau;
 	static double mRn, mRt, mRa, mRx, mRy, mRSig;
 	static double mWnBinRatio, mInitFlow, mInitNS;
 	

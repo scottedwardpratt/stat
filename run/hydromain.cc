@@ -25,7 +25,7 @@ int main (int argc, char * const argv[]) {
 	CHydro* mHydro;
 	int status;
 	
-	for (int i=0;i<bListSize;i++) {
+	for (int i=0;i<1;i++) {//bListSize;i++) {
 		
 		char bName[7];
 		sprintf(bName,"/b%1.3g/",bList[i]);

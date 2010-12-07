@@ -58,7 +58,7 @@ private:
   static double alphaIS, gammaIS, betaIS, aIS, bIS, dAlphaISDE, dGammaISDE;
 
   static bool mDebug, mSVTrim, mViscNS, mPureBjorken, mBjorken, mLinT, mLogT, mLogSinhT, mISVort, mISMax;
-  static double mT0, mSVRatio, mBVRatio, mISAMax, mISBMax;
+  static double mT0, mSVRatio, mBVRatio, mISAMax, mISBMax, mInitNS;
 
 protected:
   // functions to fill calc variables using internal information
@@ -81,15 +81,15 @@ public:
 
   // grabs:
   // cell position
-  inline double getTau() {if (mLinT) return x[0]; else if (mLogT) return mT0*exp(x[0]); else if (mLogSinhT) return asinh(exp(x[0]));}
-  inline double getEta() {return x[3];}
-  inline double getZ() {return getTau()*sinh(x[3]);}
-  inline double getTime() {return getTau()*cosh(x[3]);}
-  inline double getUMesh() {return sqrt(1+pow(tanh(x[3]),2))*tanh(x[3]);}
-  inline double getX() {return x[1];}
-  inline double getY() {return x[2];}
-  inline double getX(int i) {if(i<4 && i>=0) return x[i]; else return 0.;}
-  inline double getDx(int i) {if (i<4 && i>=0) return dx[i]; else return 0.;}
+	inline double getTau() {if (mLinT) return x[0]; else if (mLogT) return mT0*exp(x[0]); else if (mLogSinhT) return asinh(exp(x[0]));}
+	inline double getEta() {return x[3];}
+	inline double getZ() {return getTau()*sinh(x[3]);}
+	inline double getTime() {return getTau()*cosh(x[3]);}
+	inline double getUMesh() {return sqrt(1+pow(tanh(x[3]),2))*tanh(x[3]);}
+	inline double getX() {return x[1];}
+	inline double getY() {return x[2];}
+	inline double getX(int i) {if (i==0) return getTau(); else if(i<4 && i>0) return x[i]; else return 0.;}
+	inline double getDx(int i) {if (i<4 && i>=0) return dx[i]; else return 0.;}
 
   //relativistic velocities 
   inline double getU0() {return s[0];}
@@ -208,6 +208,8 @@ public:
   void update(int);  // update an unconnected edge
   void update(CCell*);
   
+	void initNS();
+	
   // integrates the cell forward in time
   // puts result into cell passed
   void forward(CCell*);

@@ -47,7 +47,7 @@ CMesh::CMesh(parameterMap* pM){
  wnSigma= parameter::getD(*pMap,"GLAUBER_Sigma",0.4);
  wnA    = parameter::getD(*pMap,"GLAUBER_A",197.);
  wnB    = parameter::getD(*pMap,"GLAUBER_B",0.);
- wnK    = parameter::getD(*pMap,"GLAUBER_K",4.3);
+ wnKTau = parameter::getD(*pMap,"GLAUBER_K_TAU",4.3);
 
  mWnBinRatio = parameter::getD(*pMap,"GLAUBER_WNBIN_RATIO",1.0);
  mInitFlow = parameter::getD(*pMap,"HYDRO_INIT_FLOW",0.0);
@@ -220,7 +220,7 @@ void CMesh::initialCondition(CCell* mCell, int i, int j, int k) {
   else 
     mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k) * exp(-0.5*pow( (mDn*i - 3.)/ 0.4, 2.)));
 */
-  mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k) * exp( -0.5*pow( (mDn*i)/1.6, 2.)));
+  mCell->setE( wnKTau/getX(i,j,k,0)  * wnE(mDx*(double)j, mDy*(double)k) * exp( -0.5*pow( (mDn*i)/1.6, 2.)));
 
   for (int l=5;l<11;l++) mCell->setS(l,0.);
 }
@@ -235,13 +235,19 @@ void CMesh::addInitialFlow() {
 		  mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]->setS(2, - 0.5*getDS(i,j,k,1,3)/( getE(i,j,k) + getP(i,j,k)) * getTau());
 		}
   else {
-    for (int i=0;i<mNSize;i++)
-	  for (int j=0;j<mXSize;j++)
-		for (int k=0;k<mYSize;k++) {
-		  update(i,j,k);
-		  mCells[i+1][j+1][k+1]->setS(1, - mInitFlow*0.5*getDS(i,j,k,3,0)/( getE(i,j,k) + getP(i,j,k)) * getTau());
-		  mCells[i+1][j+1][k+1]->setS(2, - mInitFlow*0.5*getDS(i,j,k,3,1)/( getE(i,j,k) + getP(i,j,k)) * getTau());
-		}
+	  for (int i=0;i<mNSize;i++)
+		  for (int j=0;j<mXSize;j++)
+			  for (int k=0;k<mYSize;k++) {
+				  update(i,j,k);
+					  //				  if (k==0 && i==0) 
+						  //					  printf("%d:  %f  %f  %f\n",j,-getDS(i,j,k,3,0)/getE(i,j,k),-getDS(i,j,k,3,0)/getP(i,j,k)
+						  //							 ,- mInitFlow*0.5*getDS(i,j,k,3,0)/( getE(i,j,k) + getP(i,j,k)) * getTau());
+				  mCells[i+1][j+1][k+1]->setS(1, - mInitFlow*0.5*getDS(i,j,k,3,0)/( getE(i,j,k) + getP(i,j,k)) * getTau());
+				  mCells[i+1][j+1][k+1]->setS(2, - mInitFlow*0.5*getDS(i,j,k,3,1)/( getE(i,j,k) + getP(i,j,k)) * getTau());
+			  }
+	  
+	  return;
+	  
 	if (mPureBjorken) {
 	    // outer boundaries
 	for (int j=0;j<mYSize;j++) 
@@ -1904,25 +1910,15 @@ bool CMesh::detectCrash(){
 }
 
 void CMesh::initNS() {
-  if (!mPureBjorken) 
-    for (int i=-1;i<=mNSize;i++)
-      for (int j=-1;j<=mXSize;j++)
-	    for (int k=-1;k<=mYSize;k++) 
-//		    mCells[i+1][j+1][k+1]->setA(2, (2./ROOT3)*mCells[i+1][j+1][k+1]->getSVEos()
-//										   /(mCells[i+1][j+1][k+1]->getTau()*mCells[i+1][j+1][k+1]->getISAlphaEos()));
-		    mCells[i+1][j+1][k+1]->setA(2, tanh(3.* (2./ROOT3)*mCells[i+1][j+1][k+1]->getSVEos()
-										   /(mCells[i+1][j+1][k+1]->getTau()*mCells[i+1][j+1][k+1]->getISAlphaEos()))/3.);
-  else 
-    for (int j=-1;j<=mXSize;j++)
-	    for (int k=-1;k<=mYSize;k++) 
-		  if (mSVTrimInit && (!mSVTrim))
-		    mCells[1][j+1][k+1]->setA(2, (2./ROOT3)*mCells[1][j+1][k+1]->getSVEos()
-										/(mCells[1][j+1][k+1]->getTau()*mCells[1][j+1][k+1]->getISAlphaEos())
-										/(1. + exp( (sqrt(mDx*mDx*j*j+mDy*mDy*k*k) - 10.)/0.6)));
-		  else 
-		    mCells[1][j+1][k+1]->setA(2, (2./ROOT3)*mCells[1][j+1][k+1]->getSVEos()
-										/(mCells[1][j+1][k+1]->getTau()*mCells[1][j+1][k+1]->getISAlphaEos()));
-
+	if (!mPureBjorken) 
+		for (int i=-1;i<=mNSize;i++)
+			for (int j=-1;j<=mXSize;j++)
+				for (int k=-1;k<=mYSize;k++) 
+					mCells[i+1][j+1][k+1]->initNS();
+	else 
+		for (int j=-1;j<=mXSize;j++)
+			for (int k=-1;k<=mYSize;k++) 
+				mCells[1][j+1][k+1]->initNS();
 }
 
 void CMesh::printCell(int eta,int x,int y) {
@@ -2009,6 +2005,6 @@ bool CMesh::mOctant, CMesh::mPureBjorken, CMesh::mBjorken, CMesh::mPrintMs, CMes
 double CMesh::mFOTemp, CMesh::mDeadT, CMesh::mT0, CMesh::mDx, CMesh::mDy, CMesh::mDn;
 int CMesh::mNSize, CMesh::mXSize, CMesh::mYSize, CMesh::mNSizeOrig, CMesh::mXSizeOrig, CMesh::mYSizeOrig;
 int CMesh::mPrintN, CMesh::mPrintX, CMesh::mPrintY;
-double CMesh::wnRho0, CMesh::wnRAu, CMesh::wnXi, CMesh::wnSigma, CMesh::wnA, CMesh::wnB, CMesh::wnK;
+double CMesh::wnRho0, CMesh::wnRAu, CMesh::wnXi, CMesh::wnSigma, CMesh::wnA, CMesh::wnB, CMesh::wnKTau;
 double CMesh::mE0, CMesh::mRn, CMesh::mRt, CMesh::mRa, CMesh::mRx, CMesh::mRy, CMesh::mRSig, CMesh::mWnBinRatio;
 double CMesh::mInitFlow, CMesh::mInitNS;
