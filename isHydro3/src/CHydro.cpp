@@ -99,7 +99,9 @@ int CHydro::runHydro() {
 	onMesh->setParameterMap(pMap);
 	onMesh->deaden();
 
+	cout << "adding flow!" << std::endl; fflush(stdout);
 	if (mInitFlow != 0.) onMesh->addInitialFlow();
+	cout << "setting to NS!\n"; fflush(stdout);
 	if (mInitNS != 0.)   onMesh->initNS();
 
 	sLoss=0.; sLoss2=0.; eLoss=0.;

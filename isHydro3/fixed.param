@@ -1,5 +1,5 @@
 bool HYDRO_DEBUG false
-string HYDRO_OUTPUT_DATAROOT /Users/cleverless/programs/GitRoot/hydroData/
+string HYDRO_OUTPUT_DATAROOT ./  #/Users/cleverless/programs/GitRoot/hydroData/
 bool HYDRO_IO_SLICES true
 bool HYDRO_IO_SPOTS false
 bool HYDRO_IO_FULL true
@@ -9,11 +9,11 @@ bool HYDRO_IO_OSCARFULL false
 bool HYDRO_IO_OSCARHYPER true
 string HYDRO_IO_OSCARHYPER_FN freezeout.dat
 bool HYDRO_IO_SPECTRA false
-double HYDRO_DT 0.04
-int HYDRO_TSTEP 500
-int HYDRO_PRINTSTEP 100
+double HYDRO_DT 0.01
+int HYDRO_TSTEP 5
+int HYDRO_PRINTSTEP 1
 int HYDRO_IO_TECHQM_TSTEP 1
-int HYDRO_IO_OSCAR_TSTEP 5
+int HYDRO_IO_OSCAR_TSTEP 
 int HYDRO_IO_SLICE_TSTEP 1
 string EQOFST_HRGDATA /Users/cleverless/programs/LatticeEOS/eosTest/josh.dat
 double EQOFST_LOW_CROSS_T 0.165
