@@ -493,8 +493,16 @@ void CCell::initNS() {
 	s[6] = - getSV()/(ROOT3*getISAlpha()) * (dULocal[1][1] + dULocal[2][2] - 2.*dULocal[3][3]);
 	s[7] = - (getSV()/getISAlpha()) * (dULocal[1][2] + dULocal[2][1]);
 	s[8] = - (getSV()/getISAlpha()) * (dULocal[1][3] + dULocal[3][1]);
-	s[9] = - (getSV()/getISAlpha()) * (dULocal[3][2] + dULocal[2][3]);
-	
+	s[9] = - (getSV()/getISAlpha()) * (dULocal[3][2] + dULocal[2][3]);	
+}
+
+// turn this cell off; if impossible return false
+// FIXME :assumes octant=true
+void CCell::deactivate() {
+	active = false;
+	for (int i=0;i<3;i++) 
+		if (neighbors[i][0]->x[i+1] == 0.)
+			neighbors[i][0]->deactivate();
 }
 
 double CCell::getTxy(int x, int y) {

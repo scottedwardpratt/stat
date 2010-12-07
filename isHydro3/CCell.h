@@ -201,26 +201,29 @@ public:
   inline void setXNeighbors(CCell* p1, CCell* p2) {neighbors[0][0]=p1; neighbors[0][1]=p2;}
   inline void setYNeighbors(CCell* p1, CCell* p2) {neighbors[1][0]=p1; neighbors[1][1]=p2;}
 
-  // updates: up[i], uup
-  // calls: calcDeriv(), FillM()
-  // called by: forward()
-  void update();
-  void update(int);  // update an unconnected edge
-  void update(CCell*);
+		// updates: up[i], uup
+		// calls: calcDeriv(), FillM()
+		// called by: forward()
+	void update();
+	void update(int);  // update an unconnected edge
+	void update(CCell*);
   
 	void initNS();
 	
-  // integrates the cell forward in time
-  // puts result into cell passed
-  void forward(CCell*);
-  void forward(CCell*, CCell*);
-  void forward(CCell*, CCell*, CCell*, CCell*);
+		// active?
+	void deactivate();
+ 
+		// integrates the cell forward in time
+		// puts result into cell passed
+	void forward(CCell*);
+	void forward(CCell*, CCell*);
+	void forward(CCell*, CCell*, CCell*, CCell*);
   
-  // prints
-  void print();			// ten local variables (no EOS dep stuff)
-  void print(int);
-  void printM();		// state of dt coeff matrix
-  void printMm(double Mm[10][11]);
+		// prints
+	void print();			// ten local variables (no EOS dep stuff)
+	void print(int);
+	void printM();		// state of dt coeff matrix
+	void printMm(double Mm[10][11]);
 
 };
 //#include "CCell.cpp"
