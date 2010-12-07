@@ -23,7 +23,7 @@
 #include <cmath>
 #include "hydroDef.h"
 #include <cstdio>
-#include <coral.h> 
+#include "coral.h" 
 #include "CEos.h"
 
 class CCell{ 
@@ -34,7 +34,6 @@ private:
   CCell* neighbors[3][2];		// pointers to cell's neighbors
   double s[11];					// [(u_0,u_i); e; a_i; b]
   double dUdT[3];				// time derivative of u
-  bool active;
   
   // calculation variables
 //  static double value;			// junk variable, used by a bunch of functions
@@ -59,7 +58,7 @@ private:
   static double alphaIS, gammaIS, betaIS, aIS, bIS, dAlphaISDE, dGammaISDE;
 
   static bool mDebug, mSVTrim, mViscNS, mPureBjorken, mBjorken, mLinT, mLogT, mLogSinhT, mISVort, mISMax;
-  static double mT0, mSVRatio, mBVRatio, mISAMax, mISBMax;
+  static double mT0, mSVRatio, mBVRatio, mISAMax, mISBMax, mInitNS;
 
 protected:
   // functions to fill calc variables using internal information
@@ -74,7 +73,6 @@ public:
   // constructors
   CCell(parameterMap* pMap);
   CCell(double,double,double,double);	// set positions
-  CCell(CCell*);
   
   // destructor
   ~CCell();
@@ -83,16 +81,15 @@ public:
 
   // grabs:
   // cell position
-  inline bool   getActive() {return active;}
-  inline double getTau() {if (mLinT) return x[0]; else if (mLogT) return mT0*exp(x[0]); else if (mLogSinhT) return asinh(exp(x[0]));}
-  inline double getEta() {return x[3];}
-  inline double getZ() {return getTau()*sinh(x[3]);}
-  inline double getTime() {return getTau()*cosh(x[3]);}
-  inline double getUMesh() {return sqrt(1+pow(tanh(x[3]),2))*tanh(x[3]);}
-  inline double getX() {return x[1];}
-  inline double getY() {return x[2];}
-  inline double getX(int i) {if(i<4 && i>=0) return x[i]; else return 0.;}
-  inline double getDx(int i) {if (i<4 && i>=0) return dx[i]; else return 0.;}
+	inline double getTau() {if (mLinT) return x[0]; else if (mLogT) return mT0*exp(x[0]); else if (mLogSinhT) return asinh(exp(x[0]));}
+	inline double getEta() {return x[3];}
+	inline double getZ() {return getTau()*sinh(x[3]);}
+	inline double getTime() {return getTau()*cosh(x[3]);}
+	inline double getUMesh() {return sqrt(1+pow(tanh(x[3]),2))*tanh(x[3]);}
+	inline double getX() {return x[1];}
+	inline double getY() {return x[2];}
+	inline double getX(int i) {if (i==0) return getTau(); else if(i<4 && i>0) return x[i]; else return 0.;}
+	inline double getDx(int i) {if (i<4 && i>=0) return dx[i]; else return 0.;}
 
   //relativistic velocities 
   inline double getU0() {return s[0];}
@@ -175,7 +172,7 @@ public:
   inline CEos* getEos() {return eos;} 
   
   // Variable sets:
-  inline void setActive(bool v) {active=v;}
+  
   // cell positions
   inline void setTau(double v) {if (mLinT) x[0]=v; else if (mLogT) x[0] = log(v/mT0); else if (mLogSinhT) x[0] = log(sinh(v));}
   inline void setEta(double v) {x[3] = v;}
@@ -203,7 +200,6 @@ public:
   inline void setEtaNeighbors(CCell* p1, CCell* p2) {neighbors[2][0]=p1; neighbors[2][1]=p2;}
   inline void setXNeighbors(CCell* p1, CCell* p2) {neighbors[0][0]=p1; neighbors[0][1]=p2;}
   inline void setYNeighbors(CCell* p1, CCell* p2) {neighbors[1][0]=p1; neighbors[1][1]=p2;}
-  inline void setNeighbors(CCell* p1, CCell* p2, int i) {neighbors[i][0]=p1; neighbors[i][1]=p2;}
 
   // updates: up[i], uup
   // calls: calcDeriv(), FillM()
@@ -212,9 +208,8 @@ public:
   void update(int);  // update an unconnected edge
   void update(CCell*);
   
-  // active?
-  void deactivate();
-  
+	void initNS();
+	
   // integrates the cell forward in time
   // puts result into cell passed
   void forward(CCell*);
