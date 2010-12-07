@@ -9,7 +9,7 @@
 #include "hydroDef.h"
 #include "CEos.h"
 #include <cstdio>
-#include "coral.h"
+#include <coral.h>
 
 class CMesh {
   private:
@@ -23,7 +23,7 @@ class CMesh {
 	static int mNSize, mXSize, mYSize, mNSizeOrig, mXSizeOrig, mYSizeOrig;
 	static int mPrintX, mPrintY, mPrintN;
 	
-	static double wnRho0, wnRAu, wnXi, wnSigma, wnA, wnB, wnKTau;
+	static double wnRho0, wnRAu, wnXi, wnSigma, wnA, wnB, wnK;
 	static double mRn, mRt, mRa, mRx, mRy, mRSig;
 	static double mWnBinRatio, mInitFlow, mInitNS;
 	
@@ -70,8 +70,10 @@ class CMesh {
 	double getTau(){return mCells[1][1][1]->getTau();}
 	void setTau(double);
 	
+	inline bool getActive(int eta, int x, int y) 
+	  {if (mOctant) return mCells[eta+1][x+1][y+1]->getActive(); else return mCells[eta+mNSizeOrig][x+mXSizeOrig][y+mYSizeOrig]->getActive();}
 	inline void update(int eta, int x, int y) 
-	  { if (mOctant) mCells[eta+1][x+1][y+1]->update(); else mCells[eta+mNSizeOrig][x+mXSizeOrig][y+mYSizeOrig];}
+	  {if (mOctant) mCells[eta+1][x+1][y+1]->update(); else mCells[eta+mNSizeOrig][x+mXSizeOrig][y+mYSizeOrig]->update();}
 	inline double getS(int eta, int x, int y, int s)
 	  {if (!mOctant) return mCells[eta+mNSizeOrig][x+mXSizeOrig][y+mYSizeOrig]->getS(s); else return mCells[eta+1][x+1][y+1]->getS(s);}
 	inline double getDS(int eta, int x, int y, int m, int n) 
@@ -141,9 +143,15 @@ class CMesh {
 	inline int getNSize() {return mNSize;}
 	inline int getXSize() {return mXSize;}
 	inline int getYSize() {return mYSize;}
+	inline int getNSizeOrig() {return mNSizeOrig;}
+	inline int getXSizeOrig() {return mXSizeOrig;}
+	inline int getYSizeOrig() {return mYSizeOrig;}
 	inline void setNSize(int i) {mNSize = i;}
 	inline void setXSize(int i) {mXSize = i;}
 	inline void setYSize(int i) {mYSize = i;}
+
+	inline void setActive(int eta, int x, int y, bool v) 
+	  {if (mOctant) mCells[eta+1][x+1][y+1]->setActive(v); else mCells[eta+mNSizeOrig][x+mXSizeOrig][y+mYSizeOrig]->setActive(v);}
 
 	double integralE(int);
 	double integralE();
@@ -172,9 +180,15 @@ class CMesh {
 	double getPLoss(CMesh*,int);
 	double getPLoss(CMesh*,int,int);
 	
+	inline void deactivate(int eta, int x, int y) 
+	  {if (mOctant) mCells[eta+1][x+1][y+1]->deactivate(); else mCells[eta+mNSizeOrig][x+mXSizeOrig][y+mYSizeOrig]->deactivate();}
+	
 	// remove the cells 
 	void deaden();
+	void deaden(CMesh*);
 	bool detectCrash();
+	
+	void checkAzimuthalSymmetry();
 
 };
 //#include "CMesh.cpp"

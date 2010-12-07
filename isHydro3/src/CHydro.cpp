@@ -52,14 +52,7 @@ CHydro::CHydro(parameterMap* pM) {
 	mT0 = parameter::getD(*pMap,"HYDRO_T0",1.0);
 	mDt = parameter::getD(*pMap,"HYDRO_DT",0.03);
 	mE0 = parameter::getD(*pMap,"HYDRO_E0",1.0);
-
-	
-	zeroPointers();
-}
-
-void CHydro::zeroPointers(){
-	fEX = NULL;
-	fEN = NULL;
+  
 }
 
 int CHydro::runHydro() {
@@ -82,6 +75,7 @@ int CHydro::runHydro() {
 	}
   
 	if (mOldFile) {
+		printf("Reading from old file:  %s\n",mOldFileName.c_str());
 		onMesh   = new CMesh(mOldFileName.c_str());
 		offMesh  = new CMesh(onMesh);
 		tempMesh = new CMesh(onMesh);
@@ -98,10 +92,10 @@ int CHydro::runHydro() {
     onMesh->setEos(mEos);  // static, so just once
 	onMesh->setParameterMap(pMap);
 	onMesh->deaden();
-
+	
 	if (mInitFlow != 0.) onMesh->addInitialFlow();
 	if (mInitNS != 0.)   onMesh->initNS();
-
+	
 	sLoss=0.; sLoss2=0.; eLoss=0.;
 	pLoss[0] = 0.; pLoss[1] = 0.; pLoss[2] = 0.;
 	epLoss=0.;
@@ -145,8 +139,14 @@ int CHydro::runHydro() {
 		fprintf(fTxxNSML,"%0.6g %0.6g\n", mTau, onMesh->getPixyNSMesh(0,mPrintX,0,1,1));
 		fprintf(fDzz,"%0.6g %0.6g\n",mTau, mTau*onMesh->getDULocal(0,0,0,3,3)-1.);
 	}	
-	if (mIoOscarFull) openOscarFull();
-	if (mIoOscarHyper) openOscarHyper();
+	if (mIoOscarFull) {
+		openOscarFull();
+		printOscarFull(onMesh,0);
+	}
+	if (mIoOscarHyper) {
+		openOscarHyper();
+		printOscarHyper(onMesh,0);
+	}
 
     time(&now);
 	if (!mPureBjorken) 
@@ -160,6 +160,9 @@ int CHydro::runHydro() {
 
 		if (mSawtooth) onMesh->forward(tempMesh,offMesh,mDt);
 		else if (mRK2) {
+			onMesh->deaden();
+			copyCellActive(onMesh,offMesh);
+			copyCellActive(onMesh,tempMesh);
 			onMesh->forward(offMesh,mDt/2.);
 			onMesh->forward(tempMesh,offMesh,mDt);
 		}
@@ -182,18 +185,12 @@ int CHydro::runHydro() {
 	
 		if (tempMesh->getT(0,0,0) < mFoTemp) {
 			if (mIoSlices || mIoFull) printE(tempMesh,5);
-			closeFile();
 			t=mTStep+1;
 		}
 	  
-		if (t%mPrintStep==0 && (mIoSlices || mIoFull)) {
-			printE(tempMesh,t/mPrintStep);
-			closeFile();
-		}
+		if (t%mPrintStep==0 && (mIoSlices || mIoFull)) printE(tempMesh,t/mPrintStep);
 		else if ((t*50)%mTStep==0) {printf(".");  fflush(stdout);}
 
-		testFileOpen();
-		
 		if (mIoSpots && t%mIoSliceTStep == 0) 
 			printSpots();
 
@@ -212,7 +209,6 @@ int CHydro::runHydro() {
 				mDt /= 2.;
 			}
 
-		tempMesh->deaden();
 		if (mSawtooth) {
 			deadMesh = onMesh;
 			onMesh = offMesh;
@@ -227,28 +223,14 @@ int CHydro::runHydro() {
 	  // no reassignments for RK4
 	}
 
-	if (mIoSpots)
-		closeFileSpots();
-	
-	if (mIoIntegrals)
-		closeFileIntegrals();
-	
-	if (mIoOscarHyper)
-		fclose(fOscarHyper);
-	
-	if (mIoOscarFull)
-		fclose(fOscarFull);
-	
 	time(&now);
 	printf("\nHydro Finished...... (Total Time: %0.6g sec)\n",difftime(now,start)); fflush(stdout);
   
 	onMesh->~CMesh(); 
 	offMesh->~CMesh(); 
-	if (mRK4) {
-		k1->~CMesh();
-		k2->~CMesh();
-	}
-	
+	k1->~CMesh();
+	k2->~CMesh();;
+
 	if (mIoSpectra) {
 		printf("Computing Spectra.......\n"); fflush(stdout);
 		printDNs(tempMesh,mNSize,mXSize,mYSize);
@@ -256,52 +238,23 @@ int CHydro::runHydro() {
 	
 	tempMesh->~CMesh();
   
-	closeFile();
-	testFileOpen();
-	return 0;
+  return 0;
 }
 
 void CHydro::printE(CMesh* lMesh, int lT) { 
-
+	openFile(lT);
 	time(&now);
 	printf("\nAt Time: [%0.6g] (elapsed time %0.6g sec) .",lMesh->getTau(),difftime(now,start)); fflush(stdout);
 
-	if (mIoFull) {
-		string temp;
-		if (lT == 1) {
-			temp = mDataRoot;
-			temp.append("fFull1.txt");
-			fFull = fopen(temp.c_str(),"w");
-		} else if (lT ==2) {
-			temp = mDataRoot;
-			temp.append("fFull2.txt");
-			fFull = fopen(temp.c_str(),"w");
-		} else if (lT ==3) {
-			temp = mDataRoot;
-			temp.append("fFull3.txt");
-			fFull = fopen(temp.c_str(),"w");
-		} else if (lT ==4) {
-			temp = mDataRoot;
-			temp.append("fFull4.txt");
-			fFull = fopen(temp.c_str(),"w");
-		} else if (lT ==5) {
-			temp = mDataRoot;
-			temp.append("fFull5.txt");
-			fFull = fopen(temp.c_str(),"w");
-		} 
-		printMesh(lMesh);
-	}
-	
-	if (!mIoSlices) return;
-	openFile(lT);
-	
-	int nPrintX = min(mPrintX,lMesh->getXSize()-1);
-	int nPrintY = min(mPrintY,lMesh->getYSize()-1);
-	int lPrintN = min(mPrintN,lMesh->getNSize()-1);
+	int nPrintX = min(parameter::getI(*pMap,"HYDRO_PRINTX",0),lMesh->getXSize()-1);
+	int nPrintY = min(parameter::getI(*pMap,"HYDRO_PRINTY",0),lMesh->getYSize()-1);
+	int lPrintN = min(parameter::getI(*pMap,"HYDRO_PRINTN",0),lMesh->getNSize()-1);
 	if (mPureBjorken) lPrintN=0;
 
     if (!mPureBjorken)
-		for (int i=-1;i<=lMesh->getNSize();i++) {
+		for (int i=0;i<lMesh->getNSize();i++) {
+			if (!lMesh->getActive(i,nPrintX,nPrintY)) break;
+		
 			double localN = lMesh->getX(i,nPrintX,nPrintY,3);
 			if (parameter::getB(*pMap,"HYDRO_BJORKEN",true))  
 				fprintf(fEN,"%0.9g %0.9g\n", localN, pow(lMesh->getTau(),(4./3.)) * lMesh->getS(i,nPrintX,nPrintY,4));
@@ -322,11 +275,12 @@ void CHydro::printE(CMesh* lMesh, int lT) {
 
 			fprintf(fT,"%0.9g %0.9g\n", localN, lMesh->getT(i,nPrintX,nPrintY));
 			fprintf(fP,"%0.9g %0.9g\n", localN, lMesh->getP(i,nPrintX,nPrintY));
-			fprintf(fTxx,"%0.9g %0.9g\n", localN,lMesh->getTxyMesh(i,nPrintX,nPrintY,1,1));
-			fprintf(fTyy,"%0.9g %0.9g\n", localN,lMesh->getTxyMesh(i,nPrintX,nPrintY,2,2));
-			fprintf(fTzz,"%0.9g %0.9g\n", localN,lMesh->getTxyMesh(i,nPrintX,nPrintY,3,3));
-			fprintf(fTxy,"%0.9g %0.9g\n", localN,lMesh->getTxyMesh(i,nPrintX,nPrintY,1,2));
-			fprintf(fTyz,"%0.9g %0.9g\n", localN,lMesh->getTxyMesh(i,nPrintX,nPrintY,2,3));
+			double mP = lMesh->getP(i,nPrintX,nPrintY);
+			fprintf(fTxx,"%0.9g %0.9g\n", localN,lMesh->getTxyMesh(i,nPrintX,nPrintY,1,1)/mP);
+			fprintf(fTyy,"%0.9g %0.9g\n", localN,lMesh->getTxyMesh(i,nPrintX,nPrintY,2,2)/mP);
+			fprintf(fTzz,"%0.9g %0.9g\n", localN,lMesh->getTxyMesh(i,nPrintX,nPrintY,3,3)/mP);
+			fprintf(fTxy,"%0.9g %0.9g\n", localN,lMesh->getTxyMesh(i,nPrintX,nPrintY,1,2)/mP);
+			fprintf(fTyz,"%0.9g %0.9g\n", localN,lMesh->getTxyMesh(i,nPrintX,nPrintY,2,3)/mP);
 		}
 
 	double mFOS[XSIZE+YSIZE][2];
@@ -339,6 +293,8 @@ void CHydro::printE(CMesh* lMesh, int lT) {
 
 	int lPrintY = nPrintY;
 	for (int i=0;i<lMesh->getXSize();i++) {
+		if (!lMesh->getActive(lPrintN,i,lPrintY)) break;
+	
 		double localX = lMesh->getX(lPrintN,i,lPrintY,1);
 		fprintf(fEX,"%0.9g %0.9g\n", localX, lMesh->getS(lPrintN,i,lPrintY,4));
 		fprintf(fS,"%0.9g %0.9g\n", localX, lMesh->getS(lPrintN,i,lPrintY));
@@ -357,14 +313,14 @@ void CHydro::printE(CMesh* lMesh, int lT) {
 		fprintf(fT,"%0.9g %0.9g\n", localX, lMesh->getT(lPrintN,i,lPrintY));
 		fprintf(fP,"%0.9g %0.9g\n", localX, P);
 
-		fprintf(fTxx,"%0.9g %0.9g\n", localX, lMesh->getPixyMesh(lPrintN,i,lPrintY,1,1)/P);
+//		fprintf(fTxx,"%0.9g %0.9g\n", localX, lMesh->getPixyMesh(lPrintN,i,lPrintY,1,1)/P);
 		fprintf(fTrr,"%0.9g %0.9g\n", localX, lMesh->getTRR(lPrintN,i,lPrintY)/P);
 		fprintf(fTpp,"%0.9g %0.9g\n", localX, lMesh->getTPhiPhi(lPrintN,i,lPrintY)/P);
 		fprintf(fTpr,"%0.9g %0.9g\n", localX, lMesh->getTRPhi(lPrintN,i,lPrintY)/P);
 
 		fprintf(fTxxNS,"%0.9g %0.9g\n",localX, lMesh->getPixyNS(lPrintN,i,lPrintY,1,1)/P);
-		fprintf(fTyy,"%0.9g %0.9g\n",  localX, lMesh->getPixyMesh(lPrintN,i,lPrintY,2,2)/P);
-		fprintf(fTzz,"%0.9g %0.9g\n",  localX, lMesh->getPixyMesh(lPrintN,i,lPrintY,3,3)/P);
+//		fprintf(fTyy,"%0.9g %0.9g\n",  localX, lMesh->getPixyMesh(lPrintN,i,lPrintY,2,2)/P);
+//		fprintf(fTzz,"%0.9g %0.9g\n",  localX, lMesh->getPixyMesh(lPrintN,i,lPrintY,3,3)/P);
 
 		fprintf(fTIS, "%0.9g %0.9g\n", localX, lMesh->getTIS(lPrintN,i,lPrintY));
 		fprintf(fTISB,"%0.9g %0.9g\n", localX, lMesh->getTISB(lPrintN,i,lPrintY));
@@ -375,6 +331,8 @@ void CHydro::printE(CMesh* lMesh, int lT) {
 	
 	int mPrintN = lPrintN, mPrintX = nPrintX;
 	for (int i=0; i<lMesh->getYSize();i++) {
+		if (!lMesh->getActive(mPrintN,mPrintX,i)) break;
+	
 		double localY = lMesh->getX(mPrintN,mPrintX,i,2);
 		fprintf(fEY, "%0.9g %0.9g\n", localY, lMesh->getS(mPrintN,mPrintX,i,4));
 		
@@ -412,7 +370,8 @@ void CHydro::printE(CMesh* lMesh, int lT) {
 			fprintf(fISN,"%0.9g %0.9g\n", lMesh->getYL(i,nPrintX,nPrintY), lMesh->integralS(i));  
 		}
 
-	
+	if (parameter::getB(*pMap,"HYDRO_IO_FULL",false)) printMesh(lMesh);
+	closeFile();
 }
 
 void CHydro::openFile(int lT) {
@@ -597,6 +556,10 @@ void CHydro::openFile(int lT) {
 		temp = mDataRoot;
 		temp.append("fTISB1.txt");
 		fTISB = fopen(temp.c_str(),"w");
+
+		temp = mDataRoot;
+		temp.append("fFull1.txt");
+		fFull = fopen(temp.c_str(),"w");
 	  
 		temp = mDataRoot;
 		temp.append("fEP1.txt");
@@ -788,6 +751,10 @@ void CHydro::openFile(int lT) {
 	  fTISB = fopen(temp.c_str(),"w");
 
 	  temp = mDataRoot;
+	  temp.append("fFull2.txt");
+	  fFull = fopen(temp.c_str(),"w");
+	  
+	  temp = mDataRoot;
 	  temp.append("fEP2.txt");
 	  fEP = fopen(temp.c_str(),"w");
 	  
@@ -976,6 +943,10 @@ void CHydro::openFile(int lT) {
 	  temp.append("fTISB3.txt");
 	  fTISB = fopen(temp.c_str(),"w");
 
+	  temp = mDataRoot;
+	  temp.append("fFull3.txt");
+	  fFull = fopen(temp.c_str(),"w");
+	  
 	  temp = mDataRoot;
 	  temp.append("fEP3.txt");
 	  fEP = fopen(temp.c_str(),"w");
@@ -1166,6 +1137,10 @@ void CHydro::openFile(int lT) {
 	  fTISB = fopen(temp.c_str(),"w");
 
 	  temp = mDataRoot;
+	  temp.append("fFull4.txt");
+	  fFull = fopen(temp.c_str(),"w");
+	  
+	  temp = mDataRoot;
 	  temp.append("fEP4.txt");
 	  fEP = fopen(temp.c_str(),"w");
 	  
@@ -1355,6 +1330,10 @@ void CHydro::openFile(int lT) {
 	  fTISB = fopen(temp.c_str(),"w");
 
 	  temp = mDataRoot;
+	  temp.append("fFull5.txt");
+	  fFull = fopen(temp.c_str(),"w");
+	  
+	  temp = mDataRoot;
 	  temp.append("fEP5.txt");
 	  fEP = fopen(temp.c_str(),"w");
 	  
@@ -1412,21 +1391,6 @@ void CHydro::openFileIntegrals() {
 	temp = mDataRoot;
 	temp.append("fELoss.txt");
     fELoss = fopen(temp.c_str(),"w");
-}
-
-void CHydro::closeFileIntegrals() {
-    fclose(fIE);
-	fclose(fIPX);
-	fclose(fIPY);
-	fclose(fIPN);
-	fclose(fPXLoss);
-	fclose(fPYLoss);
-	fclose(fPNLoss);
-	fclose(fIS);
-	fclose(fIS2);
-	fclose(fSLoss);
-	fclose(fSLoss2);
-    fclose(fELoss);
 }
 
 void CHydro::printIntegrals(int t) {
@@ -1590,47 +1554,18 @@ void CHydro::openFileSpots() {
 	fTxxNSML = fopen(temp.c_str(),"w");
 }
 
-void CHydro::closeFileSpots() {
-    fclose(fE0);
-    fclose(fT0);
-    fclose(fTxx0);
-    fclose(fTzz0);
-	fclose(fUL);
-	fclose(fEL);
-	fclose(fA1L);
-	fclose(fA2L);
-	fclose(fBL);
-	fclose(fDzz);
-	fclose(fEP0);
-	fclose(fEX0);
-	fclose(fVR0);
-	fclose(fFOSL);
-	fclose(fFOSSST);
-	fclose(fTxxL);
-	fclose(fTxxNSL);
-	fclose(fTxxML);
-	fclose(fTxxNSML);
-}
-
 void CHydro::closeFile() {
-	
-	int status = fclose(fEX);
-		//	if (status != 0) printf("\n*** failed close of fEX  ....(%d vs %d)\n",status,EOF);
-	
-	fclose(fEY); fclose(fEZ); fclose(fS); fclose(fT); fclose(fP);
-	fclose(fEN); fclose(fU0); fclose(fUx); fclose(fUy); fclose(fUz); fclose(fULz); fclose(fUzz);
-	fclose(fE0); fclose(fTxx0); fclose(fTzz0);
-	
-	status = fclose(fFull);
-		//	if (status != 0) printf("\n*** failed close of fFull....(%d vs %d)\n",status,EOF);
-	
-	fclose(fA1x); fclose(fA2x); fclose(fA3x); fclose(fA4x); fclose(fA5x); fclose(fBx);
-	fclose(fA1y); fclose(fA2y); fclose(fA3y); fclose(fA4y); fclose(fA5y); fclose(fBy);
-	fclose(fA1z); fclose(fA2z); fclose(fA3z); fclose(fA4z); fclose(fA5z); fclose(fBz);
-	fclose(fTxx); fclose(fTyy); fclose(fTzz); fclose(fTxy); fclose(fTxz); fclose(fTyz); fclose(fTxxNS);
-	fclose(fTrr); fclose(fTpp); fclose(fTpr);
-	fclose(fTIS); fclose(fTISB);
-	fclose(fFOS);
+  fclose(fEX); fclose(fEY); fclose(fEZ); fclose(fS); fclose(fT); fclose(fP);
+  fclose(fEN); fclose(fU0); fclose(fUx); fclose(fUy); fclose(fUz); fclose(fULz); fclose(fUzz);
+  fclose(fE0); fclose(fTxx0); fclose(fTzz0);
+  fclose(fFull);
+  fclose(fA1x); fclose(fA2x); fclose(fA3x); fclose(fA4x); fclose(fA5x); fclose(fBx);
+  fclose(fA1y); fclose(fA2y); fclose(fA3y); fclose(fA4y); fclose(fA5y); fclose(fBy);
+  fclose(fA1z); fclose(fA2z); fclose(fA3z); fclose(fA4z); fclose(fA5z); fclose(fBz);
+  fclose(fTxx); fclose(fTyy); fclose(fTzz); fclose(fTxy); fclose(fTxz); fclose(fTyz); fclose(fTxxNS);
+  fclose(fTrr); fclose(fTpp); fclose(fTpr);
+  fclose(fTIS); fclose(fTISB);
+  fclose(fFOS);
 }
 
 void CHydro::printMesh(CMesh* lMesh) {
@@ -1642,6 +1577,11 @@ void CHydro::printMesh(CMesh* lMesh) {
 	  for (int i=-1;i<=mN;i++) 
 	    for (int j=-1;j<=mX;j++) 
 	      for (int k=-1;k<=mY;k++) {
+			if (!lMesh->getActive(i,j,k)) {
+				fprintf(fFull,"0\n");
+				break;
+			}
+			fprintf(fFull,"1 ");
 		    for (int l=1;l<4;l++)  fprintf(fFull,"%0.6g ",lMesh->getX(i,j,k,l));
 		    for (int l=0;l<11;l++) fprintf(fFull,"%0.9g ",lMesh->getS(i,j,k,l));
 		    fprintf(fFull,"\n");
@@ -1649,6 +1589,11 @@ void CHydro::printMesh(CMesh* lMesh) {
 	else 
 	  for (int j=-1;j<=mX;j++) 
 	      for (int k=-1;k<=mY;k++) {
+		    if (!lMesh->getActive(0,j,k)) {
+				fprintf(fFull,"0 \n");
+				break;
+			}
+			fprintf(fFull,"1 ");
 		    for (int l=1;l<4;l++)  fprintf(fFull,"%0.6g ",lMesh->getX(0,j,k,l));
 		    for (int l=0;l<11;l++) fprintf(fFull,"%0.9g ",lMesh->getS(0,j,k,l));
 		    fprintf(fFull,"\n");
@@ -1713,11 +1658,9 @@ void CHydro::printTQM(CMesh* lMesh) {
 void CHydro::openOscarHyper() {
   // 1
 //  fOscarHyper = fopen("fOscarHyper.OSCAR2008H","w");
-	string fn = parameter::getS(*pMap,"HYDRO_IO_OSCARHYPER_FN","");
-	fn = mDataRoot + fn;
-	fOscarHyper = fopen( fn.c_str(),"w");
-	fprintf(fOscarHyper,"OSCAR2008H  ");
-	
+  string fn = parameter::getS(*pMap,"HYDRO_IO_OSCARHYPER_FN","");
+  fOscarHyper = fopen( fn.c_str(),"w");
+  fprintf(fOscarHyper,"OSCAR2008H  ");
   if ( parameter::getD(*pMap,"HYDRO_SVRATIO",0.0) > 0. || parameter::getD(*pMap,"HYDRO_BVRATIO",0.0) > 0.) 
     fprintf(fOscarHyper,"viscous     ");
   else 
@@ -1843,16 +1786,16 @@ void CHydro::openOscarFull() {
   fprintf(fOscarFull,"GRID:  Euler\n");
   if (parameter::getB(*pMap,"HYDRO_OCTANT",true)) {
 	fprintf(fOscarFull,"%d %d %d %d 0 5 3\n",
-			parameter::getI(*pMap,"HYDRO_TSTEP",100),parameter::getI(*pMap,"HYDRO_XSIZE",60)+1,
-			parameter::getI(*pMap,"HYDRO_YSIZE",60)+1,parameter::getI(*pMap,"HYDRO_NSIZE",20)+1);
+			parameter::getI(*pMap,"HYDRO_TSTEP",100)+1,parameter::getI(*pMap,"HYDRO_XSIZE",60),
+			parameter::getI(*pMap,"HYDRO_YSIZE",60),parameter::getI(*pMap,"HYDRO_NSIZE",20));
     fprintf(fOscarFull,"%f ",parameter::getD(*pMap,"HYDRO_T0",1.0));
     if (parameter::getB(*pMap,"HYDRO_LINT",false)) 
 	  fprintf(fOscarFull,"%f ",parameter::getI(*pMap,"HYDRO_TSTEP",100)*parameter::getD(*pMap,"HYDRO_DT",0.1)+parameter::getD(*pMap,"HYDRO_T0",1.0));
     // else FIXME
   
-	fprintf(fOscarFull,"0. %f 0. %f 0. %f\n",parameter::getD(*pMap,"HYDRO_DX",0.1)*parameter::getI(*pMap,"HYDRO_XSIZE",60),
-											 parameter::getD(*pMap,"HYDRO_DY",0.1)*parameter::getI(*pMap,"HYDRO_YSIZE",60),
-											 parameter::getD(*pMap,"HYDRO_DN",0.1)*parameter::getI(*pMap,"HYDRO_NSIZE",20));
+	fprintf(fOscarFull,"0. %f 0. %f 0. %f\n",parameter::getD(*pMap,"HYDRO_DX",0.1)*(parameter::getI(*pMap,"HYDRO_XSIZE",60)-1),
+											 parameter::getD(*pMap,"HYDRO_DY",0.1)*(parameter::getI(*pMap,"HYDRO_YSIZE",60)-1),
+											 parameter::getD(*pMap,"HYDRO_DN",0.1)*(parameter::getI(*pMap,"HYDRO_NSIZE",20)-1));
   }
   else {printf("!!!!!!!!!! OSCAR OUTPUT FAILING !!!!!!!!!!"); return;}
   
@@ -1876,9 +1819,9 @@ void CHydro::openOscarFull() {
 }
 
 void CHydro::printOscarFull(CMesh* lMesh, int mT) {
-  int mX = lMesh->getXSize();
-  int mY = lMesh->getYSize();
-  int mN = lMesh->getNSize();
+  int mX = lMesh->getXSizeOrig();
+  int mY = lMesh->getYSizeOrig();
+  int mN = lMesh->getNSizeOrig();
   
   double mSVRatio = parameter::getD(*pMap,"HYDRO_SVRATIO",0.0);
   double mBVRatio = parameter::getD(*pMap,"HYDRO_BVRATIO",0.0);
@@ -1912,28 +1855,41 @@ void CHydro::printOscarFull(CMesh* lMesh, int mT) {
     for (int i=0;i<mX;i++)
       for (int j=0;j<mY;j++) 
 	    for (int k=0;k<mN;k++) {
-	    lMesh->update(k,i,j);
-		fprintf(fOscarFull,"%d %d %d %d ",mT,i,j,k);
-		fprintf(fOscarFull,"%g %g %g 1. ",lMesh->getE(k,i,j),lMesh->getP(k,i,j),lMesh->getT(k,i,j));
+			if (!lMesh->getActive(i,j,k)) {
+				fprintf(fOscarFull,"%4d %4d %4d %4d ",mT,i,j,k);
+				for (int z=0;z<8;z++) 
+					fprintf(fOscarFull,"+0.000000E+00 ");
+				if (mSVRatio > 0.) 
+					for (int z=0;z<7;z++) 
+						fprintf(fOscarFull,"+0.000000E+00 ");
+				if (mBVRatio > 0.) 
+					fprintf(fOscarFull,"+0.000000E+00 +0.000000E+00 ");
+				fprintf(fOscarFull,"\n");
+				continue;
+			}
 		
-		fprintf(fOscarFull,"%g %g %g ",lMesh->getS(k,i,j,1)/lMesh->getS(k,i,j,0),
+	    lMesh->update(k,i,j);
+		fprintf(fOscarFull,"%4d %4d %4d %4d ",mT,i,j,k);
+		fprintf(fOscarFull,"%+E %+E %+E +1.000000E+00 ",lMesh->getE(k,i,j),lMesh->getP(k,i,j),lMesh->getT(k,i,j));
+		
+		fprintf(fOscarFull,"%+E %+E %+E ",lMesh->getS(k,i,j,1)/lMesh->getS(k,i,j,0),
 									   lMesh->getS(k,i,j,2)/lMesh->getS(k,i,j,0), 
 									   lMesh->getS(k,i,j,3)/lMesh->getS(k,i,j,0));
 		
 		if (mSVRatio > 0.) {
 		  double mAlpha = lMesh->getISAlpha(k,i,j);
 		  for (int m=1;m<6;m++) 
-		    fprintf(fOscarFull,"%g ",mAlpha*lMesh->getS(k,i,j,m+4));
+		    fprintf(fOscarFull,"%+E ",mAlpha*lMesh->getS(k,i,j,m+4));
 		}
 		if (mBVRatio > 0.) 
-		  fprintf(fOscarFull,"%g ",lMesh->getS(k,i,j,10)*lMesh->getISGamma(k,i,j));
+		  fprintf(fOscarFull,"%+E ",lMesh->getS(k,i,j,10)*lMesh->getISGamma(k,i,j));
 		
 	    if (mSVRatio > 0.)  
-		  fprintf(fOscarFull,"%g %g ",lMesh->getSV(k,i,j),lMesh->getTIS(k,i,j));
+		  fprintf(fOscarFull,"%+E %+E ",lMesh->getSV(k,i,j),lMesh->getTIS(k,i,j));
 		if (mBVRatio > 0.)
-		  fprintf(fOscarFull,"%g %g ",lMesh->getBV(k,i,j),lMesh->getTISB(k,i,j));
+		  fprintf(fOscarFull,"%+E %+E ",lMesh->getBV(k,i,j),lMesh->getTISB(k,i,j));
 		
-		fprintf(fOscarFull,"%g ",lMesh->getS(k,i,j));
+		fprintf(fOscarFull,"%+E ",lMesh->getS(k,i,j));
 		fprintf(fOscarFull,"\n");
 		fflush(fOscarFull);
 	  }
@@ -2075,25 +2031,11 @@ void CHydro::printDNs(CMesh* lMesh, int mNSize, int mXSize, int mYSize) {
 
 }
 
-void CHydro::testFileOpen() {
-	if (fEX != NULL) printf("problem with file fEX (%p)...\n",fEX);
-	if (fEN != NULL) printf("problem with file fEN (%p)...\n",fEN);
-	if (fE0 != NULL) printf("problem with file fE0 (%p)...\n",fE0);
-	if (fIE != NULL) printf("problem with file fIE (%p)...\n",fIE);
-	if (fIPX != NULL) printf("problem with file fIPX (%p)...\n",fIPX);
-	if (fA1x != NULL) printf("problem with file fA1X (%p)...\n",fA1x);
-	if (fTxx != NULL) printf("problem with file fTxx (%p)...\n",fTxx);
-	if (fTrr != NULL) printf("problem with file fTrr (%p)...\n",fTrr);
-	if (fSLoss != NULL) printf("problem with file fSloss (%p)...\n",fSLoss);
-	if (fUL != NULL) printf("problem with file fUL (%p)...\n",fUL);
-	if (fTIS != NULL) printf("problem with file fTIS (%p)...\n",fTIS);
-	if (fEP != NULL) printf("problem with file fEP (%p)...\n",fEP);
-	if (fVR0 != NULL) printf("problem with file fVR0 (%p)..\n",fVR0);
-	if (fFOS != NULL) printf("problem with file fFOS (%p)...\n",fFOS);
-	if (fTQMX != NULL) printf("problem with file fTQMX (%p)...\n",fTQMX);
-	if (fTxxL != NULL) printf("problem with file fTxxL (%p)...\n",fTxxL);
-	if (fFull != NULL) printf("problem with file fFull (%p)...\n",fFull);
-	if (fPiDNDY != NULL) printf("problem with file fPiDNDYU (%p)...\n",fPiDNDY);
+void CHydro::copyCellActive(CMesh* m1, CMesh* m2) {
+	for (int i=-1;i<=m2->getNSizeOrig();i++)
+		for (int j=-1;j<=m2->getXSizeOrig();j++)
+			for (int k=-1;k<=m2->getYSizeOrig();k++)
+				m2->setActive(i,j,k,m1->getActive(i,j,k));
 }
 
 string CHydro::mDataRoot, CHydro::mOldFileName;

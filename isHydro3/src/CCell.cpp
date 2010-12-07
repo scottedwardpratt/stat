@@ -7,28 +7,31 @@
 #include "CEos.h"
 #include <iostream>
 #include <fstream>
-#include "coral.h"
 
 CCell::CCell(parameterMap* pM){
 	paramFill(pM);
 }
 
 CCell::CCell(double t0,double n0, double x0, double y0) { 
+  active = true;
   if (mLinT) x[0] = t0;
   else if (mLogT) x[0] = log(t0/mT0);
   else if (mLogSinhT) x[0] = log( sinh(t0));
-//  else printf("whoa!!!\n");
   x[3] = n0;
   x[1] = x0;
   x[2] = y0;
-  
-//  printf("%f %f %f %f\n",x[0],x[1],x[2],x[3]);
 }
 
 CCell::~CCell() {
 	//noop
 }
   
+CCell::CCell(CCell* cell) {
+  for (int i=0;i<4;i++) x[i] = cell->x[i];
+  for (int i=0;i<11;i++) s[i] = cell->s[i];
+  active = cell->active;
+}  
+
 void CCell::paramFill(parameterMap* pM) {
   pMap = pM;
   
@@ -57,121 +60,44 @@ void CCell::paramFill(parameterMap* pM) {
 
 void CCell::calcDeriv() {
 
-  for (int j=0;j<3;j++) 
-    if (mPureBjorken) {
- 	  for (int i=0;i<2;i++) 
-	    dS[j][i] = (neighbors[i][1]->s[j+1] - neighbors[i][0]->s[j+1])/(2.*dx[i+1]);
-	  dS[j][2] = 0.;
-	}
-	else 
-      for (int i=0;i<3;i++) {
-		dS[j][i] = (neighbors[i][1]->s[j+1] - neighbors[i][0]->s[j+1])/(2.*dx[i+1]);
-		if (mBjorken && i==2) dS[j][i] /= getTau();
-	  }
-
-  if (mBjorken) dS[2][2] += s[0]/getTau();
-
-  for (int j=4;j<10;j++) 
-    if (mPureBjorken) {
-	  for (int i=0;i<2;i++) 
-	     dS[j][i] = (neighbors[i][1]->s[j+1] - neighbors[i][0]->s[j+1])/(2.*dx[i+1]);
-	  dS[j][2] = 0.;
-	}	
-	else 
-      for (int i=0;i<3;i++) {
-		dS[j][i] = (neighbors[i][1]->s[j+1] - neighbors[i][0]->s[j+1])/(2.*dx[i+1]);
-		if (mBjorken && i==2) dS[j][i] /= getTau();
-	  }
-
-  for (int j=0;j<4;j++) 
-      for (int i=0;i<4;i++)  
-	    dULocal[j][i] = getSpLocDS(j,i);
-
-  for (int i=0;i<2;i++)
-	dS[3][i] = getE() * (neighbors[i][1]->s[4] - neighbors[i][0]->s[4])/(2.*dx[i+1]);
-  if (mPureBjorken) dS[3][2] = 0.;
-  else 
-    if (mBjorken) 
-	  dS[3][2] = (getE()/(2.*dx[3]*getTau())) * (neighbors[2][1]->s[4]  -  neighbors[2][0]->s[4]);
-	else 
-	  dS[3][2] = (getE()/(2.*dx[3])) * (neighbors[2][1]->s[4]  -  neighbors[2][0]->s[4]);
-
-  if (ISSCALE == 'c') for (int i=0;i<3;i++) dTISS[i] = 0.;
-  if (ISSCALE == 'e') for (int i=0;i<3;i++) dTISS[i] = dS[3][i];
-  if (ISSCALE == 'j') for (int i=0;i<3;i++) dTISS[i] = (5./8.)*dS[3][i]*exp(-s[4]);  //FIXME	
-  
-  /*
-  if (!mViscNS) {
-	for (int j=0;j<4;j++)
-	  for (int k=j;k<4;k++) 
-	    if (mPureBjorken) {
-		  for (int i=0;i<2;i++) {
-		    DiPixy[i][j][k] = (neighbors[i][1]->getPixyMeshEos(j,k) 
-							    - neighbors[i][0]->getPixyMeshEos(j,k))/(2.*dx[i+1]);
-		    if (i==2) DiPixy[i][j][k] /= getTau();
-		    DiPixy[i][k][j] = DiPixy[i][j][k];
-		  }
-		  DiPixy[2][j][k] = 0.;
-		  DiPixy[2][k][j] = 0.;
-		}  
-		else 
-		  for (int i=0;i<3;i++) {
-		    DiPixy[i][j][k] = (neighbors[i][1]->getPixyMeshEos(j,k) 
-							- neighbors[i][0]->getPixyMeshEos(j,k))/(2.*dx[i+1]);
-		    if (i==2) DiPixy[i][j][k] /= getTau();
-		    DiPixy[i][k][j] = DiPixy[i][j][k];
-		  }
-
-	if (mBjorken && false) { 
-	  DiPixy[2][0][0] += 2*getPixyMeshEos(0,3)/getTau();
-	  DiPixy[2][3][3] += 2*getPixyMeshEos(0,3)/getTau();
-	  DiPixy[2][0][3] += (getPixyMeshEos(0,0) + getPixyMeshEos(3,3))/getTau();
-	  DiPixy[2][3][0] += (getPixyMeshEos(0,0) + getPixyMeshEos(3,3))/getTau();
-	  DiPixy[2][3][1] +=  getPixyMeshEos(0,1)/getTau();
-	  DiPixy[2][1][3] +=  getPixyMeshEos(0,1)/getTau();
- 	  DiPixy[2][3][2] +=  getPixyMeshEos(0,2)/getTau();
-	  DiPixy[2][2][3] +=  getPixyMeshEos(0,2)/getTau();
-	}
+	for (int j=0;j<10;j++)
+		for (int i=0;i<3;i++)
+			if (neighbors[i][1]->getActive())
+				dS[j][i] = (neighbors[i][1]->s[j+1] - neighbors[i][0]->s[j+1])/(2.*dx[i+1]);
+			else 
+				dS[j][i] = (3.*s[j+1] - 4.*neighbors[i][0]->s[j+1] 
+							+ neighbors[i][0]->neighbors[i][0]->s[j+1]) / (2.*dx[i+1]);
 	
-    for (int j=0;j<3;j++)
-	  for (int k=0;k<3;k++) 
-	    for (int i=0;i<3;i++)
-	      DiPixyLocal[i][j][k] = getDiPixyLocal(i,j+1,k+1);
+	for (int i=0;i<3;i++)
+		dS[3][i] *= getE();
 	
-    for (int i=0;i<3;i++) {
-	    dS[4][i] =  0.5 * ( DiPixyLocal[i][1][1] - DiPixyLocal[i][2][2])/getISAlpha();
-	    dS[4][i] -= 0.5 * ( Pixy[0][0] - Pixy[1][1]) * dTISS[i]/(getISAlpha()*getISAlpha());
-		
-	    dS[5][i] =  (DiPixyLocal[i][1][1] + DiPixyLocal[i][2][2] - 2*DiPixyLocal[i][3][3])/(2.*ROOT3*getISAlpha());
-	    dS[5][i] -= (Pixy[0][0] + Pixy[1][1] - 2*Pixy[2][2])/(2.*ROOT3) * dTISS[i]/(getISAlpha()*getISAlpha());
-		
-	    dS[6][i] = DiPixyLocal[i][1][2]/getISAlpha();
-	    dS[6][i] -= Pixy[0][1]*dTISS[i]/(getISAlpha()*getISAlpha());
-		
-	    dS[7][i] = DiPixyLocal[i][1][3]/getISAlpha();
-	    dS[7][i] -= Pixy[0][2]*dTISS[i]/(getISAlpha()*getISAlpha());
+	if (mPureBjorken)
+		for (int j=0;j<10;j++)
+			dS[j][2] = 0.;
+	else if (mBjorken)
+		for (int j=0;j<10;j++)
+			dS[j][2] /= getTau();
 
-	    dS[8][i] = DiPixyLocal[i][2][3]/getISAlpha();
-	    dS[8][i] -= Pixy[1][2]*dTISS[i]/(getISAlpha()*getISAlpha());
-	  }
-  }
-  else {
-    for (int j=4;j<10;j++) 
-	  for (int i=0;i<3;i++)
-	    dS[j][i] = s[j+1] * (3./(4.*getE())) * dS[3][i];
-  }
-  */
+	if (mBjorken) dS[2][2] += s[0]/getTau();
+
+	for (int j=0;j<4;j++) 
+		for (int i=0;i<4;i++)  
+			dULocal[j][i] = getSpLocDS(j,i);
+
+	if (ISSCALE == 'c') for (int i=0;i<3;i++) dTISS[i] = 0.;
+	if (ISSCALE == 'e') for (int i=0;i<3;i++) dTISS[i] = dS[3][i];
+	if (ISSCALE == 'j') for (int i=0;i<3;i++) dTISS[i] = (5./8.)*dS[3][i]*exp(-s[4]);  //FIXME	
   
-  for (int j=0;j<3;j++)
-	  for (int k=0;k<3;k++) 
-	    for (int i=0;i<3;i++)
-	      DiPixyLocal[i][j][k] = getDiPixyLocal(i,j+1,k+1);
+	for (int j=0;j<3;j++)
+		for (int k=0;k<3;k++) 
+			for (int i=0;i<3;i++)
+				DiPixyLocal[i][j][k] = getDiPixyLocal(i,j+1,k+1);
 
-  for (int i=0;i<3;i++) {
-    DPixy[i] = 0.;
-    for (int j=0;j<3;j++) 
-	  DPixy[i] += DiPixyLocal[j][j][i];
-  }
+	for (int i=0;i<3;i++) {
+		DPixy[i] = 0.;
+		for (int j=0;j<3;j++) 
+			DPixy[i] += DiPixyLocal[j][j][i];
+	}
 }
 
 // Fills the matrix inverted in forward
@@ -486,15 +412,15 @@ void CCell::update(int ii) {
   fillEosVar();
 }
 
-void CCell::initNS() {
-	update();
-	
-	s[5] = - (getSV()/getISAlpha()) * (dULocal[1][1] - dULocal[2][2]);
-	s[6] = - getSV()/(ROOT3*getISAlpha()) * (dULocal[1][1] + dULocal[2][2] - 2.*dULocal[3][3]);
-	s[7] = - (getSV()/getISAlpha()) * (dULocal[1][2] + dULocal[2][1]);
-	s[8] = - (getSV()/getISAlpha()) * (dULocal[1][3] + dULocal[3][1]);
-	s[9] = - (getSV()/getISAlpha()) * (dULocal[3][2] + dULocal[2][3]);
-	
+// turn this cell off; if impossible return false
+// FIXME :assumes octant=true
+void CCell::deactivate() {
+	active = false;
+  
+	for (int i=0;i<3;i++) 
+		if (neighbors[i][0]->x[i+1] == 0.)
+			neighbors[i][0]->deactivate();
+
 }
 
 double CCell::getTxy(int x, int y) {
@@ -1354,7 +1280,7 @@ void CCell::print() {
 		  std::cout << "dS[" << j << "][" << i << "] = " << dS[j][i] << std::endl;
 	std::cout << std::endl;
 	}
-	
+	return;
 	std::cout << std::endl;
 	std::cout << "dULocal:  " << std::endl;
 	for (int i=0;i<4;i++) {
@@ -1463,5 +1389,5 @@ double CCell::alphaIS, CCell::gammaIS, CCell::betaIS, CCell::aIS, CCell::bIS;
 double CCell::dAlphaISDE, CCell::dGammaISDE;
 bool CCell::mDebug, CCell::mSVTrim, CCell::mViscNS, CCell::mPureBjorken, CCell::mBjorken;
 bool CCell::mLinT, CCell::mLogT, CCell::mLogSinhT, CCell::mISVort, CCell::mISMax;
-double CCell::mT0, CCell::mSVRatio, CCell::mBVRatio, CCell::mISAMax, CCell::mISBMax, CCell::mInitNS;
+double CCell::mT0, CCell::mSVRatio, CCell::mBVRatio, CCell::mISAMax, CCell::mISBMax;
 parameterMap* CCell::pMap;

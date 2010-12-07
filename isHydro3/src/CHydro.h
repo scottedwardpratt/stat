@@ -52,11 +52,9 @@ private:
 	void printE(CMesh* lMesh,int lT);
 	void printMesh(CMesh* lMesh);
 	void openFileIntegrals();
-	void closeFileIntegrals();
 	void printIntegrals(int t);
 	void printSpots();
 	void openFileSpots();
-	void closeFileSpots();
 	void openFile(int lT);
 	void closeFile();
 	void printTQM(CMesh* lMesh);
@@ -65,10 +63,8 @@ private:
 	void printOscarHyper(CMesh* lMesh, int mT);
 	void printOscarFull(CMesh* lMesh, int mT);
 	void printDNs(CMesh* lMesh,int,int,int);
+	void copyCellActive(CMesh*, CMesh*);
 
-	void testFileOpen();
-	void zeroPointers();
-	
 	inline int min(int a, int b) {if (a>b) return b; else return a;}
 
 	time_t start, now;

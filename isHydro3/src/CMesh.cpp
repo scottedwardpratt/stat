@@ -7,7 +7,6 @@
 #include <iostream>
 #include <fstream>
 #include "CEos.h"
-#include "coral.h"
 
 CMesh::CMesh(parameterMap* pM){
  pMap = pM;
@@ -47,7 +46,7 @@ CMesh::CMesh(parameterMap* pM){
  wnSigma= parameter::getD(*pMap,"GLAUBER_Sigma",0.4);
  wnA    = parameter::getD(*pMap,"GLAUBER_A",197.);
  wnB    = parameter::getD(*pMap,"GLAUBER_B",0.);
- wnKTau = parameter::getD(*pMap,"GLAUBER_K_TAU",4.3);
+ wnK    = parameter::getD(*pMap,"GLAUBER_K",4.3);
 
  mWnBinRatio = parameter::getD(*pMap,"GLAUBER_WNBIN_RATIO",1.0);
  mInitFlow = parameter::getD(*pMap,"HYDRO_INIT_FLOW",0.0);
@@ -113,15 +112,21 @@ CMesh::CMesh(parameterMap* pM){
 		}
 
 	// connect your cells and (antiquated..) reduce boundary problem...
-	for (int i=0;i<mNSize;i++)
-	  for (int j=0;j<mXSize;j++)
-		for (int k=0;k<mYSize;k++) {
-		    mCells[i+1][j+1][k+1]->setEtaNeighbors( mCells[i][j+1][k+1], 
-																mCells[i+2][j+1][k+1]);
-			mCells[i+1][j+1][k+1]->setXNeighbors( mCells[i+1][j][k+1], 
-															  mCells[i+1][j+2][k+1]);
-		    mCells[i+1][j+1][k+1]->setYNeighbors( mCells[i+1][j+1][k], 
-															  mCells[i+1][j+1][k+2]);
+	for (int i=0;i<=mNSize;i++)
+	  for (int j=0;j<=mXSize;j++)
+		for (int k=0;k<=mYSize;k++) {
+		  if (i<mNSize)
+		    mCells[i+1][j+1][k+1]->setEtaNeighbors(mCells[i][j+1][k+1], mCells[i+2][j+1][k+1]);
+		  else 
+		    mCells[i+1][j+1][k+1]->setEtaNeighbors(mCells[i][j+1][k+1], mCells[i+1][j+1][k+1]);		
+		  if (j<mXSize)																							
+			mCells[i+1][j+1][k+1]->setXNeighbors(  mCells[i+1][j][k+1], mCells[i+1][j+2][k+1]);
+		  else 	
+		    mCells[i+1][j+1][k+1]->setXNeighbors(  mCells[i+1][j][k+1], mCells[i+1][j+1][k+1]);
+		  if (k<mYSize)
+		    mCells[i+1][j+1][k+1]->setYNeighbors(  mCells[i+1][j+1][k], mCells[i+1][j+1][k+2]);
+		  else 
+		    mCells[i+1][j+1][k+1]->setYNeighbors(  mCells[i+1][j+1][k], mCells[i+1][j+1][k+1]);
 		}
  }
 }
@@ -186,23 +191,25 @@ CMesh::CMesh(const char *fName) {
 CMesh::CMesh(CMesh* mesh) {
   for (int i=-1;i<=mNSize;i++)
 	  for (int j=-1;j<=mXSize;j++)
-		for (int k=-1;k<=mYSize;k++){
-	  	  mCells[i+1][j+1][k+1] = new CCell(mesh->getX(i,j,k,0),
-											mesh->getX(i,j,k,3),
-											mesh->getX(i,j,k,1),
-											mesh->getX(i,j,k,2));
-		  for (int l=1;l<11;l++)  mCells[i+1][j+1][k+1]->setS(l,mesh->getS(i,j,k,l));
-		}
-		  
-  for (int i=0;i<mNSize;i++)
-	  for (int j=0;j<mXSize;j++)
-		for (int k=0;k<mYSize;k++) {
-		    mCells[i+1][j+1][k+1]->setEtaNeighbors( mCells[i][j+1][k+1], 
-																mCells[i+2][j+1][k+1]);
-			mCells[i+1][j+1][k+1]->setXNeighbors( mCells[i+1][j][k+1], 
-															  mCells[i+1][j+2][k+1]);
-		    mCells[i+1][j+1][k+1]->setYNeighbors( mCells[i+1][j+1][k], 
-															  mCells[i+1][j+1][k+2]);
+		for (int k=-1;k<=mYSize;k++)
+		  mCells[i+1][j+1][k+1] = new CCell(mesh->mCells[i+1][j+1][k+1]);
+
+// connect cells
+	for (int i=0;i<=mNSize;i++)
+	  for (int j=0;j<=mXSize;j++)
+		for (int k=0;k<=mYSize;k++) {
+		  if (i<mNSize)
+		    mCells[i+1][j+1][k+1]->setEtaNeighbors(mCells[i][j+1][k+1], mCells[i+2][j+1][k+1]);
+		  else 
+		    mCells[i+1][j+1][k+1]->setEtaNeighbors(mCells[i][j+1][k+1], mCells[i+1][j+1][k+1]);		
+		  if (j<mXSize)																							
+			mCells[i+1][j+1][k+1]->setXNeighbors(  mCells[i+1][j][k+1], mCells[i+1][j+2][k+1]);
+		  else 	
+		    mCells[i+1][j+1][k+1]->setXNeighbors(  mCells[i+1][j][k+1], mCells[i+1][j+1][k+1]);
+		  if (k<mYSize)
+		    mCells[i+1][j+1][k+1]->setYNeighbors(  mCells[i+1][j+1][k], mCells[i+1][j+1][k+2]);
+		  else 
+		    mCells[i+1][j+1][k+1]->setYNeighbors(  mCells[i+1][j+1][k], mCells[i+1][j+1][k+1]);
 		}
 }
 
@@ -213,20 +220,23 @@ CMesh::~CMesh() {
 
 // assigns the cells initial conditions
 void CMesh::initialCondition(CCell* mCell, int i, int j, int k) {
-  mCell->setU( 0., 0., 0.);
-/*
-  if ((mDn*i) < 3.)
-    mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k));
-  else 
-    mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k) * exp(-0.5*pow( (mDn*i - 3.)/ 0.4, 2.)));
-*/
-  mCell->setE( wnKTau/getX(i,j,k,0)  * wnE(mDx*(double)j, mDy*(double)k) * exp( -0.5*pow( (mDn*i)/1.6, 2.)));
+	mCell->setU( 0., 0., 0.);
 
-  for (int l=5;l<11;l++) mCell->setS(l,0.);
+		//  if ((mDn*i) < 3.)
+		//    mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k));
+		//  else 
+		//    mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k) * exp(-0.5*pow( (mDn*i - 3.)/ 0.4, 2.)));
+
+	mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k) * exp( -0.5*pow( (mDn*i)/2.5, 2.)));
+		
+		//	mCell->setE( 20.*exp(-0.5*pow( (mDn*i)/1.6, 2.)));
+		//  mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k));
+
+	for (int l=5;l<11;l++) mCell->setS(l,0.);
 }
 
 void CMesh::addInitialFlow() {
-  if (!mOctant) 
+	if (!mOctant) {
 	for (int i=-mNSize+1;i<mNSize;i++)
 	  for (int j=-mXSize+1;j<mXSize;j++)
 		for (int k=-mXSize+1;k<mYSize;k++) {
@@ -234,49 +244,50 @@ void CMesh::addInitialFlow() {
 		  mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]->setS(1, - 0.5*getDS(i,j,k,0,3)/( getE(i,j,k) + getP(i,j,k)) * getTau());
 		  mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]->setS(2, - 0.5*getDS(i,j,k,1,3)/( getE(i,j,k) + getP(i,j,k)) * getTau());
 		}
-  else {
-	  for (int i=0;i<mNSize;i++)
-		  for (int j=0;j<mXSize;j++)
-			  for (int k=0;k<mYSize;k++) {
-				  update(i,j,k);
-					  //				  if (k==0 && i==0) 
-						  //					  printf("%d:  %f  %f  %f\n",j,-getDS(i,j,k,3,0)/getE(i,j,k),-getDS(i,j,k,3,0)/getP(i,j,k)
-						  //							 ,- mInitFlow*0.5*getDS(i,j,k,3,0)/( getE(i,j,k) + getP(i,j,k)) * getTau());
-				  mCells[i+1][j+1][k+1]->setS(1, - mInitFlow*0.5*getDS(i,j,k,3,0)/( getE(i,j,k) + getP(i,j,k)) * getTau());
-				  mCells[i+1][j+1][k+1]->setS(2, - mInitFlow*0.5*getDS(i,j,k,3,1)/( getE(i,j,k) + getP(i,j,k)) * getTau());
-			  }
-	  
-	  return;
-	  
-	if (mPureBjorken) {
-	    // outer boundaries
-	for (int j=0;j<mYSize;j++) 
-		smoothEdge(mCells[1][mXSize-2][j+1],
-				   mCells[1][mXSize-1][j+1],
-				   mCells[1][mXSize][j+1],
-				   mCells[1][mXSize+1][j+1]);
-
-	for (int j=0;j<mXSize;j++) 
-		smoothEdge(mCells[1][j+1][mYSize-2],
-		   	       mCells[1][j+1][mYSize-1],
-				   mCells[1][j+1][mYSize],
-				   mCells[1][j+1][mYSize+1]);
 	
-	smoothEdge(mCells[1][mXSize+1][mYSize-2],
-			   mCells[1][mXSize+1][mYSize-1],
-			   mCells[1][mXSize+1][mYSize],
-			   mCells[1][mXSize+1][mYSize+1]);
-	
-    // inner boundaries
-    for (int j=0;j<mYSize;j++) 
-	  flipEdge(1,mCells[1][2][j+1],
-			     mCells[1][1][j+1],
-			     mCells[1][0][j+1]);
+	for (int i=0;i<=mXSize;i++)
+		for (int j=0;j<=mYSize;j++)
+			flipEdge(3,mCells[2][i+1][j+1],
+					mCells[1][i+1][j+1],
+					mCells[0][i+1][j+1]);
 
-	for (int j=-1;j<mXSize;j++) 
-		flipEdge(2,mCells[1][j+1][2],
-				   mCells[1][j+1][1],
-				   mCells[1][j+1][0]);
+	for (int i=-1;i<=mNSize;i++) {
+		for (int j=0;j<=mYSize;j++) 
+			flipEdge(1,mCells[i+1][2][j+1],
+					mCells[i+1][1][j+1],
+					mCells[i+1][0][j+1]);
+		for (int j=-1;j<=mXSize;j++) 
+			flipEdge(2,mCells[i+1][j+1][2],
+					mCells[i+1][j+1][1],
+					mCells[i+1][j+1][0]);
+	}		
+		
+  }
+	else {
+		for (int i=0;i<=mNSize;i++)
+			for (int j=0;j<=mXSize;j++)
+				for (int k=0;k<=mYSize;k++) {
+					if (!mCells[i+1][j+1][k+1]->getActive()) break;
+					update(i,j,k);
+					mCells[i+1][j+1][k+1]->setS(1, - mInitFlow*0.5*getDS(i,j,k,3,0)/( getE(i,j,k) + getP(i,j,k)) * getTau());
+					mCells[i+1][j+1][k+1]->setS(2, - mInitFlow*0.5*getDS(i,j,k,3,1)/( getE(i,j,k) + getP(i,j,k)) * getTau());
+				}
+		
+	for (int i=0;i<=mXSize;i++)
+		for (int j=0;j<=mYSize;j++)
+			flipEdge(3,mCells[2][i+1][j+1],
+					mCells[1][i+1][j+1],
+					mCells[0][i+1][j+1]);
+
+	for (int i=-1;i<=mNSize;i++) {
+		for (int j=0;j<=mYSize;j++) 
+			flipEdge(1,mCells[i+1][2][j+1],
+					mCells[i+1][1][j+1],
+					mCells[i+1][0][j+1]);
+		for (int j=-1;j<=mXSize;j++) 
+			flipEdge(2,mCells[i+1][j+1][2],
+					mCells[i+1][j+1][1],
+					mCells[i+1][j+1][0]);
 	}	
   }
 }
@@ -326,68 +337,12 @@ void CMesh::forward(CMesh* mMesh, double mDt) {
  
  if (mOctant) {
   if (!mPureBjorken) {
-  for (int i=0;i<mNSize;i++)
-    for (int j=0;j<mXSize;j++)
-	  for (int k=0;k<mYSize;k++) 
-	    mCells[i+1][j+1][k+1]->forward(mMesh->mCells[i+1][j+1][k+1]);		
-
-//fix the boundary cells
-// outer eta boundaries
-  for (int i=0;i<mXSize;i++)
-    for (int j=0;j<mYSize;j++) {
-		smoothEdge(mMesh->mCells[mNSize-2][i+1][j+1],
-				   mMesh->mCells[mNSize-1][i+1][j+1],
-				   mMesh->mCells[mNSize][i+1][j+1],
-				   mMesh->mCells[mNSize+1][i+1][j+1]);
-		mMesh->mCells[mNSize+1][i+1][j+1]->setTau(mMesh->mCells[mNSize][i+1][j+1]->getTau());
-		sLoss += mMesh->mCells[mNSize+1][i+1][j+1]->getS() * mMesh->mCells[mNSize+1][i+1][j+1]->getS(3)*mDx*mDy;
-		eLoss += mMesh->mCells[mNSize+1][i+1][j+1]->getE() * mMesh->mCells[mNSize+1][i+1][j+1]->getS(3)*mDx*mDy; 
-	}	
-
-//outer radial boundaries
-  for (int i=0;i<=mNSize;i++) {
-    for (int j=0;j<mYSize;j++) {
-		smoothEdge(mMesh->mCells[i+1][mXSize-2][j+1],
-				   mMesh->mCells[i+1][mXSize-1][j+1],
-				   mMesh->mCells[i+1][mXSize][j+1],
-				   mMesh->mCells[i+1][mXSize+1][j+1]);
-		mMesh->mCells[i+1][mXSize+1][j+1]->setTau(mMesh->mCells[i+1][mXSize][j+1]->getTau());
-		
-		if (mBjorken)
-		  sLoss += mMesh->mCells[i+1][mXSize+1][j+1]->getS() * mMesh->getTau()
-				* mMesh->mCells[i+1][mXSize+1][j+1]->getS(1)*mDn*mDy;
-		else
-		  sLoss += mMesh->mCells[i+1][mXSize+1][j+1]->getS() 
-				* mMesh->mCells[i+1][mXSize+1][j+1]->getS(1)*mDn*mDy;
-	} 
-	for (int j=0;j<mXSize;j++) {			   
-		smoothEdge(mMesh->mCells[i+1][j+1][mYSize-2],
-		   	       mMesh->mCells[i+1][j+1][mYSize-1],
-				   mMesh->mCells[i+1][j+1][mYSize],
-				   mMesh->mCells[i+1][j+1][mYSize+1]);
-		mMesh->mCells[i+1][j+1][mYSize+1]->setTau(mMesh->mCells[i+1][j+1][mYSize]->getTau());
-		
-		if (mBjorken)
-		  sLoss += mMesh->mCells[i+1][j+1][mYSize+1]->getS() * mMesh->getTau()
-				* mMesh->mCells[i+1][j+1][mYSize+1]->getS(2)*mDx*mDn;
-		else 
-		  sLoss += mMesh->mCells[i+1][j+1][mYSize+1]->getS() 
-				* mMesh->mCells[i+1][j+1][mYSize+1]->getS(2)*mDx*mDn;
-	}
-	smoothEdge(mMesh->mCells[i+1][mXSize+1][mYSize-2],
-			   mMesh->mCells[i+1][mXSize+1][mYSize-1],
-			   mMesh->mCells[i+1][mXSize+1][mYSize],
-			   mMesh->mCells[i+1][mXSize+1][mYSize+1]);
-	mMesh->mCells[i+1][mXSize+1][mYSize+1]->setTau(mMesh->mCells[i+1][mXSize+1][mYSize]->getTau());
-	
-	if (mBjorken)
-	  sLoss += mMesh->mCells[i+1][mXSize+1][mYSize+1]->getS() * mMesh->getTau() *
-				(mMesh->mCells[i+1][mXSize+1][mYSize+1]->getS(1)*mDy*mDn + mMesh->mCells[i+1][mXSize+1][mYSize+1]->getS(2)*mDx*mDn);
-	else 
-	  sLoss += mMesh->mCells[i+1][mXSize+1][mYSize+1]->getS() * 
-				(mMesh->mCells[i+1][mXSize+1][mYSize+1]->getS(1)*mDy*mDn + mMesh->mCells[i+1][mXSize+1][mYSize+1]->getS(2)*mDx*mDn);
-	
-  }
+  for (int i=0;i<=mNSize;i++)
+    for (int j=0;j<=mXSize;j++)
+	  for (int k=0;k<=mYSize;k++) 
+	    if (getActive(i,j,k))
+	      mCells[i+1][j+1][k+1]->forward(mMesh->mCells[i+1][j+1][k+1]);
+		else break;
 
 //inner eta bound
   for (int i=0;i<=mXSize;i++)
@@ -415,58 +370,12 @@ void CMesh::forward(CMesh* mMesh, double mDt) {
 
   } 
   else { //mPureBjorken
-    for (int j=0;j<mXSize;j++)
-	  for (int k=0;k<mYSize;k++) 
-	    mCells[1][j+1][k+1]->forward(mMesh->mCells[1][j+1][k+1]);
+    for (int j=0;j<=mXSize;j++)
+	  for (int k=0;k<=mYSize;k++) 
+	    if (getActive(0,j,k))
+	      mCells[1][j+1][k+1]->forward(mMesh->mCells[1][j+1][k+1]);
+		else break;
   
-    // outer boundaries
-	for (int j=0;j<mYSize;j++) {
-		smoothEdge(mMesh->mCells[1][mXSize-2][j+1],
-				   mMesh->mCells[1][mXSize-1][j+1],
-				   mMesh->mCells[1][mXSize][j+1],
-				   mMesh->mCells[1][mXSize+1][j+1]);
-		mMesh->mCells[1][mXSize+1][j+1]->setTau(mMesh->mCells[1][mXSize][j+1]->getTau());
-		
-		if (mBjorken) {
-		sLoss += mMesh->mCells[1][mXSize][j+1]->getS() * mMesh->getTau()
-				* mMesh->mCells[1][mXSize][j+1]->getS(1)*mDn*mDy;
-		eLoss += mMesh->mCells[1][mXSize+1][j+1]->getTxyMeshEos(0,0) * mMesh->getTau()
-				* mMesh->mCells[1][mXSize+1][j+1]->getS(1)*mDn*mDy;
-		} 
-		else {
-		sLoss += mMesh->mCells[1][mXSize+1][j+1]->getS()
-				* mMesh->mCells[1][mXSize+1][j+1]->getS(1)*mDn*mDy;
-		eLoss += mMesh->mCells[1][mXSize+1][j+1]->getE()
-				* mMesh->mCells[1][mXSize+1][j+1]->getS(1)*mDn*mDy;
-		}
-	} 
-	for (int j=0;j<mXSize;j++) {		
-		smoothEdge(mMesh->mCells[1][j+1][mYSize-2],
-		   	       mMesh->mCells[1][j+1][mYSize-1],
-				   mMesh->mCells[1][j+1][mYSize],
-				   mMesh->mCells[1][j+1][mYSize+1]);
-		mMesh->mCells[1][j+1][mYSize+1]->setTau(mMesh->mCells[1][j+1][mYSize]->getTau());
-		
-		if (mBjorken) {
-		sLoss += mMesh->mCells[1][j+1][mYSize]->getS() * mMesh->getTau()
-				* mMesh->mCells[1][j+1][mYSize]->getS(2)*mDx*mDn;
-		eLoss += mMesh->mCells[1][j+1][mYSize+1]->getTxyMeshEos(0,0) * mMesh->getTau()
-				* mMesh->mCells[1][j+1][mYSize+1]->getS(2)*mDx*mDn;
-		} 
-		else {
-		sLoss += mMesh->mCells[1][j+1][mYSize+1]->getS()
-				* mMesh->mCells[1][j+1][mYSize+1]->getS(2)*mDx*mDn;
-		eLoss += mMesh->mCells[1][j+1][mYSize+1]->getE()
-				* mMesh->mCells[1][j+1][mYSize+1]->getS(2)*mDx*mDn;
-		}
-	}
-	
-	smoothEdge(mMesh->mCells[1][mXSize+1][mYSize-2],
-			   mMesh->mCells[1][mXSize+1][mYSize-1],
-			   mMesh->mCells[1][mXSize+1][mYSize],
-			   mMesh->mCells[1][mXSize+1][mYSize+1]);
-	mMesh->mCells[1][mXSize+1][mYSize+1]->setTau(mMesh->mCells[1][mXSize+1][mYSize]->getTau());
-	
     // inner boundaries
     for (int j=0;j<mYSize;j++) {
 	  flipEdge(1,mMesh->mCells[1][2][j+1],
@@ -508,82 +417,21 @@ void CMesh::forward(CMesh* onMesh, CMesh* offMesh, double mDt) {
     
  if (mPrintMs) {
   std::cout << "pre-whole" << std::endl;
-  mCells[mPrintN+1][mPrintX+1][mPrintY+1]->update();
-  mCells[mPrintN+1][mPrintX+1][mPrintY+1]->print();
-  if (mSawtooth) offMesh->mCells[mPrintN+1][mPrintX+1][mPrintY+1]->printM();
+  onMesh->mCells[mPrintN+1][mPrintX+1][mPrintY+1]->update();
+  onMesh->mCells[mPrintN+1][mPrintX+1][mPrintY+1]->print();
+  onMesh->mCells[mPrintN+1][mPrintX+1][mPrintY+1]->printM();
  }
   
  if (mOctant) {
    if (!mPureBjorken) {
-    for (int i=0;i<mNSize;i++)
-      for (int j=0;j<mXSize;j++)
-	    for (int k=0;k<mYSize;k++) 
-	      mCells[i+1][j+1][k+1]->forward( onMesh->mCells[i+1][j+1][k+1],
-										 offMesh->mCells[i+1][j+1][k+1]); 
+    for (int i=0;i<=mNSize;i++)
+      for (int j=0;j<=mXSize;j++)
+	    for (int k=0;k<=mYSize;k++) 
+		  if (getActive(i,j,k))
+	        mCells[i+1][j+1][k+1]->forward(onMesh->mCells[i+1][j+1][k+1], offMesh->mCells[i+1][j+1][k+1]); 
+		  else break;
 
-    double mTau = onMesh->mCells[2][2][2]->getTau();
-
-//fix the boundary cells
-// outer eta boundaries
-    for (int i=0;i<mXSize;i++)
-      for (int j=0;j<mYSize;j++) {
-		smoothEdge(onMesh->mCells[mNSize-2][i+1][j+1],
-				   onMesh->mCells[mNSize-1][i+1][j+1],
-				   onMesh->mCells[mNSize][i+1][j+1],
-				   onMesh->mCells[mNSize+1][i+1][j+1]);
-		onMesh->mCells[mNSize+1][i+1][j+1]->setTau(mTau);
-				
-		sLoss += onMesh->mCells[mNSize+1][i+1][j+1]->getS() 
-				 * onMesh->mCells[mNSize+1][i+1][j+1]->getS(3)*mDx*mDy;
-		
-	    sLoss -= onMesh->mCells[1][i+1][j+1]->getS() 
-				 * onMesh->mCells[1][i+1][j+1]->getS(3)*mDx*mDy;
-		}
-
-//outer radial boundaries
-    for (int i=0;i<=mNSize;i++) {
-      for (int j=0;j<mYSize;j++) {
-		smoothEdge(onMesh->mCells[i+1][mXSize-2][j+1],
-				   onMesh->mCells[i+1][mXSize-1][j+1],
-				   onMesh->mCells[i+1][mXSize][j+1],
-				   onMesh->mCells[i+1][mXSize+1][j+1]);
-		onMesh->mCells[i+1][mXSize+1][j+1]->setTau(mTau);
-		
-		if (mBjorken) {
-		  sLoss += onMesh->mCells[i+1][mXSize+1][j+1]->getS() * mTau
-				* onMesh->mCells[i+1][mXSize+1][j+1]->getS(1)*mDy*mDn;
-	      sLoss -= onMesh->mCells[i+1][1][j+1]->getS() * mTau
-				 * onMesh->mCells[i+1][1][j+1]->getS(1)*mDn*mDy;
-		}
-		else {
-		  sLoss += onMesh->mCells[i+1][mXSize+1][j+1]->getS() 
-				* onMesh->mCells[i+1][mXSize+1][j+1]->getS(1)*mDy*mDn;
-	      sLoss -= onMesh->mCells[i+1][1][j+1]->getS()
-				 * onMesh->mCells[i+1][1][j+1]->getS(1)*mDn*mDy;
-		}
-	 } 
-	 for (int j=0;j<=mXSize;j++) {		
-		smoothEdge(onMesh->mCells[i+1][j+1][mYSize-2],
-		   	       onMesh->mCells[i+1][j+1][mYSize-1],
-				   onMesh->mCells[i+1][j+1][mYSize],
-				   onMesh->mCells[i+1][j+1][mYSize+1]);
-		onMesh->mCells[i+1][j+1][mYSize+1]->setTau(mTau);
-		
-		if (mBjorken) {
-		  sLoss += onMesh->mCells[i+1][j+1][mYSize+1]->getS()  * mTau
-				* onMesh->mCells[i+1][j+1][mYSize+1]->getS(2)*mDx*mDn;
-	      sLoss -= onMesh->mCells[i+1][j+1][1]->getS() * mTau
-				 * onMesh->mCells[i+1][j+1][1]->getS(2)*mDn*mDx;
-		}
-		else {
-		  sLoss += onMesh->mCells[i+1][j+1][mYSize+1]->getS()
-				* onMesh->mCells[i+1][j+1][mYSize+1]->getS(2)*mDx*mDn;
-	      sLoss -= onMesh->mCells[i+1][j+1][1]->getS()
-				 * onMesh->mCells[i+1][j+1][1]->getS(2)*mDn*mDx;
-		}
-		
-	 }
-  }
+    double mTau = onMesh->mCells[1][1][1]->getTau();
 
 //inner eta bound
     for (int i=0;i<=mXSize;i++)
@@ -592,7 +440,7 @@ void CMesh::forward(CMesh* onMesh, CMesh* offMesh, double mDt) {
 				   onMesh->mCells[1][i+1][j+1],
 				   onMesh->mCells[0][i+1][j+1]);
 		onMesh->mCells[0][i+1][j+1]->setTau(mTau);
-	}
+	  }
 
 //inner rad bound
     for (int i=-1;i<=mNSize;i++) {
@@ -613,59 +461,12 @@ void CMesh::forward(CMesh* onMesh, CMesh* offMesh, double mDt) {
 
    } 
    else {  //mPureBjorken 
-     for (int j=0;j<mXSize;j++)
-	   for (int k=0;k<mYSize;k++) 
-	     mCells[1][j+1][k+1]->forward(onMesh->mCells[1][j+1][k+1],
-									 offMesh->mCells[1][j+1][k+1]);
+     for (int j=0;j<=mXSize;j++)
+	   for (int k=0;k<=mYSize;k++) 
+	     if (getActive(0,j,k))
+	       mCells[1][j+1][k+1]->forward(onMesh->mCells[1][j+1][k+1], offMesh->mCells[1][j+1][k+1]);
+		else break;
 								   
-   // outer boundaries
-	for (int j=0;j<mYSize;j++) {
-		smoothEdge(onMesh->mCells[1][mXSize-2][j+1],
-				   onMesh->mCells[1][mXSize-1][j+1],
-				   onMesh->mCells[1][mXSize][j+1],
-				   onMesh->mCells[1][mXSize+1][j+1]);
-		onMesh->mCells[1][mXSize+1][j+1]->setTau(onMesh->mCells[1][mXSize][j+1]->getTau());
-		
-		if (mBjorken) {
-		  sLoss += onMesh->mCells[1][mXSize+1][j+1]->getS() * onMesh->getTau()
-				* onMesh->mCells[1][mXSize+1][j+1]->getS(1)*mDn*mDy;
-		  sLoss -= onMesh->mCells[1][1][j+1]->getS() * onMesh->getTau()
-				* onMesh->mCells[1][1][j+1]->getS(1)*mDn*mDy;
-		  }
-		else {
-		    sLoss += onMesh->mCells[1][mXSize+1][j+1]->getS() 
-				* onMesh->mCells[1][mXSize+1][j+1]->getS(1)*mDn*mDy;
-		    sLoss -= onMesh->mCells[1][1][j+1]->getS() 
-				* onMesh->mCells[1][1][j+1]->getS(1)*mDn*mDy;
-		}
-	} 
-	for (int j=0;j<=mXSize;j++) {		
-		smoothEdge(onMesh->mCells[1][j+1][mYSize-2],
-		   	       onMesh->mCells[1][j+1][mYSize-1],
-				   onMesh->mCells[1][j+1][mYSize],
-				   onMesh->mCells[1][j+1][mYSize+1]);
-		onMesh->mCells[1][j+1][mYSize+1]->setTau(onMesh->mCells[1][j+1][mYSize]->getTau());
-		
-		if (mBjorken) {
-		  sLoss += onMesh->mCells[1][j+1][mYSize+1]->getS() * onMesh->getTau()
-				* onMesh->mCells[1][j+1][mYSize+1]->getS(2)*mDx*mDn;
-		  sLoss -= onMesh->mCells[1][j+1][1]->getS() * onMesh->getTau()
-				* onMesh->mCells[1][j+1][1]->getS(2)*mDx*mDn;
-		} 
-		else {
-		  sLoss += onMesh->mCells[1][j+1][mYSize+1]->getS() 
-				* onMesh->mCells[1][j+1][mYSize+1]->getS(2)*mDx*mDn;
-		  sLoss -= onMesh->mCells[1][j+1][1]->getS()
-				* onMesh->mCells[1][j+1][1]->getS(2)*mDx*mDn;
-		}
-	}
-	
-	smoothEdge(onMesh->mCells[1][mXSize+1][mYSize-2],
-			   onMesh->mCells[1][mXSize+1][mYSize-1],
-			   onMesh->mCells[1][mXSize+1][mYSize],
-			   onMesh->mCells[1][mXSize+1][mYSize+1]);
-	onMesh->mCells[1][mXSize+1][mYSize+1]->setTau(onMesh->mCells[1][mXSize+1][mYSize]->getTau());
-	
   // inner boundaries
     for (int j=0;j<=mYSize;j++) {
 	  flipEdge(1,onMesh->mCells[1][2][j+1],
@@ -1866,31 +1667,35 @@ void CMesh::flipEdge(int fE, CCell* c1, CCell* c2, CCell* cOut) {
 
 void CMesh::deaden() {
 	sLoss = 0.; eLoss = 0.;
+	
   if (mOctant) {
-	while (mNSize>5 && mCells[mNSize+1][1][1]->getTEos() < mDeadT) {
-		for (int i=0;i<=mXSize;i++)
-			for (int j=0;j<=mYSize;j++) {
-				sLoss += mDn*mDx*mDy * getTau() * getS(mNSize,i,j)*getS(mNSize,i,j,0);					
-				eLoss += mDn*mDx*mDy * getTau() * getTxyMesh(mNSize,i,j,0,0);
-			}
-		mNSize--;
+  
+	for (int i=mNSize; i>=0; i--) {
+	  for (int j=mXSize; j>=0; j--) {
+	    for (int k=mYSize; k>0; k--) {
+		  
+		  if (!getActive(i,j,k)) continue;
+		  if (getT(i,j,k) > mDeadT) break;
+		  else {
+		    deactivate(i,j,k);
+			sLoss += mDn*mDx*mDy * getTau() * getS(i,j,k)*getS(i,j,k,0);					
+			eLoss += mDn*mDx*mDy * getTau() * getTxyMesh(i,j,k,0,0);
+		  }
+		}
+	  }	
 	}
-	while (mXSize>5 && mCells[1][mXSize+1][1]->getTEos() < mDeadT) {
-		for (int i=0;i<=mNSize;i++)
-			for (int j=0;j<=mYSize;j++) {
-				sLoss += mDn*mDx*mDy * getTau() * getS(i,mXSize,j)*getS(i,mXSize,j,0);					
-				eLoss += mDn*mDx*mDy * getTau() * getTxyMesh(i,mXSize,j,0,0);
-			}
-		mXSize--;
-	}
-	while (mYSize>5 && mCells[1][1][mYSize+1]->getTEos() < mDeadT) {
-		for (int i=0;i<=mNSize;i++)
-			for (int j=0;j<=mXSize;j++) {
-				sLoss += mDn*mDx*mDy * getTau() * getS(i,j,mYSize)*getS(i,j,mYSize,0);
-				eLoss += mDn*mDx*mDy * getTau() * getTxyMesh(i,j,mYSize,0,0);
-			}
-		mYSize--;
-	}
+  
+    for (int i=mNSize; i>0; i--) 
+	  if (!getActive(i,0,0)) mNSize = i;
+	  else break;
+    
+	for (int i=mXSize; i>0; i--) 
+	  if (!getActive(0,i,0)) mXSize = i;
+	  else break;
+	  
+    for (int i=mYSize; i>0; i--) 
+	  if (!getActive(0,0,i)) mYSize = i;
+	  else break;
   }
 }
 
@@ -1910,15 +1715,80 @@ bool CMesh::detectCrash(){
 }
 
 void CMesh::initNS() {
-	if (!mPureBjorken) 
-		for (int i=-1;i<=mNSize;i++)
-			for (int j=-1;j<=mXSize;j++)
-				for (int k=-1;k<=mYSize;k++) 
-					mCells[i+1][j+1][k+1]->initNS();
-	else 
-		for (int j=-1;j<=mXSize;j++)
-			for (int k=-1;k<=mYSize;k++) 
-				mCells[1][j+1][k+1]->initNS();
+
+  if (!mPureBjorken) {
+	for (int i=0;i<=mNSize;i++)
+		for (int j=0;j<=mXSize;j++)
+			for (int k=0;k<=mYSize;k++) {
+				if (!getActive(i,j,k)) break;
+				update(i,j,k);
+				CCell* mC = mCells[i+1][j+1][k+1];
+				mC->setA(1, mInitNS*(-mC->getSV()/ROOT2)*(mC->getDS(0,0)-mC->getDS(1,1))/mC->getISAlpha());
+				mC->setA(2, mInitNS*(-mC->getSV()/ROOT3)*(mC->getDS(0,0)+mC->getDS(1,1)-2*mC->getDS(2,2))/mC->getISAlpha());
+				mC->setA(3, -mInitNS*mC->getSV()*(mC->getDS(0,1)+mC->getDS(1,0))/mC->getISAlpha());
+				mC->setA(4, -mInitNS*mC->getSV()*(mC->getDS(0,2)+mC->getDS(2,0))/mC->getISAlpha());
+				mC->setA(5, -mInitNS*mC->getSV()*(mC->getDS(1,2)+mC->getDS(2,1))/mC->getISAlpha());
+			}
+	
+	for (int i=0;i<=mXSize;i++)
+		for (int j=0;j<=mYSize;j++)
+			flipEdge(3,mCells[2][i+1][j+1],
+					mCells[1][i+1][j+1],
+					mCells[0][i+1][j+1]);
+
+	for (int i=-1;i<=mNSize;i++) {
+		for (int j=0;j<=mYSize;j++) 
+			flipEdge(1,mCells[i+1][2][j+1],
+					mCells[i+1][1][j+1],
+					mCells[i+1][0][j+1]);
+		for (int j=-1;j<=mXSize;j++) 
+			flipEdge(2,mCells[i+1][j+1][2],
+					mCells[i+1][j+1][1],
+					mCells[i+1][j+1][0]);
+	}		
+  }
+  else {
+	for (int j=0;j<=mXSize;j++)
+		for (int k=0;k<=mYSize;k++) {
+			if (!getActive(0,j,k)) break;
+			update(0,j,k);
+			CCell* mC = mCells[1][j+1][k+1];
+			mC->setA(1, mInitNS*(-mC->getSV()/ROOT2)*(mC->getSpLocDS(1,1)-mC->getSpLocDS(2,2))/mC->getISAlpha());
+			mC->setA(2, mInitNS*(-mC->getSV()/ROOT3)*(mC->getSpLocDS(1,1)+mC->getSpLocDS(2,2)-2*mC->getSpLocDS(3,3))/mC->getISAlpha());
+			mC->setA(3, -mInitNS*mC->getSV()*(mC->getSpLocDS(1,2)+mC->getSpLocDS(2,1))/mC->getISAlpha());
+			mC->setA(4, 0.);
+			mC->setA(5, 0.);
+		}
+		
+	for (int j=0;j<mYSize;j++) 
+		flipEdge(1,mCells[1][2][j+1],
+			     mCells[1][1][j+1],
+			     mCells[1][0][j+1]);
+	for (int j=0;j<mXSize;j++) 
+		flipEdge(2,mCells[1][j+1][2],
+				   mCells[1][j+1][1],
+				   mCells[1][j+1][0]);
+  }
+/*
+  if (!mPureBjorken) 
+    for (int i=-1;i<=mNSize;i++)
+      for (int j=-1;j<=mXSize;j++)
+	    for (int k=-1;k<=mYSize;k++) 
+//		    mCells[i+1][j+1][k+1]->setA(2, (2./ROOT3)*mCells[i+1][j+1][k+1]->getSVEos()
+//										   /(mCells[i+1][j+1][k+1]->getTau()*mCells[i+1][j+1][k+1]->getISAlphaEos()));
+		    mCells[i+1][j+1][k+1]->setA(2, tanh(3.* (2./ROOT3)*mCells[i+1][j+1][k+1]->getSVEos()
+										   /(mCells[i+1][j+1][k+1]->getTau()*mCells[i+1][j+1][k+1]->getISAlphaEos()))/3.);
+  else 
+    for (int j=-1;j<=mXSize;j++)
+	    for (int k=-1;k<=mYSize;k++) 
+		  if (mSVTrimInit && (!mSVTrim))
+		    mCells[1][j+1][k+1]->setA(2, (2./ROOT3)*mCells[1][j+1][k+1]->getSVEos()
+										/(mCells[1][j+1][k+1]->getTau()*mCells[1][j+1][k+1]->getISAlphaEos())
+										/(1. + exp( (sqrt(mDx*mDx*j*j+mDy*mDy*k*k) - 10.)/0.6)));
+		  else 
+		    mCells[1][j+1][k+1]->setA(2, (2./ROOT3)*mCells[1][j+1][k+1]->getSVEos()
+										/(mCells[1][j+1][k+1]->getTau()*mCells[1][j+1][k+1]->getISAlphaEos()));
+*/
 }
 
 void CMesh::printCell(int eta,int x,int y) {
@@ -1999,12 +1869,39 @@ double CMesh::getPiPhiPhi(int eta, int x, int y) {
 	else return 0.;
 }
 
+void CMesh::checkAzimuthalSymmetry() {
+	double tolerance = 1E-10;
+	
+	for (int i=0;i<=mNSize;i++) 
+		for (int j=0;j<=mXSize;j++)
+			for (int k=j;k<=mYSize;k++) {
+				if (!getActive(i,j,k)) break;
+				if ( abs(getS(i,j,k,1) - getS(i,k,j,2)) > tolerance*abs(getS(i,j,k,1)))
+					printf("velo sym prob at %d %d %d (%0.6g != %0.6g)\n",i,j,k,getS(i,j,k,1),getS(i,k,j,2));
+				if ( abs(getS(i,j,k,2) - getS(i,k,j,1)) > tolerance*abs(getS(i,j,k,2)))
+					printf("velo sym prob at %d %d %d (%0.6g != %0.6g)\n",i,j,k,getS(i,j,k,2),getS(i,k,j,1));
+				if ( abs(getS(i,j,k,4) - getS(i,k,j,4)) > tolerance*abs(getS(i,j,k,4)))
+					printf("energy sym prob at %d %d %d (%0.6g != %0.6g)\n",i,j,k,getS(i,j,k,4),getS(i,k,j,4));
+				
+				if ( abs(getS(i,j,k,5) + getS(i,k,j,5)) > tolerance*abs(getS(i,j,k,5)) && k!=j)
+					printf("a1 sym prob at %d %d %d (%0.6g != %0.6g)\n",i,j,k,getS(i,j,k,5),-getS(i,k,j,5));
+				
+				if ( abs(getS(i,j,k,6) - getS(i,k,j,6)) > tolerance*abs(getS(i,j,k,6)))
+					printf("a2 sym prob at %d %d %d (%0.6g != %0.6g)\n",i,j,k,getS(i,j,k,6),getS(i,k,j,6));
+				if ( abs(getS(i,j,k,7) - getS(i,k,j,7)) > tolerance*abs(getS(i,j,k,7)))
+					printf("a3 sym prob at %d %d %d (%0.6g != %0.6g)\n",i,j,k,getS(i,j,k,7),getS(i,k,j,7));
+				if ( abs(getS(i,j,k,8) - getS(i,k,j,9)) > tolerance*abs(getS(i,j,k,8)))
+					printf("a4/a5 sym prob at %d %d %d (%0.6g != %0.6g)\n",i,j,k,getS(i,j,k,8),getS(i,k,j,9));
+			}
+}
+
+
 //statics 
 parameterMap* CMesh::pMap;
 bool CMesh::mOctant, CMesh::mPureBjorken, CMesh::mBjorken, CMesh::mPrintMs, CMesh::mSVTrimInit, CMesh::mSVTrim, CMesh::mSawtooth;
 double CMesh::mFOTemp, CMesh::mDeadT, CMesh::mT0, CMesh::mDx, CMesh::mDy, CMesh::mDn;
 int CMesh::mNSize, CMesh::mXSize, CMesh::mYSize, CMesh::mNSizeOrig, CMesh::mXSizeOrig, CMesh::mYSizeOrig;
 int CMesh::mPrintN, CMesh::mPrintX, CMesh::mPrintY;
-double CMesh::wnRho0, CMesh::wnRAu, CMesh::wnXi, CMesh::wnSigma, CMesh::wnA, CMesh::wnB, CMesh::wnKTau;
+double CMesh::wnRho0, CMesh::wnRAu, CMesh::wnXi, CMesh::wnSigma, CMesh::wnA, CMesh::wnB, CMesh::wnK;
 double CMesh::mE0, CMesh::mRn, CMesh::mRt, CMesh::mRa, CMesh::mRx, CMesh::mRy, CMesh::mRSig, CMesh::mWnBinRatio;
 double CMesh::mInitFlow, CMesh::mInitNS;
