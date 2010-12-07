@@ -220,12 +220,23 @@ CMesh::~CMesh() {
 
 // assigns the cells initial conditions
 void CMesh::initialCondition(CCell* mCell, int i, int j, int k) {
+<<<<<<< HEAD:isHydro3/src/CMesh.cpp
 	mCell->setU( 0., 0., 0.);
 
 		//  if ((mDn*i) < 3.)
 		//    mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k));
 		//  else 
 		//    mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k) * exp(-0.5*pow( (mDn*i - 3.)/ 0.4, 2.)));
+=======
+  mCell->setU( 0., 0., 0.);
+/*
+  if ((mDn*i) < 3.)
+    mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k));
+  else 
+    mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k) * exp(-0.5*pow( (mDn*i - 3.)/ 0.4, 2.)));
+*/
+  mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k) * exp( -0.5*pow( (mDn*i)/1.6, 2.)));
+>>>>>>> parent of f920104... initial condition problems...:isHydro3/CMesh.cpp
 
 	mCell->setE( wnK * wnE(mDx*(double)j, mDy*(double)k) * exp( -0.5*pow( (mDn*i)/2.5, 2.)));
 		
@@ -236,62 +247,88 @@ void CMesh::initialCondition(CCell* mCell, int i, int j, int k) {
 }
 
 void CMesh::addInitialFlow() {
-	if (!mOctant) {
-	for (int i=-mNSize+1;i<mNSize;i++)
-	  for (int j=-mXSize+1;j<mXSize;j++)
-		for (int k=-mXSize+1;k<mYSize;k++) {
-		  mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]->update();
-		  mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]->setS(1, - 0.5*getDS(i,j,k,0,3)/( getE(i,j,k) + getP(i,j,k)) * getTau());
-		  mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]->setS(2, - 0.5*getDS(i,j,k,1,3)/( getE(i,j,k) + getP(i,j,k)) * getTau());
-		}
-	
-	for (int i=0;i<=mXSize;i++)
-		for (int j=0;j<=mYSize;j++)
-			flipEdge(3,mCells[2][i+1][j+1],
-					mCells[1][i+1][j+1],
-					mCells[0][i+1][j+1]);
-
-	for (int i=-1;i<=mNSize;i++) {
-		for (int j=0;j<=mYSize;j++) 
-			flipEdge(1,mCells[i+1][2][j+1],
-					mCells[i+1][1][j+1],
-					mCells[i+1][0][j+1]);
-		for (int j=-1;j<=mXSize;j++) 
-			flipEdge(2,mCells[i+1][j+1][2],
-					mCells[i+1][j+1][1],
-					mCells[i+1][j+1][0]);
-	}		
-		
-  }
+	if (!mOctant) 
+		for (int i=-mNSize+1;i<mNSize;i++)
+			for (int j=-mXSize+1;j<mXSize;j++)
+				for (int k=-mXSize+1;k<mYSize;k++) {
+					mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]->update();
+					mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]->setS(1, - 0.5*getDS(i,j,k,0,3)/( getE(i,j,k) + getP(i,j,k)) * getTau());
+					mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]->setS(2, - 0.5*getDS(i,j,k,1,3)/( getE(i,j,k) + getP(i,j,k)) * getTau());
+				}
 	else {
-		for (int i=0;i<=mNSize;i++)
-			for (int j=0;j<=mXSize;j++)
-				for (int k=0;k<=mYSize;k++) {
-					if (!mCells[i+1][j+1][k+1]->getActive()) break;
+		for (int i=0;i<mNSize;i++)
+			for (int j=0;j<mXSize;j++)
+				for (int k=0;k<mYSize;k++) {
 					update(i,j,k);
 					mCells[i+1][j+1][k+1]->setS(1, - mInitFlow*0.5*getDS(i,j,k,3,0)/( getE(i,j,k) + getP(i,j,k)) * getTau());
 					mCells[i+1][j+1][k+1]->setS(2, - mInitFlow*0.5*getDS(i,j,k,3,1)/( getE(i,j,k) + getP(i,j,k)) * getTau());
 				}
+		if (mPureBjorken) {
+				// outer boundaries
+			for (int j=0;j<mYSize;j++) 
+				smoothEdge(mCells[1][mXSize-2][j+1],
+						   mCells[1][mXSize-1][j+1],
+						   mCells[1][mXSize][j+1],
+						   mCells[1][mXSize+1][j+1]);
+			
+			for (int j=0;j<mXSize;j++) 
+				smoothEdge(mCells[1][j+1][mYSize-2],
+						   mCells[1][j+1][mYSize-1],
+						   mCells[1][j+1][mYSize],
+						   mCells[1][j+1][mYSize+1]);
+			
+			smoothEdge(mCells[1][mXSize+1][mYSize-2],
+					   mCells[1][mXSize+1][mYSize-1],
+					   mCells[1][mXSize+1][mYSize],
+					   mCells[1][mXSize+1][mYSize+1]);
+	
+			for (int i=0;i<=mXSize;i++)
+				for (int j=0;j<=mYSize;j++)
+					flipEdge(3,mCells[2][i+1][j+1],
+							 mCells[1][i+1][j+1],
+							 mCells[0][i+1][j+1]);
+
+			for (int i=-1;i<=mNSize;i++) {
+				for (int j=0;j<=mYSize;j++) 
+					flipEdge(1,mCells[i+1][2][j+1],
+							 mCells[i+1][1][j+1],
+							 mCells[i+1][0][j+1]);
+				for (int j=-1;j<=mXSize;j++) 
+					flipEdge(2,mCells[i+1][j+1][2],
+							 mCells[i+1][j+1][1],
+							 mCells[i+1][j+1][0]);
+			}		
+			
+		}
+		else {
+			for (int i=0;i<=mNSize;i++)
+				for (int j=0;j<=mXSize;j++)
+					for (int k=0;k<=mYSize;k++) {
+						if (!mCells[i+1][j+1][k+1]->getActive()) break;
+						update(i,j,k);
+						mCells[i+1][j+1][k+1]->setS(1, - mInitFlow*0.5*getDS(i,j,k,3,0)/( getE(i,j,k) + getP(i,j,k)) * getTau());
+						mCells[i+1][j+1][k+1]->setS(2, - mInitFlow*0.5*getDS(i,j,k,3,1)/( getE(i,j,k) + getP(i,j,k)) * getTau());
+					}
 		
-	for (int i=0;i<=mXSize;i++)
-		for (int j=0;j<=mYSize;j++)
-			flipEdge(3,mCells[2][i+1][j+1],
-					mCells[1][i+1][j+1],
-					mCells[0][i+1][j+1]);
-
-	for (int i=-1;i<=mNSize;i++) {
-		for (int j=0;j<=mYSize;j++) 
-			flipEdge(1,mCells[i+1][2][j+1],
-					mCells[i+1][1][j+1],
-					mCells[i+1][0][j+1]);
-		for (int j=-1;j<=mXSize;j++) 
-			flipEdge(2,mCells[i+1][j+1][2],
-					mCells[i+1][j+1][1],
-					mCells[i+1][j+1][0]);
-	}	
-  }
+			for (int i=0;i<=mXSize;i++)
+				for (int j=0;j<=mYSize;j++)
+					flipEdge(3,mCells[2][i+1][j+1],
+							 mCells[1][i+1][j+1],
+							 mCells[0][i+1][j+1]);
+			
+			for (int i=-1;i<=mNSize;i++) {
+				for (int j=0;j<=mYSize;j++) 
+					flipEdge(1,mCells[i+1][2][j+1],
+							 mCells[i+1][1][j+1],
+							 mCells[i+1][0][j+1]);
+				for (int j=-1;j<=mXSize;j++) 
+					flipEdge(2,mCells[i+1][j+1][2],
+							 mCells[i+1][j+1][1],
+							 mCells[i+1][j+1][0]);
+			}	
+		}
+	}
 }
-
 double CMesh::wnRho(double x, double y, double z) {
 	return wnRho0 / ( 1. + exp( (sqrt(x*x+y*y+z*z) - wnRAu)/wnXi));
 }
@@ -1715,6 +1752,7 @@ bool CMesh::detectCrash(){
 }
 
 void CMesh::initNS() {
+<<<<<<< HEAD:isHydro3/src/CMesh.cpp
 
   if (!mPureBjorken) {
 	for (int i=0;i<=mNSize;i++)
@@ -1770,6 +1808,8 @@ void CMesh::initNS() {
 				   mCells[1][j+1][0]);
   }
 /*
+=======
+>>>>>>> parent of f920104... initial condition problems...:isHydro3/CMesh.cpp
   if (!mPureBjorken) 
     for (int i=-1;i<=mNSize;i++)
       for (int j=-1;j<=mXSize;j++)
@@ -1788,7 +1828,11 @@ void CMesh::initNS() {
 		  else 
 		    mCells[1][j+1][k+1]->setA(2, (2./ROOT3)*mCells[1][j+1][k+1]->getSVEos()
 										/(mCells[1][j+1][k+1]->getTau()*mCells[1][j+1][k+1]->getISAlphaEos()));
+<<<<<<< HEAD:isHydro3/src/CMesh.cpp
 */
+=======
+
+>>>>>>> parent of f920104... initial condition problems...:isHydro3/CMesh.cpp
 }
 
 void CMesh::printCell(int eta,int x,int y) {

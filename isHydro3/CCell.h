@@ -214,7 +214,7 @@ public:
   
   // active?
   void deactivate();
-  
+ 
   // integrates the cell forward in time
   // puts result into cell passed
   void forward(CCell*);

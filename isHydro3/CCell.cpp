@@ -416,11 +416,9 @@ void CCell::update(int ii) {
 // FIXME :assumes octant=true
 void CCell::deactivate() {
 	active = false;
-  
 	for (int i=0;i<3;i++) 
 		if (neighbors[i][0]->x[i+1] == 0.)
 			neighbors[i][0]->deactivate();
-
 }
 
 double CCell::getTxy(int x, int y) {

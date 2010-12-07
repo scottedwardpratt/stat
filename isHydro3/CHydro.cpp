@@ -92,10 +92,17 @@ int CHydro::runHydro() {
     onMesh->setEos(mEos);  // static, so just once
 	onMesh->setParameterMap(pMap);
 	onMesh->deaden();
+<<<<<<< HEAD:isHydro3/src/CHydro.cpp
 	
 	if (mInitFlow != 0.) onMesh->addInitialFlow();
 	if (mInitNS != 0.)   onMesh->initNS();
 	
+=======
+
+	if (mInitNS != 0.)   onMesh->initNS();
+	if (mInitFlow != 0.) onMesh->addInitialFlow();
+
+>>>>>>> parent of f920104... initial condition problems...:isHydro3/CHydro.cpp
 	sLoss=0.; sLoss2=0.; eLoss=0.;
 	pLoss[0] = 0.; pLoss[1] = 0.; pLoss[2] = 0.;
 	epLoss=0.;
