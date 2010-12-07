@@ -91,6 +91,7 @@ public:
 	inline double getY() {return x[2];}
 	inline double getX(int i) {if (i==0) return getTau(); else if(i<4 && i>0) return x[i]; else return 0.;}
 	inline double getDx(int i) {if (i<4 && i>=0) return dx[i]; else return 0.;}
+	inline bool getActive() {return active;}
 
 		//relativistic velocities 
 	inline double getU0() {return s[0];}
@@ -182,6 +183,8 @@ public:
 
 	inline void setDt(double v) {dx[0] = v;}
 
+	inline void setActive(bool v) {	active = v;}
+	
 		// relativistic velocities  (gamma v)
 	void setU(double,double,double);
 	inline void setUx(double v) {s[1] = v; s[0] = sqrt(1.+s[1]*s[1]+s[2]*s[2]+s[3]*s[3]);}
