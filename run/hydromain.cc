@@ -1,4 +1,5 @@
 #include "CHydro.h"
+#include "qualifier.h"
 
 int main (int argc, char * const argv[]) {
 	string run_name;
@@ -12,9 +13,6 @@ int main (int argc, char * const argv[]) {
 	command = "mkdir -p output/" + run_name;
 	system(command.c_str());
 	
-	const int bListSize = 5;
-	double bList[bListSize] = {0., 2.2, 3.7, 5.2, 7.0};
-	
 	parameterMap* pMap = new parameterMap();
 	
 	string parsfilename="parameters/"+run_name+"/fixed.param";
@@ -24,20 +22,18 @@ int main (int argc, char * const argv[]) {
 	
 	CHydro* mHydro;
 	int status;
+	CQualifiers qualifiers;
+	qualifiers.Read("qualifiers.dat");
 	
-	for (int i=0;i<bListSize;i++) {
+	for (int iqual=0;iqual<qualifiers.nqualifiers;iqual++) {
 		
-		char bName[7];
-		sprintf(bName,"/b%1.3g/",bList[i]);
-
-		string dataRoot = string("output/") + run_name + string(bName);
+		qualifiers.SetPars(pMap,iqual);
+		string dataRoot = string("output/") + run_name + "/"+qualifiers.qualifier[iqual]+"/";
 			//printf("\n\nmkdir -p %s\n\n",dataRoot.c_str());
-		
+		parameter::set(*pMap,"HYDRO_OUTPUT_DATAROOT",dataRoot);		
 		command = "mkdir -p " + dataRoot;
 		system(command.c_str());		
 		
-		parameter::set(*pMap,"HYDRO_OUTPUT_DATAROOT",dataRoot);
-		parameter::set(*pMap,"GLAUBER_B",bList[i]);
 			//		parameter::PrintPars(*pMap);
 		
 		mHydro = new CHydro(pMap);
@@ -45,7 +41,7 @@ int main (int argc, char * const argv[]) {
 		
 		if (status != 0) {
 			printf("\n\n*******crash generating %s.....\n\n*******aborting with %d unfinished runs!!!!!!\n\n",
-				   dataRoot.c_str(),bListSize-i);
+				   dataRoot.c_str(),qualifiers.nqualifiers-iqual);
 			return 1;
 		}
 		else 

@@ -219,6 +219,10 @@ int CHYDROtoB3D::GenerateParticles(int iring1,int iring2){
 							ID=resinfo->code;
 							ipart=int(b3d->PartMap.size());
 							//printf("%d: ID=%d, x=%g, y=%g, tau=%g, eta=%g, px=%g, py=%g, mass=%g, y=%g\n",ipart,ID,x[1],x[2],tau,eta,p[1],p[2],mass,y);
+							if(b3d->DeadPartMap.size()==0){
+								printf("MUST INCREASE NPARTSMAX!!!!\n");
+								exit(1);
+							}
 							b3d->part[ipart]->Init(ID,x[1],x[2],tau,eta,p[1],p[2],mass,y);
 					//printf("y=%g, eta=%g, y-eta=%g\n",y,eta,y-eta);
 						}

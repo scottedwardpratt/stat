@@ -85,6 +85,10 @@ void CAction::PerformDecay(){
 		printf("FATAL: Action.Perform(), In decay, nbodies=%d\n",nbodies);
 		exit(1);
 	}
+	if(b3d->DeadPartMap.size()<nbodies){
+		printf("PERFORM_DECAY: MUST INCREASE NPARTMAX\n");
+		exit(1);
+	}
 	mother->DeleteFromCurrentMap();
 	mother->AddToMap(&(b3d->DeadPartMap));
 	for(ibody=0;ibody<nbodies;ibody++){
