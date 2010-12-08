@@ -27,7 +27,6 @@ int main(int argc, char *argv[]){
 			if(b3d->VIZWRITE){
 				for(double tau=1.0;tau<20.01;tau+=0.5) b3d->AddAction_VizWrite(tau);
 			}
-			//printf("DeadActionMap size=%d, deadparts=%d, liveparts=%d\n",int(b3d->DeadActionMap.size()),int(b3d->DeadPartMap.size()),int(b3d->PartMap.size()));
 			b3d->PerformAllActions();
 			dnchdy=b3d->WriteDataH5();
 			printf("##### finished event %d ##### dNch/dy=%g #####\n",b3d->ievent_write,double(dnchdy));
