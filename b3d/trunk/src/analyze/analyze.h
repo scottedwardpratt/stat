@@ -17,12 +17,13 @@ using namespace std;
 
 class CAnalyze{
 public:
-	string qualifier;
+	string qualifier,run_name;
 	int npartsmax,neventsmax,nsample;
 	parameterMap parmap;
 	CompType *ptype;
 	//CompType ptype(sizeof(CPartH5));
-	CAnalyze(string parameter_root_dir,string qualifier_set);
+	CAnalyze(string run_name);
+	void SetQualifier(string qualname);
 	string input_dataroot,output_dataroot;
 	string h5_infilename,outfilename,vizfilename;
 	H5File *h5file,*vizfile;

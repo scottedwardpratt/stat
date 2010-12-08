@@ -3,37 +3,20 @@
 
 #include "analyze.h"
 
-CAnalyze::CAnalyze(string parameter_root_dir,string qualifier_set){
-	qualifier=qualifier_set;
-	string parsfilename,dirname;
-	int ll=parameter_root_dir.size();
-	char lchar=(parameter_root_dir.c_str())[ll-1];
-	if(lchar=='/'){
-		dirname=parameter_root_dir+qualifier;
-	}
-	else dirname=parameter_root_dir+"/"+qualifier;
-	parsfilename=dirname+"/fixed.param";
-	printf("reading %s\n",parsfilename.c_str());
+CAnalyze::CAnalyze(string run_name_set){
+	run_name=run_name_set;
+	string parsfilename="parameters/"+run_name+"/fixed.param";
 	parameter::ReadParsFromFile(parmap,parsfilename);
-	parsfilename=dirname+"/stats.param";
-	printf("reading %s\n",parsfilename.c_str());
+	parsfilename="parameters/"+run_name+"/stats.param";
 	parameter::ReadParsFromFile(parmap,parsfilename);
+
 	ptype=new CompType(sizeof(CPartH5));
-	qualifier=qualifier_set;
-	parameter::ReadParsFromFile(parmap,parsfilename);
 	
 	neventsmax=parameter::getI(parmap,"B3D_NEVENTS",40000);
 	npartsmax=parameter::getI(parmap,"B3D_NPARTSMAX",3000);
 	nsample=parameter::getI(parmap,"B3D_NSAMPLE",1);
 	npartsmax*=nsample;
-	input_dataroot=parameter::getS(parmap,"B3D_INPUT_DATAROOT","data/b3d");
-	output_dataroot=parameter::getS(parmap,"B3D_OUTPUT_DATAROOT","data/b3d");
-	h5_infilename=parameter::getS(parmap,"B3D_H5_INFILENAME","b3d.h5");	
-	vizfilename=parameter::getS(parmap,"B3D_VIZ_INFILENAME","b3dviz.h5");	
-	partH5=new CPartH5[npartsmax];
-	STAR_ACCEPTANCE=parameter::getB(parmap,"B3D_STAR_ACCEPTANCE","false");
-	CALCGARRAYS=false;
-	//CompType ptype( sizeof(CPart) );
+	
 	ptype->insertMember("listid", HOFFSET(CPartH5,listid), PredType::NATIVE_INT);
 	ptype->insertMember("ID", HOFFSET(CPartH5,ID), PredType::NATIVE_INT);
 	ptype->insertMember("x", HOFFSET(CPartH5,x), PredType::NATIVE_DOUBLE);
@@ -44,11 +27,28 @@ CAnalyze::CAnalyze(string parameter_root_dir,string qualifier_set){
 	ptype->insertMember("py", HOFFSET(CPartH5,py), PredType::NATIVE_DOUBLE);
 	ptype->insertMember("rapidity", HOFFSET(CPartH5,rapidity), PredType::NATIVE_DOUBLE);
 	ptype->insertMember("mass", HOFFSET(CPartH5,mass), PredType::NATIVE_DOUBLE);
+	
+	partH5=new CPartH5[npartsmax];
+	STAR_ACCEPTANCE=parameter::getB(parmap,"B3D_STAR_ACCEPTANCE","false");
+	CALCGARRAYS=false;
+	//CompType ptype( sizeof(CPart) );
+
+}
+
+void CAnalyze::SetQualifier(string qualifiername){
+	input_dataroot="output/"+run_name+"/"+qualifiername;
+	output_dataroot="analysis/"+run_name+"/"+qualifiername;
+	string command="mkdir -p "+output_dataroot;
+	system(command.c_str());
+	h5_infilename=input_dataroot+"/b3d.h5";
+	//if(h5file!=NULL) delete h5file;
+	//h5_infilename=parameter::getS(parmap,"B3D_H5_INFILENAME","b3d.h5");	
+	//vizfilename=parameter::getS(parmap,"B3D_VIZ_INFILENAME","b3dviz.h5");
+	//vizfile = new H5File(infilename,H5F_ACC_RDONLY);
 }
 
 int CAnalyze::ReadDataH5(int ievent){
 	int nparts=0;
-
 	char eventno[20];
 	H5D_space_status_t status;
 	sprintf(eventno,"event%d",ievent);
