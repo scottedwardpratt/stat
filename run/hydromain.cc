@@ -38,7 +38,6 @@ int main (int argc, char * const argv[]) {
 		
 		mHydro = new CHydro(pMap);
 		status = mHydro->runHydro();
-		break;
 		
 		if (status != 0) {
 			printf("\n\n*******crash generating %s.....\n\n*******aborting with %d unfinished runs!!!!!!\n\n",
