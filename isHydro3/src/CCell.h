@@ -58,7 +58,7 @@ private:
 	static double cS2, P, S, tIS, tISB, SV, BV, T, sigmaA, sigmaB;
 	static double alphaIS, gammaIS, betaIS, aIS, bIS, dAlphaISDE, dGammaISDE;
 	
-	static bool mDebug, mSVTrim, mViscNS, mPureBjorken, mBjorken, mLinT, mLogT, mLogSinhT, mISVort, mISMax;
+	static bool mDebug, mSVTrim, mSVTrimInit, mViscNS, mPureBjorken, mBjorken, mLinT, mLogT, mLogSinhT, mISVort, mISMax;
 	static double mT0, mSVRatio, mBVRatio, mISAMax, mISBMax, mInitNS;
 	
 protected:

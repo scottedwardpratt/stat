@@ -36,29 +36,32 @@ CCell::~CCell() {
 }
   
 void CCell::paramFill(parameterMap* pM) {
-  pMap = pM;
+	pMap = pM;
   
-  mDebug  = parameter::getB(*pMap,"HYDRO_DEBUG",false);
-  mSVTrim = parameter::getB(*pMap,"HYDRO_SVTRIM",false);
-  mViscNS = parameter::getB(*pMap,"HYDRO_VISCNS",false);
-  mPureBjorken = parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false);
-  mBjorken = parameter::getB(*pMap,"HYDRO_BJORKEN",true);
-  mLinT = parameter::getB(*pMap,"HYDRO_LINT",false);
-  mLogT = parameter::getB(*pMap,"HYDRO_LOGT",false);
-  mLogSinhT = parameter::getB(*pMap,"HYDRO_LOGSINHT",true);
-  mISVort = parameter::getB(*pMap,"HYDRO_IS_VORT",false);
-  mISMax = parameter::getB(*pMap,"HYDRO_IS_MAX",false);
-
-  mT0 = parameter::getD(*pMap,"HYDRO_T0",1.0);
-  mSVRatio = parameter::getD(*pMap,"HYDRO_SVRATIO",0.0);
-  mBVRatio = parameter::getD(*pMap,"HYDRO_BVRATIO",0.0);
-  mISAMax  = parameter::getD(*pMap,"HYDRO_IS_AMAX",0.0);
-  mISBMax  = parameter::getD(*pMap,"HYDRO_IS_BMAX",0.0);
-  
-//  dx[0] = parameter::getD(*pMap,"DT");
-  dx[1] = parameter::getD(*pMap,"HYDRO_DX",0.1);
-  dx[2] = parameter::getD(*pMap,"HYDRO_DY",0.1);
-  dx[3] = parameter::getD(*pMap,"HYDRO_DN",0.1);
+	mDebug  = parameter::getB(*pMap,"HYDRO_DEBUG",false);
+	mSVTrim = parameter::getB(*pMap,"HYDRO_SVTRIM",false);
+	mSVTrimInit = parameter::getB(*pMap,"HYDRO_SVTRIMINIT",false);
+	
+	mViscNS = parameter::getB(*pMap,"HYDRO_VISCNS",false);
+	mPureBjorken = parameter::getB(*pMap,"HYDRO_PURE_BJORKEN",false);
+	mBjorken = parameter::getB(*pMap,"HYDRO_BJORKEN",true);
+	mLinT = parameter::getB(*pMap,"HYDRO_LINT",false);
+	mLogT = parameter::getB(*pMap,"HYDRO_LOGT",false);
+	mLogSinhT = parameter::getB(*pMap,"HYDRO_LOGSINHT",true);
+	mISVort = parameter::getB(*pMap,"HYDRO_IS_VORT",false);
+	mISMax = parameter::getB(*pMap,"HYDRO_IS_MAX",false);
+	
+	mT0 = parameter::getD(*pMap,"HYDRO_T0",1.0);
+	mSVRatio = parameter::getD(*pMap,"HYDRO_SVRATIO",0.0);
+	mBVRatio = parameter::getD(*pMap,"HYDRO_BVRATIO",0.0);
+	mISAMax  = parameter::getD(*pMap,"HYDRO_IS_AMAX",0.0);
+	mISBMax  = parameter::getD(*pMap,"HYDRO_IS_BMAX",0.0);
+	mInitNS = parameter::getD(*pMap,"HYDRO_INIT_NS",0.0);
+	
+		//  dx[0] = parameter::getD(*pMap,"DT");
+	dx[1] = parameter::getD(*pMap,"HYDRO_DX",0.1);
+	dx[2] = parameter::getD(*pMap,"HYDRO_DY",0.1);
+	dx[3] = parameter::getD(*pMap,"HYDRO_DN",0.1);
 }
 
 void CCell::calcDeriv() {
@@ -419,11 +422,28 @@ void CCell::update(int ii) {
 void CCell::initNS() {
 	update();
 	
-	s[5] = - (getSV()/getISAlpha()) * (dULocal[1][1] - dULocal[2][2]);
-	s[6] = - getSV()/(ROOT3*getISAlpha()) * (dULocal[1][1] + dULocal[2][2] - 2.*dULocal[3][3]);
-	s[7] = - (getSV()/getISAlpha()) * (dULocal[1][2] + dULocal[2][1]);
-	s[8] = - (getSV()/getISAlpha()) * (dULocal[1][3] + dULocal[3][1]);
-	s[9] = - (getSV()/getISAlpha()) * (dULocal[3][2] + dULocal[2][3]);	
+	if (!mSVTrimInit) {
+		s[5] = - mInitNS*(getSV()/getISAlpha()) * (dULocal[1][1] - dULocal[2][2]);
+		s[6] = - mInitNS*getSV()/(ROOT3*getISAlpha()) * (dULocal[1][1] + dULocal[2][2] - 2.*dULocal[3][3]);
+		s[7] = - mInitNS*(getSV()/getISAlpha()) * (dULocal[1][2] + dULocal[2][1]);
+		s[8] = - mInitNS*(getSV()/getISAlpha()) * (dULocal[1][3] + dULocal[3][1]);
+		s[9] = - mInitNS*(getSV()/getISAlpha()) * (dULocal[3][2] + dULocal[2][3]);
+	}
+	else {
+		
+		s[5] = - (getP()/getISAlpha()) * tanh( mInitNS*(getSV()/getP())*(dULocal[1][1] - dULocal[2][2]));
+		s[6] = - (getP()/getISAlpha()) * tanh( mInitNS*(getSV()/getP()) * (dULocal[1][1] + dULocal[2][2] - 2.*dULocal[3][3])/ROOT3);
+		s[7] = - (getP()/getISAlpha()) * tanh( mInitNS*(getSV()/getP())*(dULocal[1][2] + dULocal[2][1]));
+		s[8] = - (getP()/getISAlpha()) * tanh( mInitNS*(getSV()/getP())*(dULocal[1][3] + dULocal[3][1]));
+		s[9] = - (getP()/getISAlpha()) * tanh( mInitNS*(getSV()/getP())*(dULocal[3][2] + dULocal[2][3]));
+		/*
+		s[5] = - ((getP() + getE())/getISAlpha()) * tanh( mInitNS*(getSV()/(getP() + getE()))*(dULocal[1][1] - dULocal[2][2]));
+		s[6] = - ((getP() + getE())/getISAlpha()) * tanh( mInitNS*(getSV()/(getP() + getE())) * (dULocal[1][1] + dULocal[2][2] - 2.*dULocal[3][3])/ROOT3);
+		s[7] = - ((getP() + getE())/getISAlpha()) * tanh( mInitNS*(getSV()/(getP() + getE()))*(dULocal[1][2] + dULocal[2][1]));
+		s[8] = - ((getP() + getE())/getISAlpha()) * tanh( mInitNS*(getSV()/(getP() + getE()))*(dULocal[1][3] + dULocal[3][1]));
+		s[9] = - ((getP() + getE())/getISAlpha()) * tanh( mInitNS*(getSV()/(getP() + getE()))*(dULocal[3][2] + dULocal[2][3]));
+		 */
+	}
 }
 
 // turn this cell off; if impossible return false
@@ -1399,7 +1419,7 @@ double CCell::cS2, CCell::P, CCell::S, CCell::tIS, CCell::tISB;
 double CCell::SV, CCell::BV, CCell::T, CCell::sigmaA, CCell::sigmaB;
 double CCell::alphaIS, CCell::gammaIS, CCell::betaIS, CCell::aIS, CCell::bIS;
 double CCell::dAlphaISDE, CCell::dGammaISDE;
-bool CCell::mDebug, CCell::mSVTrim, CCell::mViscNS, CCell::mPureBjorken, CCell::mBjorken;
+bool CCell::mDebug, CCell::mSVTrim, CCell::mSVTrimInit, CCell::mViscNS, CCell::mPureBjorken, CCell::mBjorken;
 bool CCell::mLinT, CCell::mLogT, CCell::mLogSinhT, CCell::mISVort, CCell::mISMax;
 double CCell::mT0, CCell::mSVRatio, CCell::mBVRatio, CCell::mISAMax, CCell::mISBMax, CCell::mInitNS;
 parameterMap* CCell::pMap;
