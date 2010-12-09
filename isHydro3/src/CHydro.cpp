@@ -98,9 +98,7 @@ int CHydro::runHydro() {
 	onMesh->setParameterMap(pMap);
 	onMesh->deaden();
 
-	cout << "adding flow!" << std::endl; fflush(stdout);
 	if (mInitFlow != 0.) onMesh->addInitialFlow();
-	cout << "setting to NS!\n"; fflush(stdout);
 	if (mInitNS != 0.)   onMesh->initNS();
 
 	sLoss=0.; sLoss2=0.; eLoss=0.;
@@ -187,7 +185,8 @@ int CHydro::runHydro() {
 			return 1;
 		}
 
-		if (mIoIntegrals) printIntegrals(t);
+		if (mIoIntegrals) 
+			printIntegrals(t);
 	
 		if (tempMesh->getT(0,0,0) < mFoTemp) {
 			if (mIoSlices || mIoFull) printE(tempMesh,5);
@@ -265,8 +264,8 @@ int CHydro::runHydro() {
 	
 	tempMesh->~CMesh();
   
-	closeFile();
-	testFileOpen();
+		//	closeFile();
+		//	testFileOpen();
 	return 0;
 }
 
@@ -348,6 +347,7 @@ void CHydro::printE(CMesh* lMesh, int lT) {
 
 	int lPrintY = nPrintY;
 	for (int i=0;i<lMesh->getXSize();i++) {
+		if (!lMesh->getActive(lPrintN,i,lPrintY)) break;
 		double localX = lMesh->getX(lPrintN,i,lPrintY,1);
 		fprintf(fEX,"%0.9g %0.9g\n", localX, lMesh->getS(lPrintN,i,lPrintY,4));
 		fprintf(fS,"%0.9g %0.9g\n", localX, lMesh->getS(lPrintN,i,lPrintY));
@@ -384,6 +384,8 @@ void CHydro::printE(CMesh* lMesh, int lT) {
 	
 	int mPrintN = lPrintN, mPrintX = nPrintX;
 	for (int i=0; i<lMesh->getYSize();i++) {
+		if (!lMesh->getActive(mPrintN,mPrintX,i)) break;
+		
 		double localY = lMesh->getX(mPrintN,mPrintX,i,2);
 		fprintf(fEY, "%0.9g %0.9g\n", localY, lMesh->getS(mPrintN,mPrintX,i,4));
 		
@@ -1661,8 +1663,8 @@ void CHydro::printMesh(CMesh* lMesh) {
 			  fprintf(fFull,"\n");
 		  }
 	else 
-	  for (int j=-1;j<=mX;j++) 
-	      for (int k=-1;k<=mY;k++) {
+	  for (int j=0;j<=mX;j++) 
+	      for (int k=0;k<=mY;k++) {
 			  if (!lMesh->getActive(0,j,k)) {
 				  fprintf(fFull,"0 \n");
 				  break;
@@ -2095,13 +2097,25 @@ void CHydro::printDNs(CMesh* lMesh, int mNSize, int mXSize, int mYSize) {
 }
 
 void CHydro::copyCellActive(CMesh* m1, CMesh* m2) {
-	for (int i=-1;i<=m2->getNSizeOrig();i++)
-		for (int j=-1;j<=m2->getXSizeOrig();j++)
-			for (int k=-1;k<=m2->getYSizeOrig();k++)
-				m2->setActive(i,j,k,m1->getActive(i,j,k));
+		//	cout << std::endl << m2->getXSize() << " " << m2->getXSizeOrig() << " " << m1->getXSize() << " " << m1->getXSizeOrig() << std::endl;
+	
+	if (!mPureBjorken) 
+		for (int i=-1;i<=m2->getNSizeOrig();i++)
+			for (int j=-1;j<=m2->getXSizeOrig();j++)
+				for (int k=-1;k<=m2->getYSizeOrig();k++) 
+					m2->setActive(i,j,k,m1->getActive(i,j,k));
+	else 
+		for (int j=-1;j<=m2->getXSize();j++)
+			for (int k=-1;k<=m2->getYSize();k++) {
+					//				cout << j << " " << k << std::endl; fflush(stdout);
+				m2->setActive(0,j,k,m1->getActive(0,j,k));
+			}
+				
+		//	cout << "success cCA()" << std::endl;  fflush(stdout);
 }
 
 void CHydro::testFileOpen() {
+	return;
 	if (fEX != NULL) printf("problem with file fEX (%p)...\n",fEX);
 	if (fEN != NULL) printf("problem with file fEN (%p)...\n",fEN);
 	if (fE0 != NULL) printf("problem with file fE0 (%p)...\n",fE0);

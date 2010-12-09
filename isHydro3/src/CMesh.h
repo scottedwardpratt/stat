@@ -57,6 +57,7 @@ class CMesh {
 	void average(CMesh*,CMesh*);
 	
 	void smoothEdge(CCell*,CCell*,CCell*,CCell*);
+	void flipEdge();
 	void flipEdge(int,CCell*,CCell*,CCell*);
 	
 	void calcLoss();

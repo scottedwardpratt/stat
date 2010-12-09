@@ -113,33 +113,22 @@ CMesh::CMesh(parameterMap* pM){
 		}
 
 	// connect your cells and (antiquated..) reduce boundary problem...
-	for (int i=-1;i<=mNSize;i++)
-	  for (int j=-1;j<=mXSize;j++)
-		for (int k=-1;k<=mYSize;k++) {
-			if (i==-1)
-				mCells[i+1][j+1][k+1]->setEtaNeighbors( mCells[i+1][j+1][k+1], 
-													   mCells[i+2][j+1][k+1]);
-			else if (i<mNSize)
+	for (int i=0;i<=mNSize;i++)
+	  for (int j=0;j<=mXSize;j++)
+		for (int k=0;k<=mYSize;k++) {
+			if (i<mNSize)
 				mCells[i+1][j+1][k+1]->setEtaNeighbors( mCells[i][j+1][k+1], 
 													   mCells[i+2][j+1][k+1]);
 			else 
 				mCells[i+1][j+1][k+1]->setEtaNeighbors( mCells[i][j+1][k+1], 
 													   mCells[i+1][j+1][k+1]);
-
-			if (j==-1)
-				mCells[i+1][j+1][k+1]->setXNeighbors( mCells[i+1][j+1][k+1], 
-													   mCells[i+1][j+2][k+1]);
-			else if (j<mNSize)
+			if (j<mXSize)
 				mCells[i+1][j+1][k+1]->setXNeighbors( mCells[i+1][j][k+1], 
 													   mCells[i+1][j+2][k+1]);
 			else 
 				mCells[i+1][j+1][k+1]->setXNeighbors( mCells[i+1][j][k+1], 
 													   mCells[i+1][j+1][k+1]);
-			
-			if (k==-1)
-				mCells[i+1][j+1][k+1]->setYNeighbors( mCells[i+1][j+1][k+1], 
-													   mCells[i+2][j+1][k+2]);
-			else if (k<mNSize)
+			if (k<mYSize)
 				mCells[i+1][j+1][k+1]->setYNeighbors( mCells[i+1][j+1][k], 
 													   mCells[i+1][j+1][k+2]);
 			else 
@@ -215,33 +204,22 @@ CMesh::CMesh(CMesh* mesh) {
 			mCells[i+1][j+1][k+1] = new CCell(mesh->mCells[i+1][j+1][k+1]);
 		  
 		// connect your cells and (antiquated..) reduce boundary problem...
-	for (int i=-1;i<=mNSize;i++)
-		for (int j=-1;j<=mXSize;j++)
-			for (int k=-1;k<=mYSize;k++) {
-				if (i==-1)
-					mCells[i+1][j+1][k+1]->setEtaNeighbors( mCells[i+1][j+1][k+1], 
-														   mCells[i+2][j+1][k+1]);
-				else if (i<mNSize)
+	for (int i=0;i<=mNSize;i++)
+		for (int j=0;j<=mXSize;j++)
+			for (int k=0;k<=mYSize;k++) {
+				if (i<mNSize)
 					mCells[i+1][j+1][k+1]->setEtaNeighbors( mCells[i][j+1][k+1], 
 														   mCells[i+2][j+1][k+1]);
 				else 
 					mCells[i+1][j+1][k+1]->setEtaNeighbors( mCells[i][j+1][k+1], 
 														   mCells[i+1][j+1][k+1]);
-				
-				if (j==-1)
-					mCells[i+1][j+1][k+1]->setXNeighbors( mCells[i+1][j+1][k+1], 
-														 mCells[i+1][j+2][k+1]);
-				else if (j<mNSize)
+				if (j<mXSize)
 					mCells[i+1][j+1][k+1]->setXNeighbors( mCells[i+1][j][k+1], 
 														 mCells[i+1][j+2][k+1]);
 				else 
 					mCells[i+1][j+1][k+1]->setXNeighbors( mCells[i+1][j][k+1], 
 														 mCells[i+1][j+1][k+1]);
-				
-				if (k==-1)
-					mCells[i+1][j+1][k+1]->setYNeighbors( mCells[i+1][j+1][k+1], 
-														 mCells[i+2][j+1][k+2]);
-				else if (k<mNSize)
+				if (k<mYSize)
 					mCells[i+1][j+1][k+1]->setYNeighbors( mCells[i+1][j+1][k], 
 														 mCells[i+1][j+1][k+2]);
 				else 
@@ -272,22 +250,33 @@ void CMesh::initialCondition(CCell* mCell, int i, int j, int k) {
 
 void CMesh::addInitialFlow() {
 
-  if (!mOctant) 
-	for (int i=-mNSize+1;i<mNSize;i++)
-	  for (int j=-mXSize+1;j<mXSize;j++)
-		for (int k=-mXSize+1;k<mYSize;k++) {
+	if (!mOctant) 
+		for (int i=-mNSize+1;i<mNSize;i++)
+			for (int j=-mXSize+1;j<mXSize;j++)
+				for (int k=-mXSize+1;k<mYSize;k++) {
 		  mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]->update();
 		  mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]->setS(1, - 0.5*getDS(i,j,k,0,3)/( getE(i,j,k) + getP(i,j,k)) * getTau());
 		  mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]->setS(2, - 0.5*getDS(i,j,k,1,3)/( getE(i,j,k) + getP(i,j,k)) * getTau());
 		}
-  else 
-	  for (int i=-1;i<=mNSize;i++)
-		  for (int j=-1;j<=mXSize;j++)
-			  for (int k=-1;k<=mYSize;k++) {
-				  update(i,j,k);
-				  mCells[i+1][j+1][k+1]->setS(1, - mInitFlow*0.5*getDS(i,j,k,3,0)/( getE(i,j,k) + getP(i,j,k)) * getTau());
-				  mCells[i+1][j+1][k+1]->setS(2, - mInitFlow*0.5*getDS(i,j,k,3,1)/( getE(i,j,k) + getP(i,j,k)) * getTau());
-			  }
+	else 
+		if (!mPureBjorken)
+			for (int i=0;i<=mNSize;i++)
+				for (int j=0;j<=mXSize;j++)
+					for (int k=0;k<=mYSize;k++) {
+						if (!getActive(i,j,k)) break;
+						update(i,j,k);
+						mCells[i+1][j+1][k+1]->setS(1, - mInitFlow*0.5*getDS(i,j,k,3,0)/( getE(i,j,k) + getP(i,j,k)) * getTau());
+						mCells[i+1][j+1][k+1]->setS(2, - mInitFlow*0.5*getDS(i,j,k,3,1)/( getE(i,j,k) + getP(i,j,k)) * getTau());
+					}
+		else 
+			for (int j=0;j<=mXSize;j++)
+				for (int k=0;k<=mYSize;k++) {
+					if (!getActive(0,j,k)) break;
+					update(0,j,k);
+					mCells[1][j+1][k+1]->setS(1, - mInitFlow*0.5*getDS(0,j,k,3,0)/( getE(0,j,k) + getP(0,j,k)) * getTau());
+					mCells[1][j+1][k+1]->setS(2, - mInitFlow*0.5*getDS(0,j,k,3,1)/( getE(0,j,k) + getP(0,j,k)) * getTau());
+				}
+	flipEdge();
 }
 
 double CMesh::wnRho(double x, double y, double z) {
@@ -342,29 +331,7 @@ void CMesh::forward(CMesh* mMesh, double mDt) {
 					  mCells[i+1][j+1][k+1]->forward(mMesh->mCells[i+1][j+1][k+1]);
 				  else break;
 	
-		  //inner eta bound
-	  for (int i=0;i<=mXSize;i++)
-		  for (int j=0;j<=mYSize;j++) {	
-			  flipEdge(3,mMesh->mCells[2][i+1][j+1],
-					   mMesh->mCells[1][i+1][j+1],
-					   mMesh->mCells[0][i+1][j+1]);
-			  mMesh->mCells[0][i+1][j+1]->setTau(mMesh->mCells[2][i+1][j+1]->getTau());
-		  }
-		  //inner rad bound
-	  for (int i=-1;i<=mNSize;i++) {
-		  for (int j=0;j<=mYSize;j++) {
-			  flipEdge(1,mMesh->mCells[i+1][2][j+1],
-					   mMesh->mCells[i+1][1][j+1],
-					   mMesh->mCells[i+1][0][j+1]);
-			  mMesh->mCells[i+1][0][j+1]->setTau(mMesh->mCells[i+1][2][j+1]->getTau());
-		  }
-		  for (int j=-1;j<=mXSize;j++) {	
-			  flipEdge(2,mMesh->mCells[i+1][j+1][2],
-					   mMesh->mCells[i+1][j+1][1],
-					   mMesh->mCells[i+1][j+1][0]);
-			  mMesh->mCells[i+1][j+1][0]->setTau(mMesh->mCells[i+1][j+1][2]->getTau());
-		  }
-	  }
+	  mMesh->flipEdge();
   } else { //mPureBjorken
 	  for (int j=0;j<=mXSize;j++)
 		  for (int k=0;k<=mYSize;k++) 
@@ -372,19 +339,7 @@ void CMesh::forward(CMesh* mMesh, double mDt) {
 				  mCells[1][j+1][k+1]->forward(mMesh->mCells[1][j+1][k+1]);
 			  else break;
 	  
-		  // inner boundaries
-	  for (int j=0;j<mYSize;j++) {
-		  flipEdge(1,mMesh->mCells[1][2][j+1],
-				   mMesh->mCells[1][1][j+1],
-				   mMesh->mCells[1][0][j+1]);
-		  mMesh->mCells[1][0][j+1]->setTau(mMesh->mCells[1][2][j+1]->getTau());
-	  }
-	  for (int j=0;j<mXSize;j++) {	
-		  flipEdge(2,mMesh->mCells[1][j+1][2],
-				   mMesh->mCells[1][j+1][1],
-				   mMesh->mCells[1][j+1][0]);
-		  mMesh->mCells[1][j+1][0]->setTau(mMesh->mCells[1][j+1][2]->getTau());
-	  }	
+	  mMesh->flipEdge();
   }
  }  // !mOctant
  else { // !mOctant
@@ -418,8 +373,8 @@ void CMesh::forward(CMesh* onMesh, CMesh* offMesh, double mDt) {
 		if (mSawtooth) offMesh->mCells[mPrintN+1][mPrintX+1][mPrintY+1]->printM();
 	}
   
-	if (mOctant) {
-		if (!mPureBjorken) {
+	if (mOctant) 
+		if (!mPureBjorken) 
 			for (int i=0;i<=mNSize;i++)
 				for (int j=0;j<=mXSize;j++)
 					for (int k=0;k<=mYSize;k++) 
@@ -427,66 +382,23 @@ void CMesh::forward(CMesh* onMesh, CMesh* offMesh, double mDt) {
 							mCells[i+1][j+1][k+1]->forward( onMesh->mCells[i+1][j+1][k+1],
 														   offMesh->mCells[i+1][j+1][k+1]); 
 						else break;
-
-			double mTau = onMesh->mCells[1][1][1]->getTau();
-
-				//inner eta bound
-			for (int i=0;i<=mXSize;i++)
-				for (int j=0;j<=mYSize;j++) {
-					flipEdge(3,onMesh->mCells[2][i+1][j+1],
-							 onMesh->mCells[1][i+1][j+1],
-							 onMesh->mCells[0][i+1][j+1]);
-					onMesh->mCells[0][i+1][j+1]->setTau(mTau);
-				}
-
-				//inner rad bound
-			for (int i=-1;i<=mNSize;i++) {
-				for (int j=0;j<=mYSize;j++) {
-					flipEdge(1,onMesh->mCells[i+1][2][j+1],
-							 onMesh->mCells[i+1][1][j+1],
-							 onMesh->mCells[i+1][0][j+1]);
-					
-					onMesh->mCells[i+1][0][j+1]->setTau(mTau);
-				} 
-				for (int j=-1;j<=mXSize;j++) {	
-					flipEdge(2,onMesh->mCells[i+1][j+1][2],
-							 onMesh->mCells[i+1][j+1][1],
-							 onMesh->mCells[i+1][j+1][0]);
-					onMesh->mCells[i+1][j+1][0]->setTau(mTau);
-				}
-			}
-			
-		} 
-		else {  //mPureBjorken 
+		else 
 			for (int j=0;j<mXSize;j++)
 				for (int k=0;k<mYSize;k++) 
 					if (getActive(0,j,k))
 						mCells[1][j+1][k+1]->forward(onMesh->mCells[1][j+1][k+1],
 													 offMesh->mCells[1][j+1][k+1]);
 					else break;
-
-				// inner boundaries
-			for (int j=0;j<=mYSize;j++) {
-				flipEdge(1,onMesh->mCells[1][2][j+1],
-						 onMesh->mCells[1][1][j+1],
-						 onMesh->mCells[1][0][j+1]);
-				onMesh->mCells[1][0][j+1]->setTau(onMesh->mCells[1][2][j+1]->getTau());
-			}
-			for (int j=0;j<=mXSize;j++) {	
-				flipEdge(2,onMesh->mCells[1][j+1][2],
-						 onMesh->mCells[1][j+1][1],
-						 onMesh->mCells[1][j+1][0]);
-				onMesh->mCells[1][j+1][0]->setTau(onMesh->mCells[1][j+1][2]->getTau());
-			}									   
-		} // end mPureBjorken
-	}   // end mOctant
-	else {  // !mOctant
+	else 
 		for (int i=-mNSize;i<=mNSize;i++)
 			for (int j=-mXSize;j<=mXSize;j++)
 				for (int k=-mYSize;k<=mYSize;k++) 
 					mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]->forward( onMesh->mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig],
 																			  offMesh->mCells[i+mNSizeOrig][j+mXSizeOrig][k+mYSizeOrig]);
-	}
+
+	
+	onMesh->flipEdge();
+	
 	if (mPrintMs) {
 		std::cout << "post-whole(t=" << onMesh->getTau() << ')' << std::endl;
 		onMesh->mCells[mPrintN+1][mPrintX+1][mPrintY+1]->update();
@@ -1609,6 +1521,50 @@ void CMesh::smoothEdge(CCell* c1,CCell* c2, CCell* c3, CCell* cOut){
   */
 }
 
+void CMesh::flipEdge() {
+	double mTau = getTau();
+	
+	if (!mPureBjorken) {
+		for (int i=0;i<=mXSize;i++)
+			for (int j=0;j<=mYSize;j++) {	
+				flipEdge(3,mCells[2][i+1][j+1],
+						 mCells[1][i+1][j+1],
+						 mCells[0][i+1][j+1]);
+				mCells[0][i+1][j+1]->setTau(mTau);
+			}
+			//inner rad bound
+		for (int i=-1;i<=mNSize;i++) {
+			for (int j=0;j<=mYSize;j++) {
+				flipEdge(1,mCells[i+1][2][j+1],
+						 mCells[i+1][1][j+1],
+						 mCells[i+1][0][j+1]);
+				mCells[i+1][0][j+1]->setTau(mTau);
+			}
+			for (int j=-1;j<=mXSize;j++) {	
+				flipEdge(2,mCells[i+1][j+1][2],
+						 mCells[i+1][j+1][1],
+						 mCells[i+1][j+1][0]);
+				mCells[i+1][j+1][0]->setTau(mTau);
+			}
+		}
+	}
+	else {
+			// inner boundaries
+		for (int j=0;j<=mYSize;j++) {
+			flipEdge(1,mCells[1][2][j+1],
+					 mCells[1][1][j+1],
+					 mCells[1][0][j+1]);
+			mCells[1][0][j+1]->setTau(mTau);
+		}
+		for (int j=-1;j<=mXSize;j++) {	
+			flipEdge(2,mCells[1][j+1][2],
+					 mCells[1][j+1][1],
+					 mCells[1][j+1][0]);
+			mCells[1][j+1][0]->setTau(mTau);
+		}	
+	}
+}
+
 void CMesh::flipEdge(int fE, CCell* c1, CCell* c2, CCell* cOut) {
 /*
   if (INIT_EXP_X && fE == 1) {
@@ -1631,34 +1587,35 @@ void CMesh::flipEdge(int fE, CCell* c1, CCell* c2, CCell* cOut) {
   }
   else {
 */
-  for (int i=1;i<4;i++)	 { 
-	if (i == fE) 
-	  cOut->setS(i, -c1->getS(i));
-	else 
-	  cOut->setS(i,  c1->getS(i));
+	for (int i=1;i<4;i++)	 { 
+		if (i == fE) 
+			cOut->setS(i, -c1->getS(i));
+		else 
+			cOut->setS(i,  c1->getS(i));
     }
     cOut->setE(c1->getE());
     cOut->setS(5, c1->getS(5));
     cOut->setS(6, c1->getS(6));
-//  }
-  
-  if (fE == 1) {
-	cOut->setS(7,-c1->getS(7));
-	cOut->setS(8,-c1->getS(8));
-	cOut->setS(9, c1->getS(9));
-  } 
-  else if (fE == 2) {
-	cOut->setS(7,-c1->getS(7));
-	cOut->setS(8, c1->getS(8));
-	cOut->setS(9,-c1->getS(9));
-  } 
-  else if (fE == 3) {
-	cOut->setS(7, c1->getS(7));
-	cOut->setS(8,-c1->getS(8));
-	cOut->setS(9,-c1->getS(9));
-  }
-  
-  cOut->setS(10,c1->getS(10));
+		//  }
+	
+	if (fE == 1) {
+		cOut->setS(7,-c1->getS(7));
+		cOut->setS(8,-c1->getS(8));
+		cOut->setS(9, c1->getS(9));
+	} 
+	else if (fE == 2) {
+		cOut->setS(7,-c1->getS(7));
+		cOut->setS(8, c1->getS(8));
+		cOut->setS(9,-c1->getS(9));
+	} 
+	else if (fE == 3) {
+		cOut->setS(7, c1->getS(7));
+		cOut->setS(8,-c1->getS(8));
+		cOut->setS(9,-c1->getS(9));
+	}
+	
+	cOut->setS(10,c1->getS(10));
+	cOut->setActive(c1->getActive());
 }
 
 void CMesh::deaden() {
@@ -1705,14 +1662,20 @@ bool CMesh::detectCrash(){
 
 void CMesh::initNS() {
 	if (!mPureBjorken) 
-		for (int i=-1;i<=mNSize;i++)
-			for (int j=-1;j<=mXSize;j++)
-				for (int k=-1;k<=mYSize;k++) 
+		for (int i=0;i<=mNSize;i++)
+			for (int j=0;j<=mXSize;j++)
+				for (int k=0;k<=mYSize;k++) {
+					if (!getActive(i,j,k)) break;
 					mCells[i+1][j+1][k+1]->initNS();
+				}
 	else 
-		for (int j=-1;j<=mXSize;j++)
-			for (int k=-1;k<=mYSize;k++) 
-				mCells[1][j+1][k+1]->initNS();
+		for (int j=0;j<=mXSize;j++)
+			for (int k=0;k<=mYSize;k++) {
+				if (!getActive(0,j,k)) break;
+				mCells[1][j+1][k+1]->initNS();				
+			}
+	
+	flipEdge();	
 }
 
 void CMesh::printCell(int eta,int x,int y) {

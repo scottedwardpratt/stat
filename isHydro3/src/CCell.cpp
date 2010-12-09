@@ -14,15 +14,15 @@ CCell::CCell(parameterMap* pM){
 }
 
 CCell::CCell(double t0,double n0, double x0, double y0) { 
-  if (mLinT) x[0] = t0;
-  else if (mLogT) x[0] = log(t0/mT0);
-  else if (mLogSinhT) x[0] = log( sinh(t0));
-//  else printf("whoa!!!\n");
-  x[3] = n0;
-  x[1] = x0;
-  x[2] = y0;
+	if (mLinT) x[0] = t0;
+	else if (mLogT) x[0] = log(t0/mT0);
+	else if (mLogSinhT) x[0] = log( sinh(t0));
+
+	x[3] = n0;
+	x[1] = x0;
+	x[2] = y0;
   
-//  printf("%f %f %f %f\n",x[0],x[1],x[2],x[3]);
+	active = true;
 }
 
 CCell::CCell(CCell* cell) {
@@ -66,14 +66,15 @@ void CCell::calcDeriv() {
 	for (int j=0;j<10;j++)
 		for (int i=0;i<3;i++)
 			if (neighbors[i][1]->getActive())
-				dS[j][i] = (neighbors[i][1]->s[j+1] - neighbors[i][0]->s[j+1])/(2.*dx[i+1]);
+				dS[j][i] = (neighbors[i][1]->s[j+1] - neighbors[i][0]->s[j+1])/(neighbors[i][1]->x[i+1] - neighbors[i][0]->x[i+1]);
 			else 
 				dS[j][i] = (3.*s[j+1] - 4.*neighbors[i][0]->s[j+1] 
 							+ neighbors[i][0]->neighbors[i][0]->s[j+1]) / (2.*dx[i+1]);
+
 	
 	for (int i=0;i<3;i++)
 		dS[3][i] *= getE();
-	
+
 	if (mPureBjorken)
 		for (int j=0;j<10;j++)
 			dS[j][2] = 0.;
