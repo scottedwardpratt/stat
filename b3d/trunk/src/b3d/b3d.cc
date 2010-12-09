@@ -123,7 +123,6 @@ CB3D::CB3D(string run_name_set){
 		}
 	}
 	randy=new CRandom(-1234);
-	ievent_write=ievent_read=0;
 // create particle objects, and put into deadpartmap
 	int ipart;
 	part=new CPart *[NPARTSMAX];
@@ -164,6 +163,7 @@ CB3D::CB3D(string run_name_set){
 }
 
 void CB3D::SetQualifier(string qualifier_set){
+	ievent_write=ievent_read=0;
 	qualifier=qualifier_set;
 	if(h5outfile!=NULL) delete h5outfile;
 	if(h5infile!=NULL) delete h5infile;
@@ -437,6 +437,10 @@ void CB3D::AddAction_VizWrite(double tauwrite){
 
 void CB3D::AddAction_Decay(CPart *part){
 	CAction *action;
+	if(DeadActionMap.size()==0){
+		printf("MUST INCREASE NACTIONS_MAX\n");
+		exit(1);
+	}
 	double t,gamma,vz,newt,newz,taudecay;
 	t=HBARC/part->resinfo->width;
 	gamma=part->p[0]/part->GetMass();
@@ -480,6 +484,10 @@ void CB3D::AddAction_Decay(CPart *part){
 
 void CB3D::AddAction_ExitCell(CPart *part){
 	CAction *action;
+	if(DeadActionMap.size()==0){
+		printf("MUST INCREASE NACTIONS_MAX\n");
+		exit(1);
+	}
 	if(part->tauexit<TAUCOLLMAX){
 		if(DeadActionMap.size()==0){
 			printf("MUST INCREASE NACTIONS MAX\n");

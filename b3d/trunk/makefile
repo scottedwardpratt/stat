@@ -61,11 +61,11 @@ LIB=-L${MADAI_GSLPATH}/lib -L${MADAI_LIB} -lcoralutils -lanalyze -lgsl -lhdf5 -l
 all: b3d analyze
 
 clean:
-	rm ${MADAI_LIB}/libb3d.a ${MADAI_LIB}/libb3danalyze.a build/b3d/*.o build/analyze/*.o
+	rm ${MADAI_LIB}/libb3d.a ${MADAI_LIB}/libanalyze.a build/b3d/*.o build/analyze/*.o
 
 b3d: headers ${MADAI_LIB}/libb3d.a
 
-analyze: headers ${MADAI_LIB}/libb3danalyze.a
+analyze: headers ${MADAI_LIB}/libanalyze.a
 
 headers: ${B3D_HFILES}
 	for filename in ${B3D_HFILES};\
@@ -123,9 +123,9 @@ build/b3d/part.o : src/b3d/part.cc
 build/b3d/resonances.o : 	src/b3d/resonances.cc
 		${CPP} -c ${OPT} ${INC} -o build/b3d/resonances.o src/b3d/resonances.cc
 
-${MADAI_LIB}/libb3danalyze.a : ${ANALYZE_HFILES} ${ANALYZE_OBJFILES}
-	ar -ru lib/libb3danalyze.a ${ANALYZE_OBJFILES};\
-	mv -f lib/libb3danalyze.a ${MADAI_LIB}/
+${MADAI_LIB}/libanalyze.a : ${ANALYZE_HFILES} ${ANALYZE_OBJFILES}
+	ar -ru lib/libanalyze.a ${ANALYZE_OBJFILES};\
+	mv -f lib/libanalyze.a ${MADAI_LIB}/
 
 build/analyze/analyze.o : src/analyze/analyze.cc
 	${CPP} -c ${OPT} ${INC} -o build/analyze/analyze.o src/analyze/analyze.cc
