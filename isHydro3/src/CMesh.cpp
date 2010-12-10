@@ -230,7 +230,12 @@ CMesh::CMesh(CMesh* mesh) {
 
 // destructor
 CMesh::~CMesh() {
-	delete [] mCells;
+		//delete [] mCells;
+	
+	for (int i=0;i<mNSize+2;i++)
+		for (int j=0;j<mXSize+2;j++)
+			for (int k=0;k<mYSize+2;k++)
+				delete mCells[i][j][k];
 }
 
 // assigns the cells initial conditions

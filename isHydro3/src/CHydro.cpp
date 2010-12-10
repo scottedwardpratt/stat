@@ -189,8 +189,10 @@ int CHydro::runHydro() {
 			printIntegrals(t);
 	
 		if (tempMesh->getT(0,0,0) < mFoTemp) {
-			if (mIoSlices || mIoFull) printE(tempMesh,5);
-			closeFile();
+			if (mIoSlices || mIoFull) {
+				printE(tempMesh,5);
+				closeFile();
+			}
 			t=mTStep+1;
 		}
 	  
@@ -200,7 +202,7 @@ int CHydro::runHydro() {
 		}
 		else if ((t*50)%mTStep==0) {printf(".");  fflush(stdout);}
 
-		testFileOpen();
+			//		testFileOpen();
 		
 		if (mIoSpots && t%mIoSliceTStep == 0) 
 			printSpots();
@@ -250,11 +252,12 @@ int CHydro::runHydro() {
 	time(&now);
 	printf("\nHydro Finished...... (Total Time: %0.6g sec)\n",difftime(now,start)); fflush(stdout);
   
-	onMesh->~CMesh(); 
-	offMesh->~CMesh(); 
+	delete onMesh;
+	delete offMesh;
+	
 	if (mRK4) {
-		k1->~CMesh();
-		k2->~CMesh();
+		delete k1;
+		delete k2;
 	}
 	
 	if (mIoSpectra) {
@@ -262,10 +265,8 @@ int CHydro::runHydro() {
 		printDNs(tempMesh,mNSize,mXSize,mYSize);
 	}
 	
-	tempMesh->~CMesh();
+	delete tempMesh;
   
-		//	closeFile();
-		//	testFileOpen();
 	return 0;
 }
 
