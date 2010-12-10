@@ -26,15 +26,16 @@ int main (int argc, char * const argv[]) {
 	qualifiers.Read("qualifiers.dat");
 	
 	for (int iqual=0;iqual<qualifiers.nqualifiers;iqual++) {
+	//for (int iqual=0;iqual<1;iqual++) {
 		
 		qualifiers.SetPars(pMap,iqual);
 		string dataRoot = string("output/") + run_name + "/"+qualifiers.qualifier[iqual]+"/";
 			//printf("\n\nmkdir -p %s\n\n",dataRoot.c_str());
-		parameter::set(*pMap,"HYDRO_OUTPUT_DATAROOT",dataRoot);		
+		parameter::set(*pMap,"HYDRO_OUTPUT_DATAROOT",dataRoot);
 		command = "mkdir -p " + dataRoot;
 		system(command.c_str());		
 		
-			//		parameter::PrintPars(*pMap);
+					//parameter::PrintPars(*pMap);
 		
 		mHydro = new CHydro(pMap);
 		status = mHydro->runHydro();
