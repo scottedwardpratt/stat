@@ -2,8 +2,8 @@ double HYDRO_FOTEMP 0.16
 double HYDRO_T0 0.6  
 bool EQOFST_LATEOS true
 double GLAUBER_WNBIN_RATIO 1.0
-double GLAUBER_B 0. 
-double GLAUBER_K 4.61788
-double HYDRO_INIT_NS 0. 
-double HYDRO_INIT_FLOW 0.
-double HYDRO_SVRATIO 0.08
+double GLAUBER_B 3.3
+double GLAUBER_K_TAU 3.5
+double HYDRO_INIT_NS 1.0
+double HYDRO_INIT_FLOW 1.0
+double HYDRO_SVRATIO 0.1
