@@ -30,7 +30,7 @@ src/coral/CFCalc/cfcalc.cc\
 src/coral/Kernel/kernel.cc\
 src/coral/Source2CF/source2cf.cc\
 src/coral/SourceCalc/sourcecalc.cc\
-#src/coral/SourceCalc/sourcecalc_blast.cc\
+src/coral/SourceCalc/sourcecalc_blast.cc\
 src/coral/SourceCalc/sourcecalc_ellipticblast.cc\
 src/coral/SourceCalc/sourcecalc_gauss.cc\
 src/coral/SourceCalc/sourcecalc_GX1d.cc\

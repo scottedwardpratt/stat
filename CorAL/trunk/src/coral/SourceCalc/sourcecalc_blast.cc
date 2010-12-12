@@ -26,9 +26,7 @@ void CSourceCalc_Blast::InitSPars(){
 }
 
 void CSourceCalc_Blast::SetSPars(double lambdaset,
-	double Rset,double Tauset,double DelTauset,
-	double Betaset,double Tset,double Ptset,
-double EtaGset,double Maset,double Mbset){
+	double Rset,double Tauset,double DelTauset,double Betaset,double Tset,double Ptset,double EtaGset,double Maset,double Mbset){
 	InitSPars();
 	parameter::set(spars,"lambda",lambdaset);
 	parameter::set(spars,"R",Rset);
@@ -40,12 +38,9 @@ double EtaGset,double Maset,double Mbset){
 	parameter::set(spars,"EtaG",EtaGset);  
 	parameter::set(spars,"Ma",Maset);  
 	parameter::set(spars,"Mb",Mbset);
-
 }
 
-void CSourceCalc_Blast::SetSPars(double lambdaset,
-double Rset,double Tauset,double DelTauset){
-
+void CSourceCalc_Blast::SetSPars(double lambdaset,double Rset,double Tauset,double DelTauset){
 	InitSPars();
 	parameter::set(spars,"lambda",lambdaset);
 	parameter::set(spars,"R",Rset);
@@ -92,14 +87,14 @@ void CSourceCalc_Blast::CalcS(CCHArray *A){
 			x=rcm[1];
 			y=rcm[2];
 			z=rcm[3];
-#ifdef __CALC_SCBLAST_GAUSSPARS__
-			xbar+=x;
-			x2bar+=x*x;
-			ybar+=y;
-			y2bar+=y*y;
-			zbar+=z;
-			z2bar+=z*z;
-#endif
+//#ifdef __CALC_SCBLAST_GAUSSPARS__
+//			xbar+=x;
+//			x2bar+=x*x;
+//			ybar+=y;
+//			y2bar+=y*y;
+//			zbar+=z;
+//			z2bar+=z*z;
+//#endif
 			ir=int(floor(r/delr));
 			if(ir<nrmax){
 				ex=x/r; ey=y/r; ez=z/r;
@@ -113,20 +108,20 @@ void CSourceCalc_Blast::CalcS(CCHArray *A){
 	if(SameMass) snorm=2.0/double(nsample*(nsample-1));
 	else snorm=1.0/double(nsample*nsample);
 
-#ifdef __CALC_SCBLAST_GAUSSPARS__
-	xbar*=snorm;
-	x2bar*=snorm;
-	ybar*=snorm;
-	y2bar*=snorm;
-	zbar*=snorm;
-	z2bar*=snorm;
-	x2bar=x2bar-xbar*xbar;
-	y2bar=y2bar-ybar*ybar;
-	z2bar=z2bar-zbar*zbar;
-	printf("xbar=%g, ybar=%g, zbar=%g\n",xbar,ybar,zbar);
-	printf("Effective Gaussian Radii: Rout=%g, Rside=%g, Rlong=%g\n",
-		sqrt(0.5*x2bar),sqrt(0.5*y2bar),sqrt(0.5*z2bar));
-#endif
+//#ifdef __CALC_SCBLAST_GAUSSPARS__
+//	xbar*=snorm;
+//	x2bar*=snorm;
+//	ybar*=snorm;
+//	y2bar*=snorm;
+//	zbar*=snorm;
+//	z2bar*=snorm;
+//	x2bar=x2bar-xbar*xbar;
+//	y2bar=y2bar-ybar*ybar;
+//	z2bar=z2bar-zbar*zbar;
+//	printf("xbar=%g, ybar=%g, zbar=%g\n",xbar,ybar,zbar);
+//	printf("Effective Gaussian Radii: Rout=%g, Rside=%g, Rlong=%g\n",
+//		sqrt(0.5*x2bar),sqrt(0.5*y2bar),sqrt(0.5*z2bar));
+//#endif
 
 	for(ir=0;ir<nrmax;ir++){
 		volume=(4.0*PI/3)*(pow((ir+1)*delr,3)
@@ -229,7 +224,6 @@ double CSourceCalc_Blast::GetTau(double tau0,double deltau){
 	do{
 		tau=tau0+deltau*randy->gauss();
 	}while(tau<0.0);
-
 	return tau;
 }
 
