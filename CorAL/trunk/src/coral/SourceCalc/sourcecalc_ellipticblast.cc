@@ -1,3 +1,5 @@
+#ifdef __SOURCECALC__ELLIPTIC_BLAST__
+#define __SOURCECALC__ELLIPTIC_BLAST__
 using namespace std;
 
 #include "sourcecalc.h"
@@ -225,3 +227,4 @@ void CSourceCalc_EllipticBlast::Get_r(double *p,int nsample,double **r){
 
   }
 }
+#endif

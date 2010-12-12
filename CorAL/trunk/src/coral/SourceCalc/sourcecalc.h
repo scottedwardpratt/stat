@@ -125,14 +125,20 @@ private:
 class CSourceCalc_Blast : public CSourceCalc{
 public:
 	CSourceCalc_Blast();
-	void CalcS(CCHArray *A);
-	void CalcS(CMCList *lista,CMCList *listb);
+	void CalcS(CCHArray *A){
+		printf("CSourceCalc_Blast::CalcS(CCHArray *A) undefined\n");
+		exit(1);
+	};
+	void CalcS(CMCList *lista,CMCList *listb){
+		printf("CSourceCalc_Blast::CalcS(CMCList *lista,CMCList *listb) undefined\n");
+		exit(1);
+	};
 	void CalcS(int lx,int ly,int lz,CCHArray *A){
-		printf("CSourceCalc_Blast::CalS(int lx,int ly,int lz,CCHArray *A) undefined\n");
+		printf("CSourceCalc_Blast::CalcS(int lx,int ly,int lz,CCHArray *A) undefined\n");
 		exit(1);
 	};
 	void CalcS(C3DArray *threed){
-		printf("CSourceCalc_Blast::CalS(C3DArray *threed) undefined\n");
+		printf("CSourceCalc_Blast::CalcS(C3DArray *threed) undefined\n");
 		exit(1);
 	};
 	void SetSPars(double lambdaset,
