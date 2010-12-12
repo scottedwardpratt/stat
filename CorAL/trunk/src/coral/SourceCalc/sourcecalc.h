@@ -122,36 +122,6 @@ private:
 	void InitSPars();
 };
 
-class CSourceCalc_Blast : public CSourceCalc{
-public:
-	CSourceCalc_Blast();
-	void CalcS(CCHArray *A){
-		printf("CSourceCalc_Blast::CalcS(CCHArray *A) undefined\n");
-		exit(1);
-	};
-	void CalcS(CMCList *lista,CMCList *listb){
-		printf("CSourceCalc_Blast::CalcS(CMCList *lista,CMCList *listb) undefined\n");
-		exit(1);
-	};
-	void CalcS(int lx,int ly,int lz,CCHArray *A){
-		printf("CSourceCalc_Blast::CalcS(int lx,int ly,int lz,CCHArray *A) undefined\n");
-		exit(1);
-	};
-	void CalcS(C3DArray *threed){
-		printf("CSourceCalc_Blast::CalcS(C3DArray *threed) undefined\n");
-		exit(1);
-	};
-	void SetSPars(double lambdaset,
-		double Rset,double Tauset,double DelTauset,
-		double Betaset,double Tset,double Ptset,
-		double EtaGset,double Maset,double Mbset);
-	void SetSPars(double lambdaset,double Rset,double Tauset,double DelTauset);
-private:
-	void GetMCList(double *p,CMCList *mclist);
-	void InitSPars();
-	double GetTau(double tau0,double deltau);
-};
-
 class CSourceCalc_OSCAR : public CSourceCalc{
 public:
 	CSourceCalc_OSCAR();
@@ -178,6 +148,30 @@ private:
 	void InitSPars();
 	bool IDMatch(int ident,int *idlist,int nid);
 	bool Check(double *p,double *r,double m,double **ra,int &n);
+};
+
+class CSourceCalc_Blast : public CSourceCalc{
+public:
+	CSourceCalc_Blast();
+	void CalcS(CCHArray *A);
+	void CalcS(CMCList *lista,CMCList *listb);
+	void CalcS(int lx,int ly,int lz,CCHArray *A){
+		printf("CSourceCalc_Blast::CalcS(int lx,int ly,int lz,CCHArray *A) undefined\n");
+		exit(1);
+	};
+	void CalcS(C3DArray *threed){
+		printf("CSourceCalc_Blast::CalcS(C3DArray *threed) undefined\n");
+		exit(1);
+	};
+	void SetSPars(double lambdaset,
+		double Rset,double Tauset,double DelTauset,
+		double Betaset,double Tset,double Ptset,
+		double EtaGset,double Maset,double Mbset);
+	void SetSPars(double lambdaset,double Rset,double Tauset,double DelTauset);
+private:
+	void GetMCList(double *p,CMCList *mclist);
+	void InitSPars();
+	double GetTau(double tau0,double deltau);
 };
 
 #endif
