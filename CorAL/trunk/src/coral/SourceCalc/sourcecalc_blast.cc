@@ -48,7 +48,6 @@ void CSourceCalc_Blast::SetSPars(double lambdaset,double Rset,double Tauset,doub
 	parameter::set(spars,"DelTau",DelTauset);
 }
 
-/*
 void CSourceCalc_Blast::CalcS(CCHArray *A){
 	int nsample;
 	double rcm[4],*ra,*rb;
@@ -134,9 +133,7 @@ void CSourceCalc_Blast::CalcS(CCHArray *A){
 	if(!SameMass) delete listb;
 
 }
-/*
 
-/*
 void CSourceCalc_Blast::CalcS(CMCList *lista,CMCList *listb){
 	double pa[4],pb[4];
 	double ma,mb,Pt,lambda;
@@ -166,7 +163,7 @@ void CSourceCalc_Blast::CalcS(CMCList *lista,CMCList *listb){
 	}
 
 }
-*/
+
 
 void CSourceCalc_Blast::GetMCList(double *p,CMCList *mclist){
 	double eta,etaG,u[4],x,y,z,t,tt,R,weight;
