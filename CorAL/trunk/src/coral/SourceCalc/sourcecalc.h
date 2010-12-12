@@ -50,6 +50,18 @@ class CSourceCalc_GX1D : public CSourceCalc{
   void SetSPars(double lambda,double Xfrac,double R,double X,double a);
   void CalcS(int lx,int ly,int lz,CCHArray *A);
   void CalcS(CCHArray *A);
+  void CalcS(CMCList *&lista,CMCList *&listb){
+		printf("CSourceCalc_GX1D::CalcS(CMCList *&lista,CMCList *&listb) undefined\n");
+		exit(1);
+	};
+	void CalcS(C3DArray *threed){
+		printf("CSourceCalc_GX1D::CalcS(C3DArray *threed) undefined\n");
+		exit(1);
+	};
+	void GaussCFCalc(C3DArray *cf3d){
+		printf("CSourceCalc_GX1D::CalcS(C3DArray *cf3d) undefined\n");
+		exit(1);
+	};
 };
 
 class CSourceCalc_Gaussian : public CSourceCalc{
