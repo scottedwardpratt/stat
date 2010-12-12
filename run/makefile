@@ -17,7 +17,7 @@ eoscalc : eoscalc.cc libs
 	${MADAI_CPP} -o eoscalc eoscalc.cc  ${OPT} ${HPM} -lcoralutils -lb3d -lgsl
 
 b3d : b3dmain.cc libs
-	${MADAI_CPP} -o b3d b3dmain.cc ${OPT} ${HPM} -lcoralutils -lb3d -lgsl -lhdf5 -lhdf5_cpp -lhdf5_hl -lhdf5_hl_cpp -lsz -lz
+	${MADAI_CPP} -o b3d b3dmain.cc ${OPT} ${HPM} -lcoralutils -lb3d -lgsl -lgslcblas -lhdf5 -lhdf5_cpp -lhdf5_hl -lhdf5_hl_cpp -lsz -lz
 	
 analyze : analyzemain.cc libs
-		${MADAI_CPP} -o analyze analyzemain.cc ${OPT} ${HPM} -lcoralutils -lanalyze -lgsl -lhdf5 -lhdf5_cpp -lhdf5_hl -lhdf5_hl_cpp -lsz -lz
+		${MADAI_CPP} -o analyze analyzemain.cc ${OPT} ${HPM} -lcoralutils -lanalyze -lgsl -lgslcblas -lhdf5 -lhdf5_cpp -lhdf5_hl -lhdf5_hl_cpp -lsz -lz

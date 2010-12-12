@@ -122,7 +122,6 @@ private:
 	void InitSPars();
 };
 
-/*
 class CSourceCalc_Blast : public CSourceCalc{
 public:
 	CSourceCalc_Blast();
@@ -146,7 +145,6 @@ private:
 	void InitSPars();
 	double GetTau(double tau0,double deltau);
 };
-*/
 
 class CSourceCalc_OSCAR : public CSourceCalc{
 public:
