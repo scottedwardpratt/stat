@@ -83,7 +83,15 @@ public:
 	
 		// grabs:
 		// cell position
-	inline double getTau() {if (mLinT) return x[0]; else if (mLogT) return mT0*exp(x[0]); else if (mLogSinhT) return asinh(exp(x[0]));}
+	inline double getTau() {
+	    if (mLinT) return x[0];
+	    else if (mLogT) return mT0*exp(x[0]);
+	    else if (mLogSinhT) return asinh(exp(x[0]));
+	    else{
+		printf("CCell::getTau, didn't satisfy conditions\n");
+		return 0.0;
+	    }
+	}
 	inline double getEta() {return x[3];}
 	inline double getZ() {return getTau()*sinh(x[3]);}
 	inline double getTime() {return getTau()*cosh(x[3]);}

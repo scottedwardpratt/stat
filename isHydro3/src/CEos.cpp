@@ -275,7 +275,10 @@ double CEos::getDISAlphaDE(double e) {
 	else if (ISSCALE == 'e') return 1.;
 	else if (ISSCALE == 's') return (1./(4.*e));
 	else if (ISSCALE == 'c') return 0.;
-//  return ( getISAlpha(1.001*e) - getISAlpha(0.999*e))/(0.002*e);
+	else{
+	    printf("CEos::getDISAlphaDE, ISSCALE not equl to j, e, s or c\n");
+	    return ( getISAlpha(1.001*e) - getISAlpha(0.999*e))/(0.002*e);
+	}
 }
 double CEos::getDISGammaDE(double e) {
   return ( getISGamma(1.001*e) - getISGamma(0.999*e))/(0.002*e);
