@@ -76,6 +76,14 @@ class CSourceCalc_Gaussian : public CSourceCalc{
 		double Euler_psiset);
   void CalcS(CCHArray *A);
   void CalcS(C3DArray *threed);
+  void CalcS(int lx,int ly,int lz,CCHArray *A){
+		printf("CSourceCalc_Gaussian:CalS(int lx,int ly,int lz,CCHArray *A) undefined\n");
+		exit(1);	
+	};
+  void CalcS(CMCList *&lista,CMCList *&listb){
+		printf("CSourceCalc_Gaussian:CalS(CMCList *&lista,CMCList *&listb) undefined\n");
+		exit(1);	
+	};
 	void GaussCFCalc(C3DArray *cf3d);
   
  private:
@@ -89,6 +97,18 @@ class CSourceCalc_EllipticBlast : public CSourceCalc{
  public:
   CSourceCalc_EllipticBlast();
   void CalcS(CCHArray *A);
+	void CalcS(int lx,int ly,int lz,CCHArray *A){
+		printf("CalcS(int lx,int ly,int lz,CCHArray *A) undefined\n");
+		exit(1);
+	};
+  void CalcS(CMCList *&lista,CMCList *&listb){
+		printf("CalcS(CMCList *&lista,CMCList *&listb) undefined\n");
+		exit(1);
+	};
+	void CalcS(C3DArray *threed){
+		printf("CalcS(C3DArray *threed) undefined\n");
+		exit(1);
+	};
   void SetSPars(double Rxset,double Ryset,
 		double Tauset,
 		double BetaXset,double BetaYset,
@@ -107,6 +127,14 @@ class CSourceCalc_Blast : public CSourceCalc{
   CSourceCalc_Blast();
   void CalcS(CCHArray *A);
   void CalcS(CMCList *lista,CMCList *listb);
+  void CalcS(int lx,int ly,int lz,CCHArray *A){
+		printf("CSourceCalc_Blast::CalS(int lx,int ly,int lz,CCHArray *A) undefined\n");
+		exit(1);
+	};
+	void CalcS(C3DArray *threed){
+		printf("CSourceCalc_Blast::CalS(C3DArray *threed) undefined\n");
+		exit(1);
+	};
   void SetSPars(double lambdaset,
 		double Rset,double Tauset,double DelTauset,
 		double Betaset,double Tset,double Ptset,
@@ -124,6 +152,18 @@ class CSourceCalc_OSCAR : public CSourceCalc{
   CSourceCalc_OSCAR(string sparsfilename);
   //void CalcS(CCHArray *A);
 	void CalcS(CMCList *&lista,CMCList *&listb);
+	void CalcS(CCHArray *A){
+		printf("CSourceCalc_OSCAR:CalcS(CCHArray *A) undefined\n");
+		exit(1);
+	};
+  void CalcS(int lx,int ly,int lz,CCHArray *A){
+		printf("CSourceCalc_OSCAR:CalcS(int lx,int ly,int lz,CCHArray *A) undefined\n");
+		exit(1);
+	};
+	void CalcS(C3DArray *threed){
+		printf("CSourceCalc_OSCAR:CalcS(C3DArray *threed) undefined\n");
+		exit(1);
+	};
 	void SetSPars(double Pt_set,double delpt_set,double phimin_set,double phimax_set,double ymin_set,double ymax_set);
 	void SetIDs(int *idlista,int nida,int *idlistb,int nidb);
 private:
