@@ -134,6 +134,7 @@ void CSourceCalc_Blast::CalcS(CCHArray *A){
 
 }
 
+/*
 void CSourceCalc_Blast::CalcS(CMCList *lista,CMCList *listb){
 	double pa[4],pb[4];
 	double ma,mb,Pt,lambda;
@@ -163,6 +164,7 @@ void CSourceCalc_Blast::CalcS(CMCList *lista,CMCList *listb){
 	}
 
 }
+*/
 
 void CSourceCalc_Blast::GetMCList(double *p,CMCList *mclist){
 	double eta,etaG,u[4],x,y,z,t,tt,R,weight;
