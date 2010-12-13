@@ -1,5 +1,5 @@
-#ifndef __INCLUDE_SOURCECALC_H
-#define __INCLUDE_SOURCECALC_H
+#ifndef __INCLUDE_SOURCECALC_H__
+#define __INCLUDE_SOURCECALC_H__
 #include <cstdlib>
 #include <cmath>
 #include <cstdio>

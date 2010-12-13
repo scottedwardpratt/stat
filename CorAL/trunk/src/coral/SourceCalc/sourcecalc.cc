@@ -104,9 +104,9 @@ void CSourceCalc::CombineMCLists(CMCList *lista,CMCList *listb,CCHArray *A,int N
 	printf("_______ In CombineMCLists: na=%d, nb=%d, AEQUALB=%d ______\n",na,nb,int(AEQUALB));
 	A->ZeroArray();
 	for(imc=0;imc<NMC;imc++){
-		ia=rint(floor(randy->ran()*na));
+		ia=lrint(floor(randy->ran()*na));
 		do{
-			ib=rint(floor(randy->ran()*na));
+			ib=lrint(floor(randy->ran()*na));
 		}while(AEQUALB && ia==ib);
 		printf("ia=%d, ib=%d\n",ia,ib);
 		ra=lista->GetR(ia);
