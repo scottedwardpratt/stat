@@ -1,5 +1,5 @@
-#ifndef __INCLUDE_SOURCECALC_OSCAR
-#define __INCLUDE_SOURCECALC_OSCAR
+#ifndef __INCLUDE_SOURCECALC_OSCAR__
+#define __INCLUDE_SOURCECALC_OSCAR__
 #include "sourcecalc.h"
 
 using namespace std;

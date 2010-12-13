@@ -163,10 +163,7 @@ public:
 		printf("CSourceCalc_Blast::CalcS(C3DArray *threed) undefined\n");
 		exit(1);
 	};
-	void SetSPars(double lambdaset,
-		double Rset,double Tauset,double DelTauset,
-		double Betaset,double Tset,double Ptset,
-		double EtaGset,double Maset,double Mbset);
+	void SetSPars(double lambdaset,double Rset,double Tauset,double DelTauset,double Betaset,double Tset,double Ptset,double EtaGset,double Maset,double Mbset);
 	void SetSPars(double lambdaset,double Rset,double Tauset,double DelTauset);
 private:
 	void GetMCList(double *p,CMCList *mclist);
