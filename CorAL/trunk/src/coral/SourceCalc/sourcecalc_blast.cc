@@ -25,8 +25,7 @@ void CSourceCalc_Blast::InitSPars(){
 	parameter::set(spars,"Nsample",1000);
 }
 
-void CSourceCalc_Blast::SetSPars(double lambdaset,
-	double Rset,double Tauset,double DelTauset,double Betaset,double Tset,double Ptset,double EtaGset,double Maset,double Mbset){
+void CSourceCalc_Blast::SetSPars(double lambdaset,double Rset,double Tauset,double DelTauset,double Betaset,double Tset,double Ptset,double EtaGset,double Maset,double Mbset){
 	InitSPars();
 	parameter::set(spars,"lambda",lambdaset);
 	parameter::set(spars,"R",Rset);
@@ -46,6 +45,70 @@ void CSourceCalc_Blast::SetSPars(double lambdaset,double Rset,double Tauset,doub
 	parameter::set(spars,"R",Rset);
 	parameter::set(spars,"Tau",Tauset);
 	parameter::set(spars,"DelTau",DelTauset);
+}
+
+
+void CSourceCalc_Blast::GetMCList(double *p,CMCList *mclist){
+	double eta,etaG,u[4],x,y,z,t,tt,R,weight;
+	double umax,betamax,eprime,eu,eumin,T,tau,tau0,deltau;
+	double pt,gamma,gammav;
+	int imc,nsample;
+	double m=sqrt(p[0]*p[0]-p[1]*p[1]);
+	etaG=parameter::getD(spars,"EtaG",-999);
+	R=parameter::getD(spars,"R",-999);
+	T=parameter::getD(spars,"T",-999);
+	tau0=parameter::getD(spars,"Tau",-999);
+	betamax=parameter::getD(spars,"Beta",-999);
+	deltau=parameter::getD(spars,"DelTau",-999);
+	nsample=parameter::getI(spars,"Nsample",-999);
+	umax=betamax/sqrt(1.0-betamax*betamax);
+	pt=fabs(p[1]);
+	gammav=pt/m;
+	gamma=sqrt(1.0+gammav*gammav);
+	if(gammav<umax) eumin=m;
+	else eumin=sqrt(1.0+umax*umax)*p[0]-umax*p[1];
+
+	for(imc=0;imc<nsample;imc++){
+		do{
+			eta=etaG*randy->gauss();
+			TRY_AGAIN:
+			x=(1.0-2.0*randy->ran());
+			y=(1.0-2.0*randy->ran());
+			if(x*x+y*y>1.0) goto TRY_AGAIN;
+			u[1]=umax*x;
+			u[2]=umax*y;
+			x=x*R;
+			y=y*R;
+			u[3]=sinh(eta);
+			u[0]=sqrt(1.0+u[1]*u[1]+u[3]*u[3]);
+
+			eprime=p[0]*cosh(eta);
+			eu=u[0]*p[0]-u[1]*p[1];
+
+			weight=(eprime/p[0])*exp(-(eu-eumin)/T);
+			if(weight>1.0){
+				printf("DISASTER! weight=%g which is > 1.0, eu=%g, eumin=%g\n",weight,eu,eumin);
+				exit(1);
+			}
+		} while(weight<randy->ran());
+
+		tau=GetTau(tau0,deltau);
+		z=tau*sinh(eta);
+		t=tau*cosh(eta);
+
+		tt=gamma*t-gammav*x;
+		x=gamma*x-gammav*t;
+		t=tt;
+		mclist->SetR(imc,t,x,y,z);
+	}
+}
+
+double CSourceCalc_Blast::GetTau(double tau0,double deltau){
+	double tau;
+	do{
+		tau=tau0+deltau*randy->gauss();
+	}while(tau<0.0);
+	return tau;
 }
 
 void CSourceCalc_Blast::CalcS(CCHArray *A){
@@ -162,70 +225,6 @@ void CSourceCalc_Blast::CalcS(CMCList *lista,CMCList *listb){
 		GetMCList(pb,listb);
 	}
 
-}
-
-
-void CSourceCalc_Blast::GetMCList(double *p,CMCList *mclist){
-	double eta,etaG,u[4],x,y,z,t,tt,R,weight;
-	double umax,betamax,eprime,eu,eumin,T,tau,tau0,deltau;
-	double pt,gamma,gammav;
-	int imc,nsample;
-	double m=sqrt(p[0]*p[0]-p[1]*p[1]);
-	etaG=parameter::getD(spars,"EtaG",-999);
-	R=parameter::getD(spars,"R",-999);
-	T=parameter::getD(spars,"T",-999);
-	tau0=parameter::getD(spars,"Tau",-999);
-	betamax=parameter::getD(spars,"Beta",-999);
-	deltau=parameter::getD(spars,"DelTau",-999);
-	nsample=parameter::getI(spars,"Nsample",-999);
-	umax=betamax/sqrt(1.0-betamax*betamax);
-	pt=fabs(p[1]);
-	gammav=pt/m;
-	gamma=sqrt(1.0+gammav*gammav);
-	if(gammav<umax) eumin=m;
-	else eumin=sqrt(1.0+umax*umax)*p[0]-umax*p[1];
-
-	for(imc=0;imc<nsample;imc++){
-		do{
-			eta=etaG*randy->gauss();
-			TRY_AGAIN:
-			x=(1.0-2.0*randy->ran());
-			y=(1.0-2.0*randy->ran());
-			if(x*x+y*y>1.0) goto TRY_AGAIN;
-			u[1]=umax*x;
-			u[2]=umax*y;
-			x=x*R;
-			y=y*R;
-			u[3]=sinh(eta);
-			u[0]=sqrt(1.0+u[1]*u[1]+u[3]*u[3]);
-
-			eprime=p[0]*cosh(eta);
-			eu=u[0]*p[0]-u[1]*p[1];
-
-			weight=(eprime/p[0])*exp(-(eu-eumin)/T);
-			if(weight>1.0){
-				printf("DISASTER! weight=%g which is > 1.0, eu=%g, eumin=%g\n",weight,eu,eumin);
-				exit(1);
-			}
-		} while(weight<randy->ran());
-
-		tau=GetTau(tau0,deltau);
-		z=tau*sinh(eta);
-		t=tau*cosh(eta);
-
-		tt=gamma*t-gammav*x;
-		x=gamma*x-gammav*t;
-		t=tt;
-		mclist->SetR(imc,t,x,y,z);
-	}
-}
-
-double CSourceCalc_Blast::GetTau(double tau0,double deltau){
-	double tau;
-	do{
-		tau=tau0+deltau*randy->gauss();
-	}while(tau<0.0);
-	return tau;
 }
 
 #endif
