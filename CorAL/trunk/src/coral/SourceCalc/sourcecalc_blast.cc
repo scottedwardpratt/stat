@@ -111,6 +111,9 @@ double CSourceCalc_Blast::GetTau(double tau0,double deltau){
 	return tau;
 }
 
+#endif
+
+/*
 void CSourceCalc_Blast::CalcS(CCHArray *A){
 	int nsample;
 	double rcm[4],*ra,*rb;
@@ -228,3 +231,4 @@ void CSourceCalc_Blast::CalcS(CMCList *lista,CMCList *listb){
 }
 
 #endif
+*/
