@@ -1,5 +1,5 @@
-#ifndef __hydrotob3d_cc__
-#define __hydrotob3d_cc__
+#ifndef __bjmaker_cc__
+#define __bjmaker_cc__
 #define __JOSH_FORMAT__
 
 #include "b3d.h"
@@ -41,6 +41,7 @@ void CBjMaker::Init(){
 		}
 		resinfo=resinfo->nextResInfoptr;
 	}
+	delete [] density;
 }
 
 int CBjMaker::MakeEvent(){

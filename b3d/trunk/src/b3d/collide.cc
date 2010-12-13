@@ -187,6 +187,9 @@ void CB3D::Merge(CPart *part1,CPart *part2,CResInfo *resinfo){
 		part2->Kill();
 		part1->Reset();
 	}
+	if(flip){
+		delete [] p2; 
+	}
 }
 
 #endif

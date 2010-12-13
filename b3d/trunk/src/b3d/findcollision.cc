@@ -95,9 +95,9 @@ bool CB3D::FindCollision(CPart *part1,CPart *part2,double &taucoll){
 				//}
 			}
 		}
-		if(flip){
-			delete [] r1; delete [] p1;
-		}
+	}
+	if(flip){
+		delete [] r1; delete [] p1;
 	}
 	if(collide==true){
 		//CCell *cell1=part1->cell;

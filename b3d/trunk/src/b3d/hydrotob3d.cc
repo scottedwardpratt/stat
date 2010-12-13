@@ -6,6 +6,10 @@
 using namespace std;
 
 void CHYDROtoB3D::Init(){
+	if(initialization==true){
+		printf("CHYDROtoB3D already initialized\n");
+		exit(1);
+	}
 	int ires,iring;
 	string inputfilename;
 	double pi,ei,sigma2i,dedti,degen;
@@ -349,17 +353,11 @@ void CRing::Read(FILE *fptr){
 	char dummy[120];
 	double *x,*y,*uxi,*uyi;
 	x=new double[300]; y=new double[300]; uxi=new double[300]; uyi=new double[300];
-	double **PiOverh,**PiOverhtilde,Pixxoverh,Pixyoverh,Piyyoverh;
+	//double **PiOverh,**PiOverhtilde,Pixxoverh,Pixyoverh,Piyyoverh;
 	double lambda_xx[300],lambda_xy[300],lambda_yy[300];
 	int i1,i2,iphi,alpha,beta;
 	double nt,nx,ny,a1,a2,a3,a4,a5,b=0.0,epsilon,P,Rqgp,T;
 	const double root3=sqrt(3.0);
-	PiOverhtilde=new double*[4];
-	PiOverh=new double*[4];
-	for(alpha=0;alpha<4;alpha++){
-		PiOverhtilde[alpha]=new double[4];
-		PiOverh[alpha]=new double[4];
-	}
 	i=-1;		
 	fscanf(fptr,"%lf",&tau);
 	fscanf(fptr,"%lf",&x[0]);
@@ -377,6 +375,7 @@ void CRing::Read(FILE *fptr){
 	}while(dummystring!="time:" && feof(fptr)==false);
 	nread=i;
 	FillOutArrays(x,y,uxi,uyi,lambda_xx,lambda_xy,lambda_yy);
+	delete [] x; delete [] y; delete [] uxi; delete [] uyi;
 	//if(nread>0) printf("TIME=%g, %d points for Cooper-Frye ring\n",tau,nread);
 }
 
