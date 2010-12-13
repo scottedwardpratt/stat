@@ -150,7 +150,7 @@ private:
 	bool Check(double *p,double *r,double m,double **ra,int &n);
 };
 
-class CSourceCalc_Blast : public CSourceCalc{
+class CSourceCalc_Blast : public CsourceCalc{
 public:
 	CSourceCalc_Blast();
 	void CalcS(CCHArray *A);
