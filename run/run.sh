@@ -1,5 +1,5 @@
 #! /bin/sh
-NRUNS=20
+NRUNS=5
 set -e
 rm -f -r parameters/run*
 ${MADAI_BIN}/parmaker ${NRUNS}
