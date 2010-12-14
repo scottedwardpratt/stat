@@ -43,6 +43,7 @@ void CQualifiers::Read(string qfilename){
 			}
 		}
 	}
+	nqualifiers+=1;
 }
 
 void CQualifiers::SetPars(parameterMap *pmap,int iqual){
