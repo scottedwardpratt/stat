@@ -311,6 +311,7 @@ double CHYDROtoB3D::GetLambdaFact(){
 		resinfo=resinfo->nextResInfoptr;
 	}
 	lambdafact=Ipp/(60.0*PI*PI*HBARC*HBARC*(P+epsilon));
+	return lambdafact;
 }
 
 void CHYDROtoB3D::ReadHeader(FILE *fptr){
