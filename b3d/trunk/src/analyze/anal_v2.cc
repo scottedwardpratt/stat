@@ -8,9 +8,8 @@ void CAnalyze::CalcV2(){
 	double v2norm[NSPECIES]={0.0},v2norm1[NSPECIES]={0,0},v2norm2[NSPECIES]={0,0},v2norm3[NSPECIES]={0,0},v2norm4[NSPECIES]={0,0};
 	double pt,v2;
 	CPartH5 *ph5;
-	string infilename=input_dataroot+"/"+qualifier+"/"+h5_infilename;
-	printf("CAnalyze::ReadData, opening %s\n",infilename.c_str());
-	h5file = new H5File(infilename,H5F_ACC_RDONLY);
+	printf("CAnalyze::ReadData, opening %s\n",h5_infilename.c_str());
+	h5file = new H5File(h5_infilename,H5F_ACC_RDONLY);
 	nevents=int(h5file->getNumObjs());
 	if(nevents>neventsmax) nevents=neventsmax;
 	for(ievent=1;ievent<=nevents;ievent++){
@@ -20,7 +19,7 @@ void CAnalyze::CalcV2(){
 			pt=sqrt(ph5->px*ph5->px+ph5->py*ph5->py);
 			v2=ph5->px*ph5->px-ph5->py*ph5->py;
 			v2=v2/(pt*pt);
-			//printf("listid=%d, ID=%d, v2=%g, rapidity=%g\n",ph5->listid,ph5->ID,v2,ph5->rapidity);
+			ID=ph5->ID;
 			ispecies=-1;
 			if(ID==211 || ID==-211 || ID==111) ispecies=0;
 			else if(ID==310 || ID==130 || ID==321 || ID==-321) ispecies=1;
@@ -41,7 +40,6 @@ void CAnalyze::CalcV2(){
 		}
 	}
 	delete h5file;
-	printf("nevents=%d\n",nevents);
 	for(ispecies=0;ispecies<NSPECIES;ispecies++){
 		v2bar[ispecies]=v2bar[ispecies]/v2norm[ispecies];
 		v21bar[ispecies]=v21bar[ispecies]/v2norm1[ispecies];

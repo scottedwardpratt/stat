@@ -51,7 +51,8 @@ export ANALYZE_OBJFILES = build/analyze/analyze.o\
 build/analyze/anal_balance.o\
 build/analyze/anal_gamma.o\
 build/analyze/anal_spectra.o\
-build/analyze/anal_v2.o
+build/analyze/anal_v2.o\
+build/analyze/anal_hbt.o
 
 CPP=${MADAI_CPP}
 OPT=${MADAI_CFLAGS}
@@ -140,7 +141,10 @@ build/analyze/anal_spectra.o : src/analyze/anal_spectra.cc
 	${CPP} -c ${OPT} ${INC} -o build/analyze/anal_spectra.o src/analyze/anal_spectra.cc
 
 build/analyze/anal_v2.o : src/analyze/anal_v2.cc
-		${CPP} -c ${OPT} ${INC} -o build/analyze/anal_v2.o src/analyze/anal_v2.cc
+	${CPP} -c ${OPT} ${INC} -o build/analyze/anal_v2.o src/analyze/anal_v2.cc
+		
+build/analyze/anal_hbt.o : src/analyze/anal_hbt.cc
+	${CPP} -c ${OPT} ${INC} -o build/analyze/anal_hbt.o src/analyze/anal_hbt.cc
 	
 
 

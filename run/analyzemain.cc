@@ -15,14 +15,11 @@ int main(int argc, char *argv[]){
 	CAnalyze *anal=new CAnalyze(run_name);
 	CQualifiers qualifiers;
 	qualifiers.Read("qualifiers.dat");
-	
 	for(int iqual=0;iqual<qualifiers.nqualifiers;iqual++){
 		anal->SetQualifier(qualifiers.qualifier[iqual]);
-		anal->CALCGARRAYS=false;
 		anal->CalcSpectra();
+		//anal->CalcV2();
+		anal->CalcHBT();
 	}
-	//anal->CalcGamma();
-	//anal->CalcBalance();
-	//anal->ReadVizData(20.0);
 	return 0;
 }
