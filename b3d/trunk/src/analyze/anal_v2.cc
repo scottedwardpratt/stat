@@ -8,7 +8,7 @@ void CAnalyze::CalcV2(){
 	double v2norm[NSPECIES]={0.0},v2norm1[NSPECIES]={0,0},v2norm2[NSPECIES]={0,0},v2norm3[NSPECIES]={0,0},v2norm4[NSPECIES]={0,0};
 	double pt,v2;
 	CPartH5 *ph5;
-	printf("CAnalyze::ReadData, opening %s\n",h5_infilename.c_str());
+	printf("CAnalyze::CalcV2, opening %s\n",h5_infilename.c_str());
 	h5file = new H5File(h5_infilename,H5F_ACC_RDONLY);
 	nevents=int(h5file->getNumObjs());
 	if(nevents>neventsmax) nevents=neventsmax;

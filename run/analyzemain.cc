@@ -18,7 +18,7 @@ int main(int argc, char *argv[]){
 	for(int iqual=0;iqual<qualifiers.nqualifiers;iqual++){
 		anal->SetQualifier(qualifiers.qualifier[iqual]);
 		anal->CalcSpectra();
-		//anal->CalcV2();
+		anal->CalcV2();
 		anal->CalcHBT();
 	}
 	return 0;
