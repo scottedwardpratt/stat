@@ -117,7 +117,7 @@ void CPCA::Calc(){
 	for(iy=0;iy<ny;iy++){
 		respower[iy]=0.0;
 		for(jy=0;jy<ny;jy++) respower[iy]+=eigenval[jy]*pow(evec[iy][jy],2);
-		printf("respower[%d]=%10.3e, %s\n",iy,respower[iy],yname[iy].c_str());
+		printf("respower[%d]=%10.3e, %10.3e, %s\n",iy,respower[iy],spread[iy][iy],yname[iy].c_str());
 	}
 	delete [] respower;
 }
