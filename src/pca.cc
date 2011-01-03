@@ -91,12 +91,17 @@ void CPCA::Calc(){
 	eigenval=new double[ny];
 	evec=new double*[ny];
 	for(iy=0;iy<ny;iy++) evec[iy]=new double[ny];
+	double trace=0.0;
+	for(iy=0;iy<ny;iy++) trace+=spread[iy][iy];
 	
 	CGSLMatrix_Real *gslmatrix=new CGSLMatrix_Real(ny);
 	gslmatrix->EigenFind(spread,evec,eigenval);
+	double etrace=0.0;
 	for(iy=0;iy<ny;iy++){
+		etrace+=eigenval[iy];
 		printf("eigenval[%d]=%g\n",iy,eigenval[iy]);
 	}
+	printf("trace=%g=/%g\n",trace,etrace);
 	
 	/*
 	printf("0000000000000 checking 0000000000000000\n");
