@@ -101,7 +101,7 @@ void CPCA::Calc(){
 		etrace+=eigenval[iy];
 		printf("eigenval[%d]=%g\n",iy,eigenval[iy]);
 	}
-	printf("trace=%g=/%g\n",trace,etrace);
+	printf("trace=%g=%g\n",trace,etrace);
 	
 	/*
 	printf("0000000000000 checking 0000000000000000\n");
