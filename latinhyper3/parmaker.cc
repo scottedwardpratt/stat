@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
 	printf("npars=%d\n",npars);
 	for(ipar=0;ipar<npars;ipar++)
 		printf("%s %s: min=%g, max=%g\n",type[ipar],name[ipar],MINPAR[ipar],MAXPAR[ipar]);
-	sprintf(dummy1,"${MADAI_BIN}/latin3.sh %d %d\n",npars,nruns);
+	sprintf(dummy1,"latin3.sh %d %d\n",npars,nruns);
 	system(dummy1);	
 	latin3=fopen("latin3.dat","r");
 	sprintf(dummy1,"rm -f latin3.dat");
