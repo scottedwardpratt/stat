@@ -43,20 +43,15 @@ build/qualifier.o : src/qualifier.cc include/qualifier.h include/pca.h
 include/qualifier.h : src/qualifier.h
 	cp src/qualifier.h include/qualifier.h
 
-parmaker : statdirs bin/parmaker bin/genSamples.R bin/latin3.sh
+parmaker : statdirs bin/parmaker
 
 bin/parmaker : latinhyper3/parmaker.cc
 	${CPP} ${OPT} latinhyper3/parmaker.cc -o bin/parmaker
 
-bin/latin3.sh : latinhyper3/latin3.sh
-	cp -f latinhyper3/latin3.sh bin/
-
-bin/genSamples.R : latinhyper3/genSamples.R
-	cp -r latinhyper3/genSamples.R bin/
 
 #########################
 
-install : ${INSTALLDIR}/lib/libstat.a ${INSTALLDIR}/include/pca.h ${INSTALLDIR}/include/qualifier.h ${INSTALLDIR}/bin/parmaker ${INSTALLDIR}/bin/genSamples.R ${INSTALLDIR}/bin/latin3.sh ${INSTALLDIR}/bin/latin3.sh
+install : ${INSTALLDIR}/lib/libstat.a ${INSTALLDIR}/include/pca.h ${INSTALLDIR}/include/qualifier.h ${INSTALLDIR}/bin/parmaker ${INSTALLDIR}/progdata/genSamples.R ${INSTALLDIR}/bin/latin3.sh ${INSTALLDIR}/bin/latin3.sh
 
 ${INSTALLDIR}/lib/libstat.a : lib/libstat.a
 	cp -f lib/libstat.a ${INSTALLDIR}/lib/
@@ -70,14 +65,14 @@ ${INSTALLDIR}/include/qualifier.h : include/qualifier.h
 ${INSTALLDIR}/bin/parmaker : bin/parmaker
 	cp -f bin/parmaker ${INSTALLDIR}/bin/
 
-${INSTALLDIR}/bin/genSamples.R : latinhyper3/genSamples.R
-	cp -f latinhyper3/genSamples.R ${INSTALLDIR}/bin
+${INSTALLDIR}/progdata/genSamples.R : latinhyper3/genSamples.R
+	cp -f latinhyper3/genSamples.R ${INSTALLDIR}/progdata/
 
-${INSTALLDIR}/bin/latin3.sh : bin/latin3.sh
-	cp -f bin/latin3.sh ${INSTALLDIR}/bin/
+${INSTALLDIR}/bin/latin3.sh : latinhyper3/latin3.sh
+	cp -f latinhyper3/latin3.sh ${INSTALLDIR}/bin/
 
 clean :
 	rm -f include/* build/* lib/* bin/*
 
 uninstall :
-	rm -f ${INSTALLDIR}/lib/libstat.a ${INSTALLDIR}/include/pca.h ${INSTALLDIR}/include/qualifier.h ${INSTALLDIR}/bin/parmaker ${INSTALLDIR}/bin/genSamples.R ${INSTALLDIR}/bin/latin3.sh ${INSTALLDIR}/bin/latin3.sh
+	rm -f ${INSTALLDIR}/lib/libstat.a ${INSTALLDIR}/include/pca.h ${INSTALLDIR}/include/qualifier.h ${INSTALLDIR}/bin/parmaker ${INSTALLDIR}/progdata/genSamples.R ${INSTALLDIR}/bin/latin3.sh ${INSTALLDIR}/bin/latin3.sh

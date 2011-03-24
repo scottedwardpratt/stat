@@ -11,5 +11,5 @@ npars=$1
 nruns=$2
 export npars nruns
 #R CMD BATCH < ./genSamples.R
-(R --slave < ${MADAI_BIN}/genSamples.R) > latin3.dat
+(R --slave < genSamples.R) > latin3.dat
 esac
