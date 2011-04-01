@@ -3,7 +3,13 @@
 #  Scripts to illustrate PCA emulation approach with toy
 #  dataset based on draws from a damped sine wave
 #
-require("lhs")                    # Latin Hypercube Sampling pkg
+
+retval <- require("lhs", quietly=TRUE)                    # Latin Hypercube Sampling pkg
+#options(echo=FALSE)
+if(retval == FALSE){
+  print("installing the lhs library")
+  install.packages(c("lhs"))
+}
 
 #####################################################
 # Test function: damped sine wave
@@ -154,6 +160,8 @@ reconCurveAtPoint <- function(point, thetas, pca.decomp){
   yVarEmuRecon <- rep(0, ntps)
   
   for(i in 1:ntps){
+    ## ccs
+    ## not sure this is right, rederive
     yVarEmuRecon[i] <- sum((pca.decomp$ur[i,]**2)*(pca.decomp$esys$values[1:nr])*emuResult$var)
   }
 
