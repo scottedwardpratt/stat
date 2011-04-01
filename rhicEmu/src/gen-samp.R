@@ -1,3 +1,4 @@
+
 ########################################################################
 # ccs: cec24@phy.duke.edu  feb-2011
 # england, east-lansing
@@ -10,54 +11,6 @@
 # love is all from what i've heard,
 # but my hearts learnt to kill,
 # oh mine has learnt to kill
-
-
-## generate a list which is compatible with the previously
-## designed emulator / pca methods
-gen.samp <- function(
-                     fname = "", # savey?
-                     desPath = "", # alt path for design
-                     sampPath = "", # alt path for samples
-                     sampErrPath = "" #path for errors
-                     ){
-
-  if(nchar(desPath) > 0){
-    des <- load.design(desPath)
-  } else{
-    des <- load.design()           # load the default
-  }
-
-  if(nchar(sampPath) > 0){
-    samp <- load.sample(samPath, sampErrPath)
-  } else{
-    samp <- load.sample()               # load the default,
-                                        #it will be centered
-  }
-
-  tvec <- seq(1, samp$ntps) 
-
-  # we could do some error checking here to make sure that nreps and
-  # ntps etc all match up
-  if(des$nreps != samp$nreps)
-    stop("sample and design have differnet number of reps!")
-
-  # the final sample
-  # note that the existing pca apparaturs (emu-pca.R)
-  # expects the matrices to be size x reps
-  # whereas the above defns return matrices which are reps x size
-  # hence the transpose
-  sample <- list(t=tvec, y=t(samp$y), des=t(des$des))
-
-  if(nchar(fname)>0) {
-    save(sample, file=fname);
-    cat(paste("Object `", "sample", "' saved in file: `",
-                fname,"'.\n", sep=""));
-  }
-
-  invisible(sample)
-}
-                     
-
 
 
 
@@ -78,18 +31,6 @@ load.design <-  function(path="../parameters/stats.param-combined-s"){
 }
 
 
-load.sample.old <- function(path="../analysis/combined/analysis.b3.29-combined-s", center=TRUE){
-  samp <- read.table(path)
-  nReps <- dim(samp)[1]
-  nTps <-  (dim(samp)[2] -1)
-
-  sampCut <- samp[,2:(nTps+1)]
-  if(center){
-    sampCutScaled <- scale(sampCut)
-  }
-  sample <- list(nreps=nReps, ntps=nTps, y=sampCutScaled)
-}
-
 ## read combined samples and assemble into a
 ## useful list
 ## this will also center the sample data by default
@@ -101,7 +42,7 @@ load.sample.old <- function(path="../analysis/combined/analysis.b3.29-combined-s
 # the sample files need to be sorted by ID already as i'm not smart enough to do this in R
 load.sample <- function(path="../analysis/spectra-combined-s.dat",
                         errpath="../analysis/spectra-combined-errs-s.dat",
-                        center=TRUE, centerWithErrs=FALSE){
+                        center=FALSE, centerWithErrs=TRUE){
 
   samp <- read.table(path, header=FALSE)
   errSamp <- read.table(errpath, header=FALSE)
@@ -170,3 +111,51 @@ load.sample <- function(path="../analysis/spectra-combined-s.dat",
   
   
 
+## DEPRECATED
+## generate a list which is compatible with the previously
+## designed emulator / pca methods
+gen.samp <- function(
+                     fname = "", # savey?
+                     desPath = "", # alt path for design
+                     sampPath = "", # alt path for samples
+                     sampErrPath = "" #path for errors
+                     ){
+
+
+  stop("gen.samp() called, this fn is deprecated!")
+  
+  if(nchar(desPath) > 0){
+    des <- load.design(desPath)
+  } else{
+    des <- load.design()           # load the default
+  }
+
+  if(nchar(sampPath) > 0){
+    samp <- load.sample(samPath, sampErrPath)
+  } else{
+    samp <- load.sample()               # load the default,
+                                        #it will be centered
+  }
+
+  tvec <- seq(1, samp$ntps) 
+
+  # we could do some error checking here to make sure that nreps and
+  # ntps etc all match up
+  if(des$nreps != samp$nreps)
+    stop("sample and design have differnet number of reps!")
+
+  # the final sample
+  # note that the existing pca apparaturs (emu-pca.R)
+  # expects the matrices to be size x reps
+  # whereas the above defns return matrices which are reps x size
+  # hence the transpose
+  sample <- list(t=tvec, y=t(samp$y), des=t(des$des))
+
+  if(nchar(fname)>0) {
+    save(sample, file=fname);
+    cat(paste("Object `", "sample", "' saved in file: `",
+                fname,"'.\n", sep=""));
+  }
+
+  invisible(sample)
+}

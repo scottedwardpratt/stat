@@ -21,26 +21,34 @@ source("~/local/include/libRbind/EmuRbind.R")
 source("~/local/include/libRbind/multivar.R")
 
 ## see if we should rescale
-cargs <- Sys.getenv(c('rescale', 'rescaleErr'))
+cargs <- Sys.getenv(c('rescale', 'rescaleErr', 'inpath'))
 rescale <- as.numeric(cargs[1])
 rescaleErr <- as.numeric(cargs[2])
+inpath <- cargs[3]
 
 ## ccs: for debugging
 #rescale <- FALSE
 #rescaleErr <- TRUE
 
-if(rescale){
+cat("rescale = ", rescale, "\n")
+cat("rescaleErr = ", rescaleErr, "\n")
+cat("#inpath ", inpath, "\n")
+
+if(rescale == 1){
   cat("#rescaling data with sample mean & var\n")
-} else if(rescaleErr){
+} else if(rescaleErr == 1){
   cat("#rescaling data with sample mean & prior errors\n")
 }
 
 
 ## load up the saved things
 ## craps out if the files are not there, not ideal
-load("SampleTemp.dat") # becomes sample
-load("PcaTemp.dat") # becomes pca.decomp
-thetas.est <- read.table("theta-table.dat") 
+buffer <- paste(inpath, "/SampleTemp.dat", sep="")
+load(buffer) # becomes sample
+buffer <- paste(inpath, "/PcaTemp.dat", sep="")
+load(buffer) # becomes pca.decomp
+buffer <- paste(inpath, "/theta-table.dat", sep="")
+thetas.est <- read.table(buffer) 
 
 ## now we want to read the stdin
 #points <- read.table("/dev/stdin") # sadly this doesn't work
@@ -59,7 +67,7 @@ rvaluesRescaled <- vector("list", npoints)
 # compute the curves in t-space at each point
 for(i in 1:npoints){
   rvalues[[i]] <- reconCurveAtPoint(points[i,], thetas.est, pca.decomp)
-  if(rescale){
+  if(rescale==1){
   # undo the centering and scaling we did in gen.sample
   # with the stored data from sample
     rvaluesRescaled[[i]]$mean <- rvalues[[i]]$mean * sample$sds + sample$means
@@ -67,7 +75,7 @@ for(i in 1:npoints){
     # copy in the unmodified things
     rvaluesRescaled[[i]]$xpos <- rvalues[[i]]$xpos
     rvaluesRescaled[[i]]$tvalues <- rvalues[[i]]$tvalues
-  } else if(rescaleErr){
+  } else if(rescaleErr ==1){
     cat("#using rescale error!\n")
     ## escale with predetermined errors instead of using the sampleerrors
     rvaluesRescaled[[i]]$mean <- (rvalues[[i]]$mean + sample$means) * sample$errs[i,]

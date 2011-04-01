@@ -18,7 +18,11 @@ FLOW=${AWKROOT}/separate-flow.awk
 
 
 for folder in $(find . -maxdepth 1 -type d -name 'run*'); do
-		TEMP=`echo $folder | cut -c 6-7`
+
+		#find the folders
+		# good old awk, this works because we know that the folders are called 
+		# run1, run2, ... if they're not then you're boned
+		TEMP=`echo $folder | awk '{split($0,f,"n"); print f[2]}'`
 		echo "processing: ${folder}"
 		cd $folder
 		for impact in $(find . -maxdepth 1 -type d -name 'b*'); do
