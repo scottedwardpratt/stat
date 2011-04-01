@@ -7,12 +7,9 @@
 # output (stdout): for each point the ntps mean cpts and then the ntps var cpts (on a single line)
 # 
 
-#cat testPts.txt 
-
-# return the output values to the same scale as the input ? (defaults to yes)
-rescale=0
-rescaleErr=1
-basepath=$1
+rescale=0 # rescale the output back to correct values, if you scaled the data without the errors (not sensible)
+rescaleErr=1 # same but only if you scaled the data with errors (DEFAULT)
+basepath=$1 # the folder where the model output is stored and the various temp files from the emulator
 
 if [ $# -lt 1 ]; then
 		echo "#computes mean and variance for a run-folder"
