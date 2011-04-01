@@ -18,7 +18,7 @@ source("emu-pca.R") # load the pca fns
 dyn.load("~/local/lib/libRBIND.dylib") #
 # moving these files into the project root (or installing them) is probably best
 source("~/local/include/libRbind/EmuRbind.R")
-source("~/local/include/libRbind/multivar.R")
+
 
 ## see if we should rescale
 cargs <- Sys.getenv(c('rescale', 'rescaleErr', 'inpath'))
@@ -30,8 +30,8 @@ inpath <- cargs[3]
 #rescale <- FALSE
 #rescaleErr <- TRUE
 
-cat("rescale = ", rescale, "\n")
-cat("rescaleErr = ", rescaleErr, "\n")
+cat("#rescale = ", rescale, "\n")
+cat("#rescaleErr = ", rescaleErr, "\n")
 cat("#inpath ", inpath, "\n")
 
 if(rescale == 1){
@@ -80,6 +80,7 @@ for(i in 1:npoints){
     ## escale with predetermined errors instead of using the sampleerrors
     rvaluesRescaled[[i]]$mean <- (rvalues[[i]]$mean + sample$means) * sample$errs[i,]
     # this is not coming out to the right scale at all
+    # \todo fix the rescaled variance
     rvaluesRescaled[[i]]$var <- rvalues[[i]]$var * sample$errs[i,]
 
     # copy in the unmodified things
@@ -90,9 +91,8 @@ for(i in 1:npoints){
 
 # now we want to scale the curves back to the values we had before centering
 for(i in 1:npoints){
-  # you have to transpose the data.frames to get line by line output
-  write.table(t(rvalues[[i]]$mean), stdout(), row.names=FALSE, col.names=FALSE)
-  write.table(t(rvalues[[i]]$var), stdout(), row.names=FALSE, col.names=FALSE)
+  write.table(rvaluesRescaled[[i]]$mean, stdout(), row.names=FALSE, col.names=FALSE)
+  write.table(rvaluesRescaled[[i]]$var, stdout(), row.names=FALSE, col.names=FALSE)
 }
 
 
