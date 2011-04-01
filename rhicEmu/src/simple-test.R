@@ -14,7 +14,6 @@ source("emu-pca.R") # load the pca fns
 dyn.load("~/local/lib/libRBIND.dylib") #
 # move these files into the project root is  probably best
 source("~/local/include/libRbind/EmuRbind.R")
-source("~/local/include/libRbind/multivar.R")
 
 #read nhold from env
 # this file reads the given sample set and generates a pca.decomp for it and the thetas

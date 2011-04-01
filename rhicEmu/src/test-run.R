@@ -5,7 +5,7 @@ source("emu-pca.R") # load the pca fns
 dyn.load("~/local/lib/libRBIND.dylib") #
 # move these files into the project root is  probably best
 source("~/Projects/Emulator/src/libRbind/EmuRbind.R")
-source("~/Projects/Emulator/src/libRbind/multivar.R")
+
 
 # defaults to the particle specta
 sample <- gen.samp()
