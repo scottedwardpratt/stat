@@ -11,32 +11,37 @@ INSTALLDIR=${MADAI_INSTALLDIR}
 GSLPATH=${MADAI_GSLPATH}
 #e.g. /usr/local
 #################################################
-INC=-I ${GSLPATH}/include -I include -I $INSTALLDIR/include
+INC=-I ${GSLPATH}/include -I include -I ${INSTALLDIR}/include
 
 MCMC_HFILES = mcmc.h\
 parameter.h\
 distribution.h
 
-MCMC_OFILES = build/mcmc/proposal.o\
-build/mcmc/mcmc.o
+MCMC_OFILES = proposal.o\
+mcmc.o\
+distribution.o\
+prior.o\
+distribution.o
 
+SUBDIRS= build\
+build/mcmc\
+lib\
+include\
 
 all: mcmcdirs lib/mcmc.a
 	
 mcmcdirs:
-	mkdir -p build/mcmc lib include/
+	mkdir -p ${SUBDIRS}
 	
 lib/mcmc.a: h_files ${MCMC_OFILES}
 	mkdir -p lib;
-	ar -ru lib/libmcmc.a ${MCMC_OFILES};
+	ar -ru lib/libmcmc.a ${addprefix build/mcmc/, ${MCMC_OFILES}};
 	
-h_files:
+h_files: ${MCMC_HFILES}
 	cp ${MCMC_HFILES} include/
 
-build/mcmc/proposal.o: h_files proposal.cc
-	${CPP} -c ${OPT} ${INC} proposal.cc -o build/mcmc/proposal.o	
+%.o: %.cc
+	${CPP} -c ${OPT} ${INC} $< -o build/mcmc/$@
 	
-build/mcmc/mcmc.o: h_files mcmc.cc
-	${CPP} -c ${OPT} ${INC} mcmc.cc -o build/mcmc/mcmc.o
-
-	
+clean:
+	rm -rf ${SUBDIRS}

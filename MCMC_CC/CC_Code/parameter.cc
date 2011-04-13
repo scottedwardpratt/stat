@@ -24,7 +24,7 @@ ParameterSetList::ParameterSetList(MCMC *mcmc_in){
 	mcmc = mcmc_in;
 	Theta = new ParameterSet[mcmc->WRITEOUT](this);
 	WriteOutCounter = 1;
-	CurrentIteration = 1;
+	CurrentIteration = 0;
 	system("mkdir -p output/mcmc");
 	GetTheta0();
 }
@@ -32,6 +32,7 @@ ParameterSetList::ParameterSetList(MCMC *mcmc_in){
 void ParameterSetList::GetTheta0(){
 	parameterMap parmap;
 	theta0_filename = mcmc->dirname+"/parameters/theta0.param";
+	ParameterSet temp_set;
 	parameter::ReadParsFromFile(parmap, theta0_filename);
 	vector<string> temp_names = parameter::getVS(parmap, "PARAM_NAMES", NULL);
 	vector<double> temp_values = parameter::getV(parmap, "PARAM_VALUES", NULL);
@@ -49,8 +50,10 @@ void ParameterSetList::GetTheta0(){
 	}
 	
 	ParamNames = temp_names;
-	Theta[0].Names = temp_names;
-	Theta[0].Values = temp_values;
+	temp_set.Names = temp_names;
+	temp_set.Values = temp_values;
+	
+	Add(temp_set);
 }
 
 void ParameterSetList::PrintData(){
@@ -93,5 +96,9 @@ void ParameterSetList::Add(ParameterSet Theta_In){
 		Theta = new ParameterSet[mcmc->WRITEOUT](this);
 		Theta[0] = Theta_0;
 	}
+}
+
+ParameterSet CurrentParameters(){
+	return Theta[CurrentIteration];
 }
 #endif

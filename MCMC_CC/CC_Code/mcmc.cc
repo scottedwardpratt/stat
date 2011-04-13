@@ -19,11 +19,12 @@ MCMC::MCMC(string run_file){
 	WRITEOUT = parameter::getI(parmap, "WRITEOUT", 100);
 	
 	//Likelihood = new LikelihoodDistribution;
-	//Proposal = new ProposalDistribution(this);
+	Proposal = new ProposalDistribution(this);
 	//Prior = new PriorDistribution;
 	
 	Accept_Count = 0;
 	
+	randnum = new CRandom(1234);
 	ThetaList = new ParameterSetList(this);
 	
 	string command = "mkdir -p "+run_file+"/output/mcmc";
@@ -40,15 +41,15 @@ void MCMC::Run(){
 	
 	// Likelihood_Current = Likelihood.Evaluate(ThetaList->Theta[0]);
 	// Prior_Current = Prior.Evaluate(ThetaList->Theta[0]);
-	// Proposal_Current = Proposal.Evaluate(ThetaList->Theta[0]);
+	Proposal_Current = Proposal->Evaluate(ThetaList->Theta[0]);
 	
 	
 	for(int i =1; i<=MAXITERATIONS; i++){
 		LOGBF = 0;
-		// ParameterSet Temp_Theta = Proposal.Iterate();
+		ParameterSet Temp_Theta = Proposal->Iterate();
 		// Likelihood_New = Likeliood.Evaluate(Temp_Theta);
 		// Prior_New = Prior.Evaluate(Temp_Theta);
-		// Proposal_New= Proposal.Evaluate(Temp_Theta);
+		Proposal_New= Proposal->Evaluate(Temp_Theta);
 		
 		if(LOGLIKE){
 			LOGBF += Likelihood_New-Likelihood_Current;
@@ -68,9 +69,9 @@ void MCMC::Run(){
 		
 		alpha = min(1.0,exp(LOGBF));
 		printf("%5d\t%5g\t",i,alpha);
-		if(alpha > 1){ //Accept the proposed set.
+		if(alpha > randnum->ran()){ //Accept the proposed set.
 			Accept_Count++;
-			//ThetaList->Add(Temp_Theta);
+			ThetaList->Add(Temp_Theta);
 			Likelihood_Current = Likelihood_New;
 			Prior_Current = Prior_New;
 			Proposal_Current = Proposal_New;

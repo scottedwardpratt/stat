@@ -1,23 +1,39 @@
 #ifndef __DISTRIBUTION_H__
-#define __DISTRIBUTION_H__ 
+#define __DISTRIBUTION_H__
+
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include "mcmc.h" 
 
 using namespace std;
 
 class Distribution{
 public:
-	double Evaluate(ParameterSet Theta);
-
+	MCMC * mcmc;
+	Distribution(MCMC *mcmc_in);
+	Distribution();
+	
+	virtual double Evaluate(ParameterSet Theta) {return(0);}
+private:
+	
 };
 
-class ProposalDistribution: Distribution {
+class ProposalDistribution: public Distribution {
 public:
-	MCMC * mcmc;
+	ProposalDistribution(MCMC *mcmc_in);
+	ParameterSet Iterate();
+	double Evaluate(ParameterSet Theta);
+private:
+	bool SymmetricProposal;
 	vector<double> MixingStdDev;
 	double *Ranges[2];
-	
-	ProposalDistribution(MCMC * mcmc_in);
-	ParameterSet Iterate();
-private:
+	gsl_rng *randy;
 	int FindParam(string param_name);
+};
+
+class PriorDistribution:public Distribution {
+public:
+	PriorDistribution(MCMC *mcmc_in);
+	double Evaluate(ParameterSet Theta);
 };
 #endif

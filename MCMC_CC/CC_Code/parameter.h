@@ -20,16 +20,18 @@ public:
 	void Add(ParameterSet Theta_In);
 	void GetTheta0();
 	void PrintData();
+	ParameterSet CurrentParameters();
 };
 
 class ParameterSet{
+public:
 	vector<string> Names;
 	vector<double> Values;
-	vector<bool> LogParam;
-	bool Used;
-	ParameterSetList *paramlist;
-	
 	ParameterSet(ParameterSetList *list);
 	void Initialize(vector<string> names, vector<double> values);
+	
+private:
+	bool Used;
+	ParameterSetList *paramlist;
 };
 #endif
