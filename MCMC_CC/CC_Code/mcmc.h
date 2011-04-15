@@ -13,10 +13,11 @@
 #include "random.h"
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
+#include "emulator.h"
 
 using namespace std;
 
-class ParameterSet; class ParameterSetList; class ProposalDistribution;
+class ParameterSet; class ParameterSetList; class ProposalDistribution; class EmulatorHandler;
 
 class MCMC{
 public:
@@ -25,17 +26,14 @@ public:
 	MCMC(string run_file);
 	~MCMC();
 	void Run();
-	
-private:
-	int MAXITERATIONS, WRITEOUT, Accept_Count;
-	string dir_name, parameter_file_name;
-	
-	CRandom *randnum;
+	string dir_name;
 	bool LOGLIKE;
 	bool LOGPRIOR;
 	bool LOGPROPOSAL;
-	
-
+private:
+	int MAXITERATIONS, WRITEOUT, Accept_Count;
+	string parameter_file_name;
+	CRandom *randnum;
 	// LikelihoodDistribution *Likelihood;
 	ProposalDistribution *Proposal;
 	// PriorDistribution *Prior;

@@ -15,13 +15,16 @@ INC=-I ${GSLPATH}/include -I include -I ${INSTALLDIR}/include
 
 MCMC_HFILES = mcmc.h\
 parameter.h\
-distribution.h
+distribution.h\
+emulator.h
 
 MCMC_OFILES = proposal.o\
 mcmc.o\
 distribution.o\
 prior.o\
-distribution.o
+distribution.o\
+emulator.o\
+likelihood.o
 
 SUBDIRS= build\
 build/mcmc\

@@ -7,6 +7,8 @@
 
 using namespace std;
 
+class EmulatorHandler;
+
 class Distribution{
 public:
 	MCMC * mcmc;
@@ -35,5 +37,17 @@ class PriorDistribution:public Distribution {
 public:
 	PriorDistribution(MCMC *mcmc_in);
 	double Evaluate(ParameterSet Theta);
+};
+
+class LikelihoodDistribution:public Distribution {
+public:
+	LikelihoodDistribution(MCMC *mcmc_in);
+	~LikelihoodDistribution();
+	double Evaluate(ParameterSet Theta);
+private:
+	vector<double> GetData();
+	vector<double> DATA;
+	bool UseEmulator;
+	EmulatorHandler * emulator;
 };
 #endif

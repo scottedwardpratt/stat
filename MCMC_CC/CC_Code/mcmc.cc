@@ -39,8 +39,6 @@ void MCMC::Run(){
 	
 	double LOGBF,alpha;
 	
-	// Likelihood_Current = Likelihood.Evaluate(ThetaList->Theta[0]);
-	// Prior_Current = Prior.Evaluate(ThetaList->Theta[0]);
 	Proposal_Current = Proposal->Evaluate(ThetaList->Theta[0]);
 	
 	
