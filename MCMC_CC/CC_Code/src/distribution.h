@@ -31,8 +31,9 @@ public:
 private:
 	bool SymmetricProposal;
 	vector<double> MixingStdDev;
-	double *Ranges[2];
-	gsl_rng *randy;
+	double *Min_Ranges;
+	double *Max_Ranges;
+	gsl_rng * randy;
 	int FindParam(string param_name);
 };
 

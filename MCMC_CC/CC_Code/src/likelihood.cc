@@ -8,33 +8,26 @@
 using namespace std;
 
 LikelihoodDistribution::LikelihoodDistribution(MCMC *mcmc_in):Distribution(mcmc_in){
-	cout << "Likelihood:Start" << endl;
 	SepMap = parameter::getB(mcmc->parmap, "LIKELIHOOD_PARAMETER_MAP", false);
 	
 	if(SepMap){
-		// cout << "Seperate parameter map for likelihood." << endl;
 		string parmapfile = mcmc->dir_name + "/mcmc/parameters/likelihood.param";
 		parmap = new parameterMap;
 		parameter::ReadParsFromFile(*parmap, parmapfile);
-		//parameter::ReadParsFromFile(parmap, parameter_file_name);
 	}else{
-		// cout << "Using MCMC parameter map for likelihood." << endl;
 		parmap = &(mcmc->parmap);
 	}
 	
 	UseEmulator = parameter::getB(*parmap, "USE_EMULATOR", false);
 	
 	if(UseEmulator){
-		// cout << "About to create new emulator handler." << endl;
 		emulator = new EmulatorHandler(parmap, mcmc_in);
 	}
 	else{
-		// cout << "Unable to use necessary emulator." << endl;
 		exit(1);
 	}
 
 	DATA = GetData();
-	cout << "Likelihood: Done." << endl;
 }
 
 LikelihoodDistribution::~LikelihoodDistribution(){
@@ -42,6 +35,7 @@ LikelihoodDistribution::~LikelihoodDistribution(){
 }
 
 double LikelihoodDistribution::Evaluate(ParameterSet Theta){
+	// cout << "LikeEval" << endl;
 	vector<double> ModelMeans;
 	vector<double> ModelErrors;
 	double likelihood;
@@ -54,15 +48,25 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 		//determine another way to fill the vectors
 	}
 	
+	// cout << "Means: " << endl;
+	// for(int i=0; i < ModelMeans.size(); i++){
+	// 	cout << ModelMeans[i] << endl;
+	// }
+	// cout << "Errors: " << endl;
+	// for(int j = 0; j< ModelErrors.size(); j++){
+	// 	cout << ModelErrors[j] << endl;
+	// }
+	// 
+	// exit(1);
+	
 	//Initialize GSL containers
 	gsl_matrix * sigma = gsl_matrix_calloc(ModelErrors.size(), ModelErrors.size());
 	gsl_vector * diff = gsl_vector_alloc(ModelErrors.size());
-	//gsl_vector * diff2 = gsl_vector_alloc(ModelErrors.size());
 	gsl_vector * temp = gsl_vector_alloc(ModelErrors.size());
 	
 	//Read in appropriate elements
 	for(int i = 0; i<ModelErrors.size(); i++){
-		gsl_matrix_set(sigma, i,i,ModelErrors[i]);
+		gsl_matrix_set(sigma, i,i,Theta.GetValue("SIGMA"));
 		gsl_vector_set(diff, i, ModelMeans[i]-DATA[i]);
 	}
 	
@@ -73,7 +77,11 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	//multiply matrix and left vector together using CBLAS routines
 	gsl_blas_dgemv(CblasNoTrans,1.0, sigma, diff, 0.0, temp);
 	
-	likelihood = (-1/2)*gsl_vector_mul(diff, temp);
+	gsl_blas_ddot(diff, temp, &likelihood);
+	
+	likelihood = (-1.0/2.0)*likelihood;
+	
+	cout << "Exponent: " << likelihood << endl;
 	
 	if(!(mcmc->LOGLIKE)){
 		likelihood = exp(likelihood);
@@ -87,31 +95,21 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	return likelihood;
 }
 
-//Fix this later.
 vector<double> LikelihoodDistribution::GetData(){
-	cout << "Reading in data." << endl;
 	vector<double> datameans;
 	vector<double> dataerror;
-	//vector<string> stringtemp;
-	//vector<double> doubtemp;
 	
 	parameterMap actualparmap;
 	
 	string actual_filename = mcmc->dir_name+"/mcmc/parameters/actual.param";
 	parameter::ReadParsFromFile(actualparmap, actual_filename);
-	//cout << "Reading in actual parameters from " << actual_filename << endl;
 	
 	vector<string> temp_names = parameter::getVS(actualparmap, "NAMES", "");
-	//cout << "Parameter names read in." << endl;
 	vector<double> temp_values = parameter::getV(actualparmap, "VALUES", "");
-	//cout << "Parameter values read in." << endl;
 	
 	ParameterSet ActualParams(mcmc->ThetaList);
-	//cout << "New parameterset generated." << endl;
 	ActualParams.Initialize(temp_names, temp_values);
-	//cout << "Parameters initialized." << endl;
 	emulator->QueryEmulator(ActualParams, datameans, dataerror);
-	cout << "Done reading in data." << endl;
 	return datameans;
 }
 #endif

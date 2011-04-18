@@ -19,6 +19,8 @@ PriorDistribution::PriorDistribution(MCMC * mcmc_in):Distribution(mcmc_in){
 }
 
 double PriorDistribution::Evaluate(ParameterSet Theta){
+	// cout << "PriorEval:Start" << endl;
+	// 	cout << "PriorEval:End" << endl;
 	return 1.0;
 }
 #endif

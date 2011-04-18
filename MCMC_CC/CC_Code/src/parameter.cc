@@ -54,24 +54,51 @@ void ParameterSet::Reset(){
 	Used = false;
 }
 
+int ParameterSet::GetIndex(string ParamName){
+	int out = -1;
+	int i = 0;
+	bool Found = false;
+	
+	while(i < Names.size()){
+		//cout << "FindParam: Comparing " << name << " to " << PNames[i] << endl;
+		if(strcmp(Names[i].c_str(), ParamName.c_str()) == 0){
+			if(!Found){
+				out = i;
+				Found = true;
+			}else{ //A matching parameter has already been found, multiple parameters with the same name.
+				cout << Names[out] << endl;
+				cout << Names[i] << endl;
+				cout << "In ParameterSet::GetIndex; Duplicate parameter names found. Please change parameter names." << endl;
+				exit(1);
+			}
+		}
+		i++;
+	}
+	return out;
+}
+
+double ParameterSet::GetValue(string ParamName){
+	int index = GetIndex(ParamName);
+	
+	return Values[index];
+}
+
 ParameterSetList::ParameterSetList(MCMC *mcmc_in){
-	cout << "ParameterSetList:Start" << endl;
 	mcmc = mcmc_in;
-	Theta = new ParameterSet*[mcmc->WRITEOUT];
+	Theta = new ParameterSet*[mcmc->WRITEOUT+1];
 	for(int i = 0; i < mcmc->WRITEOUT; i++){
 		Theta[i] = new ParameterSet(this);
 	}
-	//cout << "Theta made." << endl;
 	WriteOutCounter = 1;
 	CurrentIteration = 0;
 	GetTheta0();
 	string command = "mkdir -p " + mcmc->dir_name + "/mcmc/trace";
 	system(command.c_str());
-	cout << "ParameterSetList:Done." << endl;
+	
+	HoldOver = new ParameterSet(this);
 }
 
 void ParameterSetList::GetTheta0(){
-	cout << "Theta0:Start" << endl;
 	parameterMap parmap;
 	string theta0_filename = mcmc->dir_name+"/mcmc/parameters/theta0.param";
 	ParameterSet temp_set(this);
@@ -97,7 +124,6 @@ void ParameterSetList::GetTheta0(){
 	temp_set.Values = temp_values;
 	
 	Add(temp_set);
-	cout << "Theta0:Done" << endl;
 }
 
 void ParameterSetList::PrintDataToFile(){
@@ -120,9 +146,15 @@ void ParameterSetList::PrintDataToFile(){
 		
 		for(int i =0; i < mcmc->WRITEOUT; i++){
 			for(int j=0; j< Theta[i]->Values.size(); j++){
-				outputfile << Theta[i]->Names[j] << "\t";
+				if(Theta[i]){
+					outputfile << Theta[i]->Values[j] << "\t";
+				}
+				else{
+					cout << "Error: Accessing empty element." << endl;
+					exit(1);
+				}
 			}
-			cout << endl;
+			outputfile << endl;
 		}
 		outputfile.close();
 	}else{
@@ -136,16 +168,24 @@ void ParameterSetList::Add(ParameterSet Theta_In){
 	Theta[CurrentIteration]->Initialize(Theta_In);
 	CurrentIteration++;
 	
-	if(CurrentIteration > mcmc->WRITEOUT){
+	if(CurrentIteration == mcmc->WRITEOUT){
+		HoldOver->Initialize(*Theta[CurrentIteration-1]);
 		PrintDataToFile();
-		CurrentIteration = 1;
-		for(int i =1; i < mcmc->WRITEOUT; i++){
+		CurrentIteration = 0;
+		for(int i = 1; i < mcmc->WRITEOUT; i++){
 			Theta[i]->Reset();
 		}
 	}
 }
 
 ParameterSet ParameterSetList::CurrentParameters(){
-	return *Theta[CurrentIteration];
+	ParameterSet tempset(this);
+	if(CurrentIteration == 0){
+		tempset = *HoldOver;
+	}
+	else{
+		tempset = *Theta[CurrentIteration -1];
+	}
+	return tempset;
 }
 #endif

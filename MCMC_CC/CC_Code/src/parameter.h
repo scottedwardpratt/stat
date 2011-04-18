@@ -22,6 +22,7 @@ public:
 	void GetTheta0();
 	void PrintDataToFile();
 	ParameterSet CurrentParameters();
+	ParameterSet * HoldOver;
 };
 
 class ParameterSet{
@@ -35,6 +36,8 @@ public:
 	void Initialize(vector<string> names, vector<double> values);
 	void Print();
 	void Reset();
+	int GetIndex(string ParamName);
+	double GetValue(string ParamName);
 private:
 	bool Used;
 };

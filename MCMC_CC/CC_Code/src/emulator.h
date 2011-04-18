@@ -19,6 +19,7 @@ private:
 	string EmulatorScriptHome;
 	string EmInputFile;
 	string EmOutputFile;
+	string EmErrorFile;
 	char * pPath;
 };
 
