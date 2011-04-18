@@ -11,40 +11,58 @@ INSTALLDIR=${MADAI_INSTALLDIR}
 GSLPATH=${MADAI_GSLPATH}
 #e.g. /usr/local
 #################################################
-INC=-I ${GSLPATH}/include -I include -I ${INSTALLDIR}/include
+INC= -I${GSLPATH}/include -I include -I ${INSTALLDIR}/include 
+LIBS= -L${GSLPATH}/lib -L${INSTALLDIR}/lib
 
 MCMC_HFILES = mcmc.h\
 parameter.h\
 distribution.h\
 emulator.h
 
-MCMC_OFILES = proposal.o\
-mcmc.o\
-distribution.o\
-prior.o\
-distribution.o\
+MCMC_OFILES = distribution.o\
 emulator.o\
-likelihood.o
+likelihood.o\
+mcmc.o\
+parameter.o\
+prior.o\
+proposal.o
 
-SUBDIRS= build\
-build/mcmc\
+
+SUBDIRS= build/mcmc\
 lib\
 include\
 
-all: mcmcdirs lib/mcmc.a
+all: mcmcdirs lib/libmcmc.a install run
 	
+install: lib/libmcmc.a
+	cp -f lib/libmcmc.a ${INSTALLDIR}/lib/;
+	cp -f ${addprefix include/, ${MCMC_HFILES}} ${INSTALLDIR}/include;
+
 mcmcdirs:
 	mkdir -p ${SUBDIRS}
 	
-lib/mcmc.a: h_files ${MCMC_OFILES}
-	mkdir -p lib;
+lib/libmcmc.a: ${addprefix include/, ${MCMC_HFILES}} ${addprefix build/mcmc/, ${MCMC_OFILES}}
 	ar -ru lib/libmcmc.a ${addprefix build/mcmc/, ${MCMC_OFILES}};
 	
-h_files: ${MCMC_HFILES}
-	cp ${MCMC_HFILES} include/
 
-%.o: %.cc
-	${CPP} -c ${OPT} ${INC} $< -o build/mcmc/$@
+include/%.h: src/%.h
+	cp -f $< $@
+
+build/mcmc/%.o: src/%.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
 	
 clean:
-	rm -rf ${SUBDIRS}
+	rm -f mcmc;
+	
+	for dir in ${SUBDIRS}; do\
+		rm -f $$dir/*.o;\
+		rm -f $$dir/*.h;\
+		rm -f $$dir/*.a;\
+	done
+		
+uninstall:
+	rm  -f ${INSTALLDIR}/lib/libmcmc.a;
+	rm  -f ${addprefix ${INSTALLDIR}/include/, ${MCMC_HFILES}}
+
+run: mcmcrun.cc
+	${CPP} ${OPT} ${INC} -o mcmc $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}

@@ -6,15 +6,16 @@
 
 using namespace std;
 
-EmulatorHandler::EmulatorHandler(MCMC *mcmc_in){
+EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMC * mcmc_in){
 	mcmc = mcmc_in;
+	cout << "EmulatorHandler: Constructor Start" << endl;
 	
-	EmulatorScriptHome = parameter::getS(mcmc->parmap, "EMULATOR_FILEPATH", "/Users/kevinnovak/Research/RHIC_Research/madai-analysis");
+	EmulatorScriptHome = parameter::getS(*parmap, "EMULATOR_FILEPATH", \
+	"/Users/kevinnovak/Research/RHIC_Research/madai-analysis");
 	EmInputFile = EmulatorScriptHome + "/src/InputPts.txt";
 	EmOutputFile = EmulatorScriptHome + "/src/EmulatorOutput.txt";
 	
 	fstream f;
-	
 	
 	//create input/output files. I think this works, but it seems crude to me (fix later)
 	f.open(EmInputFile.c_str(), ios::out);
@@ -25,12 +26,13 @@ EmulatorHandler::EmulatorHandler(MCMC *mcmc_in){
 	f << flush;
 	f.close();
 	
-	
 	//check if emulator has been run yet.
-	string checkfilename = EmulatorScriptHome + "/model-data/" + mcmc->dir_name + "/theta-tables.dat";
+	string checkfilename = mcmc->dir_name + "/theta-table.dat";
+	
 	f.open(checkfilename.c_str());
 	if(f){
 		f.close();
+		cout << "Emulator exists." << endl;
 	}else{
 		cerr << "EmulatorHander: Emulator doesn't exist for this project yet!" << endl;
 		exit(1);
@@ -46,6 +48,7 @@ EmulatorHandler::EmulatorHandler(MCMC *mcmc_in){
 		exit(1);
 	}
 	
+	cout << "EmulatorHandler: Constructor Done." << endl;
 }
 
 EmulatorHandler::~EmulatorHandler(){
@@ -59,20 +62,26 @@ EmulatorHandler::~EmulatorHandler(){
 }
 
 void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, vector<double> &Errors){
+	cout << "EmulatorHandler: QueryEmulator" << endl;
 	ofstream outputfile;
 	ifstream inputfile;
 	string command;
 	string currentline;
 	char * token;
 	int NumDataRows = 1;
-	
+	//Theta.Print();
+	EmulatedParams = (Theta.paramlist)->EmulatorParams;
+	//cout << "Emulator variables set." << endl;
 	outputfile.open(EmInputFile.c_str());
 	
 	if(outputfile){
-		for(int i = 0; i < Theta.Values.size(); i++){
-			outputfile << Theta.Values[i];
-			if(i != Theta.Values.size()-1){
-				outputfile << " ";
+		//cout << "Date point file open." << endl;
+		if(EmulatedParams.find(Theta.Names[0]) != string::npos){
+			outputfile << Theta.Values[0];
+		}
+		for(int i = 1; i < Theta.Values.size(); i++){
+			if(EmulatedParams.find(Theta.Names[i]) != string::npos){
+				outputfile << " " << Theta.Values[i];
 			}
 		}
 		outputfile << endl;
@@ -82,8 +91,12 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 		exit(1);
 	}
 	
-	command = "cat " + EmInputFile + " | ./computePoints.sh > "+ EmOutputFile;
+	command = "cat " + EmInputFile + " | " + EmulatorScriptHome + "/src/computePoints.sh  "+ mcmc->dir_name + " > "+ EmOutputFile + " 2> " EmOutputFile;
+	//cout << "Points read in, about to run emulator." << endl;
+	
+	cout << command << endl;
 	int result = system(command.c_str());
+	//cout << "Emulator ran." << endl;
 	
 	if(result != 0){
 		cerr << "Error: Unable to run emulator." << endl;
@@ -105,7 +118,8 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 				char * templine;
 				strcpy(templine, currentline.c_str());
 				token = strtok(templine, " ");
-				//Since the emulator returns alternating rows of values and errors, if the row number is even its a row of error values
+				//Since the emulator returns alternating rows of values and errors,
+				//if the row number is even its a row of error values
 				if(NumDataRows % 2 == 0){
 					while(token != NULL){
 						Errors.push_back(atof(token));

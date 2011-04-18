@@ -9,18 +9,28 @@ ProposalDistribution::ProposalDistribution(MCMC * mcmc_in): Distribution(mcmc_in
 	fstream ranges;
 	string type, param_name;
 	int count = 0;
+	SepMap = parameter::getB(mcmc->parmap, "PROPOSAL_PARAMETER_MAP", false);
+	
+	if(SepMap){
+		string parmapfile = mcmc->dir_name + "/mcmc/parameters/proposal.param";
+		parmap = new parameterMap;
+		parameter::ReadParsFromFile(*parmap, parmapfile);
+		//parameter::ReadParsFromFile(parmap, parameter_file_name);
+	}else{
+		parmap = &(mcmc->parmap);
+	}
 	
 	randy=gsl_rng_alloc(gsl_rng_ranlxd1);
 	int numparams = mcmc->ThetaList->ParamNames.size();
+	
 	vector<double> temp (numparams, .01);
-	MixingStdDev = parameter::getV(mcmc->parmap, "MIXING_STD_DEV", 0);
+	MixingStdDev = parameter::getV(*parmap, "MIXING_STD_DEV", 0);
 	Ranges[1]=new double[numparams];
 	Ranges[2]=new double[numparams];
+	SymmetricProposal = parameter::getB(*parmap, "SYMMETRIC_PROPOSAL", true);
 	
-	SymmetricProposal = parameter::getB(mcmc->parmap, "SYMMETRIC_PROPOSAL", true);
-	
+	//Determine the acceptable ranges of the parameters
 	ranges.open("ranges.dat", fstream::in);
-	
 	if(ranges){
 		while(!ranges.eof()){
 			ranges >> type;

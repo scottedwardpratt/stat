@@ -17,7 +17,12 @@
 
 using namespace std;
 
-class ParameterSet; class ParameterSetList; class ProposalDistribution; class EmulatorHandler;
+class ParameterSet;
+class ParameterSetList;
+class ProposalDistribution;
+class EmulatorHandler;
+class LikelihoodDistribution;
+class PriorDistribution;
 
 class MCMC{
 public:
@@ -30,13 +35,14 @@ public:
 	bool LOGLIKE;
 	bool LOGPRIOR;
 	bool LOGPROPOSAL;
+	int  WRITEOUT;
 private:
-	int MAXITERATIONS, WRITEOUT, Accept_Count;
+	int MAXITERATIONS, Accept_Count;
 	string parameter_file_name;
 	CRandom *randnum;
-	// LikelihoodDistribution *Likelihood;
+	LikelihoodDistribution *Likelihood;
 	ProposalDistribution *Proposal;
-	// PriorDistribution *Prior;
+	PriorDistribution *Prior;
 };
 
 #endif

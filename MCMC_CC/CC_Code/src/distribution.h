@@ -4,23 +4,26 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include "mcmc.h" 
+#include "parametermap.h"
 
 using namespace std;
 
 class EmulatorHandler;
+class MCMC;
+class ParameterSet;
 
 class Distribution{
 public:
-	MCMC * mcmc;
 	Distribution(MCMC *mcmc_in);
 	Distribution();
 	
-	virtual double Evaluate(ParameterSet Theta) {return(0);}
-private:
-	
+protected:
+	MCMC * mcmc;
+	bool SepMap;
+	parameterMap * parmap;
 };
 
-class ProposalDistribution: public Distribution {
+class ProposalDistribution:private Distribution {
 public:
 	ProposalDistribution(MCMC *mcmc_in);
 	ParameterSet Iterate();
@@ -33,13 +36,13 @@ private:
 	int FindParam(string param_name);
 };
 
-class PriorDistribution:public Distribution {
+class PriorDistribution:private Distribution {
 public:
 	PriorDistribution(MCMC *mcmc_in);
 	double Evaluate(ParameterSet Theta);
 };
 
-class LikelihoodDistribution:public Distribution {
+class LikelihoodDistribution:private Distribution {
 public:
 	LikelihoodDistribution(MCMC *mcmc_in);
 	~LikelihoodDistribution();
