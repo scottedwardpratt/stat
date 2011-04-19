@@ -67,7 +67,6 @@ EmulatorHandler::~EmulatorHandler(){
 }
 
 void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, vector<double> &Errors){
-	// cout << "EmulatorHandler: QueryEmulator" << endl;
 	ofstream outputfile;
 	ifstream inputfile;
 	string command;
@@ -94,8 +93,6 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 	}
 	
 	command = "cat " + EmInputFile + " | " + EmulatorScriptHome + "/src/computePoints.sh  "+ mcmc->dir_name + " > "+ EmOutputFile + " 2> " + EmErrorFile;
-	
-	//cout << command << endl;
 	int result = system(command.c_str());
 	
 	if(result != 0){
@@ -109,7 +106,6 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 		while(!inputfile.eof()){
 			getline(inputfile, currentline, '\n');
 			if(currentline.compare(0,1,"#") != 0 && !currentline.empty() ){ //Comments have a # character
-				// cout <<  "Line in question: " << currentline << endl;
 				if(currentline.compare(0,5,"Error") ==0){ //pass emulator errors to cerr stream
 					cerr << "Error during emulation: Check " << EmOutputFile << " and " << EmErrorFile << endl;
 					cerr << currentline << endl;
@@ -121,19 +117,14 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 				double tempnum;
 				
 				ss << currentline;
-				//Since the emulator returns alternating rows of values and errors,
-				//if the row number is even its a row of error values
-				// cout << "Number of data rows is " << NumDataRows << ", so this is ";
 				if(NumDataRows % 2 == 0){
 					while(ss >> tempnum){
 						Errors.push_back(tempnum);
 					}
-					// cout << "pushed to Errors." << endl;
 				}else{
 					while(ss >> tempnum){
 						Means.push_back(tempnum);
 					}
-					// cout << "pushed to Means: " << endl;
 				}
 				NumDataRows++;
 			}
@@ -149,6 +140,5 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 		cerr << "Error: Emulator output size mismatch. Error in reading emulator output in." << endl;
 		exit(1);
 	}
-	// cout << "QueryEmulator: Done." << endl;
 }
 #endif

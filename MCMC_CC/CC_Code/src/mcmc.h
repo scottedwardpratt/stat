@@ -14,6 +14,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include "emulator.h"
+#include <time.h>
 
 using namespace std;
 
@@ -36,11 +37,12 @@ public:
 	bool LOGPRIOR;
 	bool LOGPROPOSAL;
 	int  WRITEOUT;
+	//Made public to test against Matlab, change back later.
+	LikelihoodDistribution *Likelihood;
 private:
 	int MAXITERATIONS, Accept_Count;
 	string parameter_file_name;
 	CRandom *randnum;
-	LikelihoodDistribution *Likelihood;
 	ProposalDistribution *Proposal;
 	PriorDistribution *Prior;
 };

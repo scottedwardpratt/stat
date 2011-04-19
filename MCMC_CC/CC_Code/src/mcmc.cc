@@ -31,8 +31,6 @@ MCMC::MCMC(string run_file){
 	string command = "mkdir -p "+run_file+"/mcmc/trace";
 	system(command.c_str());
 	printf("Iteration\tAlpha\tResult\n");
-	
-	// cout << "MCMC Constructor: Done" << endl;
 }
 
 void MCMC::Run(){
@@ -52,7 +50,6 @@ void MCMC::Run(){
 	Prior_Current = Prior->Evaluate(*ThetaZeroPtr);
 	
 	for(int i =1; i<=MAXITERATIONS; i++){
-		cout << "MCMC step " << i << endl;
 		LOGBF = 0;
 		ParameterSet Temp_Theta = Proposal->Iterate();
 		Likelihood_New = Likelihood->Evaluate(Temp_Theta);
@@ -77,23 +74,19 @@ void MCMC::Run(){
 		{
 			LOGBF +=log(Proposal_New/Proposal_Current);
 		}
-		// 
-		// cout << "New: " << Likelihood_New << endl;
-		// cout << "Current: " << Likelihood_Current << endl;
-		// cout << log(Likelihood_New/Likelihood_Current) << endl;
 		
 		alpha = min(1.0,exp(LOGBF));
 		printf("%5d\t%5g\t",i,alpha);
 		if(alpha > randnum->ran()){ //Accept the proposed set.
 			printf("Accept\n");
 			Accept_Count++;
-			ThetaList->Add(Temp_Theta);
 			Likelihood_Current = Likelihood_New;
 			Prior_Current = Prior_New;
 			Proposal_Current = Proposal_New;
 		}else{
 			printf("Reject\n");
 		}
+		ThetaList->Add(Temp_Theta);
 	}
 }
 #endif

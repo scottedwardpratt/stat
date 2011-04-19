@@ -20,6 +20,7 @@ public:
 protected:
 	MCMC * mcmc;
 	bool SepMap;
+	bool TIMING;
 	parameterMap * parmap;
 };
 

@@ -4,6 +4,7 @@
 #include "mcmc.h"
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_linalg.h>
+#include <time.h>
 
 using namespace std;
 
@@ -19,6 +20,7 @@ LikelihoodDistribution::LikelihoodDistribution(MCMC *mcmc_in):Distribution(mcmc_
 	}
 	
 	UseEmulator = parameter::getB(*parmap, "USE_EMULATOR", false);
+	TIMING = parameter::getB(*parmap, "TIMING", false) || parameter::getB(*parmap, "TIME_LIKELIHOOD", false);
 	
 	if(UseEmulator){
 		emulator = new EmulatorHandler(parmap, mcmc_in);
@@ -35,7 +37,10 @@ LikelihoodDistribution::~LikelihoodDistribution(){
 }
 
 double LikelihoodDistribution::Evaluate(ParameterSet Theta){
-	// cout << "LikeEval" << endl;
+	clock_t begintime;
+	if(TIMING){
+		begintime = clock();
+	}
 	vector<double> ModelMeans;
 	vector<double> ModelErrors;
 	double likelihood;
@@ -48,21 +53,11 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 		//determine another way to fill the vectors
 	}
 	
-	// cout << "Means: " << endl;
-	// for(int i=0; i < ModelMeans.size(); i++){
-	// 	cout << ModelMeans[i] << endl;
-	// }
-	// cout << "Errors: " << endl;
-	// for(int j = 0; j< ModelErrors.size(); j++){
-	// 	cout << ModelErrors[j] << endl;
-	// }
-	// 
-	// exit(1);
-	
 	//Initialize GSL containers
 	gsl_matrix * sigma = gsl_matrix_calloc(ModelErrors.size(), ModelErrors.size());
 	gsl_vector * diff = gsl_vector_alloc(ModelErrors.size());
 	gsl_vector * temp = gsl_vector_alloc(ModelErrors.size());
+	// cout << "Done allocating gsl containers." << endl;
 	
 	//Read in appropriate elements
 	for(int i = 0; i<ModelErrors.size(); i++){
@@ -81,8 +76,6 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	
 	likelihood = (-1.0/2.0)*likelihood;
 	
-	cout << "Exponent: " << likelihood << endl;
-	
 	if(!(mcmc->LOGLIKE)){
 		likelihood = exp(likelihood);
 	}
@@ -91,6 +84,11 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	gsl_vector_free(diff);
 	gsl_vector_free(temp);
 	gsl_matrix_free(sigma);
+	
+	if(TIMING){
+		cout << "Likelihood evaluation took " << (clock()-begintime)*1000/CLOCKS_PER_SEC << " ms." << endl;
+		// cout << CLOCKS_PER_SEC << endl;
+	}
 	
 	return likelihood;
 }

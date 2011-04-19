@@ -91,9 +91,6 @@ ProposalDistribution::ProposalDistribution(MCMC * mcmc_in): Distribution(mcmc_in
 		exit(1);
 	}
 	
-	// for(int i = 0; i < mcmc->ThetaList->ParamNames.size(); i++){
-	// 	cout << "Parameter: " << mcmc->ThetaList->ParamNames[i] << " Min: " << Min_Ranges[i] << " Max: " << Max_Ranges[i] << endl;
-	// }
 	if(count != numparams){
 		cout << "Error: number of parameters in ranges data and total number of parameters are different." << endl;
 		cout << "Count: " << count << " NumParams: " << numparams << endl;
@@ -127,11 +124,6 @@ int ProposalDistribution::FindParam(string name){
 }
 
 ParameterSet ProposalDistribution::Iterate(){
-	// cout << "In Iterate" << endl;
-	// for(int i = 0; i < mcmc->ThetaList->ParamNames.size(); i++){
-	// 	cout << "Parameter: " << mcmc->ThetaList->ParamNames[i] << " Min: " << Min_Ranges[i] << " Max: " << Max_Ranges[i] << endl;
-	// }
-	// cout << "Iterate: Start" << endl;
 	ParameterSet current = mcmc->ThetaList->CurrentParameters();
 	ParameterSet proposed = current;
 	gsl_rng * r;
@@ -155,27 +147,21 @@ ParameterSet ProposalDistribution::Iterate(){
 		}while((proposed.Values[i] < Min_Ranges[i]) || (proposed.Values[i]>Max_Ranges[i]));
 	}
 	
-	int kevin = proposed.GetIndex("SIGMA");
-	
-	// cout << "Index: " << kevin << endl;
-	// cout << "Minimum: " << Min_Ranges[kevin] << " Maximum: " << Max_Ranges[kevin] << endl;
-	// cout << "SIGMA: " << proposed.GetValue("SIGMA") << endl;
 	return proposed;
 }
 
 double ProposalDistribution::Evaluate(ParameterSet Theta){
-	// cout << "PropEval: Start" << endl;
 	double probability = 0.01;
 	
 	if(SymmetricProposal){
-		// cout << "Symmetric Proposal" << endl;
 		probability = 1.0;
 	}else{
-		cout << "ERROR: SHOULDN'T BE HERE." << endl;
+		cout << "ERROR: ProposalDistribution::Evaluate:" << endl;
+		cout << "Allowed for unsymmetric proposal without defining method to evaluate proposal." << endl;
+		exit(-1);
 		//do something else.
 	}
 	
-	// cout << "PropEval: End" << endl;
 	return probability;
 }
 #endif
