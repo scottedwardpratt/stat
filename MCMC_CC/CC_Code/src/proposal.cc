@@ -91,6 +91,14 @@ ProposalDistribution::ProposalDistribution(MCMC * mcmc_in): Distribution(mcmc_in
 		exit(1);
 	}
 	
+	
+	gsl_rng * r;
+	
+	const gsl_rng_type * rngtype;
+	rngtype = gsl_rng_default;
+	gsl_rng_env_setup();
+	randy = gsl_rng_alloc(rngtype);
+	
 	if(count != numparams){
 		cout << "Error: number of parameters in ranges data and total number of parameters are different." << endl;
 		cout << "Count: " << count << " NumParams: " << numparams << endl;
@@ -123,15 +131,8 @@ int ProposalDistribution::FindParam(string name){
 	return out;
 }
 
-ParameterSet ProposalDistribution::Iterate(){
-	ParameterSet current = mcmc->ThetaList->CurrentParameters();
+ParameterSet ProposalDistribution::Iterate(ParameterSet current){
 	ParameterSet proposed = current;
-	gsl_rng * r;
-	
-	const gsl_rng_type * rngtype;
-	rngtype = gsl_rng_default;
-	gsl_rng_env_setup();
-	randy = gsl_rng_alloc(rngtype);
 	
 	if(proposed.Values.size() != proposed.Names.size() || proposed.Values.size() != MixingStdDev.size()){
 		cout << "Error: Parameter names/values aren't same size, or no mixing standard deviation for a parameter." << endl;
@@ -147,6 +148,10 @@ ParameterSet ProposalDistribution::Iterate(){
 		}while((proposed.Values[i] < Min_Ranges[i]) || (proposed.Values[i]>Max_Ranges[i]));
 	}
 	
+	// for(int i = 0; i< proposed.Names.size(); i++){
+	// 	cout << "Iterated " << proposed.Names[i] << " from " << current.Values[i] << " to " << proposed.Values[i] << endl;
+	// }
+	
 	return proposed;
 }
 
@@ -159,7 +164,6 @@ double ProposalDistribution::Evaluate(ParameterSet Theta){
 		cout << "ERROR: ProposalDistribution::Evaluate:" << endl;
 		cout << "Allowed for unsymmetric proposal without defining method to evaluate proposal." << endl;
 		exit(-1);
-		//do something else.
 	}
 	
 	return probability;

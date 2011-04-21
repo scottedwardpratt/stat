@@ -38,7 +38,6 @@ public:
 	void Reset();
 	int GetIndex(string ParamName);
 	double GetValue(string ParamName);
-private:
 	bool Used;
 };
 #endif

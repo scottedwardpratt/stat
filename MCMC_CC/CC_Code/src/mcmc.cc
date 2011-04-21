@@ -12,11 +12,13 @@ MCMC::MCMC(string run_file){
 	cout << "Reading in " << parameter_file_name << endl;
 	
 	parameter::ReadParsFromFile(parmap, parameter_file_name.c_str());
+	runnickname = parameter::getS(parmap, "NAME", "mcmcrun");
 	MAXITERATIONS = parameter::getI(parmap, "MAX_ITERATIONS", 500);
 	LOGLIKE = parameter::getB(parmap, "LOGLIKE", true);
 	LOGPRIOR = parameter::getB(parmap, "LOGPRIOR", true);
 	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
 	WRITEOUT = parameter::getI(parmap, "WRITEOUT", 100);
+	VIZTRACE = parameter::getB(parmap, "VISUALIZE_TRACE", true);
 	
 	randnum = new CRandom(1234);
 	ThetaList = new ParameterSetList(this);
@@ -24,11 +26,16 @@ MCMC::MCMC(string run_file){
 	Likelihood = new LikelihoodDistribution(this);
 	Proposal = new ProposalDistribution(this);
 	Prior = new PriorDistribution(this);
+	if(VIZTRACE){
+		cout << "Visualizing trace." << endl;
+		Viz_Count = parameter::getI(parmap, "VIZ_COUNT", floor(MAXITERATIONS/200));
+		Visualizer = new VizHandler(this);
+	}
 	
 	// cout << "Distributions Declared." << endl;
 	Accept_Count = 0;
 	
-	string command = "mkdir -p "+run_file+"/mcmc/trace";
+	string command = "mkdir -p "+run_file+"/mcmc/trace/"+ runnickname;
 	system(command.c_str());
 	printf("Iteration\tAlpha\tResult\n");
 }
@@ -40,6 +47,7 @@ void MCMC::Run(){
 	
 	double LOGBF,alpha;
 	ParameterSet * ThetaZeroPtr = ThetaList->Theta[0];
+	ParameterSet CurrentParameters = *ThetaZeroPtr;
 	
 	if(!ThetaZeroPtr){
 		cout << "Error getting zeroth iteration parameters." << endl;
@@ -51,7 +59,13 @@ void MCMC::Run(){
 	
 	for(int i =1; i<=MAXITERATIONS; i++){
 		LOGBF = 0;
-		ParameterSet Temp_Theta = Proposal->Iterate();
+		if(VIZTRACE){
+			// cout << i << "\t" << Viz_Count << endl;
+			if(i % Viz_Count == 0 || i == 1 || (i % WRITEOUT == 1 && i !=1)){
+				Visualizer->UpdateTraceFig();
+			}
+		}
+		ParameterSet Temp_Theta = Proposal->Iterate(CurrentParameters);
 		Likelihood_New = Likelihood->Evaluate(Temp_Theta);
 		Prior_New = Prior->Evaluate(Temp_Theta);
 		Proposal_New= Proposal->Evaluate(Temp_Theta);
@@ -75,14 +89,15 @@ void MCMC::Run(){
 			LOGBF +=log(Proposal_New/Proposal_Current);
 		}
 		
-		alpha = min(1.0,exp(LOGBF));
-		printf("%5d\t%5g\t",i,alpha);
+		alpha = exp(LOGBF);
+		printf("%5d\t%7.5g\t",i,alpha);
 		if(alpha > randnum->ran()){ //Accept the proposed set.
 			printf("Accept\n");
 			Accept_Count++;
 			Likelihood_Current = Likelihood_New;
 			Prior_Current = Prior_New;
 			Proposal_Current = Proposal_New;
+			CurrentParameters = Temp_Theta;
 		}else{
 			printf("Reject\n");
 		}

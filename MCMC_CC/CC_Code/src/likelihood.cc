@@ -21,6 +21,7 @@ LikelihoodDistribution::LikelihoodDistribution(MCMC *mcmc_in):Distribution(mcmc_
 	
 	UseEmulator = parameter::getB(*parmap, "USE_EMULATOR", false);
 	TIMING = parameter::getB(*parmap, "TIMING", false) || parameter::getB(*parmap, "TIME_LIKELIHOOD", false);
+	VERBOSE = parameter::getB(*parmap, "VERBOSE", false) || parameter::getB(*parmap, "VERBOSE_LIKELIHOOD", false);
 	
 	if(UseEmulator){
 		emulator = new EmulatorHandler(parmap, mcmc_in);
@@ -80,6 +81,18 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 		likelihood = exp(likelihood);
 	}
 	
+	if(VERBOSE){
+		double sum = 0.0;
+
+		for(int i = 0; i< ModelMeans.size(); i++){
+			double temp;
+			sum += gsl_vector_get(diff, i);
+			// sum += temp;
+		}
+		sum = sum/(double)ModelMeans.size();
+		cout << "Average difference between outputs:" << sum << endl;
+	}
+
 	//deallocate GSL containers.
 	gsl_vector_free(diff);
 	gsl_vector_free(temp);
@@ -87,9 +100,7 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	
 	if(TIMING){
 		cout << "Likelihood evaluation took " << (clock()-begintime)*1000/CLOCKS_PER_SEC << " ms." << endl;
-		// cout << CLOCKS_PER_SEC << endl;
 	}
-	
 	return likelihood;
 }
 

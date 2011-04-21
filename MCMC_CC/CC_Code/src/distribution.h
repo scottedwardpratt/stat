@@ -21,13 +21,14 @@ protected:
 	MCMC * mcmc;
 	bool SepMap;
 	bool TIMING;
+	bool VERBOSE;
 	parameterMap * parmap;
 };
 
 class ProposalDistribution:private Distribution {
 public:
 	ProposalDistribution(MCMC *mcmc_in);
-	ParameterSet Iterate();
+	ParameterSet Iterate(ParameterSet current);
 	double Evaluate(ParameterSet Theta);
 private:
 	bool SymmetricProposal;

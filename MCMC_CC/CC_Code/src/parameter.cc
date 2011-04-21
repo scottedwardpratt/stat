@@ -129,7 +129,7 @@ void ParameterSetList::GetTheta0(){
 void ParameterSetList::PrintDataToFile(){
 	stringstream ss;
 	ss << WriteOutCounter;
-	string filename = mcmc->dir_name + "/mcmc/trace/output"+ ss.str() +".dat";
+	string filename = mcmc->dir_name + "/mcmc/trace/" + mcmc->runnickname + "/output"+ ss.str() +".dat";
 	
 	ofstream outputfile;
 	
@@ -138,13 +138,14 @@ void ParameterSetList::PrintDataToFile(){
 	cout << "Writing out to: " << filename << endl;
 	
 	if(outputfile){
-		outputfile << "#";
+		outputfile << "#ITERATION";
 		for(int i = 0; i<Theta[0]->Names.size(); i++){
 			outputfile << Theta[0]->Names[i] << "\t";
 		}
 		outputfile << endl;
 		
 		for(int i =0; i < mcmc->WRITEOUT; i++){
+			outputfile << i+(WriteOutCounter-1)*mcmc->WRITEOUT << "\t";
 			for(int j=0; j< Theta[i]->Values.size(); j++){
 				if(Theta[i]){
 					outputfile << Theta[i]->Values[j] << "\t";
@@ -172,7 +173,7 @@ void ParameterSetList::Add(ParameterSet Theta_In){
 		HoldOver->Initialize(*Theta[CurrentIteration-1]);
 		PrintDataToFile();
 		CurrentIteration = 0;
-		for(int i = 1; i < mcmc->WRITEOUT; i++){
+		for(int i = 0; i < mcmc->WRITEOUT; i++){
 			Theta[i]->Reset();
 		}
 	}

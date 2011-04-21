@@ -17,7 +17,8 @@ LIBS= -L${GSLPATH}/lib -L${INSTALLDIR}/lib
 MCMC_HFILES = mcmc.h\
 parameter.h\
 distribution.h\
-emulator.h
+emulator.h\
+visualization.h
 
 MCMC_OFILES = distribution.o\
 emulator.o\
@@ -25,14 +26,15 @@ likelihood.o\
 mcmc.o\
 parameter.o\
 prior.o\
-proposal.o
+proposal.o\
+visualization.o
 
 
 SUBDIRS= build/mcmc\
 lib\
 include\
 
-all: mcmcdirs lib/libmcmc.a install run
+all: mcmcdirs lib/libmcmc.a
 	
 install: lib/libmcmc.a
 	cp -f lib/libmcmc.a ${INSTALLDIR}/lib/;
