@@ -63,6 +63,7 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	//Read in appropriate elements
 	for(int i = 0; i<ModelErrors.size(); i++){
 		gsl_matrix_set(sigma, i,i,Theta.GetValue("SIGMA"));
+		// gsl_matrix_set(sigma, i,i,ModelErrors[i]);
 		gsl_vector_set(diff, i, ModelMeans[i]-DATA[i]);
 	}
 	

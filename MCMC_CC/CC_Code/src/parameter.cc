@@ -52,6 +52,7 @@ void ParameterSet::Reset(){
 	Names.clear();
 	Values.clear();
 	Used = false;
+	InTrace = false;
 }
 
 int ParameterSet::GetIndex(string ParamName){
@@ -83,13 +84,19 @@ double ParameterSet::GetValue(string ParamName){
 	return Values[index];
 }
 
+void ParameterSet::VizTrace(){
+	if(!InTrace){
+		InTrace = true;
+	}
+}
+
 ParameterSetList::ParameterSetList(MCMC *mcmc_in){
 	mcmc = mcmc_in;
 	Theta = new ParameterSet*[mcmc->WRITEOUT+1];
 	for(int i = 0; i < mcmc->WRITEOUT; i++){
 		Theta[i] = new ParameterSet(this);
 	}
-	WriteOutCounter = 1;
+	WriteOutCounter = 0;
 	CurrentIteration = 0;
 	GetTheta0();
 	string command = "mkdir -p " + mcmc->dir_name + "/mcmc/trace";
@@ -128,7 +135,7 @@ void ParameterSetList::GetTheta0(){
 
 void ParameterSetList::PrintDataToFile(){
 	stringstream ss;
-	ss << WriteOutCounter;
+	ss << WriteOutCounter+1;
 	string filename = mcmc->dir_name + "/mcmc/trace/" + mcmc->runnickname + "/output"+ ss.str() +".dat";
 	
 	ofstream outputfile;
@@ -145,7 +152,7 @@ void ParameterSetList::PrintDataToFile(){
 		outputfile << endl;
 		
 		for(int i =0; i < mcmc->WRITEOUT; i++){
-			outputfile << i+(WriteOutCounter-1)*mcmc->WRITEOUT << "\t";
+			outputfile << i+WriteOutCounter*mcmc->WRITEOUT << "\t";
 			for(int j=0; j< Theta[i]->Values.size(); j++){
 				if(Theta[i]){
 					outputfile << Theta[i]->Values[j] << "\t";
@@ -163,22 +170,30 @@ void ParameterSetList::PrintDataToFile(){
 		exit(1);
 	}
 	WriteOutCounter++;
+	cout << "Done printing to file." << endl;
 }
 
 void ParameterSetList::Add(ParameterSet Theta_In){
-	Theta[CurrentIteration]->Initialize(Theta_In);
-	CurrentIteration++;
-	
-	if(CurrentIteration == mcmc->WRITEOUT){
-		HoldOver->Initialize(*Theta[CurrentIteration-1]);
-		PrintDataToFile();
-		CurrentIteration = 0;
-		for(int i = 0; i < mcmc->WRITEOUT; i++){
-			Theta[i]->Reset();
-		}
+	if(CurrentIteration >= mcmc->WRITEOUT){
+		cerr << "Error: Thetalist index out of bounds (Greater than WRITEOUT)." << endl;
+		exit(1);
+	}else{
+		Theta[CurrentIteration]->Initialize(Theta_In);
+		CurrentIteration++;
 	}
 }
-
+void ParameterSetList::WriteOut(){
+	// cout << "WriteOut." << endl;
+	HoldOver->Reset();
+	// cout << "Reset." << endl;
+	cout << CurrentIteration << endl;
+	HoldOver->Initialize(*Theta[--CurrentIteration]);
+	PrintDataToFile();
+	for(int i = 0; i < mcmc->WRITEOUT; i++){
+		Theta[i]->Reset();
+	}
+	CurrentIteration = 0;
+}
 ParameterSet ParameterSetList::CurrentParameters(){
 	ParameterSet tempset(this);
 	if(CurrentIteration == 0){

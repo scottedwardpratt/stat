@@ -12,8 +12,8 @@ public:
 	void operator() (const string& command);
 	void UpdateTraceFig();
 	string header;
-	
 protected:
+	int ThetaListSize;
 	int HighestItnReadIn;
 	MCMC *mcmc;
 	string *paramvalues;

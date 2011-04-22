@@ -30,6 +30,7 @@ MCMC::MCMC(string run_file){
 		cout << "Visualizing trace." << endl;
 		Viz_Count = parameter::getI(parmap, "VIZ_COUNT", floor(MAXITERATIONS/200));
 		Visualizer = new VizHandler(this);
+		Visualizer->UpdateTraceFig();
 	}
 	
 	// cout << "Distributions Declared." << endl;
@@ -59,12 +60,6 @@ void MCMC::Run(){
 	
 	for(int i =1; i<=MAXITERATIONS; i++){
 		LOGBF = 0;
-		if(VIZTRACE){
-			// cout << i << "\t" << Viz_Count << endl;
-			if(i % Viz_Count == 0 || i == 1 || (i % WRITEOUT == 1 && i !=1)){
-				Visualizer->UpdateTraceFig();
-			}
-		}
 		ParameterSet Temp_Theta = Proposal->Iterate(CurrentParameters);
 		Likelihood_New = Likelihood->Evaluate(Temp_Theta);
 		Prior_New = Prior->Evaluate(Temp_Theta);
@@ -89,8 +84,8 @@ void MCMC::Run(){
 			LOGBF +=log(Proposal_New/Proposal_Current);
 		}
 		
-		alpha = exp(LOGBF);
-		printf("%5d\t%7.5g\t",i,alpha);
+		alpha = min(1.0,exp(LOGBF));
+		printf("%5d\t%.5f\t",i,alpha);
 		if(alpha > randnum->ran()){ //Accept the proposed set.
 			printf("Accept\n");
 			Accept_Count++;
@@ -101,7 +96,18 @@ void MCMC::Run(){
 		}else{
 			printf("Reject\n");
 		}
-		ThetaList->Add(Temp_Theta);
+		ThetaList->Add(CurrentParameters);
+		if(VIZTRACE){
+			if((i+1) % Viz_Count == 0){
+				Visualizer->UpdateTraceFig();
+			}
+		}
+		if((i+1) % WRITEOUT == 0){
+			if(VIZTRACE){
+				Visualizer->UpdateTraceFig();
+			}
+			ThetaList->WriteOut();
+		}
 	}
 }
 #endif

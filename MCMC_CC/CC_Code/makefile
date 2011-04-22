@@ -35,6 +35,8 @@ lib\
 include\
 
 all: mcmcdirs lib/libmcmc.a
+
+temp: all install run
 	
 install: lib/libmcmc.a
 	cp -f lib/libmcmc.a ${INSTALLDIR}/lib/;

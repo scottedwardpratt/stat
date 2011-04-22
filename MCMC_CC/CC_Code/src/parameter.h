@@ -21,6 +21,7 @@ public:
 	void Add(ParameterSet Theta_In);
 	void GetTheta0();
 	void PrintDataToFile();
+	void WriteOut();
 	ParameterSet CurrentParameters();
 	ParameterSet * HoldOver;
 };
@@ -38,6 +39,8 @@ public:
 	void Reset();
 	int GetIndex(string ParamName);
 	double GetValue(string ParamName);
+	void VizTrace();
+	bool InTrace;
 	bool Used;
 };
 #endif

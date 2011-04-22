@@ -43,13 +43,13 @@ public:
 	int  WRITEOUT;
 	//Made public to test against Matlab, change back later.
 	LikelihoodDistribution *Likelihood;
+	VizHandler *Visualizer;
 private:
 	int MAXITERATIONS, Accept_Count, Viz_Count;
 	string parameter_file_name;
 	CRandom *randnum;
 	ProposalDistribution *Proposal;
 	PriorDistribution *Prior;
-	VizHandler *Visualizer;
 };
 
 #endif
