@@ -2,6 +2,7 @@
 #define __VISUALIZATION_H__
 
 #include "mcmc.h"
+#include <deque>
 
 using namespace std;
 
@@ -15,8 +16,10 @@ public:
 protected:
 	int ThetaListSize;
 	int HighestItnReadIn;
+	bool MovingWindow;
 	MCMC *mcmc;
 	string *paramvalues;
+	deque<string> *DequeParameterValues;
 	FILE * gnuplotpipe;
 };
 #endif
