@@ -38,7 +38,7 @@ include/pca.h : src/pca.h
 	cp src/pca.h include/pca.h
 
 build/qualifier.o : src/qualifier.cc include/qualifier.h include/pca.h
-	${CPP} -c src/qualifier.cc ${OPT} -I${INC} -o build/qualifier.o
+	${CPP} -c src/qualifier.cc ${OPT} ${INC} -o build/qualifier.o
 
 include/qualifier.h : src/qualifier.h
 	cp src/qualifier.h include/qualifier.h
