@@ -14,8 +14,8 @@ VizHandler::VizHandler(MCMC *mcmc_in){
 		cout << "Gnuplot not found!" << endl;
 		exit(1);
 	}
-	string gnuplotterm = parameter::getS(mcmc->parmap, "GNUPLOT_TERMINAL", "x11");
-	string gnuplotstyle = parameter::getS(mcmc->parmap, "GNUPLOT_TRACESTYLE", "linespoints");
+	gnuplotterm = parameter::getS(mcmc->parmap, "GNUPLOT_TERMINAL", "x11");
+	gnuplotstyle = parameter::getS(mcmc->parmap, "GNUPLOT_TRACESTYLE", "linespoints");
 	
 	fprintf(gnuplotpipe, "%s\n", ("set term " + gnuplotterm).c_str());
 	fprintf(gnuplotpipe, "%s\n", ("set title '" + mcmc->runnickname + "'").c_str());
@@ -108,6 +108,33 @@ void VizHandler::UpdateTraceFig(){
 	// cout << plotcommand << endl;
 	
 	fprintf(gnuplotpipe, "%s", plotcommand.c_str());
+	fflush(gnuplotpipe);
+}
+
+void VizHandler::FinalTrace(){
+	stringstream ss;
+	ss << "cat ";
+	
+	for(int i = 1; i <=ceil((double)(mcmc->MAXITERATIONS)/(double)(mcmc->WRITEOUT)); i++){
+		// cout << "Parsing output" << i << ".dat" << endl;
+		ss << mcmc->tracedir << "/output" << i << ".dat ";
+	}
+	ss << "> " << mcmc->tracedir << "/trace.dat" << endl;
+	
+	string command = ss.str();
+	system(command.c_str());
+	
+	ss.str(string());
+	ss << "plot '"<< mcmc->tracedir << "/trace.dat' using 1:2 w " << gnuplotstyle << " t '" << mcmc->ThetaList->ParamNames[0] << "', ";
+	for(int i = 1; i < mcmc->ThetaList->ParamNames.size(); i++){
+		ss<< "'' u 1:"<< i+2 <<" w "<< gnuplotstyle << " t '"<< mcmc->ThetaList->ParamNames[i];
+		if(i != mcmc->ThetaList->ParamNames.size()-1){
+			ss << "', ";
+		}
+	}
+	string gnuplotcmd = ss.str() + "\n";
+	
+	fprintf(gnuplotpipe, "%s", gnuplotcmd.c_str());
 	fflush(gnuplotpipe);
 }
 

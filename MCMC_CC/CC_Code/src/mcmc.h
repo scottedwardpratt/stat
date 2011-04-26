@@ -16,6 +16,7 @@
 #include <gsl/gsl_randist.h>
 #include "emulator.h"
 #include <time.h>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -41,15 +42,15 @@ public:
 	bool LOGPROPOSAL;
 	bool VIZTRACE;
 	int  WRITEOUT;
-	//Made public to test against Matlab, change back later.
+	bool APPEND_TRACE;
 	LikelihoodDistribution *Likelihood;
 	VizHandler *Visualizer;
-private:
 	int MAXITERATIONS, Accept_Count, Viz_Count;
 	string parameter_file_name;
 	CRandom *randnum;
 	ProposalDistribution *Proposal;
 	PriorDistribution *Prior;
+	string tracedir;
 };
 
 #endif

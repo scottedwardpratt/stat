@@ -12,8 +12,11 @@ public:
 	~VizHandler();
 	void operator() (const string& command);
 	void UpdateTraceFig();
+	void FinalTrace();
 	string header;
-protected:
+private:
+	string gnuplotterm;
+	string gnuplotstyle;
 	int ThetaListSize;
 	int HighestItnReadIn;
 	bool MovingWindow;

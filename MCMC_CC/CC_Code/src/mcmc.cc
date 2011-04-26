@@ -8,7 +8,6 @@ using namespace std;
 MCMC::MCMC(string run_file){
 	dir_name = run_file;
 	parameter_file_name = run_file+"/mcmc/parameters/mcmc.param";
-	
 	cout << "Reading in " << parameter_file_name << endl;
 	
 	parameter::ReadParsFromFile(parmap, parameter_file_name.c_str());
@@ -19,6 +18,7 @@ MCMC::MCMC(string run_file){
 	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
 	WRITEOUT = parameter::getI(parmap, "WRITEOUT", 100);
 	VIZTRACE = parameter::getB(parmap, "VISUALIZE_TRACE", true);
+	APPEND_TRACE = parameter::getB(parmap, "APPEND_TRACE", false);
 	
 	randnum = new CRandom(1234);
 	ThetaList = new ParameterSetList(this);
@@ -33,10 +33,39 @@ MCMC::MCMC(string run_file){
 		Visualizer->UpdateTraceFig();
 	}
 	
-	// cout << "Distributions Declared." << endl;
 	Accept_Count = 0;
 	
-	string command = "mkdir -p "+run_file+"/mcmc/trace/"+ runnickname;
+	tracedir = run_file+"/mcmc/trace/"+ runnickname;
+	if(APPEND_TRACE){
+		string addon;
+		bool Done = false;
+		int filecount = 0;
+
+		while(!Done){
+			struct stat st;
+			stringstream ss;
+			string tempfile = tracedir + addon;
+			if(stat(tempfile.c_str(), &st)==0){
+				//directory exists.
+				cout << tempfile << " exists, trying next option..." << endl;
+				filecount++;
+				ss << "_" << filecount;
+				addon = ss.str();
+				ss.str(string());
+			}else{
+				//doesn't exist
+				Done = true;
+				tracedir = tempfile;
+			}
+		}
+	}else{
+		cout << "Deleting prior trace data." << endl;
+		string cmd = "rm " + tracedir + "/output*.dat " + tracedir + "/trace.dat";
+		system(cmd.c_str());
+	}
+	
+	string command = "mkdir -p "+ tracedir;
+	
 	system(command.c_str());
 	printf("Iteration\tAlpha\tResult\n");
 }
@@ -58,6 +87,7 @@ void MCMC::Run(){
 	Proposal_Current = Proposal->Evaluate(*ThetaZeroPtr);
 	Prior_Current = Prior->Evaluate(*ThetaZeroPtr);
 	
+	Accept_Count = 0;
 	for(int i =1; i<=MAXITERATIONS; i++){
 		LOGBF = 0;
 		ParameterSet Temp_Theta = Proposal->Iterate(CurrentParameters);
@@ -103,11 +133,17 @@ void MCMC::Run(){
 			}
 		}
 		if((i+1) % WRITEOUT == 0){
+			cout << "Writing out." << endl;
 			if(VIZTRACE){
 				Visualizer->UpdateTraceFig();
 			}
 			ThetaList->WriteOut();
 		}
 	}
+	ThetaList->WriteOut();
+	Visualizer->FinalTrace();
+	cout << "Accepts: " << Accept_Count << endl;
+	cout << "Iterations: " << MAXITERATIONS << endl;
+	cout << "Acceptance ratio: " << (double)Accept_Count/(double)MAXITERATIONS << endl;
 }
 #endif

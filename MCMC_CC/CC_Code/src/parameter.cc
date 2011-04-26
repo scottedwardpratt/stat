@@ -134,9 +134,10 @@ void ParameterSetList::GetTheta0(){
 }
 
 void ParameterSetList::PrintDataToFile(){
+	cout << "Printing data to file." << endl;
 	stringstream ss;
 	ss << WriteOutCounter+1;
-	string filename = mcmc->dir_name + "/mcmc/trace/" + mcmc->runnickname + "/output"+ ss.str() +".dat";
+	string filename = mcmc->tracedir + "/output"+ ss.str() +".dat";
 	
 	ofstream outputfile;
 	
@@ -152,17 +153,19 @@ void ParameterSetList::PrintDataToFile(){
 		outputfile << endl;
 		
 		for(int i =0; i < mcmc->WRITEOUT; i++){
-			outputfile << i+WriteOutCounter*mcmc->WRITEOUT << "\t";
-			for(int j=0; j< Theta[i]->Values.size(); j++){
-				if(Theta[i]){
-					outputfile << Theta[i]->Values[j] << "\t";
+			if(Theta[i]->Used){
+				outputfile << i+WriteOutCounter*mcmc->WRITEOUT << "\t";
+				for(int j=0; j< Theta[i]->Values.size(); j++){
+					if(Theta[i]){
+						outputfile << Theta[i]->Values[j] << "\t";
+					}
+					else{
+						cout << "Error: Accessing empty element." << endl;
+						exit(1);
+					}
 				}
-				else{
-					cout << "Error: Accessing empty element." << endl;
-					exit(1);
-				}
+				outputfile << endl;
 			}
-			outputfile << endl;
 		}
 		outputfile.close();
 	}else{
@@ -183,10 +186,7 @@ void ParameterSetList::Add(ParameterSet Theta_In){
 	}
 }
 void ParameterSetList::WriteOut(){
-	// cout << "WriteOut." << endl;
 	HoldOver->Reset();
-	// cout << "Reset." << endl;
-	cout << CurrentIteration << endl;
 	HoldOver->Initialize(*Theta[--CurrentIteration]);
 	PrintDataToFile();
 	for(int i = 0; i < mcmc->WRITEOUT; i++){

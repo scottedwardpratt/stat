@@ -92,7 +92,8 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 		exit(1);
 	}
 	
-	command = "cat " + EmInputFile + " | " + EmulatorScriptHome + "/src/computePoints.sh  "+ mcmc->dir_name + " > "+ EmOutputFile + " 2> " + EmErrorFile;
+	command = "cat " + EmInputFile + " | " + EmulatorScriptHome + "/src/computePoints.sh  "\
+	+ mcmc->dir_name + " > "+ EmOutputFile + " 2> " + EmErrorFile;
 	int result = system(command.c_str());
 	
 	if(result != 0){
