@@ -11,20 +11,25 @@
 ##
 ## output: (stdout) for n input points, 2n lines, of interleaved mean and then variance
 ## i.e mean(point1) \n var(point1) \n mean(point2) \n var(point2)...
-## 
-source("gen-samp.R") # load the sample set
-source("emu-pca.R") # load the pca fns
-# note, need to change this to .so or whatever for deployment
-dyn.load("~/local/lib/libRBIND.dylib") #
-# moving these files into the project root (or installing them) is probably best
-source("~/local/include/libRbind/EmuRbind.R")
-
+##
 
 ## see if we should rescale
 cargs <- Sys.getenv(c('rescale', 'rescaleErr', 'inpath'))
 rescale <- as.numeric(cargs[1])
 rescaleErr <- as.numeric(cargs[2])
 inpath <- cargs[3]
+directory <- cargs[4]
+
+source(paste(directory, "/gen-samp.R", sep = "")) # load the sample set
+source(paste(directory, "/emu-pca.R", sep = "")) # load the pca fns
+
+
+# note, need to change this to .so or whatever for deployment
+dyn.load("~/local/lib/libRBIND.dylib") #
+# moving these files into the project root (or installing them) is probably best
+source("~/local/include/libRbind/EmuRbind.R")
+source("~/local/include/libRbind/multivar.R")
+
 
 ## ccs: for debugging
 #rescale <- FALSE
@@ -54,6 +59,7 @@ thetas.est <- read.table(buffer)
 #points <- read.table("/dev/stdin") # sadly this doesn't work
 points <- read.table("temp")
 npoints <- dim(points)[1]
+numpoints <-dim(points)[2]
 
 # this is for debug
 cat("#output from computePoints.R: mean and then var for each point\n")
@@ -93,7 +99,15 @@ for(i in 1:npoints){
 for(i in 1:npoints){
   write.table(rvaluesRescaled[[i]]$mean, stdout(), row.names=FALSE, col.names=FALSE)
   write.table(rvaluesRescaled[[i]]$var, stdout(), row.names=FALSE, col.names=FALSE)
+	if(any(is.na(rvaluesRescaled[[i]]$mean)==TRUE)||any(is.na(rvaluesRescaled[[i]]$var)==TRUE) ){
+		stop("NA values in emulator output.")
+	}
+	if(any(is.nan(rvaluesRescaled[[i]]$mean)==TRUE)||any(is.nan(rvaluesRescaled[[i]]$var)==TRUE) ){
+		stop("NaN values in emulator output.")
+	}
 }
+
+
 
 
 
