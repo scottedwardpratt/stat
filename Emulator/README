@@ -5,6 +5,14 @@ Summer  09
 
 One line: A method to interpolate results from expensive simulations. 
 
+FRESH-INSTALL (post checkout):
+mkdir build;
+cd build;
+cmake ..
+make 
+make install
+
+
 Brief:
 This is a project to implement a gaussian process based emulator. An emulator being a statistical model for some process. This code supposes that you wish to emulate the output of some complicated computer code, which takes any number of inputs and produces a single scalar output for each vector of inputs. 
 
