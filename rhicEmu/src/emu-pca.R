@@ -67,6 +67,10 @@ view.des <- function(obj=NA, index1=1, index2=2) {
   
 #####################################################
 # Function to find PCA
+#
+# ccs, we should add or modify this to dynamically
+# decide the minimum number of eigenvalues to get above a certain
+# threshhold.
 #####################################################
 emu.pca <- function(sample=NA, nr=3, ifile="", silent=TRUE) {
   if(missing(sample)) {
@@ -161,7 +165,8 @@ reconCurveAtPoint <- function(point, thetas, pca.decomp){
   
   for(i in 1:ntps){
     ## ccs
-    ## not sure this is right, rederive
+    ## this is suspect
+    ## 
     yVarEmuRecon[i] <- sum((pca.decomp$ur[i,]**2)*(pca.decomp$esys$values[1:nr])*emuResult$var)
   }
 

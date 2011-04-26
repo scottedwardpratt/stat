@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/zsh
 #
 # ccs, cec24@phy.duke.edu
 # computePoints: 
@@ -22,7 +22,7 @@ if [ -d $basepath -a -d $basepath/analysis -a -d $basepath/parameters ]; then
 # this is most likely a good path
 		echo "#computing values for: ${basepath}"
 else 
-		echo "#arg: ${basepath} doesn't exiset"
+		echo "#arg: ${basepath} doesn't exist"
 		exit -1
 fi
 
