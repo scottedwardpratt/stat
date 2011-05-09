@@ -176,6 +176,71 @@ reconCurveAtPoint <- function(point, thetas, pca.decomp){
 
 
 
+## same as reconCurveAtPoint but for some set of points
+##
+## the results back from the C code are stored in the list
+## emuResults, each column is the result from one of the z-emulators at each of
+## the nEmupts
+##
+## need to compare this agains reconCurveAtPoint, do they agree?
+reconCurveAtList <- function(pointSet, thetas, pca.decomp){
+  nr <- dim(pca.decomp$zmat)[1]
+  nparams <- dim(pca.decomp$des)[1]
+  nmodelpts <- dim(pca.decomp$des)[2]
+  # points = nemupts x nparams points
+  nemupts <- dim(pointSet)[1]
+  emuResult <- list(xpos = pointSet, mean = matrix(0, ncol=nr, nrow=nemupts), var=matrix(0, ncol=nr, nrow=nemupts))
+  ntps <- length(pca.decomp$t)
+  
+  #print(emuResult$mean)
+  
+  for(i in 1:nr){
+    model <- list(xmodel=as.matrix(t(pca.decomp$des)), training=t(pca.decomp$zmat)[,1])
+    
+    temp <- callEmulateAtList(model, as.numeric(thetas[i,]), as.numeric(pointSet), nemupts, nmodelpts, nparams=nparams, nthetas=(nparams+2))
+    #print(temp)
+    # these now come back as vectors
+    ## print(length(temp$mean))
+    ## print(length(temp$var))
+    ## print(dim(emuResult$mean))
+    ## print(dim(emuResult$var))
+    emuResult$mean[,i]<- temp$mean   
+    emuResult$var[,i] <- temp$var
+  }
+  #print(emuResult$mean)
+  # now we need to recon the curve
+  #
+  # this shit is not conformable right now, fix it!
+  # we read each result as a row of the emuResult$Mean matrix and
+  # multiply it into the yMeanEmuRecon matrix, which is stored with each curve
+  # in a single column
+  browser()
+  yMeanEmuRecon <- matrix(0, ncol=nemupts, nrow=ntps)
+  for(i in 1:nemupts){
+    yMeanEmuRecon[,i] <- pca.decomp$mu + pca.decomp$ur %*% diag(sqrt(pca.decomp$esys$values[1:nr])) %*%
+      emuResult$mean[i,]
+  }
+
+  print(yMeanEmuRecon)
+  
+  yVarEmuRecon <- matrix(0, ncol=nemupts, nrow=ntps)
+
+  for(i in 1:ntps){
+    for(j in 1:nemupts){
+      #browser()
+      # this is a bit confusing we're doing
+      # yVar_i_j = Sum_k ( U_i_k * U_i_k * lambda_k * V_k_j)
+      yVarEmuRecon[i,j] <- sum((pca.decomp$ur[i,]**2)*(pca.decomp$esys$values[1:nr])*emuResult$var[j,])
+    }
+  }
+
+  #print(yVarEmuRecon)
+
+  finalResult <- list(xpos = pointSet, tvalues = pca.decomp$t, mean=yMeanEmuRecon, var = yVarEmuRecon)  
+  invisible(finalResult)
+
+}
+
 
 doZEmulator <- function(design, thetas, pca.decomp){
   ##

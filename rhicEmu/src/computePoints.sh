@@ -42,5 +42,5 @@ cat /dev/stdin > temp
 # this will read temp by default
 # but we don't get output on the stdout
 #R CMD BATCH --slave computePoints.R 
-R --slave --no-save < $EMY_DIRECTORY/computePoints.R
+R --slave --no-save < $EMU_DIRECTORY/computePoints.R
 rm temp
