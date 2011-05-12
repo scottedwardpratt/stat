@@ -100,8 +100,8 @@ for(i in 1:npoints){
     rvaluesRescaled[[i]]$tvalues <- rvalues$tvalues
   } else if(rescaleErr ==1){
     cat("#using rescale error!\n")
-    print(rvalues$mean[,i])
-    print(rvalues$xpos[i,])
+    ## print(rvalues$mean[,i])
+    ## print(rvalues$xpos[i,])
     ## escale with predetermined errors instead of using the sampleerrors
     rvaluesRescaled[[i]]$mean <- (rvalues$mean[,i] + sample$means) * sample$errs[i,]
     # this is not coming out to the right scale at all

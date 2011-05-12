@@ -7,7 +7,7 @@
 retval <- require("lhs", quietly=TRUE)                    # Latin Hypercube Sampling pkg
 #options(echo=FALSE)
 if(retval == FALSE){
-  print("installing the lhs library")
+  print("#installing the lhs library")
   install.packages(c("lhs"))
 }
 
@@ -210,18 +210,17 @@ reconCurveAtList <- function(pointSet, thetas, pca.decomp){
   #print(emuResult$mean)
   # now we need to recon the curve
   #
-  # this shit is not conformable right now, fix it!
   # we read each result as a row of the emuResult$Mean matrix and
   # multiply it into the yMeanEmuRecon matrix, which is stored with each curve
   # in a single column
-  browser()
+  #browser()
   yMeanEmuRecon <- matrix(0, ncol=nemupts, nrow=ntps)
   for(i in 1:nemupts){
     yMeanEmuRecon[,i] <- pca.decomp$mu + pca.decomp$ur %*% diag(sqrt(pca.decomp$esys$values[1:nr])) %*%
       emuResult$mean[i,]
   }
 
-  print(yMeanEmuRecon)
+  #print(yMeanEmuRecon)
   
   yVarEmuRecon <- matrix(0, ncol=nemupts, nrow=ntps)
 
@@ -233,8 +232,6 @@ reconCurveAtList <- function(pointSet, thetas, pca.decomp){
       yVarEmuRecon[i,j] <- sum((pca.decomp$ur[i,]**2)*(pca.decomp$esys$values[1:nr])*emuResult$var[j,])
     }
   }
-
-  #print(yVarEmuRecon)
 
   finalResult <- list(xpos = pointSet, tvalues = pca.decomp$t, mean=yMeanEmuRecon, var = yVarEmuRecon)  
   invisible(finalResult)
