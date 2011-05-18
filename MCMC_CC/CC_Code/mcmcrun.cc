@@ -9,9 +9,10 @@ int main(int argc, char *argv[]){
 	}
 	
 	string run_file = argv[1];
-	MCMC *mcmc = new MCMC(run_file);
-	
-	mcmc->Run();
+	MCMCConfiguration *mcmcfoobar = new MCMCConfiguration(run_file);
+	cout << "Done making config." << endl;
+	MCMCRun *mcmcrun = new MCMCRun(mcmcfoobar);
+	cout << "Done making run" << endl;
 	
 	return 0;
 }

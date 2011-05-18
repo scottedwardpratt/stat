@@ -5,21 +5,24 @@
 
 using namespace std;
 
-class ParameterSetList; class MCMC; class ParameterSet;
+class ParameterSetList;
+class MCMCConfiguration;
+class MCMCRun;
+class ParameterSet;
 
 class ParameterSetList{
 public:
-	ParameterSetList(MCMC *mcmc_in);
-	MCMC *mcmc;
+	ParameterSetList(MCMCRun *mcmc_in);
+	ParameterSetList(MCMCRun *mcmc_in, ParameterSet Theta0);
+	MCMCRun *mcmc;
 	ParameterSet **Theta;
 	int WriteOutCounter;
-	vector<bool> LogParam;
 	vector<string> ParamNames;
 	string EmulatorParams;
 	int CurrentIteration;
 	
 	void Add(ParameterSet Theta_In);
-	void GetTheta0();
+	void GetTheta0FromFile();
 	void PrintDataToFile();
 	void WriteOut();
 	ParameterSet CurrentParameters();
@@ -33,6 +36,7 @@ public:
 	ParameterSetList *paramlist;
 	
 	ParameterSet(ParameterSetList *list);
+	ParameterSet();
 	void Initialize(ParameterSet ParamSetIn);
 	void Initialize(vector<string> names, vector<double> values);
 	void Print();

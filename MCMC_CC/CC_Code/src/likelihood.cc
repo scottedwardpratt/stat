@@ -2,35 +2,38 @@
 #define __LIKELIHOOD_CC__
 
 #include "mcmc.h"
-#include <gsl/gsl_blas.h>
-#include <gsl/gsl_linalg.h>
 #include <time.h>
 
 using namespace std;
 
-LikelihoodDistribution::LikelihoodDistribution(MCMC *mcmc_in):Distribution(mcmc_in){
+LikelihoodDistribution::LikelihoodDistribution(MCMCConfiguration *mcmc_in):Distribution(mcmc_in){
 	SepMap = parameter::getB(mcmc->parmap, "LIKELIHOOD_PARAMETER_MAP", false);
 	
 	if(SepMap){
-		string parmapfile = mcmc->dir_name + "/mcmc/parameters/likelihood.param";
+		string parmapfile = mcmc->parameterfile + "/likelihood.param";
 		parmap = new parameterMap;
 		parameter::ReadParsFromFile(*parmap, parmapfile);
 	}else{
 		parmap = &(mcmc->parmap);
 	}
 	
+	// cout << "Like param map made." << endl;
+	
 	UseEmulator = parameter::getB(*parmap, "USE_EMULATOR", false);
 	TIMING = parameter::getB(*parmap, "TIMING", false) || parameter::getB(*parmap, "TIME_LIKELIHOOD", false);
 	VERBOSE = parameter::getB(*parmap, "VERBOSE", false) || parameter::getB(*parmap, "VERBOSE_LIKELIHOOD", false);
 	
+	// cout << "params declared." << endl;
 	if(UseEmulator){
 		emulator = new EmulatorHandler(parmap, mcmc_in);
 	}
 	else{
 		exit(1);
 	}
+	// cout << "emulator made." << endl;
 
 	DATA = GetData();
+	// cout << "Data read in." << endl;
 }
 
 LikelihoodDistribution::~LikelihoodDistribution(){
@@ -39,14 +42,14 @@ LikelihoodDistribution::~LikelihoodDistribution(){
 
 double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	clock_t begintime;
-	if(TIMING){
-		begintime = clock();
-	}
 	vector<double> ModelMeans;
 	vector<double> ModelErrors;
 	double likelihood;
-	int foobar;
 	
+	if(TIMING){
+		begintime = clock();
+	}
+
 	if(UseEmulator){
 		emulator->QueryEmulator(Theta, ModelMeans, ModelErrors); //fills vectors with emulator output
 	}
@@ -55,28 +58,20 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	}
 	
 	//Initialize GSL containers
-	gsl_matrix * sigma = gsl_matrix_calloc(ModelErrors.size(), ModelErrors.size());
-	gsl_vector * diff = gsl_vector_alloc(ModelErrors.size());
-	gsl_vector * temp = gsl_vector_alloc(ModelErrors.size());
+	int N = ModelErrors.size();
+	gsl_matrix * sigma = gsl_matrix_calloc(N,N);
+	gsl_vector * model = gsl_vector_alloc(N);
+	gsl_vector * mu = gsl_vector_alloc(N);
 	// cout << "Done allocating gsl containers." << endl;
 	
 	//Read in appropriate elements
-	for(int i = 0; i<ModelErrors.size(); i++){
+	for(int i = 0; i<N; i++){
 		gsl_matrix_set(sigma, i,i,Theta.GetValue("SIGMA"));
-		// gsl_matrix_set(sigma, i,i,ModelErrors[i]);
-		gsl_vector_set(diff, i, ModelMeans[i]-DATA[i]);
+		gsl_vector_set(model, i,ModelMeans[i]);
+		gsl_vector_set(mu, i, DATA[i]);
 	}
 	
-	//invert matrix using cholesky decomposition
-	foobar = gsl_linalg_cholesky_decomp(sigma);
-	foobar = gsl_linalg_cholesky_invert(sigma);
-	
-	//multiply matrix and left vector together using CBLAS routines
-	gsl_blas_dgemv(CblasNoTrans,1.0, sigma, diff, 0.0, temp);
-	
-	gsl_blas_ddot(diff, temp, &likelihood);
-	
-	likelihood = (-1.0/2.0)*likelihood;
+	likelihood = Log_MVNormal(*model, *mu, *sigma);
 	
 	if(!(mcmc->LOGLIKE)){
 		likelihood = exp(likelihood);
@@ -85,23 +80,22 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	if(VERBOSE){
 		double sum = 0.0;
 
-		for(int i = 0; i< ModelMeans.size(); i++){
-			double temp;
-			sum += gsl_vector_get(diff, i);
-			// sum += temp;
+		for(int i = 0; i< N; i++){
+			sum += (gsl_vector_get(model, i) - gsl_vector_get(mu, i));
 		}
-		sum = sum/(double)ModelMeans.size();
+		sum = sum/(double)N;
 		cout << "Average difference between outputs:" << sum << endl;
 	}
 
 	//deallocate GSL containers.
-	gsl_vector_free(diff);
-	gsl_vector_free(temp);
+	gsl_vector_free(model);
+	gsl_vector_free(mu);
 	gsl_matrix_free(sigma);
 	
 	if(TIMING){
 		cout << "Likelihood evaluation took " << (clock()-begintime)*1000/CLOCKS_PER_SEC << " ms." << endl;
 	}
+	// cout << "likelihood: " << likelihood << endl;
 	return likelihood;
 }
 
@@ -111,13 +105,13 @@ vector<double> LikelihoodDistribution::GetData(){
 	
 	parameterMap actualparmap;
 	
-	string actual_filename = mcmc->dir_name+"/mcmc/parameters/actual.param";
+	string actual_filename = mcmc->parameterfile + "/actual.param";
 	parameter::ReadParsFromFile(actualparmap, actual_filename);
 	
 	vector<string> temp_names = parameter::getVS(actualparmap, "NAMES", "");
 	vector<double> temp_values = parameter::getV(actualparmap, "VALUES", "");
 	
-	ParameterSet ActualParams(mcmc->ThetaList);
+	ParameterSet ActualParams;
 	ActualParams.Initialize(temp_names, temp_values);
 	emulator->QueryEmulator(ActualParams, datameans, dataerror);
 	return datameans;

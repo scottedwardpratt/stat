@@ -8,7 +8,7 @@ using namespace std;
 
 class VizHandler{
 public:
-	VizHandler(MCMC * mcmc_in);
+	VizHandler(MCMCRun * mcmc_in);
 	~VizHandler();
 	void operator() (const string& command);
 	void UpdateTraceFig();
@@ -20,7 +20,7 @@ private:
 	int ThetaListSize;
 	int HighestItnReadIn;
 	bool MovingWindow;
-	MCMC *mcmc;
+	MCMCRun *mcmc;
 	string *paramvalues;
 	deque<string> *DequeParameterValues;
 	FILE * gnuplotpipe;

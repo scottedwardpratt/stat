@@ -28,29 +28,50 @@ class LikelihoodDistribution;
 class PriorDistribution;
 class VizHandler;
 
-class MCMC{
+class MCMCConfiguration{
 public:
-	parameterMap parmap;
-	ParameterSetList *ThetaList;
-	MCMC(string run_file);
-	~MCMC();
-	void Run();
-	string dir_name;
-	string runnickname;
+	MCMCConfiguration(string run_file);
+	MCMCConfiguration(string run_file, string configuration);
+	~MCMCConfiguration();
+	void Initialize();
+	
 	bool LOGLIKE;
 	bool LOGPRIOR;
 	bool LOGPROPOSAL;
+	parameterMap parmap;
+	string dir_name;
+	string parameterfile;
+	string configname;
+	string parameter_file_name;
+	vector<bool> LogParam;
+	string EmulatorParams;
+	vector<string> ParamNames;
+	
+	CRandom *randnum;
+	LikelihoodDistribution *Likelihood;
+	ProposalDistribution *Proposal;
+	PriorDistribution *Prior;
+	ParameterSetList *DummyList;
+};
+
+class MCMCRun{
+public:
+	parameterMap local_parmap;
+	MCMCRun(MCMCConfiguration *mcmc_config);
+	MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0);
+	~MCMCRun();
+	void Run();
+	
 	bool VIZTRACE;
 	int  WRITEOUT;
 	bool APPEND_TRACE;
-	LikelihoodDistribution *Likelihood;
-	VizHandler *Visualizer;
-	int MAXITERATIONS, Accept_Count, Viz_Count;
-	string parameter_file_name;
-	CRandom *randnum;
-	ProposalDistribution *Proposal;
-	PriorDistribution *Prior;
+	int MAXITERATIONS;
 	string tracedir;
+	MCMCConfiguration *mcmcconfig;
+	VizHandler *Visualizer;
+	ParameterSetList *ThetaList;
+	int Accept_Count;
+	int Viz_Count;
 };
 
 #endif

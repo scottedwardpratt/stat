@@ -5,21 +5,21 @@
 
 using namespace std;
 
-ProposalDistribution::ProposalDistribution(MCMC * mcmc_in): Distribution(mcmc_in){
+ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distribution(mcmc_in){
 	fstream ranges;
 	string type, param_name;
 	int count = 0;
 	SepMap = parameter::getB(mcmc->parmap, "PROPOSAL_PARAMETER_MAP", false);
 	
 	if(SepMap){
-		string parmapfile = mcmc->dir_name + "/mcmc/parameters/proposal.param";
+		string parmapfile = mcmc->parameterfile + "/proposal.param";
 		parmap = new parameterMap;
 		parameter::ReadParsFromFile(*parmap, parmapfile);
 	}else{
 		parmap = &(mcmc->parmap);
 	}
 	
-	int numparams = mcmc->ThetaList->ParamNames.size();
+	int numparams = mcmc->ParamNames.size();
 	
 	vector<double> temp (numparams, .01);
 	MixingStdDev = parameter::getV(*parmap, "MIXING_STD_DEV", "0");
@@ -86,8 +86,10 @@ ProposalDistribution::ProposalDistribution(MCMC * mcmc_in): Distribution(mcmc_in
 			}
 		}
 		ranges.close();
-	}else{
+	}
+	else{
 		cout << "Unable to open /mcmc/ranges.dat" << endl;
+		cout << "Filepath: " << emulator_ranges << endl;
 		exit(1);
 	}
 	
@@ -108,13 +110,13 @@ ProposalDistribution::ProposalDistribution(MCMC * mcmc_in): Distribution(mcmc_in
 }
 
 int ProposalDistribution::FindParam(string name){
-	vector<string> PNames = mcmc->ThetaList->ParamNames;
+	vector<string> PNames = mcmc->ParamNames;
 	int out = -1;
 	int i = 0;
 	bool Found = false;
 	
 	while(i < PNames.size()){
-		//cout << "FindParam: Comparing " << name << " to " << PNames[i] << endl;
+		// cout << "FindParam: Comparing " << name << " to " << PNames[i] << endl;
 		if(strcmp(PNames[i].c_str(), name.c_str()) == 0){
 			if(!Found){
 				out = i;

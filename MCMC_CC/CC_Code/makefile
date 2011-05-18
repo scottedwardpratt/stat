@@ -71,5 +71,5 @@ uninstall:
 run: mcmcrun.cc
 	${CPP} ${OPT} ${INC} -o mcmc $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}
 	
-test: liketest.cc
-	${CPP} ${OPT} ${INC} -o liketest $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}
+test: lognormaltest.cc
+	${CPP} ${OPT} ${INC} -o logntest $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}

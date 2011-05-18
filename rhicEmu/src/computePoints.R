@@ -68,7 +68,7 @@ numpoints <-dim(points)[2]
 
 # this is for debug
 cat("#output from computePoints.R: mean and then var for each point\n")
-cat("#thetas used to generate this in: ./theta-table.dat\n")
+cat("#thetas used to generate this in:",buffer,"\n")
 cat("#npoints read: ", npoints, "\n")
 cat("#ntps: ", pca.decomp$ntps, "\n")
 

@@ -11,6 +11,11 @@ ParameterSet::ParameterSet(ParameterSetList *list){
 	paramlist = list;
 }
 
+ParameterSet::ParameterSet(){
+	Used = false;
+	paramlist = NULL;
+}
+
 void ParameterSet::Initialize(vector<string> names, vector<double> values){
 	Names = names;
 	Values = values;
@@ -39,7 +44,7 @@ void ParameterSet::Print(){
 	
 	if(paramlist != NULL){
 		if(paramlist->mcmc != NULL){
-			cout << "Belongs to: " << paramlist->mcmc->dir_name << endl;
+			cout << "Belongs to: " << paramlist->mcmc->tracedir << endl;
 		}else{
 			cout << "Parameter list doesn't have a MCMC run associated with it." << endl;
 		}
@@ -90,7 +95,7 @@ void ParameterSet::VizTrace(){
 	}
 }
 
-ParameterSetList::ParameterSetList(MCMC *mcmc_in){
+ParameterSetList::ParameterSetList(MCMCRun *mcmc_in){
 	mcmc = mcmc_in;
 	Theta = new ParameterSet*[mcmc->WRITEOUT+1];
 	for(int i = 0; i < mcmc->WRITEOUT; i++){
@@ -98,33 +103,33 @@ ParameterSetList::ParameterSetList(MCMC *mcmc_in){
 	}
 	WriteOutCounter = 0;
 	CurrentIteration = 0;
-	GetTheta0();
-	string command = "mkdir -p " + mcmc->dir_name + "/mcmc/trace";
-	system(command.c_str());
-	
 	HoldOver = new ParameterSet(this);
+	
+	GetTheta0FromFile();
 }
 
-void ParameterSetList::GetTheta0(){
+ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, ParameterSet Theta0){
+	mcmc = mcmc_in;
+	Theta = new ParameterSet*[mcmc->WRITEOUT+1];
+	for(int i = 0; i < mcmc->WRITEOUT; i++){
+		Theta[i] = new ParameterSet(this);
+	}
+	WriteOutCounter = 0;
+	CurrentIteration = 0;
+	HoldOver = new ParameterSet(this);
+	
+	GetTheta0FromFile();
+	Theta[0]->Reset();
+	Theta[0]->Initialize(Theta0);
+}
+
+void ParameterSetList::GetTheta0FromFile(){
 	parameterMap parmap;
-	string theta0_filename = mcmc->dir_name+"/mcmc/parameters/theta0.param";
+	string theta0_filename = (mcmc->mcmcconfig)->parameterfile + "/theta0.param";
 	ParameterSet temp_set(this);
 	parameter::ReadParsFromFile(parmap, theta0_filename);
 	vector<string> temp_names = parameter::getVS(parmap, "NAMES", "");
 	vector<double> temp_values = parameter::getV(parmap, "VALUES", "");
-	vector<string> temp_logparam = parameter::getVS(parmap, "LOGPARAM", "");
-	EmulatorParams = parameter::getS(parmap, "EMULATOR", "");
-	
-	for(int i =0; i<temp_logparam.size(); i++){
-		if(strcmp(temp_logparam[i].c_str(), "true") == 0 || strcmp(temp_logparam[i].c_str(), "True") == 0){
-			LogParam.push_back(true);
-		}else if(strcmp(temp_logparam[i].c_str(), "false") == 0 || strcmp(temp_logparam[i].c_str(), "False") == 0){
-			LogParam.push_back(false);
-		}else{
-			cout << "Unrecognized LogParam value " << temp_logparam[i] << endl;
-			exit(1);
-		}
-	}
 	
 	ParamNames = temp_names;
 	temp_set.Names = temp_names;
@@ -185,6 +190,7 @@ void ParameterSetList::Add(ParameterSet Theta_In){
 		CurrentIteration++;
 	}
 }
+
 void ParameterSetList::WriteOut(){
 	HoldOver->Reset();
 	HoldOver->Initialize(*Theta[--CurrentIteration]);
@@ -194,6 +200,7 @@ void ParameterSetList::WriteOut(){
 	}
 	CurrentIteration = 0;
 }
+
 ParameterSet ParameterSetList::CurrentParameters(){
 	ParameterSet tempset(this);
 	if(CurrentIteration == 0){

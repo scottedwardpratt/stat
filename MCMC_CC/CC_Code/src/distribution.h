@@ -2,32 +2,45 @@
 #define __DISTRIBUTION_H__
 
 #include <gsl/gsl_rng.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_permutation.h>
 #include <gsl/gsl_randist.h>
+#include <gsl/gsl_blas.h>
+#include <gsl/gsl_linalg.h>
 #include "mcmc.h" 
 #include "parametermap.h"
 
 using namespace std;
 
 class EmulatorHandler;
-class MCMC;
+class MCMCConfiguration;
+class MCMCRun;
 class ParameterSet;
 
 class Distribution{
 public:
-	Distribution(MCMC *mcmc_in);
+	Distribution(MCMCConfiguration *mcmc_in);
 	Distribution();
-	
+
 protected:
-	MCMC * mcmc;
+	MCMCConfiguration * mcmc;
 	bool SepMap;
 	bool TIMING;
 	bool VERBOSE;
+	bool DEBUG;
 	parameterMap * parmap;
+	
+	double Normal(double x, double mu, double sigma);
+	double Gaussian(double x, double mu, double sigma);
+	double Log_MVNormal(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
+	double MVNormal(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
+	double LogNormal(double x, double mu, double sigma);
 };
 
 class ProposalDistribution:private Distribution {
 public:
-	ProposalDistribution(MCMC *mcmc_in);
+	ProposalDistribution(MCMCConfiguration *mcmc_in);
 	ParameterSet Iterate(ParameterSet current);
 	double Evaluate(ParameterSet Theta);
 private:
@@ -41,13 +54,13 @@ private:
 
 class PriorDistribution:private Distribution {
 public:
-	PriorDistribution(MCMC *mcmc_in);
+	PriorDistribution(MCMCConfiguration *mcmc_in);
 	double Evaluate(ParameterSet Theta);
 };
 
 class LikelihoodDistribution:private Distribution {
 public:
-	LikelihoodDistribution(MCMC *mcmc_in);
+	LikelihoodDistribution(MCMCConfiguration *mcmc_in);
 	~LikelihoodDistribution();
 	double Evaluate(ParameterSet Theta);
 private:

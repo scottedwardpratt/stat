@@ -6,7 +6,7 @@
 
 using namespace std;
 
-VizHandler::VizHandler(MCMC *mcmc_in){
+VizHandler::VizHandler(MCMCRun *mcmc_in){
 	mcmc = mcmc_in;
 	ThetaListSize = mcmc->WRITEOUT;
 	gnuplotpipe = popen("gnuplot -persist", "w");
@@ -14,11 +14,11 @@ VizHandler::VizHandler(MCMC *mcmc_in){
 		cout << "Gnuplot not found!" << endl;
 		exit(1);
 	}
-	gnuplotterm = parameter::getS(mcmc->parmap, "GNUPLOT_TERMINAL", "x11");
-	gnuplotstyle = parameter::getS(mcmc->parmap, "GNUPLOT_TRACESTYLE", "linespoints");
+	gnuplotterm = parameter::getS(mcmc->local_parmap, "GNUPLOT_TERMINAL", "x11");
+	gnuplotstyle = parameter::getS(mcmc->local_parmap, "GNUPLOT_TRACESTYLE", "linespoints");
 	
 	fprintf(gnuplotpipe, "%s\n", ("set term " + gnuplotterm).c_str());
-	fprintf(gnuplotpipe, "%s\n", ("set title '" + mcmc->runnickname + "'").c_str());
+	// fprintf(gnuplotpipe, "%s\n", ("set title '" + mcmc->runnickname + "'").c_str());
 	fprintf(gnuplotpipe, "%s\n", "set xlabel 'iteration'");
 	fprintf(gnuplotpipe, "%s\n", "set ylabel 'parameter value'");
 	fprintf(gnuplotpipe, "%s\n", "set key out vert right top");
@@ -116,7 +116,7 @@ void VizHandler::FinalTrace(){
 	ss << "cat ";
 	
 	for(int i = 1; i <=ceil((double)(mcmc->MAXITERATIONS)/(double)(mcmc->WRITEOUT)); i++){
-		// cout << "Parsing output" << i << ".dat" << endl;
+		cout << "Parsing output" << i << ".dat" << endl;
 		ss << mcmc->tracedir << "/output" << i << ".dat ";
 	}
 	ss << "> " << mcmc->tracedir << "/trace.dat" << endl;
