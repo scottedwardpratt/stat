@@ -6,11 +6,19 @@ Todo list for Madai-Analysis
 
 date: April-2-11
 
-1) Push a copy of the project to the madai-stats server
+1) Push a copy of the project to the madai-stats server (DONE)
 
-2) Fix Variance, recomposition seems to underestimate greatly 
+2) Fix Variance, recomposition seems to underestimate greatly (DONE)
 
-3) Add a dynamic cumulative eigenvalue PCA routine
+3) Add a dynamic cumulative eigenvalue PCA routine...
 
 4) Compute gradients (for scott)
+
+date: May-19-11
+
+1) cumulative eigenvalues
+
+2) compute gradient
+
+3) overhaul emulator to make fastertron?
 
