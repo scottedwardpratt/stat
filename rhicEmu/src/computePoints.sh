@@ -6,9 +6,13 @@
 # input (stdin): a list of points in the paramater space for the emulator to be evaluated at
 # output (stdout): for each point the ntps mean cpts and then the ntps var cpts (on a single line)
 # 
+# ccs, may-19th: added reconstruct. If 1 we will do the project the emulated data back into the 
+# functional space (using the call reconCurveAtList) otherwise we return the unprojected data
+# via a call to emulateAtListNoProject
 
 rescale=0 # rescale the output back to correct values, if you scaled the data without the errors (not sensible)
 rescaleErr=1 # same but only if you scaled the data with errors (DEFAULT)
+reconstruct=0 ## do we want to reconstruct the data back into the functional space? (1 = yes)
 basepath=$1 # the folder where the model output is stored and the various temp files from the emulator
 
 if [ $# -lt 1 ]; then
@@ -37,7 +41,7 @@ inpath=$basepath
 
 EMU_DIRECTORY=$(cd `dirname $0` && pwd)
 
-export rescale rescaleErr inpath EMU_DIRECTORY
+export rescale rescaleErr inpath reconstruct EMU_DIRECTORY
 cat /dev/stdin > temp
 # this will read temp by default
 # but we don't get output on the stdout
