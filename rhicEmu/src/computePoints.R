@@ -16,24 +16,39 @@
 ##
 
 ## see if we should rescale
-cargs <- Sys.getenv(c('rescale', 'rescaleErr', 'inpath', 'EMU_DIRECTORY'))
+cargs <- Sys.getenv(c('rescale', 'rescaleErr', 'inpath', 'reconstruct','EMU_DIRECTORY'))
 rescale <- as.numeric(cargs[1])
 rescaleErr <- as.numeric(cargs[2])
-inpath <- cargs[3]
-directory <- cargs[4]
 
-cat("inpath: ", inpath, "\n")
-cat("directory: ", inpath, "\n")
+inpath <- cargs[3]
+reconstruct <- as.numeric(cargs[4])
+directory <- cargs[5]
+
+cat("#inpath: ", inpath, "\n")
+cat("#directory: ", directory, "\n")
+
+cat("########################################################################\n")
+cat("# reconstruct: ", reconstruct, "                                                     #\n")
+
+if(reconstruct == 1){
+  cat("# projecting data back into functional space\n")
+} else {
+  cat("# data is *not* projected                                              #\n");
+  cat("########################################################################\n")
+}
 
 source(paste(directory, "/gen-samp.R", sep = "")) # load the sample set
 source(paste(directory, "/emu-pca.R", sep = "")) # load the pca fns
 
 
 # note, need to change this to .so or whatever for deployment
-dyn.load("~/local/lib/libRBIND.dylib") #
+dyn.load("~/local/lib/libRBIND.so") #
 # moving these files into the project root (or installing them) is probably best
 source("~/local/include/libRbind/EmuRbind.R")
+source("computePointsOutput.R")
 #source("~/local/include/libRbind/multivar.R")
+
+
 
 
 ## ccs: for debugging
@@ -75,59 +90,27 @@ cat("#ntps: ", pca.decomp$ntps, "\n")
 rvalues <- vector("list", npoints)
 rvaluesRescaled <- vector("list", npoints)
 
+if(reconstruct == 1){
 # compute the curves in t-space at each point
 # this version takes < 1 second for 330 points,
 # much more efficient.
-rvalues <- reconCurveAtList(points, thetas.est, pca.decomp)
-
+  rvalues <- reconCurveAtList(points, thetas.est, pca.decomp)
 # REFERENCE ONLY
 # this was the old method, a lot of setup and teardown had to be done
 # for each point, making it very slow
 ## print(points)
-## for(i in 1:336){ # 17 seconds
+## for(i in 1:336){ # 17 secondsp
 ## this isn't actually practical, it's just to test how much slower a single point would be
 ##   rvaluesRescaled <- reconCurveAtPoint(points[1,], thetas.est, pca.decomp)
 ## }
-
-for(i in 1:npoints){
-  if(rescale==1){
-  # undo the centering and scaling we did in gen.sample
-  # with the stored data from sample
-    rvaluesRescaled[[i]]$mean <- rvalues$mean[,i] * sample$sds + sample$means
-    rvaluesRescaled[[i]]$var <- rvalues$var[,i] * sample$sds
-    # copy in the unmodified things
-    rvaluesRescaled[[i]]$xpos <- rvalues$xpos[i,]
-    rvaluesRescaled[[i]]$tvalues <- rvalues$tvalues
-  } else if(rescaleErr ==1){
-    cat("#using rescale error!\n")
-    ## print(rvalues$mean[,i])
-    ## print(rvalues$xpos[i,])
-    ## escale with predetermined errors instead of using the sampleerrors
-    rvaluesRescaled[[i]]$mean <- (rvalues$mean[,i] + sample$means) * sample$errs[i,]
-    # this is not coming out to the right scale at all
-    # \todo fix the rescaled variance
-    # errors combine in quadrature, dumbass
-    rvaluesRescaled[[i]]$var <- sqrt((rvalues$var[,i]*rvalues$var[,i]) + (sample$errs[i,]*sample$errs[i,]))
-
-    # copy in the unmodified things
-    rvaluesRescaled[[i]]$xpos <- rvalues$xpos[i,]
-    rvaluesRescaled[[i]]$tvalues <- rvalues$tvalues
-  }
+} else {
+  rvalues <- emulateAtListNoProject(points, thetas.est, pca.decomp)
 }
 
-# now we want to scale the curves back to the values we had before centering
-for(i in 1:npoints){
-  # this just to make the output easier to look at
-  cat("\n")
-  write.table(rvaluesRescaled[[i]]$mean, stdout(), row.names=FALSE, col.names=FALSE)
-  cat("\n")
-  write.table(rvaluesRescaled[[i]]$var, stdout(), row.names=FALSE, col.names=FALSE)
-	if(any(is.na(rvaluesRescaled[[i]]$mean)==TRUE)||any(is.na(rvaluesRescaled[[i]]$var)==TRUE) ){
-		stop("NA values in emulator output.")
-	}
-	if(any(is.nan(rvaluesRescaled[[i]]$mean)==TRUE)||any(is.nan(rvaluesRescaled[[i]]$var)==TRUE) ){
-		stop("NaN values in emulator output.")
-	}
+if(reconstruct == 1) { # if we have done the projection we need to rescale the data
+  rescaleAndOuputRvalues(rvalues, rvaluesRescaled, sample, rescale, rescaleErr, npoints);
+} else{
+  outputUnProjected(rvalues, npoints)
 }
 
 
