@@ -42,10 +42,10 @@ source(paste(directory, "/emu-pca.R", sep = "")) # load the pca fns
 
 
 # note, need to change this to .so or whatever for deployment
-dyn.load("~/local/lib/libRBIND.so") #
+dyn.load("~/local/lib/libRBIND.dylib") #
 # moving these files into the project root (or installing them) is probably best
 source("~/local/include/libRbind/EmuRbind.R")
-source("computePointsOutput.R")
+source(paste(directory,"/computePointsOutput.R", sep = ""))
 #source("~/local/include/libRbind/multivar.R")
 
 

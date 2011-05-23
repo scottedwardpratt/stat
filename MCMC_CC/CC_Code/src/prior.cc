@@ -22,5 +22,6 @@ double PriorDistribution::Evaluate(ParameterSet Theta){
 	double mean = parameter::getD(*parmap, "PRIOR_MEAN", -3.7372);
 	double sigma = parameter::getD(*parmap, "PRIOR_SIGMA", 1.6845);
 	return LogNormal(Theta.GetValue("SIGMA"), mean, sigma);
+	// return 1.0;
 }
 #endif

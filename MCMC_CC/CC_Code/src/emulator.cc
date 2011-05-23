@@ -95,7 +95,7 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 	command = "cat " + EmInputFile + " | " + EmulatorScriptHome + "/src/computePoints.sh  "\
 	+ mcmc->dir_name + " > "+ EmOutputFile + " 2> " + EmErrorFile;
 	
-	// cout << command << endl;
+	cout << command << endl;
 	
 	int result = system(command.c_str());
 	
@@ -140,9 +140,9 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 		cerr << "Unable to open emulator output file." << endl;
 		exit(1);
 	}
-	// if(Means.size() != Errors.size()){
-	// 	cerr << "Error: Emulator output size mismatch. Error in reading emulator output in." << endl;
-	// 	exit(1);
-	// }
+	if(Means.size() != Errors.size()){
+		cerr << "Error: Emulator output size mismatch. Error in reading emulator output in." << endl;
+		exit(1);
+	}
 }
 #endif

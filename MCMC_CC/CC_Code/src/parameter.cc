@@ -151,18 +151,21 @@ void ParameterSetList::PrintDataToFile(){
 	cout << "Writing out to: " << filename << endl;
 	
 	if(outputfile){
-		outputfile << "#ITERATION";
+		outputfile << "#ITERATION,";
 		for(int i = 0; i<Theta[0]->Names.size(); i++){
-			outputfile << Theta[0]->Names[i] << "\t";
+			outputfile << Theta[0]->Names[i] << ",";
 		}
 		outputfile << endl;
 		
 		for(int i =0; i < mcmc->WRITEOUT; i++){
 			if(Theta[i]->Used){
-				outputfile << i+WriteOutCounter*mcmc->WRITEOUT << "\t";
+				outputfile << i+WriteOutCounter*mcmc->WRITEOUT << ",";
 				for(int j=0; j< Theta[i]->Values.size(); j++){
 					if(Theta[i]){
-						outputfile << Theta[i]->Values[j] << "\t";
+						outputfile << Theta[i]->Values[j];
+						if(j!=Theta[i]->Values.size()-1){
+							outputfile << ",";
+						}
 					}
 					else{
 						cout << "Error: Accessing empty element." << endl;

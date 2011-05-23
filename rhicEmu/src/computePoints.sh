@@ -12,7 +12,7 @@
 
 rescale=0 # rescale the output back to correct values, if you scaled the data without the errors (not sensible)
 rescaleErr=1 # same but only if you scaled the data with errors (DEFAULT)
-reconstruct=0 ## do we want to reconstruct the data back into the functional space? (1 = yes)
+reconstruct=1 ## do we want to reconstruct the data back into the functional space? (1 = yes)
 basepath=$1 # the folder where the model output is stored and the various temp files from the emulator
 
 if [ $# -lt 1 ]; then
