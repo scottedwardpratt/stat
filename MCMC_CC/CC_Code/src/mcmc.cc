@@ -185,7 +185,7 @@ MCMCRun::~MCMCRun(){
 
 }
 
-void MCMCRun::Run(){
+double MCMCRun::Run(){
 	double Likelihood_Current,Likelihood_New;
 	double Prior_Current, Prior_New;
 	double Proposal_Current, Proposal_New;
@@ -199,11 +199,11 @@ void MCMCRun::Run(){
 	}
 	
 	Likelihood_Current = mcmcconfig->Likelihood->Evaluate(*ThetaZeroPtr);
-	cout << "Likelihood theta0 eval." << endl;
+	// cout << "Likelihood theta0 eval." << endl;
 	Proposal_Current = mcmcconfig->Proposal->Evaluate(*ThetaZeroPtr);
-	cout << "Propr theta0 " << endl;
+	// cout << "Propr theta0 " << endl;
 	Prior_Current = mcmcconfig->Prior->Evaluate(*ThetaZeroPtr);
-	cout << "Prior" << endl;
+	// cout << "Prior" << endl;
 	Accept_Count = 0;
 	for(int i =1; i<=MAXITERATIONS; i++){
 		LOGBF = 0;
@@ -260,12 +260,17 @@ void MCMCRun::Run(){
 			ThetaList->WriteOut();
 		}
 	}
+	
 	ThetaList->WriteOut();
+	ThetaList->MakeTrace();
 	if(VIZTRACE){
 		Visualizer->FinalTrace();
 	}
+	double ratio = (double)Accept_Count/(double)MAXITERATIONS;
 	cout << "Accepts: " << Accept_Count << endl;
 	cout << "Iterations: " << MAXITERATIONS << endl;
-	cout << "Acceptance ratio: " << (double)Accept_Count/(double)MAXITERATIONS << endl;
+	cout << "Acceptance ratio: " << ratio << endl;
+	
+	return ratio;
 }
 #endif

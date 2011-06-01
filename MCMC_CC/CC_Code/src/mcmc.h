@@ -60,7 +60,7 @@ public:
 	MCMCRun(MCMCConfiguration *mcmc_config);
 	MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0);
 	~MCMCRun();
-	void Run();
+	double Run();
 	
 	bool VIZTRACE;
 	int  WRITEOUT;

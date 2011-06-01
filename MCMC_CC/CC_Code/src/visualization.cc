@@ -113,18 +113,7 @@ void VizHandler::UpdateTraceFig(){
 
 void VizHandler::FinalTrace(){
 	stringstream ss;
-	ss << "cat ";
 	
-	for(int i = 1; i <=ceil((double)(mcmc->MAXITERATIONS)/(double)(mcmc->WRITEOUT)); i++){
-		cout << "Parsing output" << i << ".dat" << endl;
-		ss << mcmc->tracedir << "/output" << i << ".dat ";
-	}
-	ss << "> " << mcmc->tracedir << "/trace.dat" << endl;
-	
-	string command = ss.str();
-	system(command.c_str());
-	
-	ss.str(string());
 	ss << "plot '"<< mcmc->tracedir << "/trace.dat' using 1:2 w " << gnuplotstyle << " t '" << mcmc->ThetaList->ParamNames[0] << "', ";
 	for(int i = 1; i < mcmc->ThetaList->ParamNames.size(); i++){
 		ss<< "'' u 1:"<< i+2 <<" w "<< gnuplotstyle << " t '"<< mcmc->ThetaList->ParamNames[i];

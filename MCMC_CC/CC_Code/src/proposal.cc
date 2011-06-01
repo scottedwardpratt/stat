@@ -141,6 +141,7 @@ ParameterSet ProposalDistribution::Iterate(ParameterSet current){
 	}
 	for(int i=0; i<proposed.Values.size(); i++){
 		do{
+			proposed.Values[i] = current.Values[i];
 			if(i == proposed.Names.size() || i == MixingStdDev.size()){
 				cout << "Error: iterating over non-existant parameter name or standard deviation." << endl;
 				cout << "(Seg-Fault catch)" << endl;

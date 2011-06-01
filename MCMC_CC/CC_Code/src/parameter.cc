@@ -145,43 +145,44 @@ void ParameterSetList::PrintDataToFile(){
 	string filename = mcmc->tracedir + "/output"+ ss.str() +".dat";
 	
 	ofstream outputfile;
-	
-	outputfile.open(filename.c_str());
-	
-	cout << "Writing out to: " << filename << endl;
-	
-	if(outputfile){
-		outputfile << "#ITERATION,";
-		for(int i = 0; i<Theta[0]->Names.size(); i++){
-			outputfile << Theta[0]->Names[i] << ",";
-		}
-		outputfile << endl;
-		
-		for(int i =0; i < mcmc->WRITEOUT; i++){
-			if(Theta[i]->Used){
-				outputfile << i+WriteOutCounter*mcmc->WRITEOUT << ",";
-				for(int j=0; j< Theta[i]->Values.size(); j++){
-					if(Theta[i]){
-						outputfile << Theta[i]->Values[j];
-						if(j!=Theta[i]->Values.size()-1){
-							outputfile << ",";
+	if(Theta[0]->Used){
+		outputfile.open(filename.c_str());
+
+		cout << "Writing out to: " << filename << endl;
+
+		if(outputfile){
+			outputfile << "#ITERATION,";
+			for(int i = 0; i<Theta[0]->Names.size(); i++){
+				outputfile << Theta[0]->Names[i] << ",";
+			}
+			outputfile << endl;
+
+			for(int i =0; i < mcmc->WRITEOUT; i++){
+				if(Theta[i]->Used){
+					outputfile << i+WriteOutCounter*mcmc->WRITEOUT << ",";
+					for(int j=0; j< Theta[i]->Values.size(); j++){
+						if(Theta[i]){
+							outputfile << Theta[i]->Values[j];
+							if(j!=Theta[i]->Values.size()-1){
+								outputfile << ",";
+							}
+						}
+						else{
+							cout << "Error: Accessing empty element." << endl;
+							exit(1);
 						}
 					}
-					else{
-						cout << "Error: Accessing empty element." << endl;
-						exit(1);
-					}
+					outputfile << endl;
 				}
-				outputfile << endl;
 			}
+			outputfile.close();
+		}else{
+			cout << "Error in writing output file." << endl;
+			exit(1);
 		}
-		outputfile.close();
-	}else{
-		cout << "Error in writing output file." << endl;
-		exit(1);
+		WriteOutCounter++;
+		cout << "Done printing to file." << endl;
 	}
-	WriteOutCounter++;
-	cout << "Done printing to file." << endl;
 }
 
 void ParameterSetList::Add(ParameterSet Theta_In){
@@ -213,5 +214,21 @@ ParameterSet ParameterSetList::CurrentParameters(){
 		tempset = *Theta[CurrentIteration -1];
 	}
 	return tempset;
+}
+
+void ParameterSetList::MakeTrace(){
+	stringstream ss;
+	ss << "cat ";
+	
+	for(int i = 1; i <=ceil((double)(mcmc->MAXITERATIONS)/(double)(mcmc->WRITEOUT)); i++){
+		cout << "Parsing output" << i << ".dat" << endl;
+		ss << mcmc->tracedir << "/output" << i << ".dat ";
+	}
+	ss << "> " << mcmc->tracedir << "/trace.dat" << endl;
+	
+	string command = ss.str();
+	system(command.c_str());
+	
+	ss.str(string());
 }
 #endif

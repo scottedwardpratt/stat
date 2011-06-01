@@ -25,6 +25,7 @@ public:
 	void GetTheta0FromFile();
 	void PrintDataToFile();
 	void WriteOut();
+	void MakeTrace();
 	ParameterSet CurrentParameters();
 	ParameterSet * HoldOver;
 };

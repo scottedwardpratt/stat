@@ -95,7 +95,7 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 	command = "cat " + EmInputFile + " | " + EmulatorScriptHome + "/src/computePoints.sh  "\
 	+ mcmc->dir_name + " > "+ EmOutputFile + " 2> " + EmErrorFile;
 	
-	cout << command << endl;
+	// cout << command << endl;
 	
 	int result = system(command.c_str());
 	

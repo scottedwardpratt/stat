@@ -59,7 +59,7 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	
 	//Initialize GSL containers
 	int N = ModelErrors.size();
-	cout << "N is: " << N << endl;
+	// cout << "N is: " << N << endl;
 	gsl_matrix * sigma = gsl_matrix_calloc(N,N);
 	gsl_vector * model = gsl_vector_alloc(N);
 	gsl_vector * mu = gsl_vector_alloc(N);

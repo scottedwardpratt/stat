@@ -25,6 +25,9 @@ int main(int argc, char *argv[]){
 	MCMCRun* runbig;
 	ifstream input;
 	ParameterSet * Theta0 = new ParameterSet();
+	vector<double> BigRatios;
+	vector<double> LowRatios;
+	double ratio;
 	
 	input.open("params.dat");
 	
@@ -40,10 +43,24 @@ int main(int argc, char *argv[]){
 			Theta0->Initialize(Names, Tempvalues);
 			Theta0->Print();
 			runbig = new MCMCRun(mcmcbiglambda, *Theta0);
-			runbig->Run();
+			ratio = runbig->Run();
+			BigRatios.push_back(ratio);
+			runlow = new MCMCRun(mcmclowlambda, *Theta0);
+			ratio = runlow->Run();
+			LowRatios.push_back(ratio);
 		}
 	}
 	else{
 		cout << "Unable to open parameter file." << endl;
+	}
+	
+	cout << "Acceptance ratios: " << endl;
+	
+	for(int i = 0; i < BigRatios.size(); i++){
+		cout << BigRatios[i] << endl;
+	}
+	
+	for(int j = 0; j < LowRatios.size(); j++){
+		cout << LowRatios[j] << endl;
 	}
 }
