@@ -4,6 +4,10 @@
 ## with std rescale we don't fold back in the original errors (kept in sample)
 ## with rescaleErr we do fold this error back in (which is what we ought to use)
 ##
+## but this is confusing, we are generating some nEmuPts points and we're trying to rescale
+## them with values generated for nDesignPoints
+## need to be careful here...
+##
 rescaleAndOuputRvalues <- function(rvalues, rvaluesRescaled, sample, rescale=0, rescaleErr=1, npoints){
   for(i in 1:npoints){
     if(rescale==1){
@@ -19,6 +23,9 @@ rescaleAndOuputRvalues <- function(rvalues, rvaluesRescaled, sample, rescale=0, 
       ## print(rvalues$mean[,i])
       ## print(rvalues$xpos[i,])
       ## escale with predetermined errors instead of using the sampleerrors
+      ##
+      ## cccs: the errs term is suspect
+      ##
       rvaluesRescaled[[i]]$mean <- (rvalues$mean[,i] + sample$means) * sample$errs[i,]
                                         # this is not coming out to the right scale at all
                                         # \todo fix the rescaled variance
