@@ -8,8 +8,8 @@
 # 
 # subdir_name = where you want the your external git tree to go  
 # branch_name = the branch you fetched your code into
-SUBDIR_NAME=rhicEmu
-BRANCH_NAME=madaiAna
+SUBDIR_NAME=Emulator
+BRANCH_NAME=EmuMerge
 git filter-branch -f --index-filter \
 	    'git ls-files -s | \
 	            sed "s-\t-&'"$SUBDIR_NAME"'/-" | \
