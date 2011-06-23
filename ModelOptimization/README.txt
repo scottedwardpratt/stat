@@ -41,3 +41,9 @@ Last updated: 2011/06/23
     The various source files will compile, producing a library
     libModelOptimization.a in a directory called "lib" in the root
     level of the build directory.
+
+5. (optional) Type
+
+   ctest
+
+   This runs the tests defined in the project.
