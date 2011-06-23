@@ -32,6 +32,31 @@ public:
   /** Compute the next set of parameters and the output scalar values,
    * and save them in the trace file. */
   virtual void NextIteration(Trace *trace) = 0;
+  //{  /* suggested structure for this function */
+  //std::vector< double > scalarOutputs;
+  //std::vector< double > gradient;
+  //int err;
+  //err = m_Model->GetScalarAndGradientOutputs(
+  // m_CurrentParameters,
+  // m_ActiveParameters,
+  // scalarOutputs,
+  // m_OutputScalarToOptimizeIndex,
+  // gradient);
+  //    if (err) {
+  //      // handle the error
+  //    }
+  //m_Trace->RecordData(m_CurrentParameters, scalarOutputs);
+  //
+  // // Based on:
+  // //    scalarOutputs[m_OutputScalarToOptimizeIndex]
+  // //    m_ActiveParameters
+  // //    m_Trace
+  // //    gradient
+  // //    m_CurrentParameters
+  // // Then we need to update
+  // //    m_CurrentParameters
+  //}
+
   // scalars;
   // m_Model->GetScalarOutputs( currentPosition, scalars, gradient );
   // m_Trace->RecordData( scalars )
