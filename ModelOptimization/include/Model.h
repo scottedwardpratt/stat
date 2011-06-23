@@ -27,7 +27,7 @@ public:
   /** Get the number of parameters. */
   virtual unsigned int GetNumberOfParameters() const
   {
-    return m_Parameters.size();
+    return static_cast<unsigned int>(m_Parameters.size());
   };
 
   /** Get names of the parameters. */
@@ -39,7 +39,7 @@ public:
   /** Get the number of scalar outputs. */
   virtual unsigned int GetNumberOfScalarOutputs() const
   {
-    return m_ScalarOutputNames.size();
+    return static_cast<unsigned int>(m_ScalarOutputNames.size());
   };
 
   /** Get the names of the scalar outputs of the model. */

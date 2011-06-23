@@ -69,6 +69,8 @@ Optimizer
 ::SetOutputScalarToOptimize( const std::string & scalarName )
 {
   m_OutputScalarToOptimize = scalarName;
+
+  return NO_ERROR;
 }
 
 
