@@ -30,10 +30,13 @@ LikelihoodDistribution::LikelihoodDistribution(MCMCConfiguration *mcmc_in):Distr
 	else{
 		exit(1);
 	}
-	// cout << "emulator made." << endl;
 
 	DATA = GetData();
-	// cout << "Data read in." << endl;
+	
+	//testing the outputs of the emulator at various points	// 
+		emulator_test.open("PCA0.dat");
+		emulator_test.close();
+	
 }
 
 LikelihoodDistribution::~LikelihoodDistribution(){
@@ -59,16 +62,16 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	
 	//Initialize GSL containers
 	int N = ModelErrors.size();
-	// cout << "N is: " << N << endl;
 	gsl_matrix * sigma = gsl_matrix_calloc(N,N);
 	gsl_vector * model = gsl_vector_alloc(N);
 	gsl_vector * mu = gsl_vector_alloc(N);
 	// cout << "Done allocating gsl containers." << endl;
+
 	
 	//Read in appropriate elements
 	for(int i = 0; i<N; i++){
-		gsl_matrix_set(sigma, i,i,Theta.GetValue("SIGMA"));
-		// gsl_matrix_set(sigma,i,i,ModelErrors[i]);
+		// gsl_matrix_set(sigma, i,i,Theta.GetValue("SIGMA"));
+		gsl_matrix_set(sigma,i,i,ModelErrors[i]);
 		gsl_vector_set(model, i,ModelMeans[i]);
 		gsl_vector_set(mu, i, DATA[i]);
 	}
@@ -97,7 +100,14 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	if(TIMING){
 		cout << "Likelihood evaluation took " << (clock()-begintime)*1000/CLOCKS_PER_SEC << " ms." << endl;
 	}
-	// cout << "likelihood: " << likelihood << endl;
+	
+	cout << "PCA 0: " << ModelMeans[0] << endl;
+	
+	emulator_test.open("PCA0.dat", ios_base::app);
+	emulator_test << ModelMeans[0] << endl;
+	emulator_test.close();
+	// emulator_test << ModelMeans[0] << endl;
+	
 	return likelihood;
 }
 

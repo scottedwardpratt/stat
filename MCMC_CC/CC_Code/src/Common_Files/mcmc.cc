@@ -69,10 +69,14 @@ MCMCConfiguration::MCMCConfiguration(string run_file, string configuration){
 		}
 	}
 	
+	// cout << "stuff done." << endl;
 	randnum = new CRandom(1234);
 	Likelihood = new LikelihoodDistribution(this);
+	// cout << "Like done." << endl;
 	Proposal = new ProposalDistribution(this);
+	// cout << "Proposal done." << endl;
 	Prior = new PriorDistribution(this);
+	// cout << "Prior done." << endl;
 }
 
 MCMCConfiguration::~MCMCConfiguration(){
@@ -199,11 +203,9 @@ double MCMCRun::Run(){
 	}
 	
 	Likelihood_Current = mcmcconfig->Likelihood->Evaluate(*ThetaZeroPtr);
-	// cout << "Likelihood theta0 eval." << endl;
 	Proposal_Current = mcmcconfig->Proposal->Evaluate(*ThetaZeroPtr);
-	// cout << "Propr theta0 " << endl;
 	Prior_Current = mcmcconfig->Prior->Evaluate(*ThetaZeroPtr);
-	// cout << "Prior" << endl;
+	
 	Accept_Count = 0;
 	for(int i =1; i<=MAXITERATIONS; i++){
 		LOGBF = 0;

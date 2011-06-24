@@ -50,8 +50,14 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 					exit(1);
 				}
 			}else{
-				cout << "Unrecognized variable type " << type << endl;
-				exit(1);
+				if(strncmp(type.c_str(), "#", 1) == 0){
+					string temp;
+					getline(ranges, temp, '\n');
+				}
+				else{
+					cout << "Unrecognized variable type " << type << endl;
+					exit(1);
+				}
 			}
 		}
 		ranges.close();
@@ -81,8 +87,14 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 					exit(1);
 				}
 			}else{
-				cout << "Unrecognized variable type " << type << endl;
-				exit(1);
+				if(strncmp(type.c_str(), "#", 1) == 0){
+					string temp;
+					getline(ranges, temp, '\n');
+				}
+				else{
+					cout << "Unrecognized variable type " << type << endl;
+					exit(1);
+				}
 			}
 		}
 		ranges.close();

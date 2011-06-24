@@ -18,36 +18,36 @@ int main(int argc, char *argv[]){
 	*/
 
 	string run_file = argv[1];
-	MCMCConfiguration *mcmclowlambda = new MCMCConfiguration(run_file, "lowlambda");
-	MCMCConfiguration *mcmcbiglambda = new MCMCConfiguration(run_file, "biglambda");
-	vector<string> Names = mcmcbiglambda->ParamNames;
-	MCMCRun* runlow;
-	MCMCRun* runbig;
+	MCMCConfiguration *mcmcdefault = new MCMCConfiguration(run_file, "default");
+	// cout << "Config done." << endl;
+	vector<string> Names = mcmcdefault->ParamNames;
+	// MCMCRun* runlow;
+	// MCMCRun* runbig;
+	MCMCRun *run;
 	ifstream input;
 	ParameterSet * Theta0 = new ParameterSet();
-	vector<double> BigRatios;
-	vector<double> LowRatios;
+	// vector<double> BigRatios;
+	// vector<double> LowRatios;
+	vector<double> Ratios;
 	double ratio;
 	
-	input.open("params.dat");
+	// input.open("params.dat");
+	input.open("params_nosigma.dat");
 	
 	if(input){
 		for(int i = 0; i < 5; i++){
 			Theta0->Reset();
 			vector<double> Tempvalues;
-			for(int index = 0; index< 8; index++){
+			for(int index = 0; index< Names.size(); index++){
 				double temp;
 				input >> temp;
 				Tempvalues.push_back(temp);
 			}
 			Theta0->Initialize(Names, Tempvalues);
 			Theta0->Print();
-			runbig = new MCMCRun(mcmcbiglambda, *Theta0);
-			ratio = runbig->Run();
-			BigRatios.push_back(ratio);
-			runlow = new MCMCRun(mcmclowlambda, *Theta0);
-			ratio = runlow->Run();
-			LowRatios.push_back(ratio);
+			run = new MCMCRun(mcmcdefault, *Theta0);
+			ratio = run->Run();
+			Ratios.push_back(ratio);
 		}
 	}
 	else{
@@ -56,11 +56,7 @@ int main(int argc, char *argv[]){
 	
 	cout << "Acceptance ratios: " << endl;
 	
-	for(int i = 0; i < BigRatios.size(); i++){
-		cout << BigRatios[i] << endl;
-	}
-	
-	for(int j = 0; j < LowRatios.size(); j++){
-		cout << LowRatios[j] << endl;
+	for(int j = 0; j < Ratios.size(); j++){
+		cout << Ratios[j] << endl;
 	}
 }

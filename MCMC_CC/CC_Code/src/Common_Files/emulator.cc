@@ -10,8 +10,7 @@ EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMCConfiguration * mcmc_
 	mcmc = mcmc_in;
 	// cout << "EmulatorHandler: Constructor Start" << endl;
 	
-	EmulatorScriptHome = parameter::getS(*parmap, "EMULATOR_FILEPATH", \
-	"/Users/kevinnovak/Research/RHIC_Research/madai-analysis");
+	EmulatorScriptHome = parameter::getS(*parmap, "EMULATORFILEPATH", "Couldn't find filepath");
 	EmInputFile = EmulatorScriptHome + "/src/InputPts.txt";
 	EmOutputFile = EmulatorScriptHome + "/src/EmulatorOutput.txt";
 	EmErrorFile = EmulatorScriptHome + "/src/MCMCEmulatorError.txt";
@@ -42,17 +41,7 @@ EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMCConfiguration * mcmc_
 		cerr << "EmulatorHander: Emulator doesn't exist for this project yet!" << endl;
 		exit(1);
 	}
-	
-	//get original PWD. Have to cd to the emulator directory, this is so we can cd back.
-	pPath = getenv ("PATH");
-	
-	int result = system(("cd " + EmulatorScriptHome + "/src").c_str());
-	
-	if(result != 0){
-		cerr << "Error: Unable to cd to emulator directory. The given directory is: " << EmulatorScriptHome << endl;
-		exit(1);
-	}
-	
+
 	// cout << "EmulatorHandler: Constructor Done." << endl;
 }
 
@@ -67,6 +56,7 @@ EmulatorHandler::~EmulatorHandler(){
 }
 
 void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, vector<double> &Errors){
+	// cout << "Querying emulator." << endl;
 	ofstream outputfile;
 	ifstream inputfile;
 	string command;
@@ -79,16 +69,26 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 	if(outputfile){
 		if(EmulatedParams.find(Theta.Names[0]) != string::npos){
 			outputfile << Theta.Values[0];
+			// cout << Theta.Values[0];
+		}
+		else{
+			cout << "Warning: Parameter " << Theta.Names[0] << " is not an emulated parameter." << endl;
 		}
 		for(int i = 1; i < Theta.Values.size(); i++){
 			if(EmulatedParams.find(Theta.Names[i]) != string::npos){
 				outputfile << " " << Theta.Values[i];
+				// cout << " " << Theta.Values[i];
+			}
+			else{
+				cout << "Warning: Parameter " << Theta.Names[i] << " is not an emulated parameter." << endl;
 			}
 		}
 		outputfile << endl;
+		// cout << endl;
 		outputfile.close();
 	}else{
 		cerr << "Error: Unable to open input file to generate emulator input points." << endl;
+		cout << "Filename: " << EmInputFile << endl;
 		exit(1);
 	}
 	
@@ -109,6 +109,7 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 	if(inputfile){
 		while(!inputfile.eof()){
 			getline(inputfile, currentline, '\n');
+			// cout << currentline << endl;
 			if(currentline.compare(0,1,"#") != 0 && !currentline.empty() ){ //Comments have a # character
 				if(currentline.compare(0,5,"Error") ==0){ //pass emulator errors to cerr stream
 					cerr << "Error during emulation: Check " << EmOutputFile << " and " << EmErrorFile << endl;

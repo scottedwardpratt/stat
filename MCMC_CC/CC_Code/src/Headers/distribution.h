@@ -67,6 +67,7 @@ private:
 	vector<double> GetData();
 	vector<double> DATA;
 	bool UseEmulator;
+	ofstream emulator_test;
 	EmulatorHandler * emulator;
 };
 #endif

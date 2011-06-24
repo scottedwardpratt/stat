@@ -9,6 +9,7 @@ using namespace std;
 VizHandler::VizHandler(MCMCRun *mcmc_in){
 	mcmc = mcmc_in;
 	ThetaListSize = mcmc->WRITEOUT;
+	
 	gnuplotpipe = popen("gnuplot -persist", "w");
 	if(!gnuplotpipe){
 		cout << "Gnuplot not found!" << endl;
@@ -104,8 +105,6 @@ void VizHandler::UpdateTraceFig(){
 			plotcommand = plotcommand + paramvalues[i]+ "e\n";
 		}
 	}
-	
-	// cout << plotcommand << endl;
 	
 	fprintf(gnuplotpipe, "%s", plotcommand.c_str());
 	fflush(gnuplotpipe);

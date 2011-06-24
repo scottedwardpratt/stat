@@ -1,0 +1,68 @@
+****************************************
+MCMC Sampler
+
+Kevin Novak, MSU Physics
+kevin.m.novak@gmail.com
+May, 2011
+
+****************************************
+
+This is a MCMC sampler designed to be used within the MADAI file-system 
+framework. Written in C++, it is designed to be an open-source alternative to
+the functionality provided by the Matlab MCMC sampler written by D. Dougherty 
+and K. Novak.
+
+PREREQUISITES:
+==============
+
+Before installing the MCMC sampler, you need to have the Gnu Scientific 
+Library (http://www.gnu.org/software/gsl/) installed, as well as the CorAL and
+CorAL Utilities libraries (found in the MADAI RHIC repository). In order to
+visualize the trace and generate graphics, it is also necessary to have a
+plotting program that supports in-line data input (gnuplot is recommended)
+installed. Gnuplot can be found at: http://www.gnuplot.info/.
+
+INSTALLATION:
+=============
+
+To install the MCMC sampler, modify the makefile_defs.mk file and fill in the
+appropriate fields for your installation. Then, run:
+
+make;
+make install;
+
+This compiles the MCMC sampler and transfers it to the install directory.
+
+To recompile, change, or uninstall the MCMC sampler, running:
+
+make clean;
+
+and/or:
+
+make uninstall;
+
+Will clean and/or uninstall the MCMC sampler, respectively.
+
+USAGE:
+======
+
+Once compiled and installed, the MCMC sampler is used by supplying the folder
+containing the emulator and/or model information. If using the emulator, this
+would be the folder you supplied when creating the emulator. If not, it is the
+folder containing the output/ and analysis/ directories (if using the b3d/RHIC
+file framework.) This folder should contain a subdirectory entitled mcmc,
+which is where the trace information and mcmc output will be stored. The
+folder should contain a directory named parameters, in which the initial
+parameters (theta0.param) and the MCMC parameter map (mcmc.param) must be
+stored, as well as any optional parameter map information (prior.param,
+likelihood.param, proposal.param, actual.param, etc.) should be stored.
+Finally, the mcmc directory can contain another ranges.dat file, useful for
+defining the limits on parameter space of any parameters used in MCMC sampling
+that aren't used in model functions.
+
+Example:
+
+./mcmc ~/Research/model/model_run/
+
+would run the MCMC sampler using an emulator generated from data in the
+~/Research/model/model_run/ directory.

@@ -49,10 +49,16 @@ lib/libmcmc.a: ${addprefix include/, ${MCMC_HFILES}} ${addprefix build/mcmc/, ${
 	ar -ru lib/libmcmc.a ${addprefix build/mcmc/, ${MCMC_OFILES}};
 	
 
-include/%.h: src/%.h
+include/%.h: src/Headers/%.h
 	cp -f $< $@
 
-build/mcmc/%.o: src/%.cc
+build/mcmc/likelihood.o: src/${MCMC_PROJECT}/likelihood.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
+	
+build/mcmc/prior.o: src/${MCMC_PROJECT}/prior.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
+	
+build/mcmc/%.o: src/Common_Files/%.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
 clean:
@@ -71,5 +77,5 @@ uninstall:
 run: mcmcrun.cc
 	${CPP} ${OPT} ${INC} -o mcmc $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}
 	
-test: lognormaltest.cc
-	${CPP} ${OPT} ${INC} -o logntest $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}
+test: emulatortest.cc
+	${CPP} ${OPT} ${INC} -o emutest $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}
