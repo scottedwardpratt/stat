@@ -9,6 +9,7 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 	fstream ranges;
 	string type, param_name;
 	int count = 0;
+	bool Ranges = false;
 	SepMap = parameter::getB(mcmc->parmap, "PROPOSAL_PARAMETER_MAP", false);
 	
 	if(SepMap){
@@ -32,6 +33,7 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 	
 	ranges.open(filename.c_str(), fstream::in);
 	if(ranges){
+		Ranges = true;
 		while(ranges >> type){
 			if(strcmp(type.c_str(), "double") == 0){
 				ranges >> param_name;
@@ -62,13 +64,14 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 		}
 		ranges.close();
 	}else{
-		cout << "Unable to open ranges.dat" << endl;
-		exit(1);
+		cout << "Warning: Unable to open ranges.dat in model directory." << endl;
+		// exit(1);
 	}
 	
 	string emulator_ranges = mcmc->dir_name + "/mcmc/ranges.dat";
 	ranges.open(emulator_ranges.c_str(), fstream::in);
 	if(ranges){
+		Ranges = true;
 		while(ranges >> type){
 			if(strcmp(type.c_str(), "double") == 0){
 				ranges >> param_name;
@@ -100,10 +103,16 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 		ranges.close();
 	}
 	else{
-		cout << "Unable to open /mcmc/ranges.dat" << endl;
-		cout << "Filepath: " << emulator_ranges << endl;
-		exit(1);
+		cout << "Warning:Unable to open /mcmc/ranges.dat" << endl;
+		// cout << "Filepath: " << emulator_ranges << endl;
+		// exit(1);
 	}
+	
+	if(!Ranges){
+		cout << "Unable to find any ranges.dat file." << endl;
+		exit(-1);
+	}
+	
 	
 	
 	gsl_rng * r;

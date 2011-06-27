@@ -10,5 +10,5 @@ MADAI_INSTALLDIR = /Users/kevinnovak/local
 #location of where you want things installed
 MADAI_CFLAGS =
 #compiler optimization flags, usually -O3 for linux, -fast for OSX
-MCMC_PROJECT=RHIC
+MCMC_PROJECT=Cosmosurvey
 #Project configuration you want to make. The likelihood and prior source code should be in CC_Code/src/$MCMC_PROJECT/
