@@ -25,17 +25,12 @@ LikelihoodDistribution::LikelihoodDistribution(MCMCConfiguration *mcmc_in):Distr
 	
 	// cout << "params declared." << endl;
 	if(UseEmulator){
+		cout << "Turn off USE_EMULATOR" << endl;
+		exit(-1);
 		emulator = new EmulatorHandler(parmap, mcmc_in);
-	}
-	else{
-		exit(1);
 	}
 
 	DATA = GetData();
-	
-	//testing the outputs of the emulator at various points	// 
-		emulator_test.open("PCA0.dat");
-		emulator_test.close();
 	
 }
 
@@ -47,75 +42,40 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	clock_t begintime;
 	vector<double> ModelMeans;
 	vector<double> ModelErrors;
-	double likelihood;
+	double likelihood = 0.0;
+	stringstream ss;
+	ifstream inputfile;
 	
 	if(TIMING){
 		begintime = clock();
 	}
-
-	if(UseEmulator){
-		emulator->QueryEmulator(Theta, ModelMeans, ModelErrors); //fills vectors with emulator output
-	}
-	else{
-		//determine another way to fill the vectors
-	}
 	
-	//Initialize GSL containers
-	int N = ModelErrors.size();
-	gsl_matrix * sigma = gsl_matrix_calloc(N,N);
-	gsl_vector * model = gsl_vector_alloc(N);
-	gsl_vector * mu = gsl_vector_alloc(N);
-	// cout << "Done allocating gsl containers." << endl;
-
-	
-	//Read in appropriate elements
-	for(int i = 0; i<N; i++){
-		// gsl_matrix_set(sigma, i,i,Theta.GetValue("SIGMA"));
-		gsl_matrix_set(sigma,i,i,ModelErrors[i]);
-		gsl_vector_set(model, i,ModelMeans[i]);
-		gsl_vector_set(mu, i, DATA[i]);
+	for(int i = 0; i < Theta.Values.size(); i++){
+		cout << "Comparing " << Theta.Values[i] << " against " << DATA[i] << endl;
+		double templike = log(gsl_ran_gaussian_pdf(Theta.Values[i]-DATA[i], .1));
+		cout << "Likelihood: " << templike << endl;
+		likelihood += templike;
 	}
-	
-	likelihood = Log_MVNormal(*model, *mu, *sigma);
 	
 	if(!(mcmc->LOGLIKE)){
+		cout << "Exponentiating." << endl;
 		likelihood = exp(likelihood);
 	}
-	
-	if(VERBOSE){
-		double sum = 0.0;
-
-		for(int i = 0; i< N; i++){
-			sum += (gsl_vector_get(model, i) - gsl_vector_get(mu, i));
-		}
-		sum = sum/(double)N;
-		cout << "Average difference between outputs:" << sum << endl;
-	}
-
-	//deallocate GSL containers.
-	gsl_vector_free(model);
-	gsl_vector_free(mu);
-	gsl_matrix_free(sigma);
 	
 	if(TIMING){
 		cout << "Likelihood evaluation took " << (clock()-begintime)*1000/CLOCKS_PER_SEC << " ms." << endl;
 	}
 	
-	cout << "PCA 0: " << ModelMeans[0] << endl;
-	
-	emulator_test.open("PCA0.dat", ios_base::app);
-	emulator_test << ModelMeans[0] << endl;
-	emulator_test.close();
-	// emulator_test << ModelMeans[0] << endl;
+	cout << "Likelihood: " << likelihood << endl;
 	
 	return likelihood;
 }
 
 vector<double> LikelihoodDistribution::GetData(){
 	vector<double> datameans;
-	vector<double> dataerror;
-	
+	stringstream ss;
 	parameterMap actualparmap;
+	ifstream inputfile;
 	
 	string actual_filename = mcmc->parameterfile + "/actual.param";
 	parameter::ReadParsFromFile(actualparmap, actual_filename);
@@ -123,10 +83,6 @@ vector<double> LikelihoodDistribution::GetData(){
 	vector<string> temp_names = parameter::getVS(actualparmap, "NAMES", "");
 	vector<double> temp_values = parameter::getV(actualparmap, "VALUES", "");
 	
-	ParameterSet ActualParams;
-	ActualParams.Initialize(temp_names, temp_values);
-	
-	emulator->QueryEmulator(ActualParams, datameans, dataerror);
-	return datameans;
+	return temp_values;
 }
 #endif

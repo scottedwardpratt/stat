@@ -52,9 +52,11 @@ lib/libmcmc.a: ${addprefix include/, ${MCMC_HFILES}} ${addprefix build/mcmc/, ${
 include/%.h: src/Headers/%.h
 	cp -f $< $@
 
+.PHONY:build/mcmc/likelihood.o
 build/mcmc/likelihood.o: src/${MCMC_PROJECT}/likelihood.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
+.PHONY:build/mcmc/prior.o
 build/mcmc/prior.o: src/${MCMC_PROJECT}/prior.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	

@@ -45,6 +45,7 @@ public:
 	double Evaluate(ParameterSet Theta);
 private:
 	bool SymmetricProposal;
+	bool Rescaled_Method;
 	vector<double> MixingStdDev;
 	double *Min_Ranges;
 	double *Max_Ranges;

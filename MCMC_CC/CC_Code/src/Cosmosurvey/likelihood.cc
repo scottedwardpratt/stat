@@ -105,7 +105,7 @@ vector<double> LikelihoodDistribution::GetData(){
 	for(int i = 0; i < temp_names.size(); i++){
 		ss << " -" << temp_names[i] << " " << temp_values[i];
 	}
-	ss << " -nz 10 -nl 10 -ob .0406 > output.dat" << endl;
+	ss << " -nz 10 -nl 10 -ob .0406 > data_output.dat" << endl;
 	
 	cout << ss.str() << endl;
 	cout << "Waiting on cosmosurvey...";
@@ -113,11 +113,14 @@ vector<double> LikelihoodDistribution::GetData(){
 	int result = system((ss.str()).c_str());
 	cout << "Done." << endl;
 	
-	inputfile.open("output.dat");
+	inputfile.open("data_output.dat");
 	
+	int counter = 0;
 	while(!inputfile.eof()){
+		counter++;
 		double temp;
 		inputfile >> temp;
+		cout << "Data point " << counter << ": " << temp << endl;
 		datameans.push_back(temp);
 	}
 	return datameans;

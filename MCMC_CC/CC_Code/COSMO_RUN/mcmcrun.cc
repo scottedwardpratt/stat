@@ -13,6 +13,7 @@ int main(int argc, char *argv[]){
 	vector<string> Names = mcmcdefault->ParamNames;
 	MCMCRun *run;
 	ifstream input;
+	// ParameterSet * Theta0 = new ParameterSet();
 	vector<double> Ratios;
 	double ratio;
 			

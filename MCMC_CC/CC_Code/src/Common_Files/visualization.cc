@@ -113,6 +113,8 @@ void VizHandler::UpdateTraceFig(){
 void VizHandler::FinalTrace(){
 	stringstream ss;
 	
+	fprintf(gnuplotpipe,"%s\n","set datafile separator ','");
+	fflush(gnuplotpipe);
 	ss << "plot '"<< mcmc->tracedir << "/trace.dat' using 1:2 w " << gnuplotstyle << " t '" << mcmc->ThetaList->ParamNames[0] << "', ";
 	for(int i = 1; i < mcmc->ThetaList->ParamNames.size(); i++){
 		ss<< "'' u 1:"<< i+2 <<" w "<< gnuplotstyle << " t '"<< mcmc->ThetaList->ParamNames[i];

@@ -32,19 +32,6 @@ double Distribution::Log_MVNormal(gsl_vector x, gsl_vector mu, gsl_matrix sigma)
 	gsl_matrix_memcpy(tempsigma, &sigma);
 	gsl_vector_sub(diff, &mu);
 	
-	//playing around
-	// for(int i = 0; i < N; i++){
-	// 	double sigmaval = gsl_matrix_get(&sigma, i,i);
-	// 	double tempdiff = gsl_vector_get(diff,i);
-	// 	// if(abs(tempdiff)/3.0 > sigmaval){
-	// 	// 			cout << "Warning: Residual of parameter " << i << " is larger than 3 sigma." << endl;
-	// 	// 			cout << "Residual: "<< tempdiff << " Sigma: " << sigmaval << endl;
-	// 	// 		}
-	// 	// 		else{
-	// 	// 			cout << "Parameter: " << i << " Residual: " << tempdiff << " Sigma: " << sigmaval << endl;
-	// 	// 		}
-	// }
-	
 	//invert matrix using LU decomposition
 	gsl_linalg_LU_decomp(tempsigma, p, &foobar);
 	gsl_linalg_LU_invert(tempsigma, p, sigma_inv);

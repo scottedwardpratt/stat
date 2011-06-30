@@ -214,6 +214,12 @@ double MCMCRun::Run(){
 		Prior_New = mcmcconfig->Prior->Evaluate(Temp_Theta);
 		Proposal_New = mcmcconfig->Proposal->Evaluate(Temp_Theta);
 		
+		// cout << "Likelihood of proposed set: " << Likelihood_New << endl;
+		// cout << "Likelihood of current set: " << Likelihood_Current << endl;
+		// cout << "Prior of proposed set: " << Prior_New << endl;
+		// cout << "Prior of current set: " << Prior_Current << endl;
+		// cout << "Proposal of proposed set: " << Proposal_New;
+		// cout << "Proposal of current set: " << Proposal_Current;
 
 		if(mcmcconfig->LOGLIKE){
 			LOGBF += (Likelihood_New-Likelihood_Current);

@@ -10,6 +10,11 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 	string type, param_name;
 	int count = 0;
 	bool Ranges = false;
+	int numparams = mcmc->ParamNames.size();
+	Min_Ranges=new double[numparams];
+	Max_Ranges=new double[numparams];
+	vector<double> temp (numparams, .01);
+	
 	SepMap = parameter::getB(mcmc->parmap, "PROPOSAL_PARAMETER_MAP", false);
 	
 	if(SepMap){
@@ -20,18 +25,14 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 		parmap = &(mcmc->parmap);
 	}
 	
-	int numparams = mcmc->ParamNames.size();
-	
-	vector<double> temp (numparams, .01);
+	Rescaled_Method = parameter::getB(*parmap, "RESCALED_PROPOSAL", true);
 	MixingStdDev = parameter::getV(*parmap, "MIXING_STD_DEV", "0");
-	Min_Ranges=new double[numparams];
-	Max_Ranges=new double[numparams];
 	SymmetricProposal = parameter::getB(*parmap, "SYMMETRIC_PROPOSAL", true);
 	
 	//Determine the acceptable ranges of the parameters
 	string filename = mcmc->dir_name + "/ranges.dat";
-	
 	ranges.open(filename.c_str(), fstream::in);
+	
 	if(ranges){
 		Ranges = true;
 		while(ranges >> type){
@@ -104,8 +105,6 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 	}
 	else{
 		cout << "Warning:Unable to open /mcmc/ranges.dat" << endl;
-		// cout << "Filepath: " << emulator_ranges << endl;
-		// exit(1);
 	}
 	
 	if(!Ranges){
@@ -121,6 +120,7 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 	rngtype = gsl_rng_default;
 	gsl_rng_env_setup();
 	randy = gsl_rng_alloc(rngtype);
+	gsl_rng_set(randy, time(NULL));
 	
 	if(count != numparams){
 		cout << "Error: number of parameters in ranges data and total number of parameters are different." << endl;
@@ -157,24 +157,35 @@ int ProposalDistribution::FindParam(string name){
 ParameterSet ProposalDistribution::Iterate(ParameterSet current){
 	ParameterSet proposed = current;
 	
-	if(proposed.Values.size() != proposed.Names.size() || proposed.Values.size() != MixingStdDev.size()){
-		cout << "Error: Parameter names/values aren't same size, or no mixing standard deviation for a parameter." << endl;
+	if(!Rescaled_Method){
+		if(proposed.Values.size() != proposed.Names.size() || proposed.Values.size() != MixingStdDev.size()){
+			cout << "Error: Parameter names/values aren't same size, or no mixing standard deviation for a parameter." << endl;
+		}
+
+		for(int i=0; i<proposed.Values.size(); i++){
+			do{
+				proposed.Values[i] = current.Values[i];
+				if(i == proposed.Names.size() || i == MixingStdDev.size()){
+					cout << "Error: iterating over non-existant parameter name or standard deviation." << endl;
+					cout << "(Seg-Fault catch)" << endl;
+					exit(-1);
+				}
+				proposed.Values[i] = proposed.Values[i] + gsl_ran_gaussian(randy, MixingStdDev[i]);
+			}while((proposed.Values[i] < Min_Ranges[i]) || (proposed.Values[i]>Max_Ranges[i]));
+		}
 	}
-	for(int i=0; i<proposed.Values.size(); i++){
-		do{
-			proposed.Values[i] = current.Values[i];
-			if(i == proposed.Names.size() || i == MixingStdDev.size()){
-				cout << "Error: iterating over non-existant parameter name or standard deviation." << endl;
-				cout << "(Seg-Fault catch)" << endl;
-				exit(-1);
-			}
-			proposed.Values[i] = proposed.Values[i] + gsl_ran_gaussian(randy, MixingStdDev[i]);
-		}while((proposed.Values[i] < Min_Ranges[i]) || (proposed.Values[i]>Max_Ranges[i]));
+	else{
+		for(int i=0; i<proposed.Values.size(); i++){
+			do{
+				proposed.Values[i] = current.Values[i];
+				proposed.Values[i] = (proposed.Values[i] - Min_Ranges[i])/(Max_Ranges[i]-Min_Ranges[i]); //scale to between 0 and 1
+				
+				proposed.Values[i] = proposed.Values[i] + gsl_ran_gaussian(randy, MixingStdDev[0]/sqrt((double)proposed.Names.size()));
+			}while((proposed.Values[i] < 0.0) || proposed.Values[i] > 1.0);
+			
+			proposed.Values[i] = (proposed.Values[i]*(Max_Ranges[i]-Min_Ranges[i]))+Min_Ranges[i];
+		}
 	}
-	
-	// for(int i = 0; i< proposed.Names.size(); i++){
-	// 	cout << "Iterated " << proposed.Names[i] << " from " << current.Values[i] << " to " << proposed.Values[i] << endl;
-	// }
 	
 	return proposed;
 }
