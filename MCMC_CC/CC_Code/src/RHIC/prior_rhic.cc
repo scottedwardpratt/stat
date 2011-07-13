@@ -5,7 +5,8 @@
 
 using namespace std;
 
-PriorDistribution::PriorDistribution(MCMCConfiguration * mcmc_in):Distribution(mcmc_in){
+PriorDistribution_RHIC::PriorDistribution_RHIC(MCMCConfiguration * mcmc_in){
+	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "PRIOR_PARAMETER_MAP", false);
 	
 	if(SepMap){
@@ -18,11 +19,9 @@ PriorDistribution::PriorDistribution(MCMCConfiguration * mcmc_in):Distribution(m
 	}
 }
 
-double PriorDistribution::Evaluate(ParameterSet Theta){
+double PriorDistribution_RHIC::Evaluate(ParameterSet Theta){
 	double mean = parameter::getD(*parmap, "PRIOR_MEAN", -3.7372);
 	double sigma = parameter::getD(*parmap, "PRIOR_SIGMA", 1.6845);
-	
-	
 	return Normal(log(Theta.GetValue("SIGMA")), mean, sigma);
 }
 #endif

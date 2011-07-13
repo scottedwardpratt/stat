@@ -6,7 +6,8 @@
 
 using namespace std;
 
-LikelihoodDistribution::LikelihoodDistribution(MCMCConfiguration *mcmc_in):Distribution(mcmc_in){
+LikelihoodDistribution_Cosmo::LikelihoodDistribution_Cosmo(MCMCConfiguration *mcmc_in){
+	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "LIKELIHOOD_PARAMETER_MAP", false);
 	
 	if(SepMap){
@@ -34,11 +35,11 @@ LikelihoodDistribution::LikelihoodDistribution(MCMCConfiguration *mcmc_in):Distr
 	
 }
 
-LikelihoodDistribution::~LikelihoodDistribution(){
+LikelihoodDistribution_Cosmo::~LikelihoodDistribution_Cosmo(){
 	delete emulator;
 }
 
-double LikelihoodDistribution::Evaluate(ParameterSet Theta){
+double LikelihoodDistribution_Cosmo::Evaluate(ParameterSet Theta){
 	clock_t begintime;
 	vector<double> ModelMeans;
 	vector<double> ModelErrors;
@@ -74,6 +75,7 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	for(int i = 1; i < ModelMeans.size(); i++){
 		likelihood += log(gsl_ran_poisson_pdf(static_cast<unsigned int>(ModelMeans[i] + 0.5), DATA[i]));
 	}
+	printf("LogLikelihood=%g\b",likelihood);
 	
 	if(!(mcmc->LOGLIKE)){
 		likelihood = exp(likelihood);
@@ -86,7 +88,7 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	return likelihood;
 }
 
-vector<double> LikelihoodDistribution::GetData(){
+vector<double> LikelihoodDistribution_Cosmo::GetData(){
 	vector<double> datameans;
 	stringstream ss;
 	parameterMap actualparmap;

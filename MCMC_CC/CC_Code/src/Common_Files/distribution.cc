@@ -5,8 +5,23 @@
 
 using namespace std;
 
-Distribution::Distribution(MCMCConfiguration *mcmc_in){
-	mcmc = mcmc_in;
+Distribution::Distribution(){
+}
+PriorDistribution::PriorDistribution(){
+}
+LikelihoodDistribution::LikelihoodDistribution(){
+}
+Distribution::~Distribution(){
+}
+PriorDistribution::~PriorDistribution(){
+}
+LikelihoodDistribution::~LikelihoodDistribution(){
+}
+double LikelihoodDistribution::Evaluate(ParameterSet Theta){
+}
+vector<double> LikelihoodDistribution::GetData(){
+}
+double PriorDistribution::Evaluate(ParameterSet Theta){
 }
 
 double Distribution::Normal(double x, double mu, double sigma){

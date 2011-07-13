@@ -5,7 +5,8 @@
 
 using namespace std;
 
-ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distribution(mcmc_in){
+ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
+	mcmc=mcmc_in;
 	fstream ranges;
 	string type, param_name;
 	int count = 0;
@@ -30,7 +31,7 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 	SymmetricProposal = parameter::getB(*parmap, "SYMMETRIC_PROPOSAL", true);
 	
 	//Determine the acceptable ranges of the parameters
-	string filename = mcmc->dir_name + "/ranges.dat";
+	string filename = mcmc->dir_name + "/mcmc/ranges.dat";
 	ranges.open(filename.c_str(), fstream::in);
 	
 	if(ranges){
@@ -68,7 +69,13 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 		cout << "Warning: Unable to open ranges.dat in model directory." << endl;
 		// exit(1);
 	}
+	if(count != numparams){
+		cout << "Error: number of parameters in ranges data and total number of parameters are different." << endl;
+		cout << "Count: " << count << " NumParams: " << numparams << endl;
+		exit(1);
+	}
 	
+	count=0;
 	string emulator_ranges = mcmc->dir_name + "/mcmc/ranges.dat";
 	ranges.open(emulator_ranges.c_str(), fstream::in);
 	if(ranges){
@@ -111,7 +118,12 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 		cout << "Unable to find any ranges.dat file." << endl;
 		exit(-1);
 	}
-	
+	if(count != numparams){
+		cout << "Error: number of parameters in ranges data and total number of parameters are different." << endl;
+		cout << "Count: " << count << " NumParams: " << numparams << endl;
+		exit(1);
+	}
+
 	
 	
 	gsl_rng * r;
@@ -121,12 +133,7 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in): Distrib
 	gsl_rng_env_setup();
 	randy = gsl_rng_alloc(rngtype);
 	gsl_rng_set(randy, time(NULL));
-	
-	if(count != numparams){
-		cout << "Error: number of parameters in ranges data and total number of parameters are different." << endl;
-		cout << "Count: " << count << " NumParams: " << numparams << endl;
-		exit(1);
-	}
+
 	
 }
 
@@ -192,6 +199,7 @@ ParameterSet ProposalDistribution::Iterate(ParameterSet current){
 
 double ProposalDistribution::Evaluate(ParameterSet Theta){
 	double probability = 0.01;
+	printf("ProposalDistribution::Evaluate check a\n");
 	
 	if(SymmetricProposal){
 		probability = 1.0;

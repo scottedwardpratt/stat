@@ -35,9 +35,20 @@ MCMCConfiguration::MCMCConfiguration(string run_file){
 	}
 	
 	randnum = new CRandom(1234);
-	Likelihood = new LikelihoodDistribution(this);
 	Proposal = new ProposalDistribution(this);
-	Prior = new PriorDistribution(this);
+	
+	if(parameter::getS(parmap,"MODEL","NOMODEL")=="CosmoSurvey"){
+		Likelihood = new LikelihoodDistribution_Cosmo(this);
+		Prior = new PriorDistribution_Cosmo(this);
+	}
+	/* else if(parameter::getS(parmap,"MODEL","NOMODEL")=="RHIC"){
+	 Likelihood = new LikelihoodDistribution_RHIC(this);
+	 Prior = new PriorDistribution_RHIC(this);
+	 } */
+	else{
+		printf("Must define parameter MODEL in parameter file, or yours is unrecognized\n");
+		exit(1);
+	}
 }
 
 MCMCConfiguration::MCMCConfiguration(string run_file, string configuration){
@@ -55,6 +66,8 @@ MCMCConfiguration::MCMCConfiguration(string run_file, string configuration){
 	
 	EmulatorParams = parameter::getS(parmap, "EMULATOR_PARAMETERS", "");
 	ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "");
+	for(int i=0;i<ParamNames.size();i++) printf("%s ",ParamNames[i].c_str());
+	printf("\n");
 	vector<string> temp_logparam = parameter::getVS(parmap, "LOG_PARAMETERS", "");
 	
 	
@@ -71,12 +84,26 @@ MCMCConfiguration::MCMCConfiguration(string run_file, string configuration){
 	
 	// cout << "stuff done." << endl;
 	randnum = new CRandom(1234);
-	Likelihood = new LikelihoodDistribution(this);
-	// cout << "Like done." << endl;
+	if(parameter::getS(parmap,"MODEL","NOMODEL")=="CosmoSurvey"){
+		Likelihood = new LikelihoodDistribution_Cosmo(this);
+		Prior = new PriorDistribution_Cosmo(this);
+	}
+	/* else if(parameter::getS(parmap,"MODEL","CosmoSurvey")=="RHIC"){
+	 Likelihood = new LikelihoodDistribution_RHIC(this);
+	 Prior = new PriorDistribution_RHIC(this);
+	 } */
+	else{
+		printf("Must define parameter MODEL in parameter file, or yours is unrecognized\n");
+		exit(1);
+	}
+	/*Likelihood = new LikelihoodDistribution(this);
+	 cout << "Like done." << endl; */
+	/*Prior = new PriorDistribution();
+	 cout << "Prior done." << endl;*/
+	
 	Proposal = new ProposalDistribution(this);
-	// cout << "Proposal done." << endl;
-	Prior = new PriorDistribution(this);
-	// cout << "Prior done." << endl;
+	cout << "Proposal done." << endl;
+	
 }
 
 MCMCConfiguration::~MCMCConfiguration(){
@@ -84,6 +111,7 @@ MCMCConfiguration::~MCMCConfiguration(){
 }
 
 MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
+	printf("check a, configuring MCMCrun\n");
 	mcmcconfig = mcmc_config;
 	local_parmap = mcmcconfig->parmap;
 	tracedir = mcmcconfig->dir_name + "/mcmc/trace/" + mcmcconfig->configname;
@@ -92,6 +120,7 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 	WRITEOUT = parameter::getI(local_parmap, "WRITEOUT", 100);
 	VIZTRACE = parameter::getB(local_parmap, "VISUALIZE_TRACE", true);
 	APPEND_TRACE = parameter::getB(local_parmap, "APPEND_TRACE", false);
+	printf("check b, configuring MCMCrun\n");
 	
 	ThetaList = new ParameterSetList(this);
 	
@@ -100,6 +129,7 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 		Viz_Count = parameter::getI(local_parmap, "VIZ_COUNT", floor(MAXITERATIONS/200));
 		Visualizer->UpdateTraceFig();
 	}
+	printf("check c, configuring MCMCrun\n");
 	
 	if(APPEND_TRACE){
 		string addon = "";
@@ -186,9 +216,10 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
 }
 
 MCMCRun::~MCMCRun(){
-
+	
 }
 
+/** This runs MAXITERATIONS samplings */
 double MCMCRun::Run(){
 	double Likelihood_Current,Likelihood_New;
 	double Prior_Current, Prior_New;
@@ -220,7 +251,7 @@ double MCMCRun::Run(){
 		// cout << "Prior of current set: " << Prior_Current << endl;
 		// cout << "Proposal of proposed set: " << Proposal_New;
 		// cout << "Proposal of current set: " << Proposal_Current;
-
+		
 		if(mcmcconfig->LOGLIKE){
 			LOGBF += (Likelihood_New-Likelihood_Current);
 		}
@@ -281,4 +312,5 @@ double MCMCRun::Run(){
 	
 	return ratio;
 }
+
 #endif

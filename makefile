@@ -1,6 +1,6 @@
 # enter make, make parmaker, make install, make clean, make uninstall
 # local executables can be made with make runHydro or make multiEos
-include ../rhic/makefile_defs.mk
+include ../makefile_defs.mk
 ### the variables below are set by the include statement above
 CPP=${MADAI_CPP}
 OPT=${MADAI_CFLAGS}

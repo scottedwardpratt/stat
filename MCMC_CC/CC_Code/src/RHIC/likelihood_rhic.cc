@@ -6,7 +6,8 @@
 
 using namespace std;
 
-LikelihoodDistribution::LikelihoodDistribution(MCMCConfiguration *mcmc_in):Distribution(mcmc_in){
+LikelihoodDistribution_RHIC::LikelihoodDistribution_RHIC(MCMCConfiguration *mcmc_in){
+	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "LIKELIHOOD_PARAMETER_MAP", false);
 	
 	if(SepMap){
@@ -16,7 +17,7 @@ LikelihoodDistribution::LikelihoodDistribution(MCMCConfiguration *mcmc_in):Distr
 	}else{
 		parmap = &(mcmc->parmap);
 	}
-	
+
 	// cout << "Like param map made." << endl;
 	
 	UseEmulator = parameter::getB(*parmap, "USE_EMULATOR", false);
@@ -30,20 +31,20 @@ LikelihoodDistribution::LikelihoodDistribution(MCMCConfiguration *mcmc_in):Distr
 	else{
 		exit(1);
 	}
-
+	
 	DATA = GetData();
 	
 	//testing the outputs of the emulator at various points	// 
-		emulator_test.open("PCA0.dat");
-		emulator_test.close();
+	emulator_test.open("PCA0.dat");
+	emulator_test.close();
 	
 }
 
-LikelihoodDistribution::~LikelihoodDistribution(){
+LikelihoodDistribution_RHIC::~LikelihoodDistribution_RHIC(){
 	delete emulator;
 }
 
-double LikelihoodDistribution::Evaluate(ParameterSet Theta){
+double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	clock_t begintime;
 	vector<double> ModelMeans;
 	vector<double> ModelErrors;
@@ -52,7 +53,7 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	if(TIMING){
 		begintime = clock();
 	}
-
+	
 	if(UseEmulator){
 		emulator->QueryEmulator(Theta, ModelMeans, ModelErrors); //fills vectors with emulator output
 	}
@@ -66,7 +67,7 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	gsl_vector * model = gsl_vector_alloc(N);
 	gsl_vector * mu = gsl_vector_alloc(N);
 	// cout << "Done allocating gsl containers." << endl;
-
+	
 	
 	//Read in appropriate elements
 	for(int i = 0; i<N; i++){
@@ -84,14 +85,14 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	
 	if(VERBOSE){
 		double sum = 0.0;
-
+		
 		for(int i = 0; i< N; i++){
 			sum += (gsl_vector_get(model, i) - gsl_vector_get(mu, i));
 		}
 		sum = sum/(double)N;
 		cout << "Average difference between outputs:" << sum << endl;
 	}
-
+	
 	//deallocate GSL containers.
 	gsl_vector_free(model);
 	gsl_vector_free(mu);
@@ -111,7 +112,7 @@ double LikelihoodDistribution::Evaluate(ParameterSet Theta){
 	return likelihood;
 }
 
-vector<double> LikelihoodDistribution::GetData(){
+vector<double> LikelihoodDistribution_RHIC::GetData(){
 	vector<double> datameans;
 	vector<double> dataerror;
 	

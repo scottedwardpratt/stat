@@ -20,10 +20,10 @@ class ParameterSet;
 
 class Distribution{
 public:
-	Distribution(MCMCConfiguration *mcmc_in);
 	Distribution();
+	virtual ~Distribution();
 
-protected:
+	//protected:
 	MCMCConfiguration * mcmc;
 	bool SepMap;
 	bool TIMING;
@@ -38,12 +38,14 @@ protected:
 	double LogNormal(double x, double mu, double sigma);
 };
 
-class ProposalDistribution:private Distribution {
+/** ---------------------------------------- */
+
+class ProposalDistribution:public Distribution {
 public:
 	ProposalDistribution(MCMCConfiguration *mcmc_in);
 	ParameterSet Iterate(ParameterSet current);
-	double Evaluate(ParameterSet Theta);
-private:
+	virtual double Evaluate(ParameterSet Theta);
+	//protected:
 	bool SymmetricProposal;
 	bool Rescaled_Method;
 	vector<double> MixingStdDev;
@@ -53,22 +55,64 @@ private:
 	int FindParam(string param_name);
 };
 
-class PriorDistribution:private Distribution {
+class LikelihoodDistribution:public Distribution{
 public:
-	PriorDistribution(MCMCConfiguration *mcmc_in);
+	LikelihoodDistribution();
+	virtual ~LikelihoodDistribution();
+	virtual double Evaluate(ParameterSet Theta);
+	//protected:
+	virtual vector<double> GetData();
+	vector<double> DATA;
+	bool UseEmulator;
+	ofstream emulator_test;
+	EmulatorHandler * emulator;
+};
+
+class PriorDistribution:public Distribution {
+public:
+	PriorDistribution();
+	virtual ~PriorDistribution();
+	virtual double Evaluate(ParameterSet Theta);
+};
+
+/** ---------------------------------------- */
+
+class PriorDistribution_RHIC:public PriorDistribution{
+public:
+	PriorDistribution_RHIC(MCMCConfiguration *mcmc_in);
 	double Evaluate(ParameterSet Theta);
 };
 
-class LikelihoodDistribution:private Distribution {
+class PriorDistribution_Cosmo:public PriorDistribution {
 public:
-	LikelihoodDistribution(MCMCConfiguration *mcmc_in);
-	~LikelihoodDistribution();
+	PriorDistribution_Cosmo(MCMCConfiguration *mcmc_in);
 	double Evaluate(ParameterSet Theta);
-private:
+};
+
+class LikelihoodDistribution_RHIC:public LikelihoodDistribution{
+public:
+	LikelihoodDistribution_RHIC(MCMCConfiguration *mcmc_in);
+	~LikelihoodDistribution_RHIC();
+	double Evaluate(ParameterSet Theta);
+	//private:
 	vector<double> GetData();
 	vector<double> DATA;
 	bool UseEmulator;
 	ofstream emulator_test;
 	EmulatorHandler * emulator;
 };
+
+class LikelihoodDistribution_Cosmo:public LikelihoodDistribution {
+public:
+	LikelihoodDistribution_Cosmo(MCMCConfiguration *mcmc_in);
+	~LikelihoodDistribution_Cosmo();
+	double Evaluate(ParameterSet Theta);
+	//private:
+	vector<double> GetData();
+	vector<double> DATA;
+	bool UseEmulator;
+	ofstream emulator_test;
+	EmulatorHandler * emulator;
+};
+
 #endif

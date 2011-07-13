@@ -15,17 +15,19 @@ INC= -I${GSLPATH}/include -I include -I ${INSTALLDIR}/include
 LIBS= -L${GSLPATH}/lib -L${INSTALLDIR}/lib
 
 MCMC_HFILES = mcmc.h\
-parameter.h\
+parameterset.h\
 distribution.h\
 emulator.h\
 visualization.h
 
 MCMC_OFILES = distribution.o\
 emulator.o\
-likelihood.o\
+likelihood_rhic.o\
+likelihood_cosmo.o\
 mcmc.o\
-parameter.o\
-prior.o\
+parameterset.o\
+prior_rhic.o\
+prior_cosmo.o\
 proposal.o\
 visualization.o
 
@@ -47,17 +49,21 @@ mcmcdirs:
 	
 lib/libmcmc.a: ${addprefix include/, ${MCMC_HFILES}} ${addprefix build/mcmc/, ${MCMC_OFILES}}
 	ar -ru lib/libmcmc.a ${addprefix build/mcmc/, ${MCMC_OFILES}};
-	
+
 
 include/%.h: src/Headers/%.h
 	cp -f $< $@
 
-.PHONY:build/mcmc/likelihood.o
-build/mcmc/likelihood.o: src/${MCMC_PROJECT}/likelihood.cc
+build/mcmc/likelihood_rhic.o: src/RHIC/likelihood_rhic.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
+
+build/mcmc/likelihood_cosmo.o: src/Cosmosurvey/likelihood_cosmo.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
-.PHONY:build/mcmc/prior.o
-build/mcmc/prior.o: src/${MCMC_PROJECT}/prior.cc
+build/mcmc/prior_rhic.o: src/RHIC/prior_rhic.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
+
+build/mcmc/prior_cosmo.o: src/Cosmosurvey/prior_cosmo.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
 build/mcmc/%.o: src/Common_Files/%.cc

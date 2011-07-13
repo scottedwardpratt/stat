@@ -6,9 +6,9 @@ MADAI_HDF5_HOME = /opt/local
 #root of HDF5 installation
 MADAI_CPP = /usr/bin/g++
 #compiler
-MADAI_INSTALLDIR = /Users/kevinnovak/local
+MADAI_INSTALLDIR = /Users/scottepratt/local
 #location of where you want things installed
-MADAI_CFLAGS =
+MADAI_CFLAGS = -fast
 #compiler optimization flags, usually -O3 for linux, -fast for OSX
 MCMC_PROJECT=TEST
 #Project configuration you want to make. The likelihood and prior source code should be in CC_Code/src/$MCMC_PROJECT/

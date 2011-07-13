@@ -11,7 +11,16 @@ CPCA::CPCA(int nruns_set){
 	FILE *fptr;
 	nruns=nruns_set;
 	qualifiers.Read("qualifiers.dat");
-	int iy,iqual;
+	int iy,iqual,iname;
+	nnames=0;
+	for(iqual=0;iqual<qualifiers.nqualifiers;iqual++){
+		fptr=fopen("pcanames.dat","r");
+		while(fscanf(fptr,"%s",dummy)){
+			pcaname[nnames]=dummy;
+			nnames+=1;
+		}
+		fclose(fptr);
+	}
 	ny=0;
 	for(iqual=0;iqual<qualifiers.nqualifiers;iqual++){
 		filename="analysis/run1/"+qualifiers.qualifier[iqual]+"/results.dat";
@@ -22,13 +31,16 @@ CPCA::CPCA(int nruns_set){
 			if(!feof(fptr)){
 				if(type[0]!='#'){
 					fscanf(fptr,"%s",dummy);
-					yname[ny]=string(dummy)+"_"+qualifiers.qualifier[iqual];
-					fscanf(fptr,"%lf",&dummyvalue);
-					fscanf(fptr,"%lf",&sigmay[ny]);
-					printf("yname[%d]=%s\n",ny,yname[ny].c_str());
-					ny+=1;
+					if(namecheck(dummy)){
+						yname[ny]=string(dummy)+"_"+qualifiers.qualifier[iqual];
+						fscanf(fptr,"%lf",&dummyvalue);
+						fscanf(fptr,"%lf",&sigmay[ny]);
+						printf("yname[%d]=%s\n",ny,yname[ny].c_str());
+						ny+=1;
+					}
+					else fgets(dummy,100,fptr);
 				}
-				else fgets(dummy,80,fptr);
+				else fgets(dummy,100,fptr);
 			}
 		}while(!feof(fptr));
 		fclose(fptr);
@@ -43,7 +55,7 @@ CPCA::CPCA(int nruns_set){
 
 void CPCA::ReadResults(){
 	FILE *fptr;
-	string filename;
+	string filename,varname;
 	char type[30],dummy[100];
 	double dummysigma;
 	int iy,jy,irun,iqual;
@@ -59,15 +71,19 @@ void CPCA::ReadResults(){
 				if(!feof(fptr)){
 					if(type[0]!='#'){
 						fscanf(fptr,"%s",dummy);
-						fscanf(fptr,"%lf",&value[iy]);
-						fscanf(fptr,"%lf",&dummysigma);
-						ybar[iy]+=value[iy];
-						for(jy=0;jy<=iy;jy++){
-							spread[iy][jy]+=value[iy]*value[jy];
+						varname=dummy;
+						if(namecheck(varname)){
+							fscanf(fptr,"%lf",&value[iy]);
+							fscanf(fptr,"%lf",&dummysigma);
+							ybar[iy]+=value[iy];
+							for(jy=0;jy<=iy;jy++){
+								spread[iy][jy]+=value[iy]*value[jy];
+							}
+							iy+=1;
 						}
-						iy+=1;
+						else fgets(dummy,100,fptr);
 					}
-					else fgets(dummy,80,fptr);
+					else fgets(dummy,100,fptr);
 				}
 			}while(!feof(fptr));
 			fclose(fptr);
@@ -125,6 +141,15 @@ void CPCA::Calc(){
 		printf("respower[%d]=%10.3e, %10.3e, %s\n",iy,respower[iy],spread[iy][iy],yname[iy].c_str());
 	}
 	delete [] respower;
+}
+
+bool CPCA::namecheck(string varname){
+	bool answer=false;
+	int iname=0;
+	while(answer==false && iname<nnames){
+		if(varname==pcaname[iname]) answer=true;
+		iname+=1;
+	}
 }
 
 #endif

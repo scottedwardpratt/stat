@@ -7,7 +7,7 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
-#include "parameter.h"
+#include "parameterset.h"
 #include "distribution.h"
 #include "parametermap.h"
 #include "random.h"
@@ -61,6 +61,8 @@ public:
 	MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0);
 	~MCMCRun();
 	double Run();
+	
+	ParameterSet *BestParameterSet;
 	
 	bool VIZTRACE;
 	int  WRITEOUT;

@@ -34,6 +34,7 @@ class ParameterSet{
 public:
 	vector<string> Names;
 	vector<double> Values;
+	double LogLikelihood;
 	ParameterSetList *paramlist;
 	
 	ParameterSet(ParameterSetList *list);

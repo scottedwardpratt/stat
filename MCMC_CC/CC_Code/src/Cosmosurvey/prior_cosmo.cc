@@ -5,7 +5,8 @@
 
 using namespace std;
 
-PriorDistribution::PriorDistribution(MCMCConfiguration * mcmc_in):Distribution(mcmc_in){
+PriorDistribution_Cosmo::PriorDistribution_Cosmo(MCMCConfiguration * mcmc_in){
+	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "PRIOR_PARAMETER_MAP", false);
 	
 	if(SepMap){
@@ -18,7 +19,7 @@ PriorDistribution::PriorDistribution(MCMCConfiguration * mcmc_in):Distribution(m
 	}
 }
 
-double PriorDistribution::Evaluate(ParameterSet Theta){
+double PriorDistribution_Cosmo::Evaluate(ParameterSet Theta){
 	return 1.0;
 }
 #endif
