@@ -1,6 +1,6 @@
 #ifndef __QUALIFIER_H__
 #define __QUALIFIER_H__
-#include "coral.h"
+#include "coralutils.h"
 using namespace std;
 
 class CQualifiers{

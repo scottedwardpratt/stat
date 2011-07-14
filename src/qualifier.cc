@@ -1,7 +1,6 @@
 #ifndef __QUALIFIER_CC__
 #define __QUALIFIER_CC__
 
-#include "coral.h"
 #include "qualifier.h"
 
 using namespace std;
@@ -37,6 +36,7 @@ void CQualifiers::Read(string qfilename){
 		}
 	}
 	nqualifiers+=1;
+	printf("nqualifiers=%d\n",nqualifiers);
 	fclose(fptr);
 }
 
