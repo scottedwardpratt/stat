@@ -113,6 +113,11 @@ void CPCA::ReadResults(){
 			if(iy!=jy) spread[jy][iy]=spread[iy][jy];
 		}
 	}
+	double spreadtest=0.0;
+	for(iy=0;iy<ny;iy++){
+		for(jy=0;jy<ny;jy++) spreadtest+=spread[iy][jy];
+	}
+	printf("spreadtest=%g\n",spreadtest);
 	/**
 	 printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 for(iy=0;iy<ny;iy++) printf("ybar[%d]=%g, name=%s\n",iy,ybar[iy],yname[iy].c_str());
@@ -169,11 +174,14 @@ void CPCA::Calc(){
 	double sumcheck0=0,sumcheck1=0,sumcheck2=0,normcheck=0;
 	printf("- evec[0] -- evec[1] -- evec[2] ----------\n");
 	for(iy=0;iy<ny;iy++){
-		printf("%3d %10.3e %10.3e %10.3e\n",iy,evec[iy][0],evec[iy][1],evec[iy][2]);
-		sumcheck0+=evec[iy][0]; sumcheck1+=evec[iy][1]; sumcheck2+=evec[iy][2];
+		printf("%3d %10.3e %10.3e %10.3e\n",iy,sigmay[iy]*evec[iy][0],sigmay[iy]*evec[iy][1],sigmay[iy]*evec[iy][2]);
+		sumcheck0+=evec[iy][0]*sigmay[iy]; sumcheck1+=evec[iy][1]*sigmay[iy]; sumcheck2+=evec[iy][2]*sigmay[iy];
 		normcheck+=evec[iy][0]*evec[iy][1];
 	}
 	printf("sumchecks = %g, %g, %g, %g = ?0\n",sumcheck0,sumcheck1,sumcheck2,normcheck);
+	normcheck=0.0;
+	for(iy=0;iy<ny;iy++) normcheck+=evec[iy][0]*evec[iy][0];
+	printf("normalizations=%g = ?1\n",normcheck);
 }
 
 bool CPCA::namecheck(string varname){
