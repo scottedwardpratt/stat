@@ -32,7 +32,10 @@ LikelihoodDistribution_Cosmo::LikelihoodDistribution_Cosmo(MCMCConfiguration *mc
 	}
 
 	DATA = GetData();
-	
+	intDATA.resize(DATA.size());
+	for(int i = 1; i < intDATA.size(); i++){
+		intDATA[i]=gsl_ran_poisson(randy,DATA[i]);
+	}
 }
 
 LikelihoodDistribution_Cosmo::~LikelihoodDistribution_Cosmo(){
@@ -43,7 +46,7 @@ double LikelihoodDistribution_Cosmo::Evaluate(ParameterSet Theta){
 	clock_t begintime;
 	vector<double> ModelMeans;
 	vector<double> ModelErrors;
-	double likelihood = 0.0;
+	double likelihood = 0.0,dll;
 	stringstream ss;
 	ifstream inputfile;
 	
@@ -55,7 +58,7 @@ double LikelihoodDistribution_Cosmo::Evaluate(ParameterSet Theta){
 	for(int i = 0; i < Theta.Names.size(); i++){
 		ss << " -" << Theta.Names[i] << " " << Theta.Values[i];
 	}
-	ss << " -nz 10 -nl 10 -ob .0406 > output.dat" << endl;
+	ss << " -nz 10 -nf 10 -ob .0406 > output.dat" << endl;
 	
 	cout << ss.str() << endl;
 	cout << "Waiting on cosmosurvey...";
@@ -73,9 +76,20 @@ double LikelihoodDistribution_Cosmo::Evaluate(ParameterSet Theta){
 	
 	
 	for(int i = 1; i < ModelMeans.size(); i++){
-		likelihood += log(gsl_ran_poisson_pdf(static_cast<unsigned int>(ModelMeans[i] + 0.5), DATA[i]));
+		dll=log(gsl_ran_poisson_pdf(intDATA[i],ModelMeans[i]));
+			//printf("ModelMeans[%d]=%g, intDATA[%d]=%d, Dloglikelihood=%g\n",i,ModelMeans[i],i,intDATA[i],dll);
+		//likelihood += log(gsl_ran_poisson_pdf(static_cast<unsigned int>(ModelMeans[i] + 0.5), DATA[i]));
+		likelihood += dll;
 	}
-	printf("LogLikelihood=%g\b",likelihood);
+	printf("XXXXX LogLikelihood=%g XXXXXX\b",likelihood);
+	if(likelihood>-0.0001){
+		for(int i = 1; i < ModelMeans.size(); i++){
+			dll=log(gsl_ran_poisson_pdf(intDATA[i],ModelMeans[i]));
+			printf("ModelMeans[%d]=%g, intDATA[%d]=%d, Dloglikelihood=%g\n",i,ModelMeans[i],i,intDATA[i],dll);
+				//likelihood += log(gsl_ran_poisson_pdf(static_cast<unsigned int>(ModelMeans[i] + 0.5), DATA[i]));
+		}
+		exit(1);
+	}
 	
 	if(!(mcmc->LOGLIKE)){
 		likelihood = exp(likelihood);
@@ -107,7 +121,7 @@ vector<double> LikelihoodDistribution_Cosmo::GetData(){
 	for(int i = 0; i < temp_names.size(); i++){
 		ss << " -" << temp_names[i] << " " << temp_values[i];
 	}
-	ss << " -nz 10 -nl 10 -ob .0406 > data_output.dat" << endl;
+	ss << " -nz 10 -nf 10 -ob .0406 > data_output.dat" << endl;
 	
 	cout << ss.str() << endl;
 	cout << "Waiting on cosmosurvey...";

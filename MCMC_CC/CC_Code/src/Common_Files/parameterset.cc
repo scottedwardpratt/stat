@@ -97,19 +97,15 @@ void ParameterSet::VizTrace(){
 
 ParameterSetList::ParameterSetList(MCMCRun *mcmc_in){
 	mcmc = mcmc_in;
-	printf("howdy a\n");
 	Theta = new ParameterSet*[mcmc->WRITEOUT+1];
 	for(int i = 0; i < mcmc->WRITEOUT; i++){
 		Theta[i] = new ParameterSet(this);
 	}
-	printf("howdy b\n");
 	WriteOutCounter = 0;
 	CurrentIteration = 0;
 	HoldOver = new ParameterSet(this);
-	printf("howdy c\n");
 	
 	GetTheta0FromFile();
-	printf("howdy d\n");
 }
 
 ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, ParameterSet Theta0){

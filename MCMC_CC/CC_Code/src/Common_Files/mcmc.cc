@@ -5,10 +5,10 @@
 
 using namespace std;
 
-MCMCConfiguration::MCMCConfiguration(string run_file){
+MCMCConfiguration::MCMCConfiguration(string info_dir){
 	configname = "default";
-	dir_name = run_file;
-	parameterfile = run_file+"/mcmc/parameters/" + configname;
+	dir_name = info_dir;
+	parameterfile = info_dir+"/parameters/" + configname;
 	cout << "In config: " << parameterfile << endl;
 	parameter_file_name = parameterfile + "/mcmc.param";
 	cout << "Reading in " << parameter_file_name << endl;
@@ -51,10 +51,10 @@ MCMCConfiguration::MCMCConfiguration(string run_file){
 	}
 }
 
-MCMCConfiguration::MCMCConfiguration(string run_file, string configuration){
+MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 	configname = configuration;
-	dir_name = run_file;
-	parameterfile = run_file+"/mcmc/parameters/" + configuration;
+	dir_name = info_dir;
+	parameterfile = info_dir+"/parameters/" + configuration;
 	cout << "In config: " << parameterfile << endl;
 	parameter_file_name = parameterfile + "/mcmc.param";
 	cout << "Reading in " << parameter_file_name << endl;
@@ -111,16 +111,14 @@ MCMCConfiguration::~MCMCConfiguration(){
 }
 
 MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
-	printf("check a, configuring MCMCrun\n");
 	mcmcconfig = mcmc_config;
 	local_parmap = mcmcconfig->parmap;
-	tracedir = mcmcconfig->dir_name + "/mcmc/trace/" + mcmcconfig->configname;
+	tracedir = mcmcconfig->dir_name + "/trace/" + mcmcconfig->configname;
 	
 	MAXITERATIONS = parameter::getI(local_parmap, "MAX_ITERATIONS", 500);
 	WRITEOUT = parameter::getI(local_parmap, "WRITEOUT", 100);
 	VIZTRACE = parameter::getB(local_parmap, "VISUALIZE_TRACE", true);
 	APPEND_TRACE = parameter::getB(local_parmap, "APPEND_TRACE", false);
-	printf("check b, configuring MCMCrun\n");
 	
 	ThetaList = new ParameterSetList(this);
 	
@@ -129,7 +127,6 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 		Viz_Count = parameter::getI(local_parmap, "VIZ_COUNT", floor(MAXITERATIONS/200));
 		Visualizer->UpdateTraceFig();
 	}
-	printf("check c, configuring MCMCrun\n");
 	
 	if(APPEND_TRACE){
 		string addon = "";
@@ -167,7 +164,7 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
 	mcmcconfig = mcmc_config;
 	local_parmap = mcmcconfig->parmap;
-	tracedir = mcmcconfig->dir_name + "/mcmc/trace/" + mcmcconfig->configname;
+	tracedir = mcmcconfig->dir_name + "/trace/" + mcmcconfig->configname;
 	
 	MAXITERATIONS = parameter::getI(local_parmap, "MAX_ITERATIONS", 500);
 	WRITEOUT = parameter::getI(local_parmap, "WRITEOUT", 100);
@@ -254,10 +251,12 @@ double MCMCRun::Run(){
 		
 		if(mcmcconfig->LOGLIKE){
 			LOGBF += (Likelihood_New-Likelihood_Current);
+			printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
 		}
 		else{
 			LOGBF +=log(Likelihood_New/Likelihood_Current);
 		}
+		/*
 		if(mcmcconfig->LOGPRIOR){
 			LOGBF += (Prior_New-Prior_Current);
 		}else
@@ -270,9 +269,10 @@ double MCMCRun::Run(){
 		{
 			LOGBF +=log(Proposal_New/Proposal_Current);
 		}
+		 */
 		
 		alpha = min(1.0,exp(LOGBF));
-		printf("%5d\t%.5f\t",i,alpha);
+		printf("%5d\talpha=%6.5f\t",i,alpha);
 		if(alpha > mcmcconfig->randnum->ran()){ //Accept the proposed set.
 			printf("Accept\n");
 			Accept_Count++;

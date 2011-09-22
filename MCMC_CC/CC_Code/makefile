@@ -32,7 +32,7 @@ proposal.o\
 visualization.o
 
 
-SUBDIRS= build/mcmc\
+SUBDIRS= build\
 lib\
 include\
 
@@ -47,26 +47,27 @@ install: lib/libmcmc.a
 mcmcdirs:
 	mkdir -p ${SUBDIRS}
 	
-lib/libmcmc.a: ${addprefix include/, ${MCMC_HFILES}} ${addprefix build/mcmc/, ${MCMC_OFILES}}
-	ar -ru lib/libmcmc.a ${addprefix build/mcmc/, ${MCMC_OFILES}};
+lib/libmcmc.a: ${addprefix include/, ${MCMC_HFILES}} ${addprefix build/, ${MCMC_OFILES}}
+	rm -f lib/libmcmc.a;
+	ar -ru lib/libmcmc.a ${addprefix build/, ${MCMC_OFILES}};
 
 
 include/%.h: src/Headers/%.h
 	cp -f $< $@
 
-build/mcmc/likelihood_rhic.o: src/RHIC/likelihood_rhic.cc
+build/likelihood_rhic.o: src/RHIC/likelihood_rhic.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 
-build/mcmc/likelihood_cosmo.o: src/Cosmosurvey/likelihood_cosmo.cc
+build/likelihood_cosmo.o: src/Cosmosurvey/likelihood_cosmo.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
-build/mcmc/prior_rhic.o: src/RHIC/prior_rhic.cc
+build/prior_rhic.o: src/RHIC/prior_rhic.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 
-build/mcmc/prior_cosmo.o: src/Cosmosurvey/prior_cosmo.cc
+build/prior_cosmo.o: src/Cosmosurvey/prior_cosmo.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
-build/mcmc/%.o: src/Common_Files/%.cc
+build/%.o: src/Common_Files/%.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
 clean:

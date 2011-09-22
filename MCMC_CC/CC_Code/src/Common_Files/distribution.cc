@@ -6,6 +6,12 @@
 using namespace std;
 
 Distribution::Distribution(){
+	const gsl_rng_type * rngtype;
+	rngtype = gsl_rng_default;
+	gsl_rng_env_setup();
+	randy = gsl_rng_alloc(rngtype);
+	gsl_rng_set(randy, time(NULL));
+
 }
 PriorDistribution::PriorDistribution(){
 }

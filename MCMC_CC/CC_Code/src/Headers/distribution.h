@@ -25,6 +25,7 @@ public:
 
 	//protected:
 	MCMCConfiguration * mcmc;
+	gsl_rng * randy;
 	bool SepMap;
 	bool TIMING;
 	bool VERBOSE;
@@ -51,7 +52,6 @@ public:
 	vector<double> MixingStdDev;
 	double *Min_Ranges;
 	double *Max_Ranges;
-	gsl_rng * randy;
 	int FindParam(string param_name);
 };
 
@@ -110,6 +110,7 @@ public:
 	//private:
 	vector<double> GetData();
 	vector<double> DATA;
+	vector<int> intDATA;
 	bool UseEmulator;
 	ofstream emulator_test;
 	EmulatorHandler * emulator;

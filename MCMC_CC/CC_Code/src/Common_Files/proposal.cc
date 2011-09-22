@@ -31,7 +31,7 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
 	SymmetricProposal = parameter::getB(*parmap, "SYMMETRIC_PROPOSAL", true);
 	
 	//Determine the acceptable ranges of the parameters
-	string filename = mcmc->dir_name + "/mcmc/ranges.dat";
+	string filename = mcmc->dir_name + "/ranges.dat";
 	ranges.open(filename.c_str(), fstream::in);
 	
 	if(ranges){
@@ -76,7 +76,7 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
 	}
 	
 	count=0;
-	string emulator_ranges = mcmc->dir_name + "/mcmc/ranges.dat";
+	string emulator_ranges = mcmc->dir_name + "/ranges.dat";
 	ranges.open(emulator_ranges.c_str(), fstream::in);
 	if(ranges){
 		Ranges = true;
@@ -111,7 +111,7 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
 		ranges.close();
 	}
 	else{
-		cout << "Warning:Unable to open /mcmc/ranges.dat" << endl;
+		cout << "Warning:Unable to open /ranges.dat" << endl;
 	}
 	
 	if(!Ranges){
@@ -126,14 +126,15 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
 
 	
 	
-	gsl_rng * r;
+	//gsl_rng * r;
 	
+	/*
 	const gsl_rng_type * rngtype;
 	rngtype = gsl_rng_default;
 	gsl_rng_env_setup();
 	randy = gsl_rng_alloc(rngtype);
 	gsl_rng_set(randy, time(NULL));
-
+*/
 	
 }
 
@@ -177,7 +178,10 @@ ParameterSet ProposalDistribution::Iterate(ParameterSet current){
 					cout << "(Seg-Fault catch)" << endl;
 					exit(-1);
 				}
-				proposed.Values[i] = proposed.Values[i] + gsl_ran_gaussian(randy, MixingStdDev[i]);
+				/* 
+				 added factor of 0.1 below for testing
+				 */
+				proposed.Values[i] = proposed.Values[i] + 0.1*gsl_ran_gaussian(randy, MixingStdDev[i]);
 			}while((proposed.Values[i] < Min_Ranges[i]) || (proposed.Values[i]>Max_Ranges[i]));
 		}
 	}
@@ -199,7 +203,6 @@ ParameterSet ProposalDistribution::Iterate(ParameterSet current){
 
 double ProposalDistribution::Evaluate(ParameterSet Theta){
 	double probability = 0.01;
-	printf("ProposalDistribution::Evaluate check a\n");
 	
 	if(SymmetricProposal){
 		probability = 1.0;

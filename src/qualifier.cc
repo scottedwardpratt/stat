@@ -36,7 +36,6 @@ void CQualifiers::Read(string qfilename){
 		}
 	}
 	nqualifiers+=1;
-	printf("nqualifiers=%d\n",nqualifiers);
 	fclose(fptr);
 }
 
