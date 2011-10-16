@@ -179,9 +179,9 @@ ParameterSet ProposalDistribution::Iterate(ParameterSet current){
 					exit(-1);
 				}
 				/* 
-				 added factor of 0.1 below for testing
+				 added factor of 0.025 below for testing
 				 */
-				proposed.Values[i] = proposed.Values[i] + 0.1*gsl_ran_gaussian(randy, MixingStdDev[i]);
+				proposed.Values[i] = proposed.Values[i] + 0.025*gsl_ran_gaussian(randy, MixingStdDev[i]);
 			}while((proposed.Values[i] < Min_Ranges[i]) || (proposed.Values[i]>Max_Ranges[i]));
 		}
 	}

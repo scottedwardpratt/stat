@@ -239,6 +239,10 @@ double MCMCRun::Run(){
 		LOGBF = 0;
 		ParameterSet Temp_Theta = mcmcconfig->Proposal->Iterate(CurrentParameters);
 		Likelihood_New = mcmcconfig->Likelihood->Evaluate(Temp_Theta);
+		if(i==1){
+			bestlikelihood=Likelihood_New;
+			BestParameterSetPtr=&CurrentParameters;
+		}
 		Prior_New = mcmcconfig->Prior->Evaluate(Temp_Theta);
 		Proposal_New = mcmcconfig->Proposal->Evaluate(Temp_Theta);
 		
@@ -280,6 +284,11 @@ double MCMCRun::Run(){
 			Prior_Current = Prior_New;
 			Proposal_Current = Proposal_New;
 			CurrentParameters = Temp_Theta;
+			if(Likelihood_Current>bestlikelihood && i>1){
+				bestlikelihood=Likelihood_New;
+				BestParameterSetPtr=&CurrentParameters;
+				printf("XXXXXXXXX YIPPEE!! Best parameters so far, likelihood=%g\n",bestlikelihood);
+			}
 		}else{
 			printf("Reject\n");
 		}
@@ -309,6 +318,8 @@ double MCMCRun::Run(){
 	cout << "Accepts: " << Accept_Count << endl;
 	cout << "Iterations: " << MAXITERATIONS << endl;
 	cout << "Acceptance ratio: " << ratio << endl;
+	printf("-------- Best Parameter Set, likelihood=%g -------------\n",bestlikelihood);
+	BestParameterSetPtr->Print();
 	
 	return ratio;
 }

@@ -62,7 +62,8 @@ public:
 	~MCMCRun();
 	double Run();
 	
-	ParameterSet *BestParameterSet;
+	ParameterSet *BestParameterSetPtr;
+	double bestlikelihood;
 	
 	bool VIZTRACE;
 	int  WRITEOUT;
