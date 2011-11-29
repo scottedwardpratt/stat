@@ -1,0 +1,7 @@
+# Galaxy MW3
+# 1st row: Selected bins;
+# 2nd row: Values of the cumulative luminosity function at each selected bin/
+# 3rd row: Errors =  Poisson errors -> Sqrt(N)
+  -1.5500000e+01  -1.1500000e+01  -7.5000000e+00  -3.5000000e+00
+   0               5               21              40
+   0               2.2361          4.5826          6.3246
