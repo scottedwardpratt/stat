@@ -41,10 +41,10 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 		Likelihood = new LikelihoodDistribution_Cosmo(this);
 		Prior = new PriorDistribution_Cosmo(this);
 	}
-	/* else if(parameter::getS(parmap,"MODEL","NOMODEL")=="RHIC"){
+	else if(parameter::getS(parmap,"MODEL","NOMODEL")=="RHIC"){
 	 Likelihood = new LikelihoodDistribution_RHIC(this);
 	 Prior = new PriorDistribution_RHIC(this);
-	 } */
+	 }
 	else{
 		printf("Must define parameter MODEL in parameter file, or yours is unrecognized\n");
 		exit(1);
@@ -88,10 +88,10 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 		Likelihood = new LikelihoodDistribution_Cosmo(this);
 		Prior = new PriorDistribution_Cosmo(this);
 	}
-	/* else if(parameter::getS(parmap,"MODEL","CosmoSurvey")=="RHIC"){
+	else if(parameter::getS(parmap,"MODEL","NOMODEL")=="RHIC"){
 	 Likelihood = new LikelihoodDistribution_RHIC(this);
 	 Prior = new PriorDistribution_RHIC(this);
-	 } */
+	 }
 	else{
 		printf("Must define parameter MODEL in parameter file, or yours is unrecognized\n");
 		exit(1);

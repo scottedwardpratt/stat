@@ -13,8 +13,10 @@ public:
 	EmulatorHandler(parameterMap *parmap, MCMCConfiguration * mcmc_in);
 	~EmulatorHandler();
 	void QueryEmulator(ParameterSet Theta,vector<double> &Means, vector<double> &Errors);
+	string Observables;
 private:
 	string EmulatedParams;
+	string Cent_Range;
 	MCMCConfiguration *mcmc;
 	string EmulatorScriptHome;
 	string EmInputFile;

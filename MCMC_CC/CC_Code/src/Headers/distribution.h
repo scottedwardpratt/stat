@@ -96,6 +96,7 @@ public:
 	double Evaluate(ParameterSet Theta);
 	//private:
 	vector<double> GetData();
+	vector<double> GetRealData(); //This is just a temporary name, this will replace "GetData()"
 	vector<double> DATA;
 	bool UseEmulator;
 	ofstream emulator_test;
