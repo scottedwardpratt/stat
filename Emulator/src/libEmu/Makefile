@@ -39,10 +39,10 @@ RM = /opt/local/bin/cmake -E remove -f
 CMAKE_EDIT_COMMAND = /opt/local/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator
+CMAKE_SOURCE_DIR = /Users/chris/Projects/Emulator
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator
+CMAKE_BINARY_DIR = /Users/chris/Projects/Emulator
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -110,14 +110,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(CMAKE_COMMAND) -E cmake_progress_start /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator/CMakeFiles /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator/src/libEmu/CMakeFiles/progress.marks
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f CMakeFiles/Makefile2 src/libEmu/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator/CMakeFiles 0
+	cd /Users/chris/Projects/Emulator && $(CMAKE_COMMAND) -E cmake_progress_start /Users/chris/Projects/Emulator/CMakeFiles /Users/chris/Projects/Emulator/src/libEmu/CMakeFiles/progress.marks
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f CMakeFiles/Makefile2 src/libEmu/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/chris/Projects/Emulator/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f CMakeFiles/Makefile2 src/libEmu/clean
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f CMakeFiles/Makefile2 src/libEmu/clean
 .PHONY : clean
 
 # The main clean target
@@ -126,22 +126,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f CMakeFiles/Makefile2 src/libEmu/preinstall
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f CMakeFiles/Makefile2 src/libEmu/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f CMakeFiles/Makefile2 src/libEmu/preinstall
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f CMakeFiles/Makefile2 src/libEmu/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/chris/Projects/Emulator && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 src/libEmu/CMakeFiles/Emu.dir/rule:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f CMakeFiles/Makefile2 src/libEmu/CMakeFiles/Emu.dir/rule
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f CMakeFiles/Makefile2 src/libEmu/CMakeFiles/Emu.dir/rule
 .PHONY : src/libEmu/CMakeFiles/Emu.dir/rule
 
 # Convenience name for target.
@@ -150,12 +150,12 @@ Emu: src/libEmu/CMakeFiles/Emu.dir/rule
 
 # fast build rule for target.
 Emu/fast:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/build
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/build
 .PHONY : Emu/fast
 
 # Convenience name for target.
 src/libEmu/CMakeFiles/LBFGS.dir/rule:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f CMakeFiles/Makefile2 src/libEmu/CMakeFiles/LBFGS.dir/rule
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f CMakeFiles/Makefile2 src/libEmu/CMakeFiles/LBFGS.dir/rule
 .PHONY : src/libEmu/CMakeFiles/LBFGS.dir/rule
 
 # Convenience name for target.
@@ -164,135 +164,39 @@ LBFGS: src/libEmu/CMakeFiles/LBFGS.dir/rule
 
 # fast build rule for target.
 LBFGS/fast:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/LBFGS.dir/build.make src/libEmu/CMakeFiles/LBFGS.dir/build
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/LBFGS.dir/build.make src/libEmu/CMakeFiles/LBFGS.dir/build
 .PHONY : LBFGS/fast
 
-__/modelstruct.o: __/modelstruct.c.o
-.PHONY : __/modelstruct.o
+bfgs.o: bfgs.c.o
+.PHONY : bfgs.o
 
 # target to build an object file
-__/modelstruct.c.o:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/__/modelstruct.c.o
-.PHONY : __/modelstruct.c.o
+bfgs.c.o:
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/bfgs.c.o
+.PHONY : bfgs.c.o
 
-__/modelstruct.i: __/modelstruct.c.i
-.PHONY : __/modelstruct.i
-
-# target to preprocess a source file
-__/modelstruct.c.i:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/__/modelstruct.c.i
-.PHONY : __/modelstruct.c.i
-
-__/modelstruct.s: __/modelstruct.c.s
-.PHONY : __/modelstruct.s
-
-# target to generate assembly for a file
-__/modelstruct.c.s:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/__/modelstruct.c.s
-.PHONY : __/modelstruct.c.s
-
-__/optstruct.o: __/optstruct.c.o
-.PHONY : __/optstruct.o
-
-# target to build an object file
-__/optstruct.c.o:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/__/optstruct.c.o
-.PHONY : __/optstruct.c.o
-
-__/optstruct.i: __/optstruct.c.i
-.PHONY : __/optstruct.i
+bfgs.i: bfgs.c.i
+.PHONY : bfgs.i
 
 # target to preprocess a source file
-__/optstruct.c.i:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/__/optstruct.c.i
-.PHONY : __/optstruct.c.i
+bfgs.c.i:
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/bfgs.c.i
+.PHONY : bfgs.c.i
 
-__/optstruct.s: __/optstruct.c.s
-.PHONY : __/optstruct.s
-
-# target to generate assembly for a file
-__/optstruct.c.s:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/__/optstruct.c.s
-.PHONY : __/optstruct.c.s
-
-__/resultstruct.o: __/resultstruct.c.o
-.PHONY : __/resultstruct.o
-
-# target to build an object file
-__/resultstruct.c.o:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/__/resultstruct.c.o
-.PHONY : __/resultstruct.c.o
-
-__/resultstruct.i: __/resultstruct.c.i
-.PHONY : __/resultstruct.i
-
-# target to preprocess a source file
-__/resultstruct.c.i:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/__/resultstruct.c.i
-.PHONY : __/resultstruct.c.i
-
-__/resultstruct.s: __/resultstruct.c.s
-.PHONY : __/resultstruct.s
+bfgs.s: bfgs.c.s
+.PHONY : bfgs.s
 
 # target to generate assembly for a file
-__/resultstruct.c.s:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/__/resultstruct.c.s
-.PHONY : __/resultstruct.c.s
-
-__/useful.o: __/useful.c.o
-.PHONY : __/useful.o
-
-# target to build an object file
-__/useful.c.o:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/__/useful.c.o
-.PHONY : __/useful.c.o
-
-__/useful.i: __/useful.c.i
-.PHONY : __/useful.i
-
-# target to preprocess a source file
-__/useful.c.i:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/__/useful.c.i
-.PHONY : __/useful.c.i
-
-__/useful.s: __/useful.c.s
-.PHONY : __/useful.s
-
-# target to generate assembly for a file
-__/useful.c.s:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/__/useful.c.s
-.PHONY : __/useful.c.s
-
-emulate-fns.o: emulate-fns.c.o
-.PHONY : emulate-fns.o
-
-# target to build an object file
-emulate-fns.c.o:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/emulate-fns.c.o
-.PHONY : emulate-fns.c.o
-
-emulate-fns.i: emulate-fns.c.i
-.PHONY : emulate-fns.i
-
-# target to preprocess a source file
-emulate-fns.c.i:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/emulate-fns.c.i
-.PHONY : emulate-fns.c.i
-
-emulate-fns.s: emulate-fns.c.s
-.PHONY : emulate-fns.s
-
-# target to generate assembly for a file
-emulate-fns.c.s:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/emulate-fns.c.s
-.PHONY : emulate-fns.c.s
+bfgs.c.s:
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/bfgs.c.s
+.PHONY : bfgs.c.s
 
 emulator.o: emulator.c.o
 .PHONY : emulator.o
 
 # target to build an object file
 emulator.c.o:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/emulator.c.o
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/emulator.c.o
 .PHONY : emulator.c.o
 
 emulator.i: emulator.c.i
@@ -300,7 +204,7 @@ emulator.i: emulator.c.i
 
 # target to preprocess a source file
 emulator.c.i:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/emulator.c.i
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/emulator.c.i
 .PHONY : emulator.c.i
 
 emulator.s: emulator.c.s
@@ -308,7 +212,7 @@ emulator.s: emulator.c.s
 
 # target to generate assembly for a file
 emulator.c.s:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/emulator.c.s
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/emulator.c.s
 .PHONY : emulator.c.s
 
 estimate_threaded.o: estimate_threaded.c.o
@@ -316,7 +220,7 @@ estimate_threaded.o: estimate_threaded.c.o
 
 # target to build an object file
 estimate_threaded.c.o:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/estimate_threaded.c.o
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/estimate_threaded.c.o
 .PHONY : estimate_threaded.c.o
 
 estimate_threaded.i: estimate_threaded.c.i
@@ -324,7 +228,7 @@ estimate_threaded.i: estimate_threaded.c.i
 
 # target to preprocess a source file
 estimate_threaded.c.i:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/estimate_threaded.c.i
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/estimate_threaded.c.i
 .PHONY : estimate_threaded.c.i
 
 estimate_threaded.s: estimate_threaded.c.s
@@ -332,7 +236,7 @@ estimate_threaded.s: estimate_threaded.c.s
 
 # target to generate assembly for a file
 estimate_threaded.c.s:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/estimate_threaded.c.s
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/estimate_threaded.c.s
 .PHONY : estimate_threaded.c.s
 
 estimator.o: estimator.c.o
@@ -340,7 +244,7 @@ estimator.o: estimator.c.o
 
 # target to build an object file
 estimator.c.o:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/estimator.c.o
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/estimator.c.o
 .PHONY : estimator.c.o
 
 estimator.i: estimator.c.i
@@ -348,7 +252,7 @@ estimator.i: estimator.c.i
 
 # target to preprocess a source file
 estimator.c.i:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/estimator.c.i
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/estimator.c.i
 .PHONY : estimator.c.i
 
 estimator.s: estimator.c.s
@@ -356,7 +260,7 @@ estimator.s: estimator.c.s
 
 # target to generate assembly for a file
 estimator.c.s:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/estimator.c.s
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/estimator.c.s
 .PHONY : estimator.c.s
 
 lbfgs.o: lbfgs.c.o
@@ -364,7 +268,7 @@ lbfgs.o: lbfgs.c.o
 
 # target to build an object file
 lbfgs.c.o:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/lbfgs.c.o
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/lbfgs.c.o
 .PHONY : lbfgs.c.o
 
 lbfgs.i: lbfgs.c.i
@@ -372,7 +276,7 @@ lbfgs.i: lbfgs.c.i
 
 # target to preprocess a source file
 lbfgs.c.i:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/lbfgs.c.i
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/lbfgs.c.i
 .PHONY : lbfgs.c.i
 
 lbfgs.s: lbfgs.c.s
@@ -380,15 +284,63 @@ lbfgs.s: lbfgs.c.s
 
 # target to generate assembly for a file
 lbfgs.c.s:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/lbfgs.c.s
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/lbfgs.c.s
 .PHONY : lbfgs.c.s
+
+maxbfgs.o: maxbfgs.c.o
+.PHONY : maxbfgs.o
+
+# target to build an object file
+maxbfgs.c.o:
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/maxbfgs.c.o
+.PHONY : maxbfgs.c.o
+
+maxbfgs.i: maxbfgs.c.i
+.PHONY : maxbfgs.i
+
+# target to preprocess a source file
+maxbfgs.c.i:
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/maxbfgs.c.i
+.PHONY : maxbfgs.c.i
+
+maxbfgs.s: maxbfgs.c.s
+.PHONY : maxbfgs.s
+
+# target to generate assembly for a file
+maxbfgs.c.s:
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/maxbfgs.c.s
+.PHONY : maxbfgs.c.s
+
+maximise.o: maximise.c.o
+.PHONY : maximise.o
+
+# target to build an object file
+maximise.c.o:
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/maximise.c.o
+.PHONY : maximise.c.o
+
+maximise.i: maximise.c.i
+.PHONY : maximise.i
+
+# target to preprocess a source file
+maximise.c.i:
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/maximise.c.i
+.PHONY : maximise.c.i
+
+maximise.s: maximise.c.s
+.PHONY : maximise.s
+
+# target to generate assembly for a file
+maximise.c.s:
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/maximise.c.s
+.PHONY : maximise.c.s
 
 maxlbfgs.o: maxlbfgs.c.o
 .PHONY : maxlbfgs.o
 
 # target to build an object file
 maxlbfgs.c.o:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/maxlbfgs.c.o
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/maxlbfgs.c.o
 .PHONY : maxlbfgs.c.o
 
 maxlbfgs.i: maxlbfgs.c.i
@@ -396,7 +348,7 @@ maxlbfgs.i: maxlbfgs.c.i
 
 # target to preprocess a source file
 maxlbfgs.c.i:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/maxlbfgs.c.i
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/maxlbfgs.c.i
 .PHONY : maxlbfgs.c.i
 
 maxlbfgs.s: maxlbfgs.c.s
@@ -404,7 +356,7 @@ maxlbfgs.s: maxlbfgs.c.s
 
 # target to generate assembly for a file
 maxlbfgs.c.s:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/maxlbfgs.c.s
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/maxlbfgs.c.s
 .PHONY : maxlbfgs.c.s
 
 regression.o: regression.c.o
@@ -412,7 +364,7 @@ regression.o: regression.c.o
 
 # target to build an object file
 regression.c.o:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/regression.c.o
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/regression.c.o
 .PHONY : regression.c.o
 
 regression.i: regression.c.i
@@ -420,7 +372,7 @@ regression.i: regression.c.i
 
 # target to preprocess a source file
 regression.c.i:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/regression.c.i
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/regression.c.i
 .PHONY : regression.c.i
 
 regression.s: regression.c.s
@@ -428,7 +380,7 @@ regression.s: regression.c.s
 
 # target to generate assembly for a file
 regression.c.s:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/regression.c.s
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/Emu.dir/build.make src/libEmu/CMakeFiles/Emu.dir/regression.c.s
 .PHONY : regression.c.s
 
 routines.o: routines.f.o
@@ -436,7 +388,7 @@ routines.o: routines.f.o
 
 # target to build an object file
 routines.f.o:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/LBFGS.dir/build.make src/libEmu/CMakeFiles/LBFGS.dir/routines.f.o
+	cd /Users/chris/Projects/Emulator && $(MAKE) -f src/libEmu/CMakeFiles/LBFGS.dir/build.make src/libEmu/CMakeFiles/LBFGS.dir/routines.f.o
 .PHONY : routines.f.o
 
 # Help Target
@@ -453,21 +405,9 @@ help:
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... __/modelstruct.o"
-	@echo "... __/modelstruct.i"
-	@echo "... __/modelstruct.s"
-	@echo "... __/optstruct.o"
-	@echo "... __/optstruct.i"
-	@echo "... __/optstruct.s"
-	@echo "... __/resultstruct.o"
-	@echo "... __/resultstruct.i"
-	@echo "... __/resultstruct.s"
-	@echo "... __/useful.o"
-	@echo "... __/useful.i"
-	@echo "... __/useful.s"
-	@echo "... emulate-fns.o"
-	@echo "... emulate-fns.i"
-	@echo "... emulate-fns.s"
+	@echo "... bfgs.o"
+	@echo "... bfgs.i"
+	@echo "... bfgs.s"
 	@echo "... emulator.o"
 	@echo "... emulator.i"
 	@echo "... emulator.s"
@@ -480,6 +420,12 @@ help:
 	@echo "... lbfgs.o"
 	@echo "... lbfgs.i"
 	@echo "... lbfgs.s"
+	@echo "... maxbfgs.o"
+	@echo "... maxbfgs.i"
+	@echo "... maxbfgs.s"
+	@echo "... maximise.o"
+	@echo "... maximise.i"
+	@echo "... maximise.s"
 	@echo "... maxlbfgs.o"
 	@echo "... maxlbfgs.i"
 	@echo "... maxlbfgs.s"
@@ -498,6 +444,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /Users/kevinnovak/Research/RHIC_Research/git/stat/Emulator && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/chris/Projects/Emulator && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

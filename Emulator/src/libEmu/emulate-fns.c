@@ -1,5 +1,10 @@
 #include "emulate-fns.h"
 
+
+#include "emulator.h"
+#include "regression.h"
+
+
 /**
  * emulates the model at through emulate_min -> emulate_max in each dimension
  * @param results -> malloc'd and filled by testPts.txt
@@ -20,7 +25,7 @@ void emulate_model_results(modelstruct *the_model, optstruct* options, resultstr
 
 	
 	// create the covariance matrix and save a copy in temp_matrix
-	makeCovMatrix(c_matrix, the_model->xmodel, the_model->thetas,options->nmodel_points, options->nthetas, options->nparams, options->covariance_fn);
+	makeCovMatrix(c_matrix, the_model->xmodel, the_model->thetas,options->nmodel_points, options->nthetas, options->nparams);
 	gsl_matrix_memcpy(temp_matrix, c_matrix);
 
 	//print_matrix(temp_matrix, options->nmodel_points, options->nmodel_points);
@@ -97,7 +102,7 @@ void emulateAtPointList(modelstruct *the_model, gsl_matrix* point_list, optstruc
 
 	
 	// create the covariance matrix and save a copy in temp_matrix
-	makeCovMatrix(c_matrix, the_model->xmodel, the_model->thetas,options->nmodel_points, options->nthetas, options->nparams, options->covariance_fn);
+	makeCovMatrix(c_matrix, the_model->xmodel, the_model->thetas,options->nmodel_points, options->nthetas, options->nparams);
 	gsl_matrix_memcpy(temp_matrix, c_matrix);
 	
 	chol_inverse_cov_matrix(options, temp_matrix, cinverse, &determinant_c);
@@ -148,7 +153,7 @@ void emulateAtPoint(modelstruct *the_model, gsl_vector* the_point, optstruct* op
 
 	
 	// create the covariance matrix and save a copy in temp_matrix
-	makeCovMatrix(c_matrix, the_model->xmodel, the_model->thetas,options->nmodel_points, options->nthetas, options->nparams, options->covariance_fn);
+	makeCovMatrix(c_matrix, the_model->xmodel, the_model->thetas,options->nmodel_points, options->nthetas, options->nparams);
 	gsl_matrix_memcpy(temp_matrix, c_matrix);
 	
 	chol_inverse_cov_matrix(options, temp_matrix, cinverse, &determinant_c);
@@ -157,11 +162,11 @@ void emulateAtPoint(modelstruct *the_model, gsl_vector* the_point, optstruct* op
 	makeHMatrix(h_matrix, the_model->xmodel, options->nmodel_points, options->nparams, options->nregression_fns);
 	estimateBeta(beta_vector, h_matrix, cinverse, the_model->training_vector, options->nmodel_points, options->nregression_fns);
 	
-	makeKVector(kplus, the_model->xmodel, the_point, the_model->thetas, options->nmodel_points, options->nthetas, options->nparams, options->covariance_fn);
+	makeKVector(kplus, the_model->xmodel, the_point, the_model->thetas, options->nmodel_points, options->nthetas, options->nparams);
 	makeHVector(h_vector, the_point, options->nparams);
 	
 	temp_mean = makeEmulatedMean(cinverse, the_model->training_vector, kplus, h_vector, h_matrix, beta_vector, options->nmodel_points);
-	kappa = options->covariance_fn(the_point, the_point, the_model->thetas, options->nthetas, options->nparams, options->cov_fn_alpha);
+	kappa = covariance_fn(the_point, the_point, the_model->thetas, options->nthetas, options->nparams);
 	temp_var = makeEmulatedVariance(cinverse, kplus, h_vector, h_matrix, kappa, options->nmodel_points, options->nregression_fns);
 
 	if(temp_mean > 100){
@@ -191,6 +196,42 @@ void emulateAtPoint(modelstruct *the_model, gsl_vector* the_point, optstruct* op
 }
 
 /**
+ * emulate the model at the location the_point using the precomputed inverse cov_matrix, beta_vector, h_matrix and 
+ * so forth
+ */
+
+void emulateQuick( modelstruct *the_model, gsl_vector* the_point, optstruct* options, 
+									 double* mean_out, double* var_out, gsl_matrix *h_matrix, gsl_matrix *cinverse, gsl_vector* beta_vector ){
+
+	double kappa;
+	double temp_mean, temp_var;
+	gsl_vector_view new_x_row;
+	gsl_vector *kplus = gsl_vector_alloc(options->nmodel_points);
+	gsl_vector *h_vector = gsl_vector_alloc(options->nregression_fns);
+
+	
+	makeKVector(kplus, the_model->xmodel, the_point, the_model->thetas, options->nmodel_points, options->nthetas, options->nparams);
+
+	makeHVector(h_vector, the_point, options->nparams);
+	
+	temp_mean = makeEmulatedMean(cinverse, the_model->training_vector, kplus, h_vector, h_matrix, beta_vector, options->nmodel_points);
+
+	kappa = covariance_fn(the_point, the_point, the_model->thetas, options->nthetas, options->nparams);
+
+	temp_var = makeEmulatedVariance(cinverse, kplus, h_vector, h_matrix, kappa, options->nmodel_points, options->nregression_fns);
+
+	//fprintf(stderr, "temp_mean %lf\ttemp_var %lf\n", temp_mean, temp_var);
+	// save the results
+	*mean_out = temp_mean;
+	*var_out = temp_var;
+
+	gsl_vector_free(kplus);
+	gsl_vector_free(h_vector);
+
+}
+
+
+/**
  * emulate the model at the ith entry in results->new_x
  */
 void emulate_ith_location(modelstruct *the_model, optstruct *options, resultstruct *results,int i, gsl_matrix* h_matrix, gsl_matrix* cinverse, gsl_vector *beta_vector){
@@ -206,20 +247,18 @@ void emulate_ith_location(modelstruct *the_model, optstruct *options, resultstru
 	//print_vector_quiet(&new_x_row.vector, options->nparams);
 
 	
-	makeKVector(kplus, the_model->xmodel, &new_x_row.vector, the_model->thetas, options->nmodel_points, options->nthetas, options->nparams, options->covariance_fn);
+	makeKVector(kplus, the_model->xmodel, &new_x_row.vector, the_model->thetas, options->nmodel_points, options->nthetas, options->nparams);
 
 	makeHVector(h_vector, &new_x_row.vector, options->nparams);
 	
 	temp_mean = makeEmulatedMean(cinverse, the_model->training_vector, kplus, h_vector, h_matrix, beta_vector, options->nmodel_points);
 
 
-	kappa = options->covariance_fn(&new_x_row.vector, &new_x_row.vector, the_model->thetas, options->nthetas, options->nparams, options->cov_fn_alpha);
+	kappa = covariance_fn(&new_x_row.vector, &new_x_row.vector, the_model->thetas, options->nthetas, options->nparams);
 
 	temp_var = makeEmulatedVariance(cinverse, kplus, h_vector, h_matrix, kappa, options->nmodel_points, options->nregression_fns);
 
-	
 	//fprintf(stderr, "temp_mean %lf\ttemp_var %lf\n", temp_mean, temp_var);
-
 
 	gsl_vector_set(results->emulated_mean, i, temp_mean);
 	gsl_vector_set(results->emulated_var, i, temp_var);
@@ -231,17 +270,24 @@ void emulate_ith_location(modelstruct *the_model, optstruct *options, resultstru
 /**
  * cholesky decompose temp_matrix, invert it and copy the result into result_matrix
  * the determinant of the cholesky decomp is also calculated
+ * 
+ * it might be worth adding a little noise here, or catching the gsl error and trying to
+ * recover?
  */
 
 void chol_inverse_cov_matrix(optstruct* options, gsl_matrix* temp_matrix, gsl_matrix* result_matrix, double* final_determinant_c){
 	int cholesky_test, i;
 	double determinant_c = 0.0;
+	gsl_error_handler_t *temp_handler; // disable the default handler
 	// do a cholesky decomp of the cov matrix, LU is not stable for ill conditioned matrices
+	temp_handler = gsl_set_error_handler_off();
 	cholesky_test = gsl_linalg_cholesky_decomp(temp_matrix);
 	if(cholesky_test == GSL_EDOM){
-		fprintf(stderr, "trying to cholesky a non postive def matrix, sorry...\n");
+		fprintf(stderr, "trying to cholesky a non postive def matrix, in emulate-fns.c sorry...\n");
 		exit(1);
 	}
+	gsl_set_error_handler(temp_handler);
+
 	// find the determinant and then invert 
 	// the determinant is just the trace squared
 	determinant_c = 1.0;

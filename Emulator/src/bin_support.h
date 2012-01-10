@@ -1,17 +1,10 @@
 #ifndef _INC_BIN_SUPPORT_
 #define _INC_BIN_SUPPORT_
 
-#include "stdio.h"
-#include "stdlib.h"
-#include "getopt.h"
-#include "defaults.h"
-#include "optstruct.h"
-#include "modelstruct.h"
-#include "useful.h"
-
-#include "libEmu/emulator.h"
-#include "libEmu/regression.h"
-
+/*
+ * get the version number from the cmake build file
+ */
+#include "buildConfig.h"
 
 /**
  * @file bin_support.h
@@ -35,7 +28,7 @@ void setup_cov_fn(optstruct *options);
 /**
  * fills in the grad_ranges struct in the optstruct, vital for the estimator
  */
-void setup_optimization_ranges(optstruct* options);
+void setup_optimization_ranges(optstruct* options, modelstruct* model);
 
 
 #endif

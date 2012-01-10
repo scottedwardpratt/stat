@@ -1,0 +1,38 @@
+----------------------------------------------
+
+ccs, cec24@phy.duke.edu, 7-7-11
+
+ranges, and param names and then some brief notes
+about what the params are.
+
+What actually is the name of the model? ChemTreeN
+
+----------------------------------------------
+
+a design for the galaxy project, to start with 3 parameters.
+how many runs will we do? 15 per param -> 45
+
+humanName  minValue maxValue (units if any) default
+Zr 20 5 (n/a - its redshift) 10
+Fescp 0 100 (n/a its a percent) 50
+Fbary 0 0.2 (n/a its a perecnt) 0.05
+
+----------------------------------------------
+
+Zr -> time (in redshift) when formation of small halos stops, 
+this is a flipped scale. Redshift 0 is now. 
+
+This is potentially the most influential parameter.
+
+----------------------------------------------
+
+Fescp -> what fraction of metal is blown out of dying stars
+the larger this is the more metallic new young stars will be.
+
+Possibly the default value is slightly overestimated. 
+
+----------------------------------------------
+
+Fbary -> the fraction of baryons given to a cluster
+this is a fraction so it could go to 1 but that would be
+a TOTALLY unphysical galaz

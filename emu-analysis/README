@@ -1,0 +1,20 @@
+emu-analysis
+--==--==--==--==--==--==--==--==--==--==--==--==
+ccs, cec24@phy.duke.edu 
+
+private (madai-only) scripts for using the emluator to analyse projects
+
+
+--==--==--==--==--==--==--==--==--==--==--==--==
+contents:
+
+src:
+fnAnalysis.R -- de-facto scripts for functional (multivariate) emulator analysis
+fnHyperAnalysis.R -- used in fnAnalysis, does hyper-slicing
+fnMcSampling.R -- basis for MCMC sampling with the emulator
+
+examples (probably don't work in place):
+mcTest.R -- uses fnMcSampling
+
+
+--==--==--==--==--==--==--==--==--==--==--==--==

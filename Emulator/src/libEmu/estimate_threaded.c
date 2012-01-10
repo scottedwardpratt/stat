@@ -1,8 +1,10 @@
 #include "estimate_threaded.h"
+#include "maxmultimin.h"
+
 
 #define SCREWUPVALUE -20000
 
-//#define NUMBERTHREADS 2
+#define NUMBERTHREADS 1
 
 #ifdef USEMUTEX
 // globals for the threads to use
@@ -21,7 +23,7 @@ pthread_spinlock_t results_spin;
  */
 
 /* how many lots of thread_level_tries to do */
-int ntries = 4; 
+int ntries = 1; 
 /* mutex protected counter to keep track of completed jobs */
 int jobnumber = 0; 
 /* global spot for the best thetas to be kept in */
@@ -76,6 +78,7 @@ void setup_params(struct estimate_thetas_params *params_array, modelstruct* the_
  */
 void estimate_thetas_threaded(modelstruct* the_model, optstruct* options){
 	int i;
+	int rc = 0; 
 	/* thread data */
 	/* \bug
 	 * at least on os-x there is some kind of bug where the code gets stuck hanging with
@@ -83,16 +86,18 @@ void estimate_thetas_threaded(modelstruct* the_model, optstruct* options){
 	 * and only if there are >= 4 threads (on my MBP). don't want to spend too much time trying 
 	 * to fix this right now
 	 * 
-	 * it's slower with 4 threads on the MBP than it is with 2
+	 * \bug
+	 * further issues with R hanging after calling estimateThetas a second time
+	 * 
 	 */
-	int nthreads = 2; //get_number_cpus();
-	
+	int nthreads = get_number_cpus();
+
 	/* force each thread to do at least one of the tries */
 	if(ntries < nthreads){
 		ntries = nthreads;
 	}
 
-	fprintf(stderr, "nthreads = %d\tntries = %d\n", nthreads, ntries);
+	//fprintf(stderr, "nthreads = %d\tntries = %d\n", nthreads, ntries);
 
 	/* how many attempts to maximise should we make */
 	/* each thread will make this number of tries and then compare its best values 
@@ -100,7 +105,7 @@ void estimate_thetas_threaded(modelstruct* the_model, optstruct* options){
 	 * we only care about the *best* so it doesn't matter if we just throw 
 	 * the rest out the window... 
 	 */
-	int thread_level_tries = 10; 
+	int thread_level_tries = 50; 
 
 	pthread_t *threads;
 	struct estimate_thetas_params *params;
@@ -108,12 +113,13 @@ void estimate_thetas_threaded(modelstruct* the_model, optstruct* options){
 
 	threads = MallocChecked(sizeof(pthread_t)*nthreads);
 	params = MallocChecked(sizeof(struct estimate_thetas_params)*nthreads);
-
+	
 	for(i=0; i < nthreads; i++){
 		params[i].my_best = SCREWUPVALUE;
 		params[i].the_model = MallocChecked(sizeof(modelstruct));
 		params[i].options = MallocChecked(sizeof(optstruct));
 	}
+
 
 	/*
 	 * setup the bulk of the parameter structures, but we need to 
@@ -124,16 +130,12 @@ void estimate_thetas_threaded(modelstruct* the_model, optstruct* options){
 	best_thetas = gsl_vector_alloc(options->nthetas);
 	gsl_vector_set_zero(best_thetas);
 
-
 	// set the jobnumber back to zero otherwise running twice will kill ya
 	jobnumber = 0;
 	best_likelyhood_val = SCREWUPVALUE;
 
 	/* regular stuff */
 	const gsl_rng_type *T;
-
-	/* optimum value for this seems to be 32, for 1d testing using model-cut.dat */
-	int number_steps = 32;
 	T = gsl_rng_default;
 
 	/* 
@@ -141,6 +143,10 @@ void estimate_thetas_threaded(modelstruct* the_model, optstruct* options){
 	 */
 
 	/* setup the thread params */
+	/**
+	 * \bug final scores seem similar across threads, why?
+	 * \todo investigate the initial conditions, does each thread get an inde rng
+	 */
 	for(i = 0; i < nthreads; i++){
 		// alloc a rng for each thread
 		params[i].random_number = gsl_rng_alloc(T);
@@ -156,13 +162,26 @@ void estimate_thetas_threaded(modelstruct* the_model, optstruct* options){
 	pthread_spin_init(&results_spin, 0);
 	#endif
 
+
+
 	// create the threads
-	for(i = 0; i < nthreads; i++)
-		pthread_create(&threads[i], NULL, &estimate_thread_function, &params[i]);
+	for(i = 0; i < nthreads; i++){
+		rc = pthread_create(&threads[i], NULL, &estimate_thread_function, &params[i]);
+		if(rc){
+			fprintf(stderr, "pthread_create (%d)  err: %d\n", i, rc);
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
+	}
 	
 	// wait to rejoin
-	for(i = 0; i < nthreads; i++)
-		pthread_join(threads[i], NULL);
+	for(i = 0; i < nthreads; i++){
+		if( (rc = pthread_join(threads[i], NULL)) != 0){
+			fprintf(stderr, "pthread_join (%d)  err: %d\n", i, rc);
+			perror(NULL);
+			exit(EXIT_FAILURE);
+		}
+	}
 
 	#ifdef USEMUTEX
 	// now kill the mutexs
@@ -179,13 +198,11 @@ void estimate_thetas_threaded(modelstruct* the_model, optstruct* options){
 		printf("%d\t%lf\n", i, params[i].my_best);
 	printf("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
 
-	fprintf(stderr, "final best L: %g\n", best_likelyhood_val);
-	fprintf(stderr, "THETAS WE WILL USE: \t");
-	print_vector_quiet(best_thetas, options->nthetas);
+	/* fprintf(stderr, "final best L: %g\n", best_likelyhood_val); */
+	/* fprintf(stderr, "THETAS WE WILL USE: \t"); */
+	/* print_vector_quiet(best_thetas, options->nthetas); */
 
 	
-
-
 	// tear down the thread params
 	for(i = 0; i < nthreads; i++){
 		gsl_rng_free(params[i].random_number);
@@ -213,12 +230,18 @@ void* estimate_thread_function(void* args){
 	// cast the args back
 	struct estimate_thetas_params *params = (struct estimate_thetas_params*) args;
 	int next_job;
+	int rc;
 	pthread_t my_id = pthread_self();
 	double my_theta_val = 0.0; /* this is the goodness of your current evaluation */
 	while(1){
 		/* see if we've done enough */
 		#ifdef USEMUTEX
-		pthread_mutex_lock(&job_counter_mutex);
+		rc = pthread_mutex_lock(&job_counter_mutex);
+		if(rc != 0){
+			fprintf(stderr, "ERR: pthread_mutex_lock(&job_counter_mutex) rc is %d\n", rc); 
+			perror(NULL); 
+			exit(EXIT_FAILURE);
+		}
 		#else 
 		pthread_spin_lock(&job_counter_spin);
 		#endif
@@ -227,11 +250,11 @@ void* estimate_thread_function(void* args){
 		} else {
 			next_job = jobnumber;
 			jobnumber++;
-			printf("job: %d by ", next_job); 
-			fprintPt(stdout, my_id);
-			printf("\n");
+			/* printf("job: %d by ", next_job);  */
+			/* fprintPt(stdout, my_id); */
+			/* printf("\n"); */
 		}
-		printf("jobnumber = %d\tnext_job = %d\tntries = %d\n", jobnumber, next_job, ntries);
+		//printf("jobnumber = %d\tnext_job = %d\tntries = %d\n", jobnumber, next_job, ntries);
 		/* now we can unlock the job counter */
 		#ifdef USEMUTEX		
 		pthread_mutex_unlock(&job_counter_mutex);
@@ -244,10 +267,14 @@ void* estimate_thread_function(void* args){
 			break;
 
 		/* just support LBFGS maximisation now */
-		maxWithLBFGS(params);
-		
-		/* this returns the likelihood of the final set of thetas from maxWithLBFGS */
-		my_theta_val = -1*evalLikelyhoodLBFGS_struct(params);
+		//maxWithLBFGS(params);
+		/* switch to multimin for testing */
+		maxWithMultiMin(params);
+		my_theta_val = params->lhood_current;
+
+		/* printf("my_theta_val = %g\n", my_theta_val); */
+		/* printf("params->best = %g\n", params->my_best); */
+		/* printf("params->lhood = %g\n", params->lhood_current); */
 
 		/* store you local best value too */
 		if(my_theta_val > params->my_best)
@@ -255,13 +282,18 @@ void* estimate_thread_function(void* args){
 		
 		
 		#ifdef USEMUTEX
-		pthread_mutex_lock(&results_mutex);
+		rc =pthread_mutex_lock(&results_mutex);
+		if(rc != 0){
+			fprintf(stderr, "ERR: pthread_mutex_lock(&results_mutex) rc is %d\n", rc); 
+			perror(NULL); 
+			exit(EXIT_FAILURE);
+		}
 		#else 
 		pthread_spin_lock(&results_spin);
 		#endif
-		printf("results locked: ");
-		fprintPt(stdout, my_id);
-		printf("\n");
+		/* printf("results locked: "); */
+		/* fprintPt(stdout, my_id); */
+		/* printf("\n"); */
 
 		if(my_theta_val > best_likelyhood_val){
 			// this thread has produced better thetas than previously there
@@ -276,14 +308,14 @@ void* estimate_thread_function(void* args){
 		#else 
 		pthread_spin_unlock(&results_spin);
 		#endif
-		printf("results unlocked by:");
-		fprintPt(stdout, my_id);
-		printf("\n");
+		/* printf("results unlocked by:"); */
+		/* fprintPt(stdout, my_id); */
+		/* printf("\n"); */
 
 	}
 	// and relax...
 	printf("thread: ");
-	fprintPt(stdout, my_id); 
+	fprintPt(stdout, my_id);
 	printf(" is done\n");
 	return NULL;
 }

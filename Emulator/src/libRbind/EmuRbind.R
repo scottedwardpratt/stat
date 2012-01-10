@@ -1,106 +1,152 @@
 library("lhs")
 
-# i don't quite understand how to push the results together into a data
-# frame i should check on this.
-# note that the rangemin/max create a square domain in 2d.
-# not sure how to grab the results?
-callcode <- function(model, nmodelpts, nparams=1, nthetas=3, nemupts=50, rangemin=0.0, rangemax=4.0){
+## ccs, cec24@phy.duke.edu (2011-2008)
+##
+## functions for calling the emulator through R
+##
+## common parameters
+## 
+## @param model: a list/data frame with entries: xmodel & training
+## @param model$xmodel: the design positions where the model was evaluated
+## (nparams cols, nmodelpoints rows)
+## @param model$training: the values of the model at each of the positions in xmodel
+## @param nparams: number of design dimensions
+## @param nthetas: number of hyperparams for the emulator (needs to agree with the cov-fn) 
+##
+## @param reg.order sets the order of the linear regression model applied,
+## where 0: a0, 1: a0 + a1*x etc
+##
+## @param cov.fn {1,2,3} selects the covariance function from { power_exp, matern_32, matern_52 }
+## the cov.fns require nthetas as such:
+## power_exp -> nparams + 2 
+## matern_32 -> 3
+## matern_52 -> 3
+## 
+## the thetas must always be stored as: {amplitude, nugget, length_scales...}
+## amplitude -> overall scale applied to the cov fn
+## nugget -> (iid noise term) applied to the diagonal
+## length_scales -> for power_exp there are nparams of these one for each direction,
+## for the matern class there is a single length scale
+##
+##
+## note: we can somewhat debug the running code by starting r with gdb underneath it as
+## R -d gdb --vanilla
+## this will launch gdb, you can then run R from gdb, load the source file containing the
+## offensive code and when things go screwy you'll have gdb underneath to give some clues
+## 
 
-  if(nparams==1){
-  
-    res<-  .C("callEmulator",
-     as.double((model$xmodel)),
-     as.integer(nparams),
-     as.double(model$training),
-     as.integer(nmodelpts),
-     as.integer(nthetas),
-     finalx = double(nparams*nemupts),
-     as.integer(nemupts),
-     finaly = double(nemupts),
-     finalvar = double(nemupts),
-     as.double(rangemin),
-     as.double(rangemax))
-  }else if(nparams==2){
-    newmodel <- rep(NA, 2*nmodelpts)
-    print(model)
-    # interleave the xmodel array
-    for(i in 1:nmodelpts)
-      newmodel[2*i-1] <- model$xmodel.1[i]
-    for(i in 1:nmodelpts)
-      newmodel[2*i] <- model$xmodel.2[i]
-    print(newmodel)
-    
-    res<-  .C("callEmulator",
-     as.double(newmodel),
-     as.integer(nparams),
-     as.double(model$training),
-     as.integer(nmodelpts),
-     as.integer(nthetas),
-     finalx = double(nparams*nemupts),
-     as.integer(nemupts),
-     finaly = double(nemupts),
-     finalvar = double(nemupts),
-     as.double(rangemin),
-     as.double(rangemax))
-
-  } else {
-    ## \todo fix emulator to work with n >> 2
-    print("sorry, won't work with nparams > 2")
+##
+## first we want to load the emulator dylibs call this function
+initEmu <- function(){
+  arch <- system("uname -s", intern=TRUE)
+  if(is.loaded("callEstimate") == FALSE){
+    libNAME <- "~/local/lib/libRBIND"
+    if(arch == "Linux"){
+      libNAME <- paste(libNAME, ".so", sep="")
+    } else if(arch =="Darwin"){
+      libNAME <- paste(libNAME, ".dylib", sep="")
+    } else {
+      buffer <- paste("error: uname -s gives ", arch , " not supported", sep="")
+      stop(buffer)
+    }
+    dyn.load(libNAME)
   }
-  #browser()
-  results <- data.frame(emulatedx=res$finalx[1:nemupts], emulatedy=res$finaly, emulatedvar=res$finalvar)
-  results
-} 
+}
 
-## just estimates the thetas for a model (this is the slow ass part)
-callEstimate <- function(model, nmodelpts,nparams=1, nthetas=3){
-  #browser()
-  res <- .C("callEstimate",
-            as.double((model$xmodel)),
-            as.integer(nparams),
-            as.double(model$training),
-            as.integer(nmodelpts),
-            as.integer(nthetas),
-            thetas = double(nthetas))
+
+ 
+## estimates the thetas for a model, do this first to create your emulator
+## 
+## @param fixedNugget: force the nugget to be within 5% of the given value, don't if NULL
+## @return "optimal" estimated thetas for the supplied model, cov.fn, reg.order combo
+##
+## the created emulator is really the set: {model, thetas (which come from here) and reg.oder and cov.fn)
+## so to use the emulator to make predictions at locations you'll need to send the same {model, thetas, reg.order and cov.fn)
+## 
+## 
+callEstimate <- function(model, nmodelpts,nparams=1, nthetas=3, fixedNugget=NULL, cov.fn=1, reg.order=1){
+  checkCovFn(nthetas, nparams, cov.fn)
+
+  if(is.null(fixedNugget)){
+    res <- .C("callEstimate",
+              as.double(model$xmodel),
+              as.integer(nparams),
+              as.double(model$training),
+              as.integer(nmodelpts),
+              as.integer(nthetas),
+              thetas = double(nthetas),
+              as.integer(0), as.double(0),
+              as.integer(cov.fn), as.integer(reg.order))
+  } else {
+    res <- .C("callEstimate",
+              as.double(model$xmodel),
+              as.integer(nparams),
+              as.double(model$training),
+              as.integer(nmodelpts),
+              as.integer(nthetas),
+              thetas = double(nthetas),
+              as.integer(1), as.double(fixedNugget),
+              as.integer(cov.fn), as.integer(reg.order))
+  }
   res$thetas
 }
 
-## test this, its not working right
-testCallEm <- function(){
-  m <- 6
-  model <- demoModel(6, 0)
-  # just made up but about right for matern
-  ans <- c(0.89, 0.54, 0.334, 0.64)
-  f1<-callEmulate(model, ans, m, nemupts=10)
-  plot(f1$emulatedx, f1$emulatedy)
-  print(f1)
-  f2<-callEmulate(model, ans,m, nemupts=10)
-  print(f2)
+## 
+## the idea is to take a model in a few (ideally-inde) y-dimensions (factored into principle cpts or whatever in another fn)
+## and emulate/estimate each dimension as if it was a single scalar field over the parameters.
+# @param nydims -> the number of separate training dimensions
+# @param training -> matrix of the y-values for each separate dimension
+#
+# @param fixedNugget see above
+#
+# @return matrix of optimal thetas one row per training dimension
+#
+multidim <-  function(model, nmodelpts, training, nydims, fixedNugget=NULL, cov.fn=1, reg.order=1){
+  nparams <- ncol(as.matrix(model))
+  
+  if(cov.fn == 1){
+    nthetas <- nparams+2 # this is the correct number for the gaussian cov fn
+  } else {
+    nthetas <- 3
+  }
+
+  ## store all the thetas and pass them one row at a time
+  bigthetas <- array(0, dim=c(nydims, nthetas)) 
+
+  checkCovFn(nthetas, nparams, cov.fn)
+
+  for(i in 1:nydims){ # estimate the thetas for each sub-model
+    # we have to craft a custom frame for each call
+    if(nydims > 1){
+      bigthetas[i,] <-callEstimate(list(xmodel=model, training=training[,i]) 
+                                   , nmodelpts, nparams, nthetas, fixedNugget[i],
+                                   cov.fn=cov.fn, reg.order=reg.order)
+    } else {
+      bigthetas[i,] <- callEstimate(list(xmodel=model, training) 
+                                    , nmodelpts, nparams, nthetas, fixedNugget[i],
+                                    cov.fn=cov.fn, reg.oder=reg.order)
+    }
+  }
+  bigthetas
 }
 
-## use a given set of thetas to emulate the code
-callEmulate <- function(model, thetas, nmodelpts, nparams=1, nthetas=3, nemupts=20, rangemin=0.0, rangemax=1.0){
-  #browser()
-  res <- .C("callEmulate",
-            as.double((model$xmodel)),
-            as.integer(nparams),
-            as.double(model$training),
-            as.integer(nmodelpts),
-            as.double(thetas),
-            as.integer(nthetas),
-            finalx = double(nemupts),
-            as.integer(nemupts),
-            finaly = double(nemupts),
-            finalvar = double(nemupts),
-            as.double(rangemin),
-            as.double(rangemax))
-            
-   results <- list(emulatedx=res$finalx, emulatedy=res$finaly, emulatedvar=res$finalvar)           
-  results
-}
 
 
-callEmulateAtPoint <- function(model, thetas, point, nmodelpts, nparams=1, nthetas=3){
+
+## return the emulated mean and var at point
+## N calls of this are substantially slower than using callEmulateAtList,
+## the AtList function is much more efficient.
+#
+# @param point the locn to emulate the model at
+# 
+# @return a list res containing fields {des, mean, var}
+# @return res$des location at which we obtain the emulated mean and variance
+# @return res$mean emulated mean at res$des
+# @return res$var emulated variance at res$des
+callEmulateAtPoint <- function(model, thetas, point, nmodelpts, nparams=1, nthetas=3,
+                               cov.fn=1, reg.order=1){
+
+  checkCovFn(nthetas, nparams, cov.fn)
   #browser()
   res <- .C("callEmulateAtPt",
             as.double((model$xmodel)),
@@ -111,23 +157,26 @@ callEmulateAtPoint <- function(model, thetas, point, nmodelpts, nparams=1, nthet
             as.double(thetas),
             as.integer(nthetas),
             finaly = double(1),
-            finalvar = double(1)
+            finalvar = double(1),
+            as.integer(cov.fn),
+            as.integer(reg.order)
             )
   results <- list(des=point, mean=res$finaly, var=res$finalvar)
 }
 
-callEmulateAtList <- function(model, thetas, pointList,nemupts, nmodelpoints, nparams=1, nthetas=3){
-  #browser()
 
-  ## if(nemupts != dim(pointList)[1]){
-  ##   cat("nemupts ", nemupts, "\n")
-  ##   print("error not enough emulate points")
-  ## }
+## the preferred way to compue the emulated mean and variance at a set of points given by pointList
+##
+## @param pointList an R matrix (nrow=nemupts, ncol=nparams) of points at which to emulate the model
+## @param nemupts how many points to compute
+## @return a list res(des, mean, var)
+## @return res$des<-pointList
+## @return res$mean emulated mean at each location in pointList
+## @return res$var emulated var at each location in pointList
+callEmulateAtList <- function(model, thetas, pointList,nemupts, nmodelpoints, nparams=1, nthetas=3,
+                              cov.fn=1, reg.order=1){
 
-  ## cat("calling Emulate at list\n")
-  ## cat("nmodelpoints: ", nmodelpoints, "\n")
-  ## cat("nemupts: ", nemupts, "\n")
-  ## cat("nparams: ", nparams, "\n")
+  checkCovFn(nthetas, nparams, cov.fn)
   
   res <- .C("callEmulateAtList",
             as.double((model$xmodel)),
@@ -139,76 +188,146 @@ callEmulateAtList <- function(model, thetas, pointList,nemupts, nmodelpoints, np
             as.double(thetas),
             as.integer(nthetas),
             finaly = double(nemupts),
-            finalvar = double(nemupts)
+            finalvar = double(nemupts),
+            as.integer(cov.fn),
+            as.integer(reg.order)
             )
+
   results <- list(des=pointList, mean=res$finaly, var=res$finalvar)
 }
 
-
-callEvalLikelyhood <- function(model, nmodelpoints, vertex, nparams=1,nthetas=4){
+## compute the lhood of a set of points in hyper-param space, given a set of thetas, a cov.fn and a regression
+## model
+## 
+## @param pointList an R matrix (nrow=nevalPoints, ncol=nthetas) of the locns in the hyperparam space to
+## estimate the log lhood
+## @param nevalPoints how many locations
+## @return a list res(des, lhood)
+## @return res$des <- pointList
+## @return res$lhood vector of lhoods at each location in pointList
+callEvalLhoodList <- function(model, pointList, nevalPoints, nmodelPoints, nparams=1, nthetas=3,
+                              cov.fn=1, reg.order=1){
+  checkCovFn(nthetas, nparams, cov.fn)
+  
   answer <- 0.0
-  likely <- .C("callEvalLikelyhood",
-               as.double((model$xmodel)),
-               as.integer(nparams),
-               as.double(model$training),
-               as.integer(nmodelpoints),
-               as.integer(nthetas),
-               as.double(vertex),
-               as.double(answer))
-  likely[[7]]
+  
+  res <- .C("callEvalLhoodList",
+            as.double(model$xmodel),
+            as.integer(nparams),
+            as.double(pointList),
+            as.integer(nevalPoints),
+            as.double(model$training),
+            as.integer(nmodelPoints),
+            as.integer(nthetas),
+            finalLhood = double(nevalPoints),
+            as.integer(cov.fn),
+            as.integer(reg.order)
+            )
+
+  results <- list(des=pointList, lhood=res$finalLhood)
 }
 
-## interpolate the data given by xvec and yvec at the point
-## xinterp, we need xvec and yvec to be the same length 
 ##
-callInterpolate <- function(xvec, yvec, xinterp){
-  if(length(xvec) == length(yvec)){
-    yinterp <- .C("lagrange_interp",
-                as.double(xvec),
-                as.double(yvec),
-                as.integer(length(xvec)),
-                as.double(xinterp))
-                
-  } else {
-    print("error xvec not same length as yvec")
-    yinterp <- 0.0
+## not to be externally called, checks that the cov.fn and nthetas given match up
+## should be called before doing any .C calls into rbind
+checkCovFn <- function(nthetas, nparams, cov.fn){
+  if(cov.fn < 1 || cov.fn > 3){
+    buffer <- paste("cov.fn index out of range: ", cov.fn, sep="")
+    stop(buffer)
   }
-  yinterp[[4]][1]
-}
-                                              
 
-
-## the idea is to take a model in a few (ideally-inde) y-dimensions (factored into principle cpts or whatever in another fn)
-## and emulate/estimate each dimension as if it was a single scalar field over the parameters.
-
-# nydims -> the number of separate training dimensions
-# training -> matrix of the y-values for each separate dimension
-# model-> the parameter space over which we've evaluated all of the training vectors
-# nmodelpts -> the length of each training vector, the number of points at which the model was evaluated
-multidim <-  function(model, nmodelpts, training, nydims){
-  nparams <- ncol(as.matrix(model))
-  nthetas <- nparams+2 # this is the correct number for the gaussian cov fn
-  bigthetas <- array(0, dim=c(nydims, nthetas)) # store all the thetas
-  for(i in 1:nydims){ # estimate the thetas for each sub-model
-    # we have to craft a custom frame for each call
-    if(nydims > 1){
-      bigthetas[i,] <-callEstimate(list(xmodel=model, training=training[,i]) 
-                                   , nmodelpts, nparams, nthetas)
-    } else {
-      bigthetas[i,] <- callEstimate(list(xmodel=model, training) 
-                                    , nmodelpts, nparams, nthetas)
+  if(cov.fn == 1){ ## power exp
+    if(nthetas != nparams + 2){
+      buffer <- paste("power exp called with nthetas: ", nthetas,
+                      "needs nthetas: ", nparams+2, sep="")
+      stop(buffer)
+    }
+  } else { ## matern
+    if(nthetas != 3){
+      buffer <- paste("matern class need nthetas = 3, supplied: ", nthetas)
+      stop(buffer)
     }
   }
-  bigthetas
+}
+
+##
+## fns for MC calls to the emulator
+
+## first setup the structure in rbind.h with copies of the model, options and
+## inverse cov matrix etc, so we don't have to do the inversion for each
+## evaluation in the MC chain.
+setup.MC <- function(model, thetas, nmodelpoints, nparams=1, nthetas=3, cov.fn=1, reg.order=1){
+  checkCovFn(nthetas, nparams, cov.fn)
+
+  res <- .C("setupEmulateMC",
+            as.double((model$xmodel)),
+            as.integer(nparams),
+            as.double(model$training),
+            as.integer(nmodelpoints),
+            as.double(thetas),
+            as.integer(nthetas),
+            as.integer(cov.fn),
+            as.integer(reg.order)
+            )
+}
+
+## make a quick call to the emulator mean and variance given a previous setup
+##
+emulate.MC <- function(point){
+  res <- .C("callEmulateMC",
+            as.double(point),
+            finalMean = double(1),
+            finalVar = double(1))
+
+  results <- list(des=point, mean=res$finalMean, var=res$finalVar)  
+}
+
+## clear the mc data, have to do this before making another call
+destroy.MC <- function(){
+  .C("freeEmulateMC")
 }
 
 
-# passes the same set of training data twice, just to test that multidim makes some
-# kind of sense
-testMultiDim <- function(){
-  source("~/Projects/Emulator/src/libRbind/testRbind.R")
-  npts <- 10
-  modelcomb <- demoModel(npts)
-  thetas <- multidim(modelcomb$xmodel, npts, cbind(modelcomb$training, modelcomb$training), 2)
-  thetas
+##
+## this sets up the MC for a multi-variate emulator, 
+##
+## follow the same procedure as multi-dim
+setup.MC.multi <- function(model, thetas, nmodelpoints, nydims, nparams, nthetas, cov.fn=1, reg.order=1){
+  checkCovFn(nthetas, nparams, cov.fn)
+
+  res <- .C("setupEmulateMCMulti",
+            as.double((model$xmodel)), ## matrix (nrows=nmodelpts, ncols=nparams)
+            as.integer(nparams),
+            as.double(model$training), ## matrix (nrows=nmodelpts, ncols=nydims)
+            as.integer(nydims),
+            as.integer(nmodelpoints),
+            as.double(thetas), ## matrix (nrows=nydims, ncols=nthetas)
+            as.integer(nthetas),
+            as.integer(cov.fn),
+            as.integer(reg.order))
+
 }
+
+## make a quick call to the emulator mean and variance given a previous setup
+##
+emulate.MC.multi <- function(point, nydims){
+  res <- .C("callEmulateMCMulti",
+            as.double(point),
+            as.integer(nydims),
+            finalMean = double(nydims),
+            finalVar = double(nydims))
+
+  results <- list(des=point, mean=res$finalMean, var=res$finalVar)  
+}
+
+
+## delete everything we setup
+destroy.MC.multi <- function(nydims){
+  .C("freeEmulateMCMulti",
+     as.integer(nydims))
+}
+                         
+  
+
+
+

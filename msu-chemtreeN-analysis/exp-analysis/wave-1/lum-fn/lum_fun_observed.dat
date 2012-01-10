@@ -1,0 +1,6 @@
+# 1st row: Selected bins;
+# 2nd row: Values of the cumulative luminosity function at each selected bin/
+# 3rd row: Errors =  Poisson errors -> Sqrt(N)
+  -1.5500000e+01  -1.1500000e+01  -7.5000000e+00  -3.5000000e+00
+   5.0000000e+00   1.3000000e+01   4.1000000e+01   8.3000000e+01
+   2.2360680e+00   3.6055513e+00   6.4031242e+00   9.1104336e+00
