@@ -11,6 +11,10 @@ EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMCConfiguration * mcmc_
 	// cout << "EmulatorHandler: Constructor Start" << endl;
 	
 	EmulatorScriptHome = parameter::getS(*parmap, "EMULATORFILEPATH", "Couldn't find filepath");
+	Observables = parameter::getS(mcmc->parmap, "OBSERVABLES", "Observables not specified");
+	Cent_Range = parameter::getS(mcmc->parmap, "CENTRALITY_RANGE" , "Centrality range not specified");
+
+	// cout << "The emulator is located at " << EmulatorScriptHome << endl;
 	EmInputFile = EmulatorScriptHome + "/src/InputPts.txt";
 	EmOutputFile = EmulatorScriptHome + "/src/EmulatorOutput.txt";
 	EmErrorFile = EmulatorScriptHome + "/src/MCMCEmulatorError.txt";
@@ -31,14 +35,15 @@ EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMCConfiguration * mcmc_
 	f.close();
 	
 	//check if emulator has been run yet.
-	string checkfilename = mcmc->dir_name + "/theta-table.dat";
+	string checkfilename = mcmc->dir_name + "/" + Observables + "-" + Cent_Range + "-thetas.txt";
+	// cout << checkfilename << endl;
 	
 	f.open(checkfilename.c_str());
 	if(f){
 		f.close();
 		// cout << "Emulator exists." << endl;
 	}else{
-		cerr << "EmulatorHander: Emulator doesn't exist for this project yet!" << endl;
+		cerr << "EmulatorHandler: Emulator doesn't exist for this project yet!" << endl;
 		exit(1);
 	}
 
@@ -65,11 +70,12 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 	int NumDataRows = 1;
 	EmulatedParams = mcmc->EmulatorParams;
 	outputfile.open(EmInputFile.c_str());
-	
+
 	if(outputfile){
 		if(EmulatedParams.find(Theta.Names[0]) != string::npos){
 			outputfile << Theta.Values[0];
 			// cout << Theta.Values[0];
+			// cout << Theta.Names[0] << endl;
 		}
 		else{
 			cout << "Warning: Parameter " << Theta.Names[0] << " is not an emulated parameter." << endl;
@@ -78,6 +84,7 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 			if(EmulatedParams.find(Theta.Names[i]) != string::npos){
 				outputfile << " " << Theta.Values[i];
 				// cout << " " << Theta.Values[i];
+				// cout << Theta.Names[i] << endl;
 			}
 			else{
 				cout << "Warning: Parameter " << Theta.Names[i] << " is not an emulated parameter." << endl;
@@ -92,9 +99,12 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 		exit(1);
 	}
 	
-	command = "cat " + EmInputFile + " | " + EmulatorScriptHome + "/src/computePoints.sh  "\
-	+ mcmc->dir_name + " > "+ EmOutputFile + " 2> " + EmErrorFile;
+	// command = "cat " + EmInputFile + " | " + EmulatorScriptHome + "/src/computePoints.sh  "\
+	// + mcmc->dir_name + " > "+ EmOutputFile + " 2> " + EmErrorFile;
 	
+	command = EmulatorScriptHome + "/src/computePoints.sh " + mcmc->dir_name + " "\
+	+ mcmc->dir_name + "/fn-data-" + Observables + "-" + Cent_Range + ".dat < " + EmInputFile + " > "+ EmOutputFile + " 2> " + EmErrorFile;
+
 	// cout << command << endl;
 	
 	int result = system(command.c_str());
@@ -145,5 +155,6 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 		cerr << "Error: Emulator output size mismatch. Error in reading emulator output in." << endl;
 		exit(1);
 	}
+	
 }
 #endif
