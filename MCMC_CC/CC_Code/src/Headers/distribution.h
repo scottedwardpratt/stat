@@ -57,7 +57,7 @@ public:
 
 class LikelihoodDistribution:public Distribution{
 public:
-	LikelihoodDistribution();
+	LikelihoodDistribution(MCMCConfiguration *mcmc_in);
 	virtual ~LikelihoodDistribution();
 	virtual double Evaluate(ParameterSet Theta);
 	//protected:
@@ -70,7 +70,7 @@ public:
 
 class PriorDistribution:public Distribution {
 public:
-	PriorDistribution();
+	PriorDistribution(MCMCConfiguration *mcmc_in);
 	virtual ~PriorDistribution();
 	virtual double Evaluate(ParameterSet Theta);
 };

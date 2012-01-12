@@ -97,8 +97,8 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 		exit(1);
 	}
 	/*Likelihood = new LikelihoodDistribution(this);
-	 cout << "Like done." << endl; */
-	/*Prior = new PriorDistribution();
+	 cout << "Like done." << endl; 
+	Prior = new PriorDistribution(this);
 	 cout << "Prior done." << endl;*/
 	
 	Proposal = new ProposalDistribution(this);

@@ -42,9 +42,17 @@ EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMCConfiguration * mcmc_
 	if(f){
 		f.close();
 		// cout << "Emulator exists." << endl;
-	}else{
-		cerr << "EmulatorHandler: Emulator doesn't exist for this project yet!" << endl;
-		exit(1);
+	}else{ //If it can't find it:
+		f.close();
+		string checkfilename = "./" + Observables + "-" + Cent_Range + "-thetas.txt"; //Check the base directory
+		f.open(checkfilename.c_str());
+		if(f){
+			f.close();
+			// cout << "Emulator exists." << endl;
+		}else{
+			cerr << "EmulatorHandler: Emulator doesn't exist for this project yet!" << endl;
+			exit(1);
+		}
 	}
 
 	// cout << "EmulatorHandler: Constructor Done." << endl;
