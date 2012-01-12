@@ -57,7 +57,7 @@ public:
 
 class LikelihoodDistribution:public Distribution{
 public:
-	LikelihoodDistribution(MCMCConfiguration *mcmc_in);
+	LikelihoodDistribution();
 	virtual ~LikelihoodDistribution();
 	virtual double Evaluate(ParameterSet Theta);
 	//protected:
@@ -70,7 +70,7 @@ public:
 
 class PriorDistribution:public Distribution {
 public:
-	PriorDistribution(MCMCConfiguration *mcmc_in);
+	PriorDistribution();
 	virtual ~PriorDistribution();
 	virtual double Evaluate(ParameterSet Theta);
 };
@@ -86,6 +86,12 @@ public:
 class PriorDistribution_Cosmo:public PriorDistribution {
 public:
 	PriorDistribution_Cosmo(MCMCConfiguration *mcmc_in);
+	double Evaluate(ParameterSet Theta);
+};
+
+class PriorDistribution_Test:public PriorDistribution {
+public:
+	PriorDistribution_Test(MCMCConfiguration *mcmc_in);
 	double Evaluate(ParameterSet Theta);
 };
 
@@ -112,6 +118,20 @@ public:
 	vector<double> GetData();
 	vector<double> DATA;
 	vector<int> intDATA;
+	bool UseEmulator;
+	ofstream emulator_test;
+	EmulatorHandler * emulator;
+};
+
+class LikelihoodDistribution_Test:public LikelihoodDistribution {
+public:
+	LikelihoodDistribution_Test(MCMCConfiguration *mcmc_in);
+	~LikelihoodDistribution_Test();
+	double Evaluate(ParameterSet Theta);
+	//private:
+	vector<double> GetData();
+	vector<double> GetRealData(); //This is just a temporary name, this will replace "GetData()"
+	vector<double> DATA;
 	bool UseEmulator;
 	ofstream emulator_test;
 	EmulatorHandler * emulator;
