@@ -12,5 +12,6 @@ for(index in 1:ncompare){
   mwStringCompare.Up = toupper(mwStringCompare)
 
   cat("# mwCompare: " , mwStringCompare, "\n")
+  source("../dump-grid-csv.R")
   source("../gridCompareImplaus.R")
 }
