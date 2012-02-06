@@ -9,7 +9,8 @@ private (madai-only) scripts for using the emluator to analyse projects
 contents:
 
 src:
-fnAnalysis.R -- de-facto scripts for functional (multivariate) emulator analysis
+fnAnalysis.R -- de-facto scripts for functional (multivariate) emulator analysis 
+						 25.01.2012 -> added fn.implaus.grid and supporting bits
 fnHyperAnalysis.R -- used in fnAnalysis, does hyper-slicing
 fnMcSampling.R -- basis for MCMC sampling with the emulator
 

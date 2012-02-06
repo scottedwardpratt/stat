@@ -24,7 +24,7 @@ source("~/local/include/libRbind/emuOverDesign.R") # functions for running the e
 source("~/local/include/libRbind/implausOverDesign.R") # functions for computing the implausibility
 #source("~/local/include/libRbind/testEst.R") # for testing the estimation of thetas
 
-source("../fnAnalysis.R")
+source("~/local/include/emu-analysis/fnAnalysis.R")
 
 nsamples <- 200  
 
@@ -117,30 +117,30 @@ stepData <- fn.emu.steps(fnData, 1, 3, 2)
 impSteps <- fn.implaus.steps(fnData, stepData)
 #fn.plot.imp.steps(fnData, impSteps, 5, plot.joint=FALSE)
 pdf("images/joint-implaus-1-3-2-repeat.pdf")
-fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE, title="MW6 ")
+fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE, title.in="MW6 ")
 dev.off()
 
 # lets plot all the individual implausibilities in this projection
-for(i in 1:nbins){
-  pdf(paste("./images/implaus-obs-",i,"param-1-3-2.pdf", sep=""))
-  fn.plot.imp.steps(fnData, impSteps, i, plot.joint=FALSE, title="MW6 ")
-  dev.off()
-}
+## for(i in 1:nbins){
+##   pdf(paste("./images/implaus-obs-",i,"param-1-3-2.pdf", sep=""))
+##   fn.plot.imp.steps(fnData, impSteps, i, plot.joint=FALSE, title.in="MW6 ")
+##   dev.off()
+## }
     
 
 
 stepData <- fn.emu.steps(fnData, 1, 2, 3)
 impSteps <- fn.implaus.steps(fnData, stepData)
 pdf("images/joint-implaus-1-2-3-repeat.pdf")
-fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE, title="MW6 ")
+fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE, title.in="MW6 ")
 dev.off()
 
 # lets plot all the individual implausibilities in this projection
-for(i in 1:nbins){
-  pdf(paste("./images/implaus-obs-",i,"param-1-2-3.pdf", sep=""))
-  fn.plot.imp.steps(fnData, impSteps, i, plot.joint=FALSE, title="MW6 ")
-  dev.off()
-}
+## for(i in 1:nbins){
+##   pdf(paste("./images/implaus-obs-",i,"param-1-2-3.pdf", sep=""))
+##   fn.plot.imp.steps(fnData, impSteps, i, plot.joint=FALSE, title.in="MW6 ")
+##   dev.off()
+## }
 
 
 

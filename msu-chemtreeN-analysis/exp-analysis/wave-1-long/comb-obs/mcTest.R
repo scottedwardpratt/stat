@@ -14,21 +14,21 @@ if(is.loaded("callEstimate") == FALSE){
   dyn.load(libNAME)
 }
 
-source("fnMcSampling.R")
+source("~/local/include/emu-analysis/fnMcSampling.R")
+source("~/local/include/emu-analysis/fnAnalysis.R")
 
-nsamples <- 200
 
 ## load the model data
 ##
 ## first the luminosity data
 lumOutputFile  <- "./wave-1-long/lum_fun_outputs_2.dat"
 modelDataLum <- as.matrix(read.table(lumOutputFile))
-nbinsLum <- dim(modelDataLum)[2]
+nbinsLum <- dim(modelDataLum)[2] 
 nruns <- dim(modelDataLum)[1]
 ##
 ## now the metallicity data
 metOutputFile <- "./wave-1-long/metallicity_MV_outputs_2.dat"
-modelDataMet <- as.matrix(read.table(metOutputFile))
+modelDataMet <- abs(as.matrix(read.table(metOutputFile)))
 nbinsMet <- dim(modelDataMet)[2]
 
 if(nruns != dim(modelDataMet)[1]){
@@ -36,21 +36,18 @@ if(nruns != dim(modelDataMet)[1]){
 }
 
 ## redefine nruns
-nruns <- nsamples
+#nruns <- nsamples
 
-
-nbins <-  nbinsMet + nbinsLum 
-#nbins <- nbinsLum
-modelData.big <- cbind(modelDataLum, modelDataMet)
-
-modelData <- modelData.big
+#nbins <-  nbinsMet + nbinsLum 
+nbins <- nbinsLum
+#modelData.big <- cbind(modelDataLum, modelDataMet)
+modelData <- modelDataLum
 
 ## load the design
 designFile <- "./design/design_2_sorted.dat"
 desNames <- c("Zr", "Fescp", "Fbary")
 nparams <- length(desNames)
 designData.big <- as.matrix(read.table(designFile, col.names=desNames))
-
 designData <- designData.big
 
 
@@ -70,17 +67,22 @@ expDataMet <- as.matrix(read.table(expDataFileMet))
 ## so sigma = upper-lower / 2 
 ## where upper = mean + conf, lower = mean - conf
 ## so sigma = ((mean + conf ) - (mean - conf))  / 2 = conf
-expData <- list(obsValue=c(expDataLum[2,], expDataMet[1,]),
-                  obsError=c(expDataLum[3,], expDataMet[2,]))
+## expData <- list(obsValue=c(expDataLum[2,], abs(expDataMet[1,])),
+##                   obsError=c(expDataLum[3,], abs(expDataMet[2,])))
 
-rebuild <- 0
-buffer <- paste("functional-data-lum-", nsamples, ".dat", sep="")
+expData <- list(obsValue=c(expDataLum[2,]),
+                   obsError=c(expDataLum[3,]))
+
+
+
+rebuild <- 1
+buffer <- paste("functional-data-lum-only", ".dat", sep="")
 if(rebuild == 1 || file.exists(buffer) == FALSE){
   ##
   ## generate a functional sample from the vars in global sope
   fnData <- fn.sample.gen(cov.fn=1, reg.order=1)
   ## now do the pca decomp
-  fnData <- fn.pca.gen(fnData, cutOff=0.99)
+  fnData <- fn.pca.gen(fnData, cutOff=0.98)
   ## estimate the thetas
   fnData <- fn.estimate(fnData)
 
@@ -89,6 +91,11 @@ if(rebuild == 1 || file.exists(buffer) == FALSE){
   load(buffer)
 }
 
+#stepData <- fn.emu.steps(fnData, 1, 3, 2, nemupts=32)
+#impSteps <- fn.implaus.steps(fnData, stepData)
+
+
+
 ## we need to define a function that will give a log-density for our experimental data (exp.data)
 ## given a particular proposed value (z.prop)
 ## 
@@ -96,7 +103,7 @@ if(rebuild == 1 || file.exists(buffer) == FALSE){
 ## normal distribution
 ##
 ## BUT!
-## the emulator is still scaled to the unit cube during the mc sampling, so we need
+## the emulator is still scaled during the mc sampling, so we need
 ## to scale the exp.data correctly
 ##
 ## AND!
@@ -105,8 +112,12 @@ if(rebuild == 1 || file.exists(buffer) == FALSE){
 exp.density.fn <- function(exp.data.scaled, z.prop){
   nzdim <- length(z.prop)
   density <- rep(0, nzdim)
-  ## we sample z.prop on +- pi/2 and then unwrap this to -+ infty using tan(z.prop) 
-  z.prop <- tan(z.prop)
+  ## we sample z.prop on +- pi/2 and then unwrap this to -+ infty using tan(z.prop)
+  #cat("# z.prop: ", z.prop, "\n")
+  #z.prop.t <- tan(z.prop)
+  #cat("# z.prop.t: ", z.prop.t, "\n")
+  #cat("# means: ", exp.data.scaled$obsValue, "\n")
+  #cat("# sd: ", exp.data.scaled$obsError, "\n")
   for(i in 1:nzdim){
     density[i] <- dnorm(z.prop[i], mean=exp.data.scaled$obsValue[i], sd=exp.data.scaled$obsError[i], log=TRUE)
   }
@@ -120,18 +131,18 @@ scale.obs <- function(fn.data, exp.data){
   result <- exp.data
 
   result$obsValue <- (result$obsValue - center.vec.obs)/(scale.vec.obs)
-  ## not sure is the error a sd or a var? it's a var...
+  ## not sure is the error a sd or a var? it's treated as the sd so we scale it linearly
   result$obsError <- (result$obsError)/(scale.vec.obs)
 
   result
 }
 
 expData.scaled <- scale.obs(fnData, expData)
+samples.final <- generate.mc.samples(fnData, expData.scaled, exp.density.fn, nstep.mc=20000, nprocs=1)
 
-samples.final <- generate.mc.samples(fnData, expData.scaled, exp.density.fn, nstep.mc=5000000)
 
 ## dump the mc.samples for later
-save(samples.final, file="functional-samples-200.dat")
+#save(samples.final, file="functional-samples-200.dat")
 #load("functional-samples.dat")
 
 plotSamples <- function(samples){
@@ -153,8 +164,7 @@ plotSamples <- function(samples){
   
   ## make 2d kernel smoother estimates for each pair
   pairs(samples[,1:ndims.x], panel=smoothFn, labels=desNames)
-
   
 }
 
-plotSamples(samples.final$samples)
+#plotSamples(samples.final$samples)

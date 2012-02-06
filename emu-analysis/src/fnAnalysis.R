@@ -662,6 +662,69 @@ fn.plot.imp.steps <- function(fn.data, step.list, obsIndex, plot.joint=TRUE, tit
 }
 
 
+####################################################
+##
+## compute the implausibility on a grid in 3d
+##
+## if nparams > 3 fixedValVec can be used to fix the other parameters
+##
+## ultimately we will want to do this in all nparams directions, a proper fn will have to be written to manage this
+##
+####################################################
+fn.implaus.grid <- function(fn.data, dimA, dimB, stepDim, fixedValVec=NULL, grid.size=64){
+  ## we do this by making grid.size slices in the stepDim direction,
+  ## computing the implaus for each slice and glomming it all together
+  ##
+  ## this is not terribly efficient because we're initing the emulator a lot
+
+  nsteps.z <- grid.size
+  cat("# implaus.grid, grid.size:", grid.size,"\n")
+  slice.list <- fn.emu.steps(fn.data, dimA, dimB, stepDim, fixedValVec=NULL, nsteps=nsteps.z, nemupts=grid.size)
+  cat("# emu.stepping done \n")
+
+  ## now compute the implaus over the slice.list
+  implaus.slices <- fn.implaus.steps(fn.data, slice.list)
+  cat("# implaus.slicing done \n")
+  
+  grid.final <- list(grid=array(0, dim=c(grid.size, grid.size, grid.size)))
+
+
+  
+  for(i in 1:nsteps.z){
+    grid.final$grid[,,i] <- as.matrix(implaus.slices[[i]]$implaus.joint)
+  }
+  cat("# grid mangling done \n")
+
+    ## to scale the test-design points
+  desCenter.vec <- attr(fn.data$model.sample$des, "scaled:center")
+  desScale.vec <- attr(fn.data$model.sample$des, "scaled:scale")
+
+  
+  minVal <- min(fn.data$model.sample$des[dimA,]) * desScale.vec[dimA] + desCenter.vec[dimA]
+  maxVal <- max(fn.data$model.sample$des[dimA,]) * desScale.vec[dimA] + desCenter.vec[dimA]
+  dx <- (maxVal - minVal) / grid.size
+
+  minVal <- min(fn.data$model.sample$des[dimB,]) * desScale.vec[dimB] + desCenter.vec[dimB]
+  maxVal <- max(fn.data$model.sample$des[dimB,]) * desScale.vec[dimB] + desCenter.vec[dimB]
+  dy <- (maxVal - minVal) / grid.size
+
+  minVal <- min(fn.data$model.sample$des[stepDim,]) * desScale.vec[stepDim] + desCenter.vec[stepDim]
+  maxVal <- max(fn.data$model.sample$des[stepDim,])* desScale.vec[stepDim] + desCenter.vec[stepDim]
+  dz <- (maxVal - minVal) / grid.size
+
+  grid.final$x <- dimA
+  grid.final$y <- dimB
+  grid.final$z <- stepDim
+  grid.final$dx <- dx
+  grid.final$dy <- dy
+  grid.final$dz <- dz
+  grid.final$fixedValVec <- fixedValVec
+
+  invisible(grid.final)
+}
+  
+                          
+
 
 
 #####################################################
@@ -867,4 +930,5 @@ reconCurveAtList <- function(pointSet, thetas, pca.decomp, cov.fn.in=1, reg.orde
   invisible(finalResult)
 
 }
+
 

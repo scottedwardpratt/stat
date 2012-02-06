@@ -47,7 +47,7 @@ source("~/local/include/libRbind/emuOverDesign.R") # functions for running the e
 source("~/local/include/libRbind/implausOverDesign.R") # functions for computing the implausibility
 source("~/local/include/libRbind/testEst.R") # for testing the estimation of thetas
 
-source("fnAnalysis.R")
+source("~/local/include/emu-analysis/fnAnalysis.R")
 
 nsamples <- 200  ## we'll hold back 10
 
@@ -113,7 +113,6 @@ expDataMet <- as.matrix(read.table(expDataFileMet))
 expData <- list(obsValue=c(expDataLum[2,], abs(expDataMet[1,])),
                   obsError=c(expDataLum[3,], abs(expDataMet[2,])))
 
-
 rebuild <- 1
 buffer <- paste("functional-data-lum-", nsamples, ".dat", sep="")
 if(rebuild == 1 || file.exists(buffer) == FALSE){
@@ -132,23 +131,29 @@ if(rebuild == 1 || file.exists(buffer) == FALSE){
 }
 
 
+par.default <- par()
+
 ## plot in dimensions 1 and 3 and step in 2
-stepData <- fn.emu.steps(fnData, 1, 3, 2)
+stepData <- fn.emu.steps(fnData, 1, 3, 2, nemupts=64)
 #fn.plot.steps(fnData, stepData,  2)
 ## you need to run the emulator over steps  to make predictions using fn.emu.steps
 ## before computing the implausibility
 impSteps <- fn.implaus.steps(fnData, stepData)
 #fn.plot.imp.steps(fnData, impSteps, 5, plot.joint=FALSE)
 pdf("images/joint-implaus-1-3-2-repeat.pdf")
-fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE)
+buffer <- "mw1 "
+fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE, title.in=buffer)
 dev.off()
 
+par(par.default)
 
-stepData <- fn.emu.steps(fnData, 1, 2, 3)
+stepData <- fn.emu.steps(fnData, 1, 2, 3, nemupts=64)
 impSteps <- fn.implaus.steps(fnData, stepData)
 pdf("images/joint-implaus-1-2-3-repeat.pdf")
-fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE)
+fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE, title.in=buffer)
 dev.off()
+
+par(par.default)
 
 
 

@@ -39,7 +39,7 @@ source("~/local/include/libRbind/emuOverDesign.R") # functions for running the e
 source("~/local/include/libRbind/implausOverDesign.R") # functions for computing the implausibility
 source("~/local/include/libRbind/testEst.R") # for testing the estimation of thetas
 
-source("fnAnalysis.R")
+source("~/local/include/emu-analysis/fnAnalysis.R")
 
 nsamples <- 45  ## we'll hold back 5
 
@@ -119,19 +119,29 @@ if(rebuild == 1 || file.exists(buffer) == FALSE){
   load(buffer)
 }
 
+par.default <- par()
+
 ## plot in dimensions 1 and 3 and step in 2
-stepData <- fn.emu.steps(fnData, 1, 3, 2)
-fn.plot.steps(fnData, stepData,  2)
+stepData <- fn.emu.steps(fnData, 1, 3, 2, nemupts=64)
 ## you need to run the emulator over steps  to make predictions using fn.emu.steps
 ## before computing the implausibility
 impSteps <- fn.implaus.steps(fnData, stepData)
-fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE)
+pdf("images/joint-implaus-1-3-2.pdf")
+buffer <- "mw1 (45): "
+fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE, title.in=buffer)
+dev.off()
+
+par(par.default)
 
 ## here we'll plot predictions from the emulator with the dimensions 1,2 and stepping in 3
-stepData.escp <- fn.emu.steps(fnData, 1, 2, 3)
+stepData.escp <- fn.emu.steps(fnData, 1, 2, 3, nemupts=64)
 impSteps.escp <- fn.implaus.steps(fnData, stepData.escp)
-fn.plot.imp.steps(fnData, impSteps.escp, plot.joint=TRUE)
+pdf("images/joint-implaus-1-2-3.pdf")
+fn.plot.imp.steps(fnData, impSteps.escp, plot.joint=TRUE, title.in=buffer)
+dev.off()
 
+
+par(par.default)
 
 
 ## test how stable the hyperparameters are, create them a bunch of times

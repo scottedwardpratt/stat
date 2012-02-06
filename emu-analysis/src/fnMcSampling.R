@@ -1,7 +1,7 @@
 ##
 ## ccs, cec24@phy.duke,edu
 ## sep 2011
-##i
+##
 ## functions to setup and run the mc sampling process where we
 ## are trying to find probability distribution of parameters given
 ## a set of observations.
@@ -104,17 +104,21 @@ sample.integrand <- function(fn.data, exp.data, nsteps=10000, x0, z0, xranges, z
 
   x.prev <- x0
   z.prev <- z0
-  delta.x <- xranges[,2] - xranges[,1]
-  delta.z <- zranges[,2] - zranges[,1]
+  delta.x <- (xranges[,2] - xranges[,1])
+  delta.z <- (zranges[,2] - zranges[,1])
 
   samples <- matrix(0, nrow=nsteps, ncol=ndims)
 
   ## a guess for the stepping scale 
-  alpha.x <- rep(0.01, ndims.x)
-  alpha.z <- rep(0.01, ndims.z)
+  alpha.x <- rep(0.2, ndims.x)
+  alpha.z <- rep(0.15, ndims.z)
 
-
-
+  #browser()
+  cat("# ndims.x: ", ndims.x, "\n")
+  cat("# ndims.z: ", ndims.z, "\n")
+  cat("# delta.x: ", delta.x, "\n")
+  cat("# delta.z: ", delta.z, "\n")
+  
   ## main mc sampling loop
   for(i in 1:nsteps){
 
@@ -124,7 +128,7 @@ sample.integrand <- function(fn.data, exp.data, nsteps=10000, x0, z0, xranges, z
     }
 
     ## generate a proposal step in the parameter space
-    x.star <- x.prev + alpha.x*delta.x*runif(ndims.x, min=-1, max=1)
+    x.star <- x.prev + alpha.x*delta.x*(1/2)*runif(ndims.x, min=-1, max=1)
     ## check bounds for x.star
     for(index in 1:ndims.x){
       if(x.star[index] > xranges[index, 2] || x.star[index] < xranges[index, 1]){
@@ -133,15 +137,17 @@ sample.integrand <- function(fn.data, exp.data, nsteps=10000, x0, z0, xranges, z
     }
 
     ## generate a normally distributed proposal step in the observable space
-    #z.star <- rnorm(ndims.z, z.prev, alpha.z)
-    z.star <- z.prev + alpha.z*delta.z*runif(ndims.z, min=-1, max=1)
+    z.star <- rnorm(ndims.z, z.prev, alpha.z)
+    ## switched to a uniformly distributed proposal step
+    #z.star <- z.prev + alpha.z*delta.z*(1/2)*runif(ndims.z, min=-1, max=1)
     ## check bounds for x.star
-    for(indez in 1:ndims.z){
-      if(z.star[indez] > zranges[indez, 2] || z.star[indez] < zranges[indez, 1]){
-        z.star[indez] <- zranges[indez,1] + (z.star[indez] - zranges[indez,1])%%delta.z[indez]
-      }
-    }
-
+    ##browser()
+    
+    ## for(indez in 1:ndims.z){
+    ##   if(z.star[indez] > zranges[indez,2] || z.star[indez] < zranges[indez, 1]){
+    ##     z.star[indez] <- zranges[indez,1] + (z.star[indez] - zranges[indez,1])%%delta.z[indez]
+    ##   }
+    ## }
 
     ## compute the acceptance ratio for this step
     ## sample the emulator and the data.density.fn
@@ -205,53 +211,74 @@ rescale.samps <- function(samples, fn.data){
 
 #sample.integrand <- function(fn.data, exp.data, nsteps=10000, x0, z0, xranges, zranges, data.density.fn){
 
-## assume that we're on the unit interval here
+##
+## the design is probably not scaled to the unit interval
+## the y's are also going to be scaled onto some interval
 generate.mc.samples <- function(fn.data, exp.data, data.density.fn, nprocs=4, nstep.mc=500000){
   library("multicore")
   samp.par <- vector("list", nprocs)
 
   ic.x <- matrix(runif(nparams*nprocs, 0, 1), nrow=nprocs, ncol=nparams)
-  ic.z <- matrix(runif(nbins*nprocs, -pi/2, pi/2), nrow=nprocs, ncol=nbins)
+  ic.z <- matrix(runif(nbins*nprocs, 0, 1), nrow=nprocs, ncol=nbins)
 
-  xr.in <- matrix(c(0,1), nrow=nparams, ncol=2, byrow=TRUE)
+  desRanges <- matrix(0,nrow=nparams, ncol=2)
+  desRanges[,1] <- apply(fn.data$model.sample$des, 1, min)
+  desRanges[,2] <- apply(fn.data$model.sample$des, 1, max)
+  xr.in <- desRanges
+  
   ## we'll assume that all the exp distributions are normal and so on +- infinity
-  ## we can sample this by taking our uniform range as +- pi/2 and then doing an atan when
+  ## we can sample this by taking our uniform range as +- pi/2 and then doing a tan when
   ## we actually compute the density
-  zr.in <- matrix(c(-pi/2,pi/2), nrow=nbins, ncol=2, byrow=TRUE)
+  yRanges <- matrix(0,nrow=nbins, ncol=2)
+  yRanges[,1] <- apply(fn.data$model.sample$y, 1, min)
+  yRanges[,2] <- apply(fn.data$model.sample$y, 1, max)
+  zr.in <- yRanges
+  #zr.in <- matrix(c(-pi/2,pi/2), nrow=nbins, ncol=2, byrow=TRUE)
 
-  ## run the sampling nprocs at a time
-  for(i in 1:nprocs){
-    samp.par[[i]] <- parallel(sample.integrand(fnData, exp.data, nsteps=nstep.mc,
-                                                    x0=ic.x[i,], z0=ic.z[i,],
+  ic.x <- ic.x *  (desRanges[,2]-desRanges[,1]) + desRanges[,1]
+  ic.z <- ic.z *  (yRanges[,2]-yRanges[,1]) + yRanges[,1]
+
+  samples.final <- sample.integrand(fnData, exp.data, nsteps=nstep.mc,
+                                                    x0=ic.x[1,], z0=ic.z[1,],
                                                     xranges=xr.in,
                                                     zranges=zr.in,
-                                                    data.density.fn),
-                              mc.set.seed=TRUE)
-    
-  }
-  ## collate the parallel result
-  res <- collect(samp.par)
-  res.burnt <- vector("list", nprocs)
+                                                    data.density.fn)
+
   
-  ## currently we'll throw away the first fifth as  burn in
-  nburn <- nstep.mc / 5
-  for(i in 1:nprocs){
-    res.burnt[[i]] <- res[[i]][nburn:nstep.mc,]
-  }
-  stats <- mc.stats(res.burnt)
+  
+  ## ## run the sampling nprocs at a time
+  ## for(i in 1:nprocs){
+  ##   samp.par[[i]] <- parallel(sample.integrand(fnData, exp.data, nsteps=nstep.mc,
+  ##                                                   x0=ic.x[i,], z0=ic.z[i,],
+  ##                                                   xranges=xr.in,
+  ##                                                   zranges=zr.in,
+  ##                                                   data.density.fn),
+  ##                             mc.set.seed=TRUE)
+    
+  ## }
+  ## ## collate the parallel result
+  ## res <- collect(samp.par)
+  ## res.burnt <- vector("list", nprocs)
+  
+  ## ## currently we'll throw away the first fifth as  burn in
+  ## nburn <- nstep.mc / 5
+  ## for(i in 1:nprocs){
+  ##   res.burnt[[i]] <- res[[i]][nburn:nstep.mc,]
+  ## }
+  ## stats <- mc.stats(res.burnt)
 
-  samples.rescaled <- vector("list", nprocs)
-  for(i in 1:nprocs){
-    samples.rescaled[[i]] <- rescale.samps(res.burnt[[i]], fnData)
-  }
+  ## samples.rescaled <- vector("list", nprocs)
+  ## for(i in 1:nprocs){
+  ##   samples.rescaled[[i]] <- rescale.samps(res.burnt[[i]], fnData)
+  ## }
 
-  samples.final <- NULL
-  for(i in 1:nprocs){
-    samples.final <- rbind(samples.final, samples.rescaled[[i]])
-  }
+  ## samples.final <- NULL
+  ## for(i in 1:nprocs){
+  ##   samples.final <- rbind(samples.final, samples.rescaled[[i]])
+  ## }
 
-  result <- list(samples=samples.final, stats=stats)
-  invisible(result)
+  #result <- list(samples=samples.final, stats=stats)
+  invisible(samples.final)
 }
 
 
