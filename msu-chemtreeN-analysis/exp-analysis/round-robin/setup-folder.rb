@@ -34,6 +34,6 @@ def setupFolder(name)
   Dir.chdir(top)
 end
 
-## @mwNames.each { |name| setupFolder(name)}
+@mwNames.each { |name| setupFolder(name)}
   
   
