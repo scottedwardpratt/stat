@@ -184,3 +184,4 @@ compare.round.robin <- function(outfile="./l2-comparison-matrix.dat"){
   invisible(normMat)
 }
 
+compare.round.robin()
