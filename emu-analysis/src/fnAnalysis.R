@@ -704,13 +704,19 @@ fn.implaus.grid <- function(fn.data, dimA, dimB, stepDim, fixedValVec=NULL, grid
   maxVal <- max(fn.data$model.sample$des[dimA,]) * desScale.vec[dimA] + desCenter.vec[dimA]
   dx <- (maxVal - minVal) / grid.size
 
+  xrange <- c(minVal, maxVal)
+
   minVal <- min(fn.data$model.sample$des[dimB,]) * desScale.vec[dimB] + desCenter.vec[dimB]
   maxVal <- max(fn.data$model.sample$des[dimB,]) * desScale.vec[dimB] + desCenter.vec[dimB]
   dy <- (maxVal - minVal) / grid.size
 
+  yrange <- c(minVal, maxVal)
+
   minVal <- min(fn.data$model.sample$des[stepDim,]) * desScale.vec[stepDim] + desCenter.vec[stepDim]
   maxVal <- max(fn.data$model.sample$des[stepDim,])* desScale.vec[stepDim] + desCenter.vec[stepDim]
   dz <- (maxVal - minVal) / grid.size
+
+  zrange <- c(minVal, maxVal)
 
   grid.final$x <- dimA
   grid.final$y <- dimB
@@ -718,6 +724,9 @@ fn.implaus.grid <- function(fn.data, dimA, dimB, stepDim, fixedValVec=NULL, grid
   grid.final$dx <- dx
   grid.final$dy <- dy
   grid.final$dz <- dz
+  grid.final$xrange <- xrange
+  grid.final$yrange <- yrange
+  grid.final$zrange <- zrange
   grid.final$fixedValVec <- fixedValVec
 
   invisible(grid.final)

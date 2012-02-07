@@ -21,7 +21,7 @@ l2.dist.grid <- function(grid1, grid2){
   norm
 }
 
-l2.dist.grid.log.inv <- function(grid1, grid2){
+l2.dist.grid.inv <- function(grid1, grid2){
   if(grid1$dx != grid2$dx || grid1$dy != grid2$dy || grid1$dz != grid2$dz){
     dvol <- (mean(grid1$dx,grid2$dx)*mean(grid1$dy,grid2$dy)*mean(grid1$dz*grid2$dz))
   } else {
@@ -48,7 +48,7 @@ l2.normed.grid <- function(grid1, grid2){
   g12 / (sqrt(g1.l2) * sqrt(g2.l2))
 }
 
-l2.normed.grid.log.inv <- function(grid1, grid2){
+l2.normed.grid.inv <- function(grid1, grid2){
   g1.l2 <- l2.dist.grid.log.inv(grid1, grid1)
   g2.l2 <- l2.dist.grid.log.inv(grid2, grid2)
 
@@ -86,12 +86,45 @@ int.sub.grids <- function(grid1, grid2){
   norm <- sum(diff*dvol)
 }
 
+int.sum.grids <- function(grid1, grid2){
+  if(grid1$dx != grid2$dx || grid1$dy != grid2$dy || grid1$dz != grid2$dz){
+    dvol <- (mean(grid1$dx,grid2$dx)*mean(grid1$dy,grid2$dy)*mean(grid1$dz*grid2$dz))
+  } else {
+    dvol <- grid1$dx*grid1$dy*grid1$dz ## add up the dx bits
+  }
+  #cat("# dvol: ", dvol, "\n")
+  
+  npts <- dim(grid1$grid)
+  sum.grid <- (grid1$grid + grid2$grid)^2
+
+  norm <- sum(sum.grid*dvol)
+}
+
+## compute the fraction of the grid with values less than thresh
+int.grid.thresh <- function(grid, thresh){
+    dvol <- grid$dx*grid$dy*grid$dz ## add up the dx bits
+
+    tvals <-  sapply(grid$grid, function(x)(if(x<thresh){x}else{0.0}))
+    integral.part <- sum(tvals*dvol)
+
+    int.full <- sum(dvol*grid$grid)
+
+    integral.part / int.full
+}
+
 norm.sub.grids <- function(grid.comp, grid.train){
   diff <- int.sub.grids(grid.comp, grid.train) ## do we want to normalize this in any way?
   norm.train <- l2.dist.grid(grid.train, grid.train)
   norm.comp <- l2.dist.grid(grid.comp, grid.comp)
 
   diff / norm.train
+}
+
+norm.sum.diff.grids <- function(grid1, grid2){
+  diff <- int.sub.grids(grid1, grid2)
+  sum <- int.sum.grids(grid1, grid2)
+
+  sqrt(diff / sum)
 }
 
 
@@ -109,7 +142,8 @@ compare.round.robin <- function(outfile="./l2-comparison-matrix.dat"){
   trainingGrids <- vector("list", length(topfolders))
 
   normMat <- matrix(0, nrow=ngrids, ncol=ngrids)
-  normMat.log.inv <- matrix(0, nrow=ngrids, ncol=ngrids)
+  normMat.inv <- matrix(0, nrow=ngrids, ncol=ngrids)
+  sum.diff.Mat <- matrix(0, nrow=ngrids, ncol=ngrids)
   ## compute the l2 norm against the trained emulator only
   ## 
   normMat.train <- matrix(0, nrow=length(topfolders), ncol=ngrids)
@@ -119,6 +153,7 @@ compare.round.robin <- function(outfile="./l2-comparison-matrix.dat"){
 
   count <- 1
   count.train <-  1
+  thresh.seq <- seq(0,30,length.out=60)
   for(i in 1:length(topfolders)){
     for(j in 1:length(subfolders)){
       mwString <- topfolders[i]
@@ -131,7 +166,7 @@ compare.round.robin <- function(outfile="./l2-comparison-matrix.dat"){
       
       gridList[[count]] <- implausGrid
       gridList[[count]]$name <- grid.Name
-      
+      gridList[[count]]$thresh <- sapply(thresh.seq, function(x)(int.grid.thresh(implausGrid, x)))
       if(mwString == mwStringCompare){
         trainingGrids[[count.train]] <- implausGrid
         trainingGrids[[count.train]]$name <- grid.Name
@@ -142,14 +177,22 @@ compare.round.robin <- function(outfile="./l2-comparison-matrix.dat"){
     }
   }
 
+  
   names <- sapply(gridList, function(x)(x$name))
 
   colnames(normMat) <- names
   rownames(normMat) <- names
 
-  colnames(normMat.log.inv) <- names
-  rownames(normMat.log.inv) <- names
+  colnames(normMat.inv) <- names
+  rownames(normMat.inv) <- names
 
+  thresh.vals <- sapply(gridList, function(x)(x$thresh))
+  thresh.final <- cbind(thresh.seq, thresh.vals)
+  colnames(thresh.final) <- c("t", names)
+  browser()
+  write.table(thresh.final, file="thresh-matrix.dat", row.names=FALSE)
+
+  
   
   #browser()
   
@@ -157,7 +200,8 @@ compare.round.robin <- function(outfile="./l2-comparison-matrix.dat"){
     for(j in 1:ngrids){
       cat("# ", i, j, "\n")
       normMat[i,j] <- l2.normed.grid(gridList[[i]], gridList[[j]])
-      normMat.log.inv[i,j] <- l2.normed.grid.log.inv(gridList[[i]], gridList[[j]])
+      normMat.inv[i,j] <- l2.normed.grid.inv(gridList[[i]], gridList[[j]])
+      sum.diff.Mat[i,j] <- norm.sum.diff.grids(gridList[[i]], gridList[[j]])
     }
   }
 
@@ -174,14 +218,22 @@ compare.round.robin <- function(outfile="./l2-comparison-matrix.dat"){
     }
   }
 
-  
+
 
   write.table(normMat, file=outfile)
-  write.table(normMat.log.inv, file="l2-norm-log-inv.dat")
+  write.table(normMat.inv, file="l2-norm-inv.dat")
   write.table(normMat.train, file="l2-modified-training-compare.dat")
   write.table(diffMat.train, file="sub-training-compare.dat")
+  write.table(sum.diff.Mat, file="diff-sum-grid-compare.dat")
   
   invisible(normMat)
 }
 
-compare.round.robin()
+
+plot.thresh <- function(infile="thresh-matrix.dat"){
+  library(sp)
+  library(lattice)
+  tm <- read.table(infile)
+  xyplot( obs.mw3.train.mw3 + obs.mw2.train.mw2 + obs.mw6.train.mw6 ~ t, tm, auto.key=list(title="obs", space="right", cex=1.0))
+}
+ 

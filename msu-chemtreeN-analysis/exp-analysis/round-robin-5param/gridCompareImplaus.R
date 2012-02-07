@@ -9,8 +9,7 @@ source("~/local/include/libRbind/EmuRbind.R") # load the emu bindings
 initEmu()
 source("~/local/include/emu-analysis/fnAnalysis.R")
 
-## this defines, lumOutputFile, designFile, metOutputFile and desNames once and for all
-source("./fileNames.R")
+
 
 ## load the model data
 ##

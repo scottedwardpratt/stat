@@ -6,7 +6,6 @@ initEmu()
 
 source("~/local/include/emu-analysis/fnAnalysis.R")
 ## this defines: {lumOutputFile, metOutputFile, designFile, expDataFileLum, expDataFileMet}
-source("./fileNames.R")
 
 ## load the model data
 ##

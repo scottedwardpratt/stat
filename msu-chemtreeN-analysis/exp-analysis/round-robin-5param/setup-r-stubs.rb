@@ -20,6 +20,7 @@ def createSetupEmu(folder, name)
   printComment(script, "")
   printMwString(script,name)
   printComment(script, "load the master combAna file and do the analysis")
+  printLine(script, "source(\"../fileNames.R\")\n")
   printLine(script, "source(\"../combAna.R\")\n")
   script.close()
 end
@@ -35,6 +36,7 @@ def createSetupPlotImplaus(folder, name, compareNames)
   printLine(script, "for(index i in 1:ncompare){\n")
   printCompareNameIndex(script)
   printLine(script, "cat(\"# mwCompare: \" , mwStringCompare, \"\\n\")\n")
+  printLine(script, "source(\"../fileNames.R\")\n")
   printLine(script, "source(\"../plotImplaus.R\")\n")
   printLine(script, "}\n\n")
   script.close()
@@ -48,9 +50,10 @@ def createSetupGridImplaus(folder, name, compareNames)
   printMwString(script, name)
   printCompareString(script, name, compareNames)
   printComment(script, "apply to everything")
-  printLine(script, "for(index i in 1:ncompare){\n")
+  printLine(script, "for(index in 1:ncompare){\n")
   printCompareNameIndex(script)
   printLine(script, "cat(\"# mwCompare: \" , mwStringCompare, \"\\n\")\n")
+  printLine(script, "source(\"../fileNames.R\")\n")
   printLine(script, "source(\"../gridCompareImplaus.R\")\n")
   printLine(script, "}\n\n")
   script.close()
@@ -64,9 +67,17 @@ end
 
 def printCompareString(file, name, compareNames)
   printLine(file, "compareStrings <- c(")
-  compareNames.each {|name| printLine(file, "\"#{name}\", ")}
+  count = 0
+  compareNames.each do |name|
+    if(count < compareNames.length-1)
+      printLine(file, "\"#{name}\",")
+    else 
+      printLine(file, "\"#{name}\"")
+    end
+    count = count + 1
+  end
   printLine(file, ")\n")
-  printLine(file, "ncompare <- length(compareStrings)")
+  printLine(file, "ncompare <- length(compareStrings)\n")
 end
 
 def printMwString(file, name)

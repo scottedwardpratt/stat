@@ -17,26 +17,28 @@
 ## the implausibility becomes very strange when we include contributions from the metallicity
 ## as well as contributions from the lum.
 
-source("~/local/include/libRbind/EmuRbind.R") # load the emu bindings
+## source("~/local/include/libRbind/EmuRbind.R") # load the emu bindings
 
-arch <- system("uname -s", intern=TRUE)
-if(is.loaded("callEstimate") == FALSE){
-  libNAME <- "~/local/lib/libRBIND"
-  if(arch == "Linux"){
-    libNAME <- paste(libNAME, ".so", sep="")
-  } else if(arch =="Darwin"){
-    libNAME <- paste(libNAME, ".dylib", sep="")
-  } else {
-    buffer <- paste("error: uname -s gives ", arch , " not supported", sep="")
-    stop(buffer)
-  }
-  dyn.load(libNAME)
-}
+## arch <- system("uname -s", intern=TRUE)
+## if(is.loaded("callEstimate") == FALSE){
+##   libNAME <- "~/local/lib/libRBIND"
+##   if(arch == "Linux"){
+##     libNAME <- paste(libNAME, ".so", sep="")
+##   } else if(arch =="Darwin"){
+##     libNAME <- paste(libNAME, ".dylib", sep="")
+##   } else {
+##     buffer <- paste("error: uname -s gives ", arch , " not supported", sep="")
+##     stop(buffer)
+##   }
+##   dyn.load(libNAME)
+## }
 
-#library(MASS)
+## #library(MASS)
 
-source("~/local/include/libRbind/emuOverDesign.R") # functions for running the emulator over the design in high dims
-source("~/local/include/libRbind/implausOverDesign.R") # functions for computing the implausibility
+## source("~/local/include/libRbind/emuOverDesign.R") # functions for running the emulator over the design in high dims
+## source("~/local/include/libRbind/implausOverDesign.R") # functions for computing the implausibility
+
+library(emurPkg) ## hehe load it as a library instead, this kind of works :)
 source("~/local/include/libRbind/testEst.R") # for testing the estimation of thetas
 
 source("~/local/include/emu-analysis/fnAnalysis.R")

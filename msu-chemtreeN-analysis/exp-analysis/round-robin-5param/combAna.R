@@ -8,8 +8,6 @@ source("~/local/include/libRbind/EmuRbind.R") # load the emu bindings
 initEmu()
 source("~/local/include/emu-analysis/fnAnalysis.R")
 
-source("./fileNames.R")
-
 
 ## load the model data
 ##

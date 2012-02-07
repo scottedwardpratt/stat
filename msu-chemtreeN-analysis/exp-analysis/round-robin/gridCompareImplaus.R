@@ -77,11 +77,10 @@ fnData$exp.obs = expData
 ####
 
 implausGrid <- fn.implaus.grid(fnData, 1, 2, 3, grid.size=32) ## make grid of implausibility in 1,2,3 space
+
 buffer <- paste("./", mwStringCompare , "/implaus-grid-observations-", mwStringCompare, "-training-", mwString, "-dump.csv", sep="")
-xmin.val = min(designData[,1])
-ymin.val = min(designData[,2])
-zmin.val = min(designData[,3])
-dump.grid.csv(implausGrid, outname=buffer, xmin=xmin.val, ymin=ymin.val, zmin=zmin.val)
-              
+
+dump.grid.csv(implausGrid, outname=buffer)
+
 buffer <- paste("./", mwStringCompare , "/implaus-grid-observations-", mwStringCompare, "-training-", mwString, ".dat", sep="")
 save(implausGrid, file=buffer)
