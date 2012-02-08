@@ -700,23 +700,28 @@ fn.implaus.grid <- function(fn.data, dimA, dimB, stepDim, fixedValVec=NULL, grid
   desScale.vec <- attr(fn.data$model.sample$des, "scaled:scale")
 
   
-  minVal <- min(fn.data$model.sample$des[dimA,]) * desScale.vec[dimA] + desCenter.vec[dimA]
-  maxVal <- max(fn.data$model.sample$des[dimA,]) * desScale.vec[dimA] + desCenter.vec[dimA]
-  dx <- (maxVal - minVal) / grid.size
+  ## minVal <- min(fn.data$model.sample$des[dimA,]) * desScale.vec[dimA] + desCenter.vec[dimA]
+  ## maxVal <- max(fn.data$model.sample$des[dimA,]) * desScale.vec[dimA] + desCenter.vec[dimA]
+  range.x <- fn.data$model.sample$des[dimA,] * desScale.vec[dimA] + desCenter.vec[dimA]
+  xmin <- min(range.x)
+  xmax <- max(range.x)
+  dx <- abs(xmax - xmin) / grid.size
 
-  xrange <- c(minVal, maxVal)
+  xrange <- c(xmin, xmax)
 
-  minVal <- min(fn.data$model.sample$des[dimB,]) * desScale.vec[dimB] + desCenter.vec[dimB]
-  maxVal <- max(fn.data$model.sample$des[dimB,]) * desScale.vec[dimB] + desCenter.vec[dimB]
-  dy <- (maxVal - minVal) / grid.size
+  range.y <- fn.data$model.sample$des[dimB,] * desScale.vec[dimB] + desCenter.vec[dimB]
+  ymin <- min(range.y)
+  ymax <- max(range.y)
+  dy <- abs(ymax - ymin) / grid.size
 
-  yrange <- c(minVal, maxVal)
+  yrange <- c(ymin, ymax)
 
-  minVal <- min(fn.data$model.sample$des[stepDim,]) * desScale.vec[stepDim] + desCenter.vec[stepDim]
-  maxVal <- max(fn.data$model.sample$des[stepDim,])* desScale.vec[stepDim] + desCenter.vec[stepDim]
-  dz <- (maxVal - minVal) / grid.size
+  range.z <- fn.data$model.sample$des[stepDim,] * desScale.vec[stepDim] + desCenter.vec[stepDim]
+  zmin <- min(range.z)
+  zmax <- max(range.z)
+  dz <- abs(zmax - zmin) / grid.size
 
-  zrange <- c(minVal, maxVal)
+  zrange <- c(zmin, zmax)
 
   grid.final$x <- dimA
   grid.final$y <- dimB
