@@ -9,6 +9,8 @@ source("~/local/include/libRbind/EmuRbind.R") # load the emu bindings
 initEmu()
 source("~/local/include/emu-analysis/fnAnalysis.R")
 
+source("dump-grid-csv.R")
+
 ## 21.02.2012
 ## assumes that fileNames.R has been sourced
 ## fileNames defines: lumOutputFile, metOutputFile designFile, expDataFileLum, and expDataFileMet

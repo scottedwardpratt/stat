@@ -82,5 +82,8 @@ buffer <- paste("./", mwStringCompare , "/implaus-grid-observations-", mwStringC
 
 dump.grid.csv(implausGrid, outname=buffer)
 
+buffer <- paste("./", mwStringCompare , "/implaus-grid-observations-", mwStringCompare, "-training-", mwString,"-inde-",sep="")
+dump.grid.inde.csv(implausGrid, outstub=buffer)
+
 buffer <- paste("./", mwStringCompare , "/implaus-grid-observations-", mwStringCompare, "-training-", mwString, ".dat", sep="")
 save(implausGrid, file=buffer)

@@ -25,7 +25,7 @@ compute.evidence <- function(grid){
 
   posterior <- exp(-grid$grid/2.0)
   
-  evidence <- sum(posterior * dvol)#  * priorValueX * priorValueY * priorValueZ)
+  evidence <- sum(posterior * dvol)
 }
 
 

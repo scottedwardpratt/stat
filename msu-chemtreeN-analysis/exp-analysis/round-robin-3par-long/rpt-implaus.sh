@@ -1,7 +1,6 @@
 #!/bin/zsh
-folders=$(find . -name 'mw*-round' -type d)
 
-for i in $folders; do
+for i in $(find . -name 'mw*-round' -type d); do
 		echo "# processing ${i}"
 		cd $i
 		R --slave < setup-plot-implaus.R

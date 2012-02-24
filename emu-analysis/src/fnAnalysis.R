@@ -688,14 +688,23 @@ fn.implaus.grid <- function(fn.data, dimA, dimB, stepDim, fixedValVec=NULL, grid
   
   grid.final <- list(grid=array(0, dim=c(grid.size, grid.size, grid.size)))
 
-
+  grid.final$inde <- vector("list", fnData$nbins)
+  
+  for(i in 1:fnData$nbins){
+    grid.final$inde[[i]] <- array(0, dim=c(grid.size, grid.size, grid.size))
+  }
+  
   
   for(i in 1:nsteps.z){
     grid.final$grid[,,i] <- as.matrix(implaus.slices[[i]]$implaus.joint)
+    for(index in 1:fnData$nbins){
+      grid.final$inde[[index]][,,i] <- as.matrix(implaus.slices[[i]]$implaus.inde[[index]])
+    }
   }
+  
   cat("# grid mangling done \n")
 
-    ## to scale the test-design points
+  ## to scale the test-design points
   desCenter.vec <- attr(fn.data$model.sample$des, "scaled:center")
   desScale.vec <- attr(fn.data$model.sample$des, "scaled:scale")
 

@@ -15,8 +15,9 @@ l2.dist.grid <- function(grid1, grid2){
   npts <- dim(grid1$grid)
   product <- grid1$grid * grid2$grid
 
+  vol <- (grid1$xrange[2]-grid1$xrange[1])*(grid1$yrange[2]-grid1$yrange[1])*(grid1$zrange[2]-grid1$zrange[1])
 
-  norm <- sum(product*dvol)
+  norm <- sum(product*dvol) * vol
 
   norm
 }
@@ -166,7 +167,7 @@ compare.round.robin <- function(outfile="./l2-comparison-matrix.dat"){
       
       gridList[[count]] <- implausGrid
       gridList[[count]]$name <- grid.Name
-      gridList[[count]]$thresh <- sapply(thresh.seq, function(x)(int.grid.thresh(implausGrid, x)))
+      #gridList[[count]]$thresh <- sapply(thresh.seq, function(x)(int.grid.thresh(implausGrid, x)))
       if(mwString == mwStringCompare){
         trainingGrids[[count.train]] <- implausGrid
         trainingGrids[[count.train]]$name <- grid.Name
@@ -186,11 +187,12 @@ compare.round.robin <- function(outfile="./l2-comparison-matrix.dat"){
   colnames(normMat.inv) <- names
   rownames(normMat.inv) <- names
 
-  thresh.vals <- sapply(gridList, function(x)(x$thresh))
-  thresh.final <- cbind(thresh.seq, thresh.vals)
-  colnames(thresh.final) <- c("t", names)
-  browser()
-  write.table(thresh.final, file="thresh-matrix.dat", row.names=FALSE)
+  ## thresh.vals <- sapply(gridList, function(x)(x$thresh))
+  ## thresh.final <- cbind(thresh.seq, thresh.vals)
+  ## colnames(thresh.final) <- c("t", names)
+
+  ## #browser()
+  ## write.table(thresh.final, file="thresh-matrix.dat", row.names=FALSE)
 
   
   
@@ -200,7 +202,7 @@ compare.round.robin <- function(outfile="./l2-comparison-matrix.dat"){
     for(j in 1:ngrids){
       cat("# ", i, j, "\n")
       normMat[i,j] <- l2.normed.grid(gridList[[i]], gridList[[j]])
-      normMat.inv[i,j] <- l2.normed.grid.inv(gridList[[i]], gridList[[j]])
+      #normMat.inv[i,j] <- l2.normed.grid.inv(gridList[[i]], gridList[[j]])
       sum.diff.Mat[i,j] <- norm.sum.diff.grids(gridList[[i]], gridList[[j]])
     }
   }
