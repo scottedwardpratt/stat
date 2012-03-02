@@ -390,9 +390,10 @@ fn.implaus.slice <- function(fn.data, slice.data){
       implaus.joint[i,j] <- t(expData$obsValue - mean.vec) %*% V.mat.inv %*% (expData$obsValue - mean.vec) 
       imp.inde.vec <- NULL
       for(k in 1:fnData$nbins){
-        implaus.inde[[k]][i,j] <- (mean.vec[k] - expData$obsValue[k])**2 / (V.mat[k,k]) 
-        if(implaus.inde[[k]][i,j] > 4.0)
-          implaus.inde[[k]][i,j] <- 4.0
+        implaus.inde[[k]][i,j] <- (mean.vec[k] - expData$obsValue[k])**2 / (V.mat[k,k])
+        # this cut-off was not helpful for facundo, removed
+        #if(implaus.inde[[k]][i,j] > 4.0)
+        #  implaus.inde[[k]][i,j] <- 4.0
         imp.inde.vec <- c(imp.inde.vec, implaus.inde[[k]][i,j])
       }
       implaus.inde.max[i,j] <- max(imp.inde.vec)
