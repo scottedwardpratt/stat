@@ -390,9 +390,10 @@ fn.implaus.slice <- function(fn.data, slice.data){
       implaus.joint[i,j] <- t(expData$obsValue - mean.vec) %*% V.mat.inv %*% (expData$obsValue - mean.vec) 
       imp.inde.vec <- NULL
       for(k in 1:fnData$nbins){
-        implaus.inde[[k]][i,j] <- (mean.vec[k] - expData$obsValue[k])**2 / (V.mat[k,k]) 
-        if(implaus.inde[[k]][i,j] > 4.0)
-          implaus.inde[[k]][i,j] <- 4.0
+        implaus.inde[[k]][i,j] <- (mean.vec[k] - expData$obsValue[k])**2 / (V.mat[k,k])
+        # this cut-off was not helpful for facundo, removed
+        #if(implaus.inde[[k]][i,j] > 4.0)
+        #  implaus.inde[[k]][i,j] <- 4.0
         imp.inde.vec <- c(imp.inde.vec, implaus.inde[[k]][i,j])
       }
       implaus.inde.max[i,j] <- max(imp.inde.vec)
@@ -662,6 +663,92 @@ fn.plot.imp.steps <- function(fn.data, step.list, obsIndex, plot.joint=TRUE, tit
 }
 
 
+####################################################
+##
+## compute the implausibility on a grid in 3d
+##
+## if nparams > 3 fixedValVec can be used to fix the other parameters
+##
+## ultimately we will want to do this in all nparams directions, a proper fn will have to be written to manage this
+##
+####################################################
+fn.implaus.grid <- function(fn.data, dimA, dimB, stepDim, fixedValVec=NULL, grid.size=64){
+  ## we do this by making grid.size slices in the stepDim direction,
+  ## computing the implaus for each slice and glomming it all together
+  ##
+  ## this is not terribly efficient because we're initing the emulator a lot
+
+  nsteps.z <- grid.size
+  cat("# implaus.grid, grid.size:", grid.size,"\n")
+  slice.list <- fn.emu.steps(fn.data, dimA, dimB, stepDim, fixedValVec=NULL, nsteps=nsteps.z, nemupts=grid.size)
+  cat("# emu.stepping done \n")
+
+  ## now compute the implaus over the slice.list
+  implaus.slices <- fn.implaus.steps(fn.data, slice.list)
+  cat("# implaus.slicing done \n")
+  
+  grid.final <- list(grid=array(0, dim=c(grid.size, grid.size, grid.size)))
+
+  grid.final$inde <- vector("list", fnData$nbins)
+  
+  for(i in 1:fnData$nbins){
+    grid.final$inde[[i]] <- array(0, dim=c(grid.size, grid.size, grid.size))
+  }
+  
+  
+  for(i in 1:nsteps.z){
+    grid.final$grid[,,i] <- as.matrix(implaus.slices[[i]]$implaus.joint)
+    for(index in 1:fnData$nbins){
+      grid.final$inde[[index]][,,i] <- as.matrix(implaus.slices[[i]]$implaus.inde[[index]])
+    }
+  }
+  
+  cat("# grid mangling done \n")
+
+  ## to scale the test-design points
+  desCenter.vec <- attr(fn.data$model.sample$des, "scaled:center")
+  desScale.vec <- attr(fn.data$model.sample$des, "scaled:scale")
+
+  
+  ## minVal <- min(fn.data$model.sample$des[dimA,]) * desScale.vec[dimA] + desCenter.vec[dimA]
+  ## maxVal <- max(fn.data$model.sample$des[dimA,]) * desScale.vec[dimA] + desCenter.vec[dimA]
+  range.x <- fn.data$model.sample$des[dimA,] * desScale.vec[dimA] + desCenter.vec[dimA]
+  xmin <- min(range.x)
+  xmax <- max(range.x)
+  dx <- abs(xmax - xmin) / grid.size
+
+  xrange <- c(xmin, xmax)
+
+  range.y <- fn.data$model.sample$des[dimB,] * desScale.vec[dimB] + desCenter.vec[dimB]
+  ymin <- min(range.y)
+  ymax <- max(range.y)
+  dy <- abs(ymax - ymin) / grid.size
+
+  yrange <- c(ymin, ymax)
+
+  range.z <- fn.data$model.sample$des[stepDim,] * desScale.vec[stepDim] + desCenter.vec[stepDim]
+  zmin <- min(range.z)
+  zmax <- max(range.z)
+  dz <- abs(zmax - zmin) / grid.size
+
+  zrange <- c(zmin, zmax)
+
+  grid.final$x <- dimA
+  grid.final$y <- dimB
+  grid.final$z <- stepDim
+  grid.final$dx <- dx
+  grid.final$dy <- dy
+  grid.final$dz <- dz
+  grid.final$xrange <- xrange
+  grid.final$yrange <- yrange
+  grid.final$zrange <- zrange
+  grid.final$fixedValVec <- fixedValVec
+
+  invisible(grid.final)
+}
+  
+                          
+
 
 
 #####################################################
@@ -867,4 +954,5 @@ reconCurveAtList <- function(pointSet, thetas, pca.decomp, cov.fn.in=1, reg.orde
   invisible(finalResult)
 
 }
+
 

@@ -1,0 +1,5 @@
+# General model: cf1(x) = a11*x+a21, Col1 = a11; Col2 = a21
+# 1st row: Coefficients 
+# 2rd row: 95% confidence bounds (coef +/- value)
+-0.06573   -2.382
+ 0.0045    0.0280          
