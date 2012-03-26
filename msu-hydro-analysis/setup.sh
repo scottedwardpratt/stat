@@ -35,7 +35,7 @@ if [ $# -lt 1 ]; then
 fi
 
 echo "# processing parameters"
-./data-prep/process-parameters.sh $1
+./data-prep/process-parameters.sh $1/parameters
 
 
 echo "# processing analysis files"
@@ -43,17 +43,20 @@ echo "# creating default combined analysis files"
 ## we'll create files for cents 1 2 3 for hbt,spec and spec and flow
 
 ## if you want to add another output type you should add its name here
-outputNames=(spectra-combined hbt-combined spec-and-flow-combined)
+##outputNames=(spectra-combined hbt-combined spec-and-flow-combined custom)
+outputNames=(custom)
 ## here you can add another centrality class, we currently have data for 30to40 and 40to50
-centNames=(0to10 10to20 20to30)
+centNames=(0to5 10to20 20to30)
+##centNames=(0to5)
 ## and you should add the name of the specification file here
-specFiles=(spectra-only-spec.dat hbt-only-spec.dat star-spectra-and-flow.dat)
+#specFiles=(spectra-only-spec.dat hbt-only-spec.dat star-spectra-and-flow.dat)
 
 countSpec=1
 for i in $outputNames; do
 		countCent=1
 		for j in $centNames; do
-				./data-prep/generate-analysis-files.rb $1/analysis $countCent $1/$i-$j.dat $1/$i-$j-errors.dat <./data-prep/$specFiles[$countSpec] $countSpec $countCent
+#				./data-prep/generate-analysis-files.rb $1/analysis $countCent $1/$i-$j.dat $1/$i-$j-errors.dat <./data-prep/$specFiles[$countSpec] $countSpec $countCent
+				./data-prep/generate-analysis-files.rb $1/analysis $countCent $1/$i-$j.dat $1/$i-$j-errors.dat <./data-prep/$i.dat $countSpec $countCent
 				countCent=$((countCent+1))
 		done
 		countSpec=$((countSpec+1))

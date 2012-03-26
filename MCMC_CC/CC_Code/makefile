@@ -93,6 +93,7 @@ uninstall:
 
 run: mcmcrun.cc
 	${CPP} ${OPT} ${INC} -o mcmc $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}
-	
+	cp mcmc ~/local/include/;
+
 test: emulatortest.cc
 	${CPP} ${OPT} ${INC} -o emutest $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}

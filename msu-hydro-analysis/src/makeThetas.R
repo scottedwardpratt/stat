@@ -73,7 +73,7 @@ cat("#OutPath ", outPath, "\n")
 cat("#full data will be written to: ", save.buffer, "\n")
 
 ## load the model (strip off the first col which is the run id)
-modelData <- as.matrix(read.table(modelOutput.file, header=TRUE))[,-1]
+modelData <- as.matrix(read.table(modelOutput.file, header=TRUE))
 
 ## the number of reps of the model we have 
 nruns <- dim(modelData)[1]
