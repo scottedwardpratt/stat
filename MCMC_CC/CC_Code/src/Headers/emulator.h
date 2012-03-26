@@ -14,9 +14,9 @@ public:
 	~EmulatorHandler();
 	void QueryEmulator(ParameterSet Theta,vector<double> &Means, vector<double> &Errors);
 	string Observables;
+	string Cent_Range;
 private:
 	string EmulatedParams;
-	string Cent_Range;
 	MCMCConfiguration *mcmc;
 	string EmulatorScriptHome;
 	string EmInputFile;

@@ -64,6 +64,7 @@ public:
 	
 	ParameterSet *BestParameterSetPtr;
 	double bestlikelihood;
+	double Likelihood_Current;
 	
 	bool VIZTRACE;
 	int  WRITEOUT;

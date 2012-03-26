@@ -19,7 +19,7 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
 	
 	EmulatorParams = parameter::getS(parmap, "EMULATOR_PARAMETERS", "");
-	ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "");
+	ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "blah blah blah");
 	vector<string> temp_logparam = parameter::getVS(parmap, "LOG_PARAMETERS", "");
 	
 	
@@ -69,7 +69,7 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
 	
 	EmulatorParams = parameter::getS(parmap, "EMULATOR_PARAMETERS", "");
-	ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "");
+	ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "blah blah blah");
 	for(int i=0;i<ParamNames.size();i++) printf("%s ",ParamNames[i].c_str());
 	printf("\n");
 	vector<string> temp_logparam = parameter::getVS(parmap, "LOG_PARAMETERS", "");
@@ -110,7 +110,7 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 	 cout << "Prior done." << endl;*/
 	
 	Proposal = new ProposalDistribution(this);
-	cout << "Proposal done." << endl;
+	//cout << "Proposal done." << endl;
 	
 }
 
@@ -129,13 +129,14 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 	APPEND_TRACE = parameter::getB(local_parmap, "APPEND_TRACE", false);
 	
 	ThetaList = new ParameterSetList(this);
-	
+	//Likelihood_Current=0;
+
 	if(VIZTRACE){
 		Visualizer = new VizHandler(this);
 		Viz_Count = parameter::getI(local_parmap, "VIZ_COUNT", floor(MAXITERATIONS/200));
 		Visualizer->UpdateTraceFig();
 	}
-	
+
 	if(APPEND_TRACE){
 		string addon = "";
 		bool Done = false;
@@ -180,6 +181,7 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
 	APPEND_TRACE = parameter::getB(local_parmap, "APPEND_TRACE", false);
 	
 	ThetaList = new ParameterSetList(this, Theta0);
+	//Likelihood_Current=0;
 	
 	if(VIZTRACE){
 		Visualizer = new VizHandler(this);
@@ -226,7 +228,7 @@ MCMCRun::~MCMCRun(){
 
 /** This runs MAXITERATIONS samplings */
 double MCMCRun::Run(){
-	double Likelihood_Current,Likelihood_New;
+	double Likelihood_Current, Likelihood_New;
 	double Prior_Current, Prior_New;
 	double Proposal_Current, Proposal_New;
 	
@@ -241,7 +243,7 @@ double MCMCRun::Run(){
 	Likelihood_Current = mcmcconfig->Likelihood->Evaluate(*ThetaZeroPtr);
 	Proposal_Current = mcmcconfig->Proposal->Evaluate(*ThetaZeroPtr);
 	Prior_Current = mcmcconfig->Prior->Evaluate(*ThetaZeroPtr);
-	
+
 	Accept_Count = 0;
 	for(int i =1; i<=MAXITERATIONS; i++){
 		LOGBF = 0;
@@ -259,7 +261,7 @@ double MCMCRun::Run(){
 		// cout << "Prior of proposed set: " << Prior_New << endl;
 		// cout << "Prior of current set: " << Prior_Current << endl;
 		// cout << "Proposal of proposed set: " << Proposal_New;
-		// cout << "Proposal of current set: " << Proposal_Current;
+		// cout << " Proposal of current set: " << Proposal_Current << endl;
 		
 		if(mcmcconfig->LOGLIKE){
 			LOGBF += (Likelihood_New-Likelihood_Current);
@@ -284,8 +286,11 @@ double MCMCRun::Run(){
 		 */
 		
 		alpha = min(1.0,exp(LOGBF));
+		//alpha = min(0.97,exp(LOGBF));
+		// cout << "exp(LOGBF): " << exp(LOGBF) << endl;
 		printf("%5d\talpha=%6.5f\t",i,alpha);
-		if(alpha > mcmcconfig->randnum->ran()){ //Accept the proposed set.
+		if(alpha > (mcmcconfig->randnum->ran())){ //Accept the proposed set.
+		//if(exp(LOGBF) > 1){ //Accept the proposed set.
 			printf("Accept\n");
 			Accept_Count++;
 			Likelihood_Current = Likelihood_New;

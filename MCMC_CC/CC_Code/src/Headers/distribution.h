@@ -100,13 +100,18 @@ public:
 	LikelihoodDistribution_RHIC(MCMCConfiguration *mcmc_in);
 	~LikelihoodDistribution_RHIC();
 	double Evaluate(ParameterSet Theta);
+	double *Datamean;
+	double *Dataerror;
 	//private:
-	vector<double> GetData();
-	vector<double> GetRealData(); //This is just a temporary name, this will replace "GetData()"
+	vector<double> GetFakeData();
+	vector<double> GetRealData(); 
 	vector<double> DATA;
 	bool UseEmulator;
 	ofstream emulator_test;
 	EmulatorHandler * emulator;
+	//int FindParam(string param_name, string observables_filename);
+	int FindParam(string param_name, vector<string> PNames);
+	parameterMap observablesparmap;
 };
 
 class LikelihoodDistribution_Cosmo:public LikelihoodDistribution {
@@ -130,7 +135,6 @@ public:
 	double Evaluate(ParameterSet Theta);
 	//private:
 	vector<double> GetData();
-	vector<double> GetRealData(); //This is just a temporary name, this will replace "GetData()"
 	vector<double> DATA;
 	bool UseEmulator;
 	ofstream emulator_test;

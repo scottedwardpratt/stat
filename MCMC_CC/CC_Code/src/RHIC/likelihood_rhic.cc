@@ -32,7 +32,7 @@ LikelihoodDistribution_RHIC::LikelihoodDistribution_RHIC(MCMCConfiguration *mcmc
 		exit(1);
 	}
 
-	DATA = GetData();
+	DATA = GetRealData();
 
 	//testing the outputs of the emulator at various points	// 
 	emulator_test.open("PCA0.dat");
@@ -71,10 +71,13 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	
 	//Read in appropriate elements
 	for(int i = 0; i<N; i++){
-		// gsl_matrix_set(sigma, i,i,Theta.GetValue("SIGMA"));
+		//gsl_matrix_set(sigma, i,i,Theta.GetValue("SIGMA"));
+		//ModelErrors[i]=0.1;
+		//if (ModelErrors[i] < 1) { ModelErrors[i]=1; }
 		gsl_matrix_set(sigma,i,i,ModelErrors[i]);
 		gsl_vector_set(model, i,ModelMeans[i]);
 		gsl_vector_set(mu, i, DATA[i]);
+		//cout << "i: " << i << " Data: " << DATA[i] <<  " Mean: " << ModelMeans[i] << " Error: " << ModelErrors[i] << endl;
 	}
 	
 	likelihood = Log_MVNormal(*model, *mu, *sigma);
@@ -112,7 +115,8 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	return likelihood;
 }
 
-vector<double> LikelihoodDistribution_RHIC::GetData(){
+vector<double> LikelihoodDistribution_RHIC::GetFakeData(){
+	//This makes some fake results by querying the emulator with the parameters from actual.param
 	vector<double> datameans;
 	vector<double> dataerror;
 	
@@ -133,47 +137,109 @@ vector<double> LikelihoodDistribution_RHIC::GetData(){
 }
 
 vector<double> LikelihoodDistribution_RHIC::GetRealData(){
-/*	vector<double> datameans;
-	vector<double> dataerror;
-	
-	parameterMap observablesparmap; //This is the observables in the emulator ouput
-
-	string EmulatorObservables=emulator->Observables; //The name of the observables we are working with
-	
-	string observables_filename = mcmc->parameterfile + "/" + EmulatorObservables + ".param"; //I would like to just call 
-	//on the observables list in "data-prep" but I think the format is wrong. If I am going to do it the way it is right
-	//now, I will need to add a line to setup.sh to generate the observabes list.
-	parameter::ReadParsFromFile(observablesparmap, observables_filename);
-	
-	//I will need to open up the real data, then I want to run over it with a for loop. Each pass will take one of the
-	//emulate observables and find a match, then use that to fill the datameans and dataerrors vectors.
-	//Becuase of the for loop method, I don't know if it is best to actually store the emulated observables in a
-	//parameter array. Perhaps I should store the data in a parameter array and just do a readline loop for the
-	//emulator observables.
-
-	// *********************/
-	// Here we go:
 	vector<double> datameans;
-	parameterMap observablesparmap;
 	string EmulatorObservables=emulator->Observables;
-	string observables_filename = "data-prep/" + EmulatorObservables + ".param";
-	string data_filename = "pathname for real data";
-	parameter::ReadParsFromFile(observablesparmap, data_filename);
-
+	//cout << "Observables: " << EmulatorObservables << endl;
+	string CentralityRange=emulator->Cent_Range; //This was coming up empty, then I tried fixing it, and it started working. I didn't change anything.
+	//cout << "CentralityRange: " << CentralityRange << endl;
+	string observables_filename = "data-prep/" + EmulatorObservables + ".dat";
+	cout << "Observables being read from: " << observables_filename << endl;
+	string data_filename = mcmc->dir_name + "/analysis/exp_data/cent" + CentralityRange + "/results.dat";
+	//string data_filename = mcmc->dir_name + "/analysis/exp_data/" + "cent20to30" + "/results.dat";
+	cout << "Results being read from: " << data_filename << endl;
+	
+	fstream data;
+	string type, param_name;
+	int count = 0;
+	
+	vector<string> PNames;
 	ifstream emulated_observables (observables_filename.c_str());
 
 	while(!emulated_observables.eof()){
 		string line;
-		double mean, error;
 		getline(emulated_observables, line, '\n');
-		//emulated_observables.getline(line,100);
 		if(line.compare(0,1,"#") != 0 && !line.empty() ){ //if the line is not a comment
-			// How this readline will work will depend on how the data file is formated
-			mean = parameter::getD(observablesparmap,line,-999);
-			datameans.push_back(mean);
+			PNames.push_back(line);
 		}
 	}
+	emulated_observables.close();
+
+	int numparams = PNames.size();
+	Datamean=new double[numparams];
+	Dataerror=new double[numparams];
+	vector<double> temp (numparams, .01);
+	double dump;
 	
+	data.open(data_filename.c_str(), fstream::in);
+	if(data){
+		while(data >> type){
+			if(strcmp(type.c_str(), "double") == 0){
+				data >> param_name;
+				int index = FindParam(param_name, PNames);
+				if(index != -1){ //returns -1 if not found
+					data >> Datamean[index]; //Mean
+					data >> Dataerror[index]; //Error
+					count++;
+					cout << param_name << " index: " << index << " " << Datamean[index] << endl;
+				}else{
+					cout << "Not using observable: " << param_name << endl;
+					data >> dump; //we aren't using the observable, so we need to get the data out of the stream
+					data >> dump;
+					//exit(1);
+				}
+			}else{
+				if(strncmp(type.c_str(), "#", 1) == 0){
+					string temp;
+					getline(data, temp, '\n');
+				}
+				else{
+					cout << "Unrecognized variable type " << type << endl;
+					exit(1);
+				}
+			}
+		}
+		data.close();
+	}else{
+		cout << "Warning: Unable to open data file in model directory." << endl;
+		 exit(1);
+	}
+
+	if(count!=numparams){
+		cout << "Not all emulated observables found!" << endl;
+		exit(1);
+	}
+
+	datameans.assign(Datamean,Datamean+numparams);
+
+	if(VERBOSE){
+		for(int i = 0; i<numparams; i++){
+			cout << "Data array: " << endl;
+			cout << "i: " << i << " Data: " << datameans[i] << endl;
+		}
+	}
 	return datameans;
+}
+
+int LikelihoodDistribution_RHIC::FindParam(string name, vector<string> PNames){ 
+	int out = -1;
+	int i = 0;
+	bool Found = false;
+	
+	while(i < PNames.size()){
+		// cout << "FindParam: Comparing " << name << " to " << PNames[i] << endl;
+		if(strcmp(PNames[i].c_str(), name.c_str()) == 0){
+			if(!Found){
+				out = i;
+				Found = true;
+			}else{ //A matching parameter has already been found, multiple parameters with the same name.
+				cout << PNames[out] << endl;
+				cout << PNames[i] << endl;
+				cout << "In ProposalName::FindParam; Duplicate parameter names found. Please change parameter names." << endl;
+				exit(1);
+			}
+		}
+		i++;
+	}
+	return out;
 }
 #endif

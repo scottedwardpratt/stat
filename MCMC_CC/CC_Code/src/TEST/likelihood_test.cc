@@ -26,7 +26,7 @@ LikelihoodDistribution_Test::LikelihoodDistribution_Test(MCMCConfiguration *mcmc
 	
 	// cout << "params declared." << endl;
 	if(UseEmulator){
-		emulator = new EmulatorHandler(parmap, mcmc_in);
+		cout << "This is a guassian test. The UseEmulator flag will be ignored." << endl;
 	}
 	else{
 		exit(1);
@@ -41,7 +41,6 @@ LikelihoodDistribution_Test::LikelihoodDistribution_Test(MCMCConfiguration *mcmc
 }
 
 LikelihoodDistribution_Test::~LikelihoodDistribution_Test(){
-	delete emulator;
 }
 
 double LikelihoodDistribution_Test::Evaluate(ParameterSet Theta){
@@ -54,16 +53,26 @@ double LikelihoodDistribution_Test::Evaluate(ParameterSet Theta){
 		begintime = clock();
 	}
 	
+
+	//Fill vectors:
 	if(UseEmulator){
-		emulator->QueryEmulator(Theta, ModelMeans, ModelErrors); //fills vectors with emulator output
+		// This is a gaussian test, so there shouldn't be an 'emulator' per say.
+		//emulator->QueryEmulator(Theta, ModelMeans, ModelErrors); //fills vectors with emulator output
 	}
 	else{
-		//determine another way to fill the vectors
+		int errors[]={0,0,0,0}; //For now
+		ModelErrors.assign (errors,errors+4);
+		int means[4];
+		for(int i=0;i<4;i++){
+			means[i]=Theta.Values[i];
+		}
+		ModelMeans.assign(means,means+4);
 	}
+	
 	
 	//Initialize GSL containers
 	int N = ModelErrors.size();
-	gsl_matrix * sigma = gsl_matrix_calloc(N,N);
+	//gsl_matrix * sigma = gsl_matrix_calloc(N,N);
 	gsl_vector * model = gsl_vector_alloc(N);
 	gsl_vector * mu = gsl_vector_alloc(N);
 	// cout << "Done allocating gsl containers." << endl;
@@ -72,31 +81,35 @@ double LikelihoodDistribution_Test::Evaluate(ParameterSet Theta){
 	//Read in appropriate elements
 	for(int i = 0; i<N; i++){
 		// gsl_matrix_set(sigma, i,i,Theta.GetValue("SIGMA"));
-		gsl_matrix_set(sigma,i,i,ModelErrors[i]);
+		//gsl_matrix_set(sigma,i,i,ModelErrors[i]);
 		gsl_vector_set(model, i,ModelMeans[i]);
 		gsl_vector_set(mu, i, DATA[i]);
 	}
 	
-	likelihood = Log_MVNormal(*model, *mu, *sigma);
+	//likelihood = Log_MVNormal(*model, *mu, *sigma);
 	
+	for(int i=0;i<4;i++){
+		likelihood+=(ModelMeans[i]-DATA[i])*(ModelMeans[i]-DATA[i])/2; //This is a gaussian, but it would be "log(exp(stuff))", so I just left it "stuff"
+	}
+
 	if(!(mcmc->LOGLIKE)){
 		likelihood = exp(likelihood);
 	}
 	
 	if(VERBOSE){
-		double sum = 0.0;
+		/*double sum = 0.0;
 		
 		for(int i = 0; i< N; i++){
 			sum += (gsl_vector_get(model, i) - gsl_vector_get(mu, i));
 		}
 		sum = sum/(double)N;
-		cout << "Average difference between outputs:" << sum << endl;
+		cout << "Average difference between outputs:" << sum << endl;*/
 	}
 	
 	//deallocate GSL containers.
 	gsl_vector_free(model);
 	gsl_vector_free(mu);
-	gsl_matrix_free(sigma);
+	//gsl_matrix_free(sigma);
 	
 	if(TIMING){
 		cout << "Likelihood evaluation took " << (clock()-begintime)*1000/CLOCKS_PER_SEC << " ms." << endl;
@@ -113,9 +126,14 @@ double LikelihoodDistribution_Test::Evaluate(ParameterSet Theta){
 }
 
 vector<double> LikelihoodDistribution_Test::GetData(){
+	//Four separate gaussians with means of 1, 2, 3, and 4 and standard deviations of 2. The means will be the input, 
+	//and three values on the gaussian will be the output.
+
 	vector<double> datameans;
-	vector<double> dataerror;
-	
+	int mymeans[]={1,2,3,4};
+	datameans.assign (mymeans,mymeans+4);
+	//vector<double> dataerror;
+	/*
 	parameterMap actualparmap;
 	
 	string actual_filename = mcmc->parameterfile + "/actual.param";
@@ -127,53 +145,8 @@ vector<double> LikelihoodDistribution_Test::GetData(){
 	ParameterSet ActualParams;
 	ActualParams.Initialize(temp_names, temp_values);
 	
-	emulator->QueryEmulator(ActualParams, datameans, dataerror);
+	emulator->QueryEmulator(ActualParams, datameans, dataerror);*/
 
-	return datameans;
-}
-
-vector<double> LikelihoodDistribution_Test::GetRealData(){
-/*	vector<double> datameans;
-	vector<double> dataerror;
-	
-	parameterMap observablesparmap; //This is the observables in the emulator ouput
-
-	string EmulatorObservables=emulator->Observables; //The name of the observables we are working with
-	
-	string observables_filename = mcmc->parameterfile + "/" + EmulatorObservables + ".param"; //I would like to just call 
-	//on the observables list in "data-prep" but I think the format is wrong. If I am going to do it the way it is right
-	//now, I will need to add a line to setup.sh to generate the observabes list.
-	parameter::ReadParsFromFile(observablesparmap, observables_filename);
-	
-	//I will need to open up the real data, then I want to run over it with a for loop. Each pass will take one of the
-	//emulate observables and find a match, then use that to fill the datameans and dataerrors vectors.
-	//Becuase of the for loop method, I don't know if it is best to actually store the emulated observables in a
-	//parameter array. Perhaps I should store the data in a parameter array and just do a readline loop for the
-	//emulator observables.
-
-	// *********************/
-	// Here we go:
-	vector<double> datameans;
-	parameterMap observablesparmap;
-	string EmulatorObservables=emulator->Observables;
-	string observables_filename = "data-prep/" + EmulatorObservables + ".param";
-	string data_filename = "pathname for real data";
-	parameter::ReadParsFromFile(observablesparmap, data_filename);
-
-	ifstream emulated_observables (observables_filename.c_str());
-
-	while(!emulated_observables.eof()){
-		string line;
-		double mean, error;
-		getline(emulated_observables, line, '\n');
-		//emulated_observables.getline(line,100);
-		if(line.compare(0,1,"#") != 0 && !line.empty() ){ //if the line is not a comment
-			// How this readline will work will depend on how the data file is formated
-			mean = parameter::getD(observablesparmap,line,-999);
-			datameans.push_back(mean);
-		}
-	}
-	
 	return datameans;
 }
 #endif
