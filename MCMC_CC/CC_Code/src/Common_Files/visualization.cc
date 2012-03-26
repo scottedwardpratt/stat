@@ -43,7 +43,7 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 	//cout << "The gnuplot header is: \n" << header << endl;
 
 	paramvalues = new string[mcmc->ThetaList->ParamNames.size()];
-	DequeParameterValues = new deque<string>[mcmc->ThetaList->ParamNames.size();
+	DequeParameterValues = new deque<string>[mcmc->ThetaList->ParamNames.size()];
 	MovingWindow = true; //This should be made into an option which is set in mcmc.param
 	HighestItnReadIn = 0;
 }
