@@ -8,8 +8,6 @@ PHENIX_SPECTRA_KAON_PCAVAL
 PHENIX_SPECTRA_PPBAR_YIELD
 PHENIX_SPECTRA_PPBAR_MEANPT
 PHENIX_SPECTRA_PPBAR_PCAVAL
-## V2 is not being used for the 0to5 cent bin. Untill a more elegant solution
-## is devised, the following must be commented out when using mcmc for 0to5.
-##STAR_V2_PION_PTWEIGHT
-##STAR_V2_KAON_PTWEIGHT
-##STAR_V2_PROTON_PTWEIGHT
+STAR_V2_PION_PTWEIGHT
+STAR_V2_KAON_PTWEIGHT
+STAR_V2_PROTON_PTWEIGHT
