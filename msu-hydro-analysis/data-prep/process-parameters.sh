@@ -27,7 +27,8 @@ fi
 
 
 TOP=`pwd`
-SCRIPT_PATH=${MADAI_ROOT}/data-prep
+#SCRIPT_PATH=${MADAI_ROOT}/data-prep
+SCRIPT_PATH=${TOP}/data-prep
 cd $1
 ${SCRIPT_PATH}/proc-param/combine-params.sh
 cd $TOP
