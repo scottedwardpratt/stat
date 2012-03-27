@@ -140,11 +140,11 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 	vector<double> datameans;
 	string EmulatorObservables=emulator->Observables;
 	//cout << "Observables: " << EmulatorObservables << endl;
-	string CentralityRange=emulator->Cent_Range; //This was coming up empty, then I tried fixing it, and it started working. I didn't change anything.
+	string CentralityRange=emulator->Cent_Range;
 	//cout << "CentralityRange: " << CentralityRange << endl;
-	string observables_filename = "data-prep/" + EmulatorObservables + ".dat";
+	string observables_filename = mcmc->dir_name + "/" + EmulatorObservables + "-" + CentralityRange + ".datnames";
 	cout << "Observables being read from: " << observables_filename << endl;
-	string data_filename = mcmc->dir_name + "/analysis/exp_data/cent" + CentralityRange + "/results.dat";
+	string data_filename = mcmc->dir_name + "/analysis/exp_data/" + CentralityRange + "/results.dat";
 	//string data_filename = mcmc->dir_name + "/analysis/exp_data/" + "cent20to30" + "/results.dat";
 	cout << "Results being read from: " << data_filename << endl;
 	
@@ -152,8 +152,10 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 	string type, param_name;
 	int count = 0;
 	
+	parameter::ReadParsFromFile(observablesparmap, observables_filename.c_str());
 	vector<string> PNames;
-	ifstream emulated_observables (observables_filename.c_str());
+	PNames = parameter::getVS(observablesparmap,"NAMES","blah blah");
+	/*ifstream emulated_observables (observables_filename.c_str());
 
 	while(!emulated_observables.eof()){
 		string line;
@@ -163,8 +165,9 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 		}
 	}
 	emulated_observables.close();
-
+*/
 	int numparams = PNames.size();
+	cout << numparams << endl;
 	Datamean=new double[numparams];
 	Dataerror=new double[numparams];
 	vector<double> temp (numparams, .01);

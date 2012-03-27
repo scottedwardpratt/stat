@@ -236,6 +236,10 @@ if(outputFile != STDOUT)
   outputFile.close()
 end
 
+outputFile = File.open(@finalOutputFile+"names", "w")
+outputFile.print("vector NAMES ")
+defaultResults[0].printHeader(outputFile);
+outputFile.close()
 
 ## now handle error output if any
 if(@errorOutputFile != nil)
