@@ -52,4 +52,6 @@ fi
 outpath=$basepath
 
 export infile paramfile outpath
-R --slave  < ${MADAI_ROOT}/src/makeThetas.R
+
+TOP=`pwd`
+R --slave  < ${TOP}/src/makeThetas.R
