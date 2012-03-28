@@ -1,6 +1,6 @@
 string MODEL RHIC
-string OBSERVABLES custom
-string CENTRALITY_RANGE 20to30
+string OBSERVABLES standard
+string CENTRALITY_RANGE allb
 int MAX_ITERATIONS 10000
 bool LOGLIKE true
 bool LOGPRIOR false
