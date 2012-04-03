@@ -155,7 +155,7 @@ void ParameterSetList::PrintDataToFile(){
 			for(int i = 0; i<Theta[0]->Names.size(); i++){
 				outputfile << Theta[0]->Names[i] << ",";
 			}
-			outputfile << endl;
+			// outputfile << "LIKELIHOOD" << endl;
 
 			for(int i =0; i < mcmc->WRITEOUT; i++){
 				if(Theta[i]->Used){
@@ -173,6 +173,7 @@ void ParameterSetList::PrintDataToFile(){
 						}
 					}
 					outputfile << endl;
+					// outputfile << "," << LikelihoodArray[i] << endl;
 				}
 			}
 			outputfile.close();

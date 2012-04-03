@@ -8,7 +8,8 @@ using namespace std;
 MCMCConfiguration::MCMCConfiguration(string info_dir){
 	configname = "default";
 	dir_name = info_dir;
-	parameterfile = info_dir+"/parameters/" + configname;
+	// parameterfile = info_dir+"/parameters/" + configuration;
+	parameterfile = info_dir+"/defaultpars/";
 	cout << "In config: " << parameterfile << endl;
 	parameter_file_name = parameterfile + "/mcmc.param";
 	cout << "Reading in " << parameter_file_name << endl;
@@ -58,7 +59,8 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 	configname = configuration;
 	dir_name = info_dir;
-	parameterfile = info_dir+"/parameters/" + configuration;
+	// parameterfile = info_dir+"/parameters/" + configuration;
+	parameterfile = info_dir+"/defaultpars/";
 	cout << "In config: " << parameterfile << endl;
 	parameter_file_name = parameterfile + "/mcmc.param";
 	cout << "Reading in " << parameter_file_name << endl;
@@ -134,7 +136,7 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 	if(VIZTRACE){
 		Visualizer = new VizHandler(this);
 		Viz_Count = parameter::getI(local_parmap, "VIZ_COUNT", floor(MAXITERATIONS/200));
-		Visualizer->UpdateTraceFig();
+		//Visualizer->UpdateTraceFig();
 	}
 
 	if(APPEND_TRACE){
@@ -186,7 +188,7 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
 	if(VIZTRACE){
 		Visualizer = new VizHandler(this);
 		Viz_Count = parameter::getI(local_parmap, "VIZ_COUNT", floor(MAXITERATIONS/200));
-		Visualizer->UpdateTraceFig();
+		//Visualizer->UpdateTraceFig();
 	}
 	
 	if(APPEND_TRACE){
@@ -307,15 +309,15 @@ double MCMCRun::Run(){
 		}
 		
 		ThetaList->Add(CurrentParameters);
-		
-		if(VIZTRACE){
+
+		if(VIZTRACE && (i>3)){
 			if((i+1) % Viz_Count == 0){
 				Visualizer->UpdateTraceFig();
 			}
 		}
 		if((i+1) % WRITEOUT == 0){
 			cout << "Writing out." << endl;
-			if(VIZTRACE){
+			if(VIZTRACE &&(i!=1)){
 				Visualizer->UpdateTraceFig();
 			}
 			ThetaList->WriteOut();

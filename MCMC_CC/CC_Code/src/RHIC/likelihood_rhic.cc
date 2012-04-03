@@ -111,7 +111,7 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	emulator_test << ModelMeans[0] << endl;
 	emulator_test.close();
 	// emulator_test << ModelMeans[0] << endl;
-	
+
 	return likelihood;
 }
 
@@ -140,11 +140,9 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 	vector<double> datameans;
 	string EmulatorObservables=emulator->Observables;
 	//cout << "Observables: " << EmulatorObservables << endl;
-	string CentralityRange=emulator->Cent_Range;
-	//cout << "CentralityRange: " << CentralityRange << endl;
-	string observables_filename = mcmc->dir_name + "/" + EmulatorObservables + "-" + CentralityRange + ".datnames";
+	string observables_filename = mcmc->dir_name + "/" + EmulatorObservables + ".datnames";
 	cout << "Observables being read from: " << observables_filename << endl;
-	string data_filename = mcmc->dir_name + "/analysis/exp_data/" + CentralityRange + "/results.dat";
+	string data_filename = mcmc->dir_name + "/exp_data/results.dat";
 	//string data_filename = mcmc->dir_name + "/analysis/exp_data/" + "cent20to30" + "/results.dat";
 	cout << "Results being read from: " << data_filename << endl;
 	
@@ -167,7 +165,7 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 	emulated_observables.close();
 */
 	int numparams = PNames.size();
-	cout << numparams << endl;
+	cout << "There are " << numparams  << " parameters used in the emulator." << endl;
 	Datamean=new double[numparams];
 	Dataerror=new double[numparams];
 	vector<double> temp (numparams, .01);

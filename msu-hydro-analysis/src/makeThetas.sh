@@ -24,7 +24,7 @@ if [ $# -lt 2 ]; then
 fi
 
 
-if [ -d $basepath -a -d $basepath/analysis -a -d $basepath/parameters ]; then 
+if [ -d $basepath -a -d $basepath/model_results -a -d $basepath/parameters ]; then 
 		echo "# estimating thetas for: ${basepath}"
 else 
 		echo "arg: ${basepath} doesn't exist or is bad"
