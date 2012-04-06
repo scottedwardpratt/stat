@@ -108,6 +108,19 @@ ParameterSetList::ParameterSetList(MCMCRun *mcmc_in){
 	GetTheta0FromFile();
 }
 
+ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, string filler){
+	mcmc = mcmc_in;
+	Theta = new ParameterSet*[mcmc->WRITEOUT+1];
+	for(int i = 0; i < mcmc->WRITEOUT; i++){
+		Theta[i] = new ParameterSet(this);
+	}
+	WriteOutCounter = 0;
+	CurrentIteration = 0;
+	HoldOver = new ParameterSet(this);
+	
+	GetRandomTheta0();
+}
+
 ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, ParameterSet Theta0){
 	mcmc = mcmc_in;
 	Theta = new ParameterSet*[mcmc->WRITEOUT+1];
@@ -131,6 +144,51 @@ void ParameterSetList::GetTheta0FromFile(){
 	vector<string> temp_names = parameter::getVS(parmap, "NAMES", "");
 	vector<double> temp_values = parameter::getV(parmap, "VALUES", "");
 	
+	ParamNames = temp_names;
+	temp_set.Names = temp_names;
+	temp_set.Values = temp_values;
+	
+	Add(temp_set);
+}
+
+void ParameterSetList::GetRandomTheta0(){
+	cout << "We are using random theta0 values. They are:" << endl;
+	parameterMap parmap;
+	string range_filename = (mcmc->mcmcconfig)->dir_name + "/ranges.dat";
+	ParameterSet temp_set(this);
+	string line,temp,name;
+	double low,high;
+	vector<string> temp_names;
+	vector<double> temp_values;
+
+	ifstream range_file;
+	range_file.open(range_filename.c_str());
+	if(!range_file){
+		printf("ParameterSetList::GetRandomTheta0 says: We can't seem to open the ranges.dat file.");
+		exit(1);
+	}
+
+	getline(range_file,line,'\n');
+
+	while(!range_file.eof()){
+		stringstream ss;
+		ss << line;
+		ss >> temp >> name >> low >> high;
+		//Now we need to pick a value between low and high and set it as a theta value.
+		temp_names.push_back(name);
+		temp_values.push_back(double(rand() % int((high-low)*1000))/1000+low);
+
+		ss.flush();
+		cout << name << " " << double(rand() % int((high-low)*1000))/1000+low << endl;
+
+		getline(range_file,line,'\n');
+	}
+
+	/*ParameterSet temp_set(this);
+	parameter::ReadParsFromFile(parmap, theta0_filename);
+	vector<string> temp_names = parameter::getVS(parmap, "NAMES", "");
+	vector<double> temp_values = parameter::getV(parmap, "VALUES", "");
+	*/
 	ParamNames = temp_names;
 	temp_set.Names = temp_names;
 	temp_set.Values = temp_values;

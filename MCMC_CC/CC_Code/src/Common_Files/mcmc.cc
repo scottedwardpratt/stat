@@ -130,7 +130,13 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 	VIZTRACE = parameter::getB(local_parmap, "VISUALIZE_TRACE", true);
 	APPEND_TRACE = parameter::getB(local_parmap, "APPEND_TRACE", false);
 	
-	ThetaList = new ParameterSetList(this);
+	if(RANDOM_THETA0){
+		string filler="filler";
+		ThetaList = new ParameterSetList(this, filler);
+	}
+	else{
+		ThetaList = new ParameterSetList(this);
+	}
 	//Likelihood_Current=0;
 
 	if(VIZTRACE){
@@ -181,8 +187,15 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
 	WRITEOUT = parameter::getI(local_parmap, "WRITEOUT", 100);
 	VIZTRACE = parameter::getB(local_parmap, "VISUALIZE_TRACE", true);
 	APPEND_TRACE = parameter::getB(local_parmap, "APPEND_TRACE", false);
+	RANDOM_THETA0 = parameter::getB(local_parmap, "RANDOM_THETA0", false);
 	
-	ThetaList = new ParameterSetList(this, Theta0);
+	if(RANDOM_THETA0){
+		string filler="filler";
+		ThetaList = new ParameterSetList(this, filler);
+	}
+	else{
+		ThetaList = new ParameterSetList(this, Theta0);
+	}
 	//Likelihood_Current=0;
 	
 	if(VIZTRACE){

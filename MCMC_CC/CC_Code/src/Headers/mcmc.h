@@ -70,6 +70,8 @@ public:
 	int  WRITEOUT;
 	bool APPEND_TRACE;
 	int MAXITERATIONS;
+	bool RANDOM_THETA0;
+	
 	string tracedir;
 	MCMCConfiguration *mcmcconfig;
 	VizHandler *Visualizer;
