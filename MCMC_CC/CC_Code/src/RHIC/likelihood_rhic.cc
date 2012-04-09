@@ -83,8 +83,11 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	//likelihood = Log_MVNormal(*model, *mu, *sigma);
 	likelihood = Gaussian(*model, *mu, *sigma);
 	
-	if(mcmc->LOGLIKE){
+	/*if(!(mcmc->LOGLIKE)){ //If you don't want the loglikelihood, and we've used Log_MVN, we have to exponentiate.
 		likelihood = exp(likelihood);
+	}*/
+	if(mcmc->LOGLIKE){ //If you do want the loglikelihood, and we've used Gaussian, we have to take the log.
+		likelihood = log(likelihood);
 	}
 	
 	if(VERBOSE){

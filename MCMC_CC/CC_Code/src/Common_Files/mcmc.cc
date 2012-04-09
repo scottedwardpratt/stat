@@ -288,7 +288,16 @@ double MCMCRun::Run(){
 		else{
 			LOGBF +=log(Likelihood_New/Likelihood_Current);
 		}*/
-		LOGBF=Likelihood_New/Likelihood_Current;
+		if(mcmcconfig->LOGLIKE){
+			printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
+			LOGBF = Likelihood_New-Likelihood_Current;
+			alpha = min(1.0,exp(LOGBF));
+		}
+		else{
+			printf(" l_new=%g, l_current=%g\n",Likelihood_New,Likelihood_Current);
+			LOGBF = Likelihood_New/Likelihood_Current;
+			alpha = min(1.0,LOGBF);
+		}
 		/*
 		if(mcmcconfig->LOGPRIOR){
 			LOGBF += (Prior_New-Prior_Current);
@@ -304,12 +313,11 @@ double MCMCRun::Run(){
 		}
 		 */
 		
-		alpha = min(1.0,LOGBF);
 		//alpha = min(1.0,exp(LOGBF));
 		//alpha = min(0.97,exp(LOGBF));
 		// cout << "exp(LOGBF): " << exp(LOGBF) << endl;
 		printf("%5d\talpha=%6.5f\t",i,alpha);
-		if(alpha > (mcmcconfig->randnum->ran())){ //Accept the proposed set.
+		if(alpha > (mcmcconfig->randnum->ran())) { //Accept the proposed set.
 		//if(alpha > 1){
 		//if(exp(LOGBF) > 1){ //Accept the proposed set.
 			printf("Accept\n");
@@ -321,7 +329,12 @@ double MCMCRun::Run(){
 			if(Likelihood_Current>bestlikelihood && i>1){
 				bestlikelihood=Likelihood_New;
 				BestParameterSetPtr=&CurrentParameters;
-				printf("XXXXXXXXX YIPPEE!! Best parameters so far, likelihood=%g\n",bestlikelihood);
+				if(mcmcconfig->LOGLIKE){
+					printf("XXXXXXXXX YIPPEE!! Best parameters so far, loglikelihood=%g\n",bestlikelihood);
+				}
+				else{
+					printf("XXXXXXXXX YIPPEE!! Best parameters so far, likelihood=%g\n",bestlikelihood);
+				}
 			}
 		}else{
 			printf("Reject\n");
