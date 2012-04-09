@@ -72,7 +72,7 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	//Read in appropriate elements
 	for(int i = 0; i<N; i++){
 		//gsl_matrix_set(sigma, i,i,Theta.GetValue("SIGMA"));
-		//ModelErrors[i]=0.1;
+		//ModelErrors[i]=0.1; //Suppressing the error of the emulator
 		//if (ModelErrors[i] < 1) { ModelErrors[i]=1; }
 		gsl_matrix_set(sigma,i,i,ModelErrors[i]);
 		gsl_vector_set(model, i,ModelMeans[i]);
@@ -80,9 +80,10 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 		//cout << "i: " << i << " Data: " << DATA[i] <<  " Mean: " << ModelMeans[i] << " Error: " << ModelErrors[i] << endl;
 	}
 	
-	likelihood = Log_MVNormal(*model, *mu, *sigma);
+	//likelihood = Log_MVNormal(*model, *mu, *sigma);
+	likelihood = Gaussian(*model, *mu, *sigma);
 	
-	if(!(mcmc->LOGLIKE)){
+	if(mcmc->LOGLIKE){
 		likelihood = exp(likelihood);
 	}
 	

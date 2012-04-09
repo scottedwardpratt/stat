@@ -34,6 +34,7 @@ public:
 	
 	double Normal(double x, double mu, double sigma);
 	double Gaussian(double x, double mu, double sigma);
+	double Gaussian(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
 	double Log_MVNormal(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
 	double MVNormal(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
 	double LogNormal(double x, double mu, double sigma);

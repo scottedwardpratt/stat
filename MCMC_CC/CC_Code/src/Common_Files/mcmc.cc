@@ -129,10 +129,12 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 	WRITEOUT = parameter::getI(local_parmap, "WRITEOUT", 100);
 	VIZTRACE = parameter::getB(local_parmap, "VISUALIZE_TRACE", true);
 	APPEND_TRACE = parameter::getB(local_parmap, "APPEND_TRACE", false);
+	RANDOM_THETA0 = parameter::getB(local_parmap, "RANDOM_THETA0", false);
+	SEED = parameter::getI(local_parmap, "SEED", 1111);
 	
 	if(RANDOM_THETA0){
 		string filler="filler";
-		ThetaList = new ParameterSetList(this, filler);
+		ThetaList = new ParameterSetList(this, SEED);
 	}
 	else{
 		ThetaList = new ParameterSetList(this);
@@ -188,10 +190,11 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
 	VIZTRACE = parameter::getB(local_parmap, "VISUALIZE_TRACE", true);
 	APPEND_TRACE = parameter::getB(local_parmap, "APPEND_TRACE", false);
 	RANDOM_THETA0 = parameter::getB(local_parmap, "RANDOM_THETA0", false);
+	SEED = parameter::getI(local_parmap, "SEED", 1111);
 	
 	if(RANDOM_THETA0){
 		string filler="filler";
-		ThetaList = new ParameterSetList(this, filler);
+		ThetaList = new ParameterSetList(this, SEED);
 	}
 	else{
 		ThetaList = new ParameterSetList(this, Theta0);
@@ -278,13 +281,14 @@ double MCMCRun::Run(){
 		// cout << "Proposal of proposed set: " << Proposal_New;
 		// cout << " Proposal of current set: " << Proposal_Current << endl;
 		
-		if(mcmcconfig->LOGLIKE){
+		/*if(mcmcconfig->LOGLIKE){
 			LOGBF += (Likelihood_New-Likelihood_Current);
 			printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
 		}
 		else{
 			LOGBF +=log(Likelihood_New/Likelihood_Current);
-		}
+		}*/
+		LOGBF=Likelihood_New/Likelihood_Current;
 		/*
 		if(mcmcconfig->LOGPRIOR){
 			LOGBF += (Prior_New-Prior_Current);
@@ -300,11 +304,13 @@ double MCMCRun::Run(){
 		}
 		 */
 		
-		alpha = min(1.0,exp(LOGBF));
+		alpha = min(1.0,LOGBF);
+		//alpha = min(1.0,exp(LOGBF));
 		//alpha = min(0.97,exp(LOGBF));
 		// cout << "exp(LOGBF): " << exp(LOGBF) << endl;
 		printf("%5d\talpha=%6.5f\t",i,alpha);
 		if(alpha > (mcmcconfig->randnum->ran())){ //Accept the proposed set.
+		//if(alpha > 1){
 		//if(exp(LOGBF) > 1){ //Accept the proposed set.
 			printf("Accept\n");
 			Accept_Count++;

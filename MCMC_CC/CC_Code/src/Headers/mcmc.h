@@ -71,6 +71,7 @@ public:
 	bool APPEND_TRACE;
 	int MAXITERATIONS;
 	bool RANDOM_THETA0;
+	int SEED;
 	
 	string tracedir;
 	MCMCConfiguration *mcmcconfig;

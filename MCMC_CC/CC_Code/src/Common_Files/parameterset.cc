@@ -108,7 +108,7 @@ ParameterSetList::ParameterSetList(MCMCRun *mcmc_in){
 	GetTheta0FromFile();
 }
 
-ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, string filler){
+ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, int seed){
 	mcmc = mcmc_in;
 	Theta = new ParameterSet*[mcmc->WRITEOUT+1];
 	for(int i = 0; i < mcmc->WRITEOUT; i++){
@@ -118,7 +118,7 @@ ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, string filler){
 	CurrentIteration = 0;
 	HoldOver = new ParameterSet(this);
 	
-	GetRandomTheta0();
+	GetRandomTheta0(seed);
 }
 
 ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, ParameterSet Theta0){
@@ -151,7 +151,8 @@ void ParameterSetList::GetTheta0FromFile(){
 	Add(temp_set);
 }
 
-void ParameterSetList::GetRandomTheta0(){
+void ParameterSetList::GetRandomTheta0(int seed){
+	srand(seed);
 	cout << "We are using random theta0 values. They are:" << endl;
 	parameterMap parmap;
 	string range_filename = (mcmc->mcmcconfig)->dir_name + "/ranges.dat";
