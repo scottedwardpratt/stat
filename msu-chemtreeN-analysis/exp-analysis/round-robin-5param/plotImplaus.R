@@ -47,20 +47,38 @@ load(buffer)
 ## now wodge in the expData, but actually the fn fn.implaus.slice uses the globally available expData
 fnData$exp.obs = expData
 
-## generates the joint-implausibility slices
-stepData <- fn.emu.steps(fnData, 1, 3, 2)
-impSteps <- fn.implaus.steps(fnData, stepData)
-buffer <- paste("./", mwStringCompare , "/images/joint-implaus-1-3-2.pdf", sep="")
-pdf(buffer)
-fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE, title.in=paste(mwString, "vs", mwStringCompare))
-dev.off()
+## systematically generate all projections of the joint implaus
+combs <- combn(nparams, 3)
+ncombs <- dim(combs)[2]
+for(i in 1:ncombs){
+  fixedValVec <- rep(0, nparams)
+  fixedValVec[combs[1,i]] <- NA
+  fixedValVec[combs[2,i]] <- NA
+  fixedValVec[combs[3,i]] <- NA
+  stepData <- fn.emu.steps(fnData, combs[1,i], combs[2,i], combs[3,i], fixedValVec)
+  impSteps <- fn.implaus.steps(fnData, stepData)
+  buffer <- paste("./", mwStringCompare, "/images/joint-implaus-",combs[1,i], "-", combs[2,i], "-", combs[3,i], ".pdf", sep="")
+  pdf(buffer)
+  cat("# obs: ", desNames[combs[3,i]], "\n")
+  fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE, title.in=paste(mwString, "vs", mwStringCompare, " z: ", desNames[combs[3,i]]))
+  dev.off()
+}
 
-## and the other way around
-stepData2 <- fn.emu.steps(fnData, 1, 2, 3)
-impSteps <- fn.implaus.steps(fnData, stepData2)
-buffer <- paste("./", mwStringCompare , "/images/joint-implaus-1-2-3.pdf", sep="")
-pdf(buffer)
-fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE, title.in=paste(mwString, "vs", mwStringCompare))
-dev.off()
+
+## ## generates the joint-implausibility slices
+## stepData <- fn.emu.steps(fnData, 1, 3, 2)
+## impSteps <- fn.implaus.steps(fnData, stepData)
+## buffer <- paste("./", mwStringCompare , "/images/joint-implaus-1-3-2.pdf", sep="")
+## pdf(buffer)
+## fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE, title.in=paste(mwString, "vs", mwStringCompare))
+## dev.off()
+
+## ## and the other way around
+## stepData2 <- fn.emu.steps(fnData, 1, 2, 3)
+## impSteps <- fn.implaus.steps(fnData, stepData2)
+## buffer <- paste("./", mwStringCompare , "/images/joint-implaus-1-2-3.pdf", sep="")
+## pdf(buffer)
+## fn.plot.imp.steps(fnData, impSteps, plot.joint=TRUE, title.in=paste(mwString, "vs", mwStringCompare))
+## dev.off()
 
 

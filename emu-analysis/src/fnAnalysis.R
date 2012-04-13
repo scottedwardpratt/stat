@@ -407,7 +407,7 @@ fn.implaus.slice <- function(fn.data, slice.data){
   
 }
 
-## compute the implausibility over a set of slices through the model
+## compute the implausibility.squared over a set of slices through the model
 ## the slices (stepData) have already been created by a call to fn.emu.steps
 ##
 ## @param stepData the set of slices we want to compute the implaus on
@@ -665,7 +665,7 @@ fn.plot.imp.steps <- function(fn.data, step.list, obsIndex, plot.joint=TRUE, tit
 
 ####################################################
 ##
-## compute the implausibility on a grid in 3d
+## compute the implausibility.squared on a grid in 3d
 ##
 ## if nparams > 3 fixedValVec can be used to fix the other parameters
 ##
@@ -680,7 +680,7 @@ fn.implaus.grid <- function(fn.data, dimA, dimB, stepDim, fixedValVec=NULL, grid
 
   nsteps.z <- grid.size
   cat("# implaus.grid, grid.size:", grid.size,"\n")
-  slice.list <- fn.emu.steps(fn.data, dimA, dimB, stepDim, fixedValVec=NULL, nsteps=nsteps.z, nemupts=grid.size)
+  slice.list <- fn.emu.steps(fn.data, dimA, dimB, stepDim, fixedValVec, nsteps=nsteps.z, nemupts=grid.size)
   cat("# emu.stepping done \n")
 
   ## now compute the implaus over the slice.list
@@ -892,7 +892,7 @@ reconCurveAtList <- function(pointSet, thetas, pca.decomp, cov.fn.in=1, reg.orde
     ## oh my lord, the zmat index needs to change for the different models, or else, what happens?
     model <- list(xmodel=as.matrix(t(pca.decomp$des)), training=t(pca.decomp$zmat)[,i])
 
-    ## 
+    ##
     temp <- callEmulateAtList(model, as.numeric(thetas[i,]), as.numeric(pointSet),
                               nemupts, nmodelpts, nparams=nparams, nthetas=nthetas,
                               cov.fn=cov.fn.in, reg.order=reg.order.in)
