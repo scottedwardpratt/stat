@@ -1,0 +1,4 @@
+bool USE_EMULATOR true
+bool TIMING false
+bool VERBOSE false
+string EMULATORFILEPATH /Users/johnnovak/MADAI/madai-analysis

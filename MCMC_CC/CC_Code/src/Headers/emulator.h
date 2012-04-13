@@ -16,7 +16,6 @@ public:
 	string Observables;
 private:
 	string EmulatedParams;
-	string Cent_Range;
 	MCMCConfiguration *mcmc;
 	string EmulatorScriptHome;
 	string EmInputFile;

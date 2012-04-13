@@ -13,6 +13,7 @@ class ParameterSet;
 class ParameterSetList{
 public:
 	ParameterSetList(MCMCRun *mcmc_in);
+	ParameterSetList(MCMCRun *mcmc_in, int);
 	ParameterSetList(MCMCRun *mcmc_in, ParameterSet Theta0);
 	MCMCRun *mcmc;
 	ParameterSet **Theta;
@@ -23,6 +24,7 @@ public:
 	
 	void Add(ParameterSet Theta_In);
 	void GetTheta0FromFile();
+	void GetRandomTheta0(int);
 	void PrintDataToFile();
 	void WriteOut();
 	void MakeTrace();

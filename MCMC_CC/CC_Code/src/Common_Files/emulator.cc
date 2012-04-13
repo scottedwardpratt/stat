@@ -10,9 +10,8 @@ EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMCConfiguration * mcmc_
 	mcmc = mcmc_in;
 	// cout << "EmulatorHandler: Constructor Start" << endl;
 	
-	EmulatorScriptHome = parameter::getS(*parmap, "EMULATORFILEPATH", "Couldn't find filepath");
+	EmulatorScriptHome = parameter::getS(*parmap, "EMULATORFILEPATH", "./");
 	Observables = parameter::getS(mcmc->parmap, "OBSERVABLES", "Observables not specified");
-	Cent_Range = parameter::getS(mcmc->parmap, "CENTRALITY_RANGE" , "Centrality range not specified");
 
 	// cout << "The emulator is located at " << EmulatorScriptHome << endl;
 	EmInputFile = EmulatorScriptHome + "/src/InputPts.txt";
@@ -35,16 +34,24 @@ EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMCConfiguration * mcmc_
 	f.close();
 	
 	//check if emulator has been run yet.
-	string checkfilename = mcmc->dir_name + "/" + Observables + "-" + Cent_Range + "-thetas.txt";
+	string checkfilename = mcmc->dir_name + "/" + Observables + "-thetas.txt";
 	// cout << checkfilename << endl;
 	
 	f.open(checkfilename.c_str());
 	if(f){
 		f.close();
 		// cout << "Emulator exists." << endl;
-	}else{
-		cerr << "EmulatorHandler: Emulator doesn't exist for this project yet!" << endl;
-		exit(1);
+	}else{ //If it can't find it:
+		f.close();
+		string checkfilename = "./" + Observables + "-thetas.txt"; //Check the base directory
+		f.open(checkfilename.c_str());
+		if(f){
+			f.close();
+			// cout << "Emulator exists." << endl;
+		}else{
+			cerr << "EmulatorHandler: Emulator doesn't exist for this project yet!" << endl;
+			exit(1);
+		}
 	}
 
 	// cout << "EmulatorHandler: Constructor Done." << endl;
@@ -103,7 +110,7 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 	// + mcmc->dir_name + " > "+ EmOutputFile + " 2> " + EmErrorFile;
 	
 	command = EmulatorScriptHome + "/src/computePoints.sh " + mcmc->dir_name + " "\
-	+ mcmc->dir_name + "/fn-data-" + Observables + "-" + Cent_Range + ".dat < " + EmInputFile + " > "+ EmOutputFile + " 2> " + EmErrorFile;
+	+ mcmc->dir_name + "/fn-data-" + Observables + ".dat < " + EmInputFile + " > "+ EmOutputFile + " 2> " + EmErrorFile;
 
 	// cout << command << endl;
 	

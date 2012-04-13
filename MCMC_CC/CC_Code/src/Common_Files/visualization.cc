@@ -10,6 +10,11 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 	mcmc = mcmc_in;
 	ThetaListSize = mcmc->WRITEOUT;
 	
+	if(!mcmc){
+		cout << "MCMC not loaded!" << endl;
+		exit(1);
+	}
+
 	gnuplotpipe = popen("gnuplot -persist", "w");
 	if(!gnuplotpipe){
 		cout << "Gnuplot not found!" << endl;
@@ -27,16 +32,19 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 	
 	header = "plot ";
 	for(int i = 0; i < mcmc->ThetaList->ParamNames.size(); i++){
-		header = header + "'-' w "+ gnuplotstyle + " t '"+ mcmc->ThetaList->ParamNames[i];
+		header = header + "'-' w " + gnuplotstyle + " t '" + mcmc->ThetaList->ParamNames[i]+ "'";
 		if(i != mcmc->ThetaList->ParamNames.size()-1){
-			header = header + "', ";
+			header = header + ", ";
 		}
 	}
+	//header = header + ", '-' w "+ gnuplotstyle + " t 'Likelihood'"; //Adding the Likelihood to the plot
 	header = header + "\n";
 	
+	//cout << "The gnuplot header is: \n" << header << endl;
+
 	paramvalues = new string[mcmc->ThetaList->ParamNames.size()];
 	DequeParameterValues = new deque<string>[mcmc->ThetaList->ParamNames.size()];
-	MovingWindow = true;
+	MovingWindow = true; //This should be made into an option which is set in mcmc.param
 	HighestItnReadIn = 0;
 }
 
@@ -56,14 +64,17 @@ void VizHandler::operator() (const string& command) {
 void VizHandler::UpdateTraceFig(){
 	stringstream ss;
 	string plotcommand = header;
+	//string likelihood;
 	
 	if(MovingWindow){
 		int DequeSize = 500;
+		int k;
 		for(int i = 0; i < ThetaListSize; i++){
 			if(mcmc->ThetaList->Theta[i]->Used && !(mcmc->ThetaList->Theta[i]->InTrace)){
-				for(int j =0; j< mcmc->ThetaList->Theta[i]->Values.size(); j++){
-					ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " "\
-					 << mcmc->ThetaList->Theta[i]->Values[j] << "\n";
+				for(int j = 0; j< mcmc->ThetaList->Theta[i]->Values.size(); j++){
+					k = mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1;
+					ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << mcmc->ThetaList->Theta[i]->Values[j] << "\n";
+					//cout << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << mcmc->ThetaList->Theta[i]->Values[j] << "\n";
 					if(DequeParameterValues[j].size() > DequeSize){
 						DequeParameterValues[j].pop_front();
 						DequeParameterValues[j].push_back(ss.str());
@@ -72,6 +83,7 @@ void VizHandler::UpdateTraceFig(){
 						DequeParameterValues[j].push_back(ss.str());
 					}
 					ss.str(string()); //clears the stringstream.
+					//cout << i << " " << j << " " << ThetaListSize << " " << mcmc->ThetaList->Theta[i]->Values.size() << endl;
 				}
 				mcmc->ThetaList->Theta[i]->VizTrace();
 			}
@@ -81,6 +93,7 @@ void VizHandler::UpdateTraceFig(){
 				plotcommand = plotcommand + (DequeParameterValues[i])[j];
 			}
 			plotcommand = plotcommand + "e\n";
+			//cout << plotcommand << endl;
 		}
 	}else{
 		if(!mcmc){
@@ -94,7 +107,7 @@ void VizHandler::UpdateTraceFig(){
 						paramvalues[j] = "";
 					}
 					ss << paramvalues[j] << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " "\
-					 << mcmc->ThetaList->Theta[i]->Values[j] << "\n";
+					<< mcmc->ThetaList->Theta[i]->Values[j] << "\n";
 					paramvalues[j] = ss.str();
 					ss.str(string()); //clears the stringstream.
 				}
@@ -106,6 +119,7 @@ void VizHandler::UpdateTraceFig(){
 		}
 	}
 	
+	//cout << "The plot command is: \n" << plotcommand << endl;
 	fprintf(gnuplotpipe, "%s", plotcommand.c_str());
 	fflush(gnuplotpipe);
 }
@@ -126,6 +140,39 @@ void VizHandler::FinalTrace(){
 	
 	fprintf(gnuplotpipe, "%s", gnuplotcmd.c_str());
 	fflush(gnuplotpipe);
+
+	ss.str(string()); //clears the stringstream
+
+	ss << "set term postscipt\n" << "set ouput " << mcmc->tracedir << "/trace.ps\n" << "replot\n" << "set term x11\n"; //This last may need to be changed to "set term win" on windows machines
+	fprintf(gnuplotpipe, "%s", gnuplotcmd.c_str());
+	fflush(gnuplotpipe);
+
+	//The hope is that if I pass gnuplot a bunch of commands throught the pipe it will split them up if there 
+	// are newlines in between. if it turns out that doesn't work then we have to do it the long way (see below)
+	/*
+	ss << "set term postscipt\n";
+	string gnuplotcmd = ss.str() + "\n";
+	fprintf(gnuplotpipe, "%s", gnuplotcmd.c_str());
+	fflush(gnuplotpipe);
+	ss.str(string()); //clears the stringstream
+
+	ss << "set ouput " << mcmc->tracedir << "/trace.ps\n";
+	string gnuplotcmd = ss.str() + "\n";
+	fprintf(gnuplotpipe, "%s", gnuplotcmd.c_str());
+	fflush(gnuplotpipe);
+	ss.str(string()); //clears the stringstream
+
+	ss << "replot\n";
+	string gnuplotcmd = ss.str() + "\n";
+	fprintf(gnuplotpipe, "%s", gnuplotcmd.c_str());
+	fflush(gnuplotpipe);
+	ss.str(string()); //clears the stringstream
+
+	ss << "set term x11\n"; //This may need to be changed to "set term win" on windows machines
+	string gnuplotcmd = ss.str() + "\n";
+	fprintf(gnuplotpipe, "%s", gnuplotcmd.c_str());
+	fflush(gnuplotpipe);
+	*/
 }
 
 #endif

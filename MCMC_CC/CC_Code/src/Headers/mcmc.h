@@ -64,11 +64,15 @@ public:
 	
 	ParameterSet *BestParameterSetPtr;
 	double bestlikelihood;
+	double Likelihood_Current;
 	
 	bool VIZTRACE;
 	int  WRITEOUT;
 	bool APPEND_TRACE;
 	int MAXITERATIONS;
+	bool RANDOM_THETA0;
+	int SEED;
+	
 	string tracedir;
 	MCMCConfiguration *mcmcconfig;
 	VizHandler *Visualizer;

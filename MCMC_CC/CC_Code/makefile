@@ -24,10 +24,12 @@ MCMC_OFILES = distribution.o\
 emulator.o\
 likelihood_rhic.o\
 likelihood_cosmo.o\
+likelihood_test.o\
 mcmc.o\
 parameterset.o\
 prior_rhic.o\
 prior_cosmo.o\
+prior_test.o\
 proposal.o\
 visualization.o
 
@@ -61,10 +63,16 @@ build/likelihood_rhic.o: src/RHIC/likelihood_rhic.cc
 build/likelihood_cosmo.o: src/Cosmosurvey/likelihood_cosmo.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
+build/likelihood_test.o: src/TEST/likelihood_test.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
+	
 build/prior_rhic.o: src/RHIC/prior_rhic.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 
 build/prior_cosmo.o: src/Cosmosurvey/prior_cosmo.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
+	
+build/prior_test.o: src/TEST/prior_test.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
 build/%.o: src/Common_Files/%.cc
@@ -85,6 +93,7 @@ uninstall:
 
 run: mcmcrun.cc
 	${CPP} ${OPT} ${INC} -o mcmc $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}
-	
+	cp mcmc ~/local/include/;
+
 test: emulatortest.cc
 	${CPP} ${OPT} ${INC} -o emutest $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}

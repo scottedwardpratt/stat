@@ -8,7 +8,8 @@ using namespace std;
 MCMCConfiguration::MCMCConfiguration(string info_dir){
 	configname = "default";
 	dir_name = info_dir;
-	parameterfile = info_dir+"/parameters/" + configname;
+	// parameterfile = info_dir+"/parameters/" + configuration;
+	parameterfile = info_dir+"/defaultpars/";
 	cout << "In config: " << parameterfile << endl;
 	parameter_file_name = parameterfile + "/mcmc.param";
 	cout << "Reading in " << parameter_file_name << endl;
@@ -19,7 +20,7 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
 	
 	EmulatorParams = parameter::getS(parmap, "EMULATOR_PARAMETERS", "");
-	ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "");
+	ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "blah blah blah");
 	vector<string> temp_logparam = parameter::getVS(parmap, "LOG_PARAMETERS", "");
 	
 	
@@ -45,6 +46,10 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 	 Likelihood = new LikelihoodDistribution_RHIC(this);
 	 Prior = new PriorDistribution_RHIC(this);
 	 }
+	else if((parameter::getS(parmap,"MODEL","NOMODEL")=="TEST")||(parameter::getS(parmap,"MODEL","NOMODEL")=="Test")){
+	 Likelihood = new LikelihoodDistribution_Test(this);
+	 Prior = new PriorDistribution_Test(this);
+	 }
 	else{
 		printf("Must define parameter MODEL in parameter file, or yours is unrecognized\n");
 		exit(1);
@@ -54,7 +59,8 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 	configname = configuration;
 	dir_name = info_dir;
-	parameterfile = info_dir+"/parameters/" + configuration;
+	// parameterfile = info_dir+"/parameters/" + configuration;
+	parameterfile = info_dir+"/defaultpars/";
 	cout << "In config: " << parameterfile << endl;
 	parameter_file_name = parameterfile + "/mcmc.param";
 	cout << "Reading in " << parameter_file_name << endl;
@@ -65,7 +71,7 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
 	
 	EmulatorParams = parameter::getS(parmap, "EMULATOR_PARAMETERS", "");
-	ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "");
+	ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "blah blah blah");
 	for(int i=0;i<ParamNames.size();i++) printf("%s ",ParamNames[i].c_str());
 	printf("\n");
 	vector<string> temp_logparam = parameter::getVS(parmap, "LOG_PARAMETERS", "");
@@ -92,17 +98,21 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 	 Likelihood = new LikelihoodDistribution_RHIC(this);
 	 Prior = new PriorDistribution_RHIC(this);
 	 }
+	else if((parameter::getS(parmap,"MODEL","NOMODEL")=="TEST")||(parameter::getS(parmap,"MODEL","NOMODEL")=="Test")){
+	 Likelihood = new LikelihoodDistribution_Test(this);
+	 Prior = new PriorDistribution_Test(this);
+	 }
 	else{
 		printf("Must define parameter MODEL in parameter file, or yours is unrecognized\n");
 		exit(1);
 	}
 	/*Likelihood = new LikelihoodDistribution(this);
-	 cout << "Like done." << endl; */
-	/*Prior = new PriorDistribution();
+	 cout << "Like done." << endl; 
+	Prior = new PriorDistribution(this);
 	 cout << "Prior done." << endl;*/
 	
 	Proposal = new ProposalDistribution(this);
-	cout << "Proposal done." << endl;
+	//cout << "Proposal done." << endl;
 	
 }
 
@@ -119,15 +129,24 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 	WRITEOUT = parameter::getI(local_parmap, "WRITEOUT", 100);
 	VIZTRACE = parameter::getB(local_parmap, "VISUALIZE_TRACE", true);
 	APPEND_TRACE = parameter::getB(local_parmap, "APPEND_TRACE", false);
+	RANDOM_THETA0 = parameter::getB(local_parmap, "RANDOM_THETA0", false);
+	SEED = parameter::getI(local_parmap, "SEED", 1111);
 	
-	ThetaList = new ParameterSetList(this);
-	
+	if(RANDOM_THETA0){
+		string filler="filler";
+		ThetaList = new ParameterSetList(this, SEED);
+	}
+	else{
+		ThetaList = new ParameterSetList(this);
+	}
+	//Likelihood_Current=0;
+
 	if(VIZTRACE){
 		Visualizer = new VizHandler(this);
 		Viz_Count = parameter::getI(local_parmap, "VIZ_COUNT", floor(MAXITERATIONS/200));
-		Visualizer->UpdateTraceFig();
+		//Visualizer->UpdateTraceFig();
 	}
-	
+
 	if(APPEND_TRACE){
 		string addon = "";
 		bool Done = false;
@@ -170,13 +189,22 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
 	WRITEOUT = parameter::getI(local_parmap, "WRITEOUT", 100);
 	VIZTRACE = parameter::getB(local_parmap, "VISUALIZE_TRACE", true);
 	APPEND_TRACE = parameter::getB(local_parmap, "APPEND_TRACE", false);
+	RANDOM_THETA0 = parameter::getB(local_parmap, "RANDOM_THETA0", false);
+	SEED = parameter::getI(local_parmap, "SEED", 1111);
 	
-	ThetaList = new ParameterSetList(this, Theta0);
+	if(RANDOM_THETA0){
+		string filler="filler";
+		ThetaList = new ParameterSetList(this, SEED);
+	}
+	else{
+		ThetaList = new ParameterSetList(this, Theta0);
+	}
+	//Likelihood_Current=0;
 	
 	if(VIZTRACE){
 		Visualizer = new VizHandler(this);
 		Viz_Count = parameter::getI(local_parmap, "VIZ_COUNT", floor(MAXITERATIONS/200));
-		Visualizer->UpdateTraceFig();
+		//Visualizer->UpdateTraceFig();
 	}
 	
 	if(APPEND_TRACE){
@@ -218,7 +246,7 @@ MCMCRun::~MCMCRun(){
 
 /** This runs MAXITERATIONS samplings */
 double MCMCRun::Run(){
-	double Likelihood_Current,Likelihood_New;
+	double Likelihood_Current, Likelihood_New;
 	double Prior_Current, Prior_New;
 	double Proposal_Current, Proposal_New;
 	
@@ -233,7 +261,7 @@ double MCMCRun::Run(){
 	Likelihood_Current = mcmcconfig->Likelihood->Evaluate(*ThetaZeroPtr);
 	Proposal_Current = mcmcconfig->Proposal->Evaluate(*ThetaZeroPtr);
 	Prior_Current = mcmcconfig->Prior->Evaluate(*ThetaZeroPtr);
-	
+
 	Accept_Count = 0;
 	for(int i =1; i<=MAXITERATIONS; i++){
 		LOGBF = 0;
@@ -251,14 +279,24 @@ double MCMCRun::Run(){
 		// cout << "Prior of proposed set: " << Prior_New << endl;
 		// cout << "Prior of current set: " << Prior_Current << endl;
 		// cout << "Proposal of proposed set: " << Proposal_New;
-		// cout << "Proposal of current set: " << Proposal_Current;
+		// cout << " Proposal of current set: " << Proposal_Current << endl;
 		
-		if(mcmcconfig->LOGLIKE){
+		/*if(mcmcconfig->LOGLIKE){
 			LOGBF += (Likelihood_New-Likelihood_Current);
 			printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
 		}
 		else{
 			LOGBF +=log(Likelihood_New/Likelihood_Current);
+		}*/
+		if(mcmcconfig->LOGLIKE){
+			printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
+			LOGBF = Likelihood_New-Likelihood_Current;
+			alpha = min(1.0,exp(LOGBF));
+		}
+		else{
+			printf(" l_new=%g, l_current=%g\n",Likelihood_New,Likelihood_Current);
+			LOGBF = Likelihood_New/Likelihood_Current;
+			alpha = min(1.0,LOGBF);
 		}
 		/*
 		if(mcmcconfig->LOGPRIOR){
@@ -275,9 +313,13 @@ double MCMCRun::Run(){
 		}
 		 */
 		
-		alpha = min(1.0,exp(LOGBF));
+		//alpha = min(1.0,exp(LOGBF));
+		//alpha = min(0.97,exp(LOGBF));
+		// cout << "exp(LOGBF): " << exp(LOGBF) << endl;
 		printf("%5d\talpha=%6.5f\t",i,alpha);
-		if(alpha > mcmcconfig->randnum->ran()){ //Accept the proposed set.
+		if(alpha > (mcmcconfig->randnum->ran())) { //Accept the proposed set.
+		//if(alpha > 1){
+		//if(exp(LOGBF) > 1){ //Accept the proposed set.
 			printf("Accept\n");
 			Accept_Count++;
 			Likelihood_Current = Likelihood_New;
@@ -287,22 +329,27 @@ double MCMCRun::Run(){
 			if(Likelihood_Current>bestlikelihood && i>1){
 				bestlikelihood=Likelihood_New;
 				BestParameterSetPtr=&CurrentParameters;
-				printf("XXXXXXXXX YIPPEE!! Best parameters so far, likelihood=%g\n",bestlikelihood);
+				if(mcmcconfig->LOGLIKE){
+					printf("XXXXXXXXX YIPPEE!! Best parameters so far, loglikelihood=%g\n",bestlikelihood);
+				}
+				else{
+					printf("XXXXXXXXX YIPPEE!! Best parameters so far, likelihood=%g\n",bestlikelihood);
+				}
 			}
 		}else{
 			printf("Reject\n");
 		}
 		
 		ThetaList->Add(CurrentParameters);
-		
-		if(VIZTRACE){
+
+		if(VIZTRACE && (i>3)){
 			if((i+1) % Viz_Count == 0){
 				Visualizer->UpdateTraceFig();
 			}
 		}
 		if((i+1) % WRITEOUT == 0){
 			cout << "Writing out." << endl;
-			if(VIZTRACE){
+			if(VIZTRACE &&(i!=1)){
 				Visualizer->UpdateTraceFig();
 			}
 			ThetaList->WriteOut();

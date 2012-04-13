@@ -1,0 +1,1 @@
+This file contains examples of mcmc parameter files. These can usually be found in the model-data folder in the subfolder "[analysis name]/parameters/default". These examples were taken directly from active analysis and do not necessarly represent what your files will need to look like. They are meant only as an example of what the parameter files may look like.

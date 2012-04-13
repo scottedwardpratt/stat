@@ -22,7 +22,7 @@ if [ $# -lt 1 ]; then
 		exit -1
 fi
 
-if [ -d $basepath -a -d $basepath/analysis -a -d $basepath/parameters ]; then
+if [ -d $basepath -a -d $basepath/model_results -a -d $basepath/parameters ]; then
 # this is most likely a good path
 		echo "#computing values for: ${basepath}"
 else 

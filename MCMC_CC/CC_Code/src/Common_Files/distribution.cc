@@ -38,6 +38,16 @@ double Distribution::Gaussian(double x, double mu, double sigma){
 	return Normal(x,mu,sigma);
 }
 
+double Distribution::Gaussian(gsl_vector x, gsl_vector mu, gsl_matrix sigma){
+	double out=0;
+	int n=x.size;
+	for(int i=0;i<n;i++){
+		out+=Normal(gsl_vector_get(&x,i),gsl_vector_get(&mu,i),gsl_matrix_get(&sigma,i,i));
+	}
+	out=out/n;
+	return out;
+}
+
 double Distribution::Log_MVNormal(gsl_vector x, gsl_vector mu, gsl_matrix sigma){
 	double OUT, det;
 	int foobar,N;
