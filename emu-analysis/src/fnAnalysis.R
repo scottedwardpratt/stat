@@ -507,13 +507,15 @@ fn.plot.slice <- function(fn.data, slice.data, plot.thing, unscale=TRUE, legend.
 ## @param fixedValVec should be a vector of length nparams, entries which
 ## are to be varied over (dimA, dimB, stepDim) should be NA, the remaining
 ## entries should be held at their fixed values
+## the entries of fixedValVec are rescaled to the design ranges unless scaled.fixval is set to true
 ##
 ## @param dimA, dimB index of the dimensions to emulate the model over
 ## @param stepDim, index of the dimension to march through the space
 ## @param hyperSLice, if true each point in the slice is generated through sampling in the directions orthogonal
+
 ## to the cube we're building
 fn.emu.steps <- function(fn.data, dimA, dimB, stepDim, fixedValVec=NULL, nsteps=9,
-                         range.Min=NULL, range.Max=NULL, hyperSlice=FALSE, nemupts=32){
+                         range.Min=NULL, range.Max=NULL, hyperSlice=FALSE, nemupts=32, scaled.fixval=FALSE){
 
   if(is.null(range.Min) && is.null(range.Max)){
     minVal <- min(fn.data$model.sample$des[stepDim,])
@@ -521,6 +523,17 @@ fn.emu.steps <- function(fn.data, dimA, dimB, stepDim, fixedValVec=NULL, nsteps=
   } else {
     minVal <- range.Min
     maxVal <- range.Max
+  }
+
+
+  if(!scaled.fixval){
+    for(i in 1:nparams){
+      if(!is.na(fixedValVec[i])){
+        center <- attr(fn.data$model.sample$des, "scaled:center")[i]
+        scale <- attr(fn.data$model.sample$des, "scaled:scale")[i]
+        fixedValVec[i] <- (fixedValVec[i] - center) / scale
+      }
+    }
   }
 
   stepSize <- (maxVal - minVal) / nsteps
@@ -547,11 +560,15 @@ fn.emu.steps <- function(fn.data, dimA, dimB, stepDim, fixedValVec=NULL, nsteps=
         }
       }
     }
+
+    ## debugging cat("# fixedStep: ", fixedStep, "\n")
+
     if(hyperSlice == FALSE){
       sliceList[[i]] <- fn.emulate.slice(fn.data, dimA, dimB, fixedValVec=fixedStep, nemupts=nemupts)
     } else {
       sliceList[[i]] <- fn.emulate.hyper.slice(fn.data, dimA, dimB, stepDim, stepVal)
     }
+    
     stepVec[i] <- stepVal
   }
   
