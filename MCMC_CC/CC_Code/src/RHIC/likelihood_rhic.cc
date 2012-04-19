@@ -33,6 +33,7 @@ LikelihoodDistribution_RHIC::LikelihoodDistribution_RHIC(MCMCConfiguration *mcmc
 	}
 
 	DATA = GetRealData();
+	ERROR = GetRealError();
 
 	//testing the outputs of the emulator at various points	// 
 	emulator_test.open("PCA0.dat");
@@ -64,6 +65,7 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	//Initialize GSL containers
 	int N = ModelErrors.size();
 	gsl_matrix * sigma = gsl_matrix_calloc(N,N);
+	gsl_matrix * sigma_data = gsl_matrix_calloc(N,N);
 	gsl_vector * model = gsl_vector_alloc(N);
 	gsl_vector * mu = gsl_vector_alloc(N);
 	// cout << "Done allocating gsl containers." << endl;
@@ -73,15 +75,21 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	for(int i = 0; i<N; i++){
 		//gsl_matrix_set(sigma, i,i,Theta.GetValue("SIGMA"));
 		//ModelErrors[i]=0.1; //Suppressing the error of the emulator
-		//if (ModelErrors[i] < 1) { ModelErrors[i]=1; }
+		if (ModelErrors[i] < 1) { ModelErrors[i]=1; }
+		//Bad things can happen in the likelihood calculations if the errors get too large or small
+		//ModelErrors[i]=ModelErrors[i]*2;
+//		if (ModelErrors[i] < 0.5*fabs(DATA[i]-ModelMeans[i])) { ModelErrors[i]=0.5*fabs(DATA[i]-ModelMeans[i]); }
+//		if (ModelErrors[i] > 5*fabs(DATA[i]-ModelMeans[i])) { ModelErrors[i]=5*fabs(DATA[i]-ModelMeans[i]); }
 		gsl_matrix_set(sigma,i,i,ModelErrors[i]);
 		gsl_vector_set(model, i,ModelMeans[i]);
 		gsl_vector_set(mu, i, DATA[i]);
+		gsl_matrix_set(sigma_data,i,i,ERROR[i]);
 		//cout << "i: " << i << " Data: " << DATA[i] <<  " Mean: " << ModelMeans[i] << " Error: " << ModelErrors[i] << endl;
 	}
 	
 	//likelihood = Log_MVNormal(*model, *mu, *sigma);
-	likelihood = Gaussian(*model, *mu, *sigma);
+	//likelihood = Gaussian(*model, *mu, *sigma);
+	likelihood = Gaussian(*model, *mu, *sigma, *sigma_data); //This is the integrated likelihood
 	
 	/*if(!(mcmc->LOGLIKE)){ //If you don't want the loglikelihood, and we've used Log_MVN, we have to exponentiate.
 		likelihood = exp(likelihood);
@@ -223,6 +231,74 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 		}
 	}
 	return datameans;
+}
+
+vector<double> LikelihoodDistribution_RHIC::GetRealError(){
+	vector<double> dataerrors;
+	string EmulatorObservables=emulator->Observables;
+	string observables_filename = mcmc->dir_name + "/" + EmulatorObservables + ".datnames";
+	string data_filename = mcmc->dir_name + "/exp_data/results.dat";
+	
+	fstream data;
+	string type, param_name;
+	int count = 0;
+	
+	parameter::ReadParsFromFile(observablesparmap, observables_filename.c_str());
+	vector<string> PNames;
+	PNames = parameter::getVS(observablesparmap,"NAMES","blah blah");
+
+	int numparams = PNames.size();
+	Datamean=new double[numparams];
+	Dataerror=new double[numparams];
+	vector<double> temp (numparams, .01);
+	double dump;
+	
+	data.open(data_filename.c_str(), fstream::in);
+	if(data){
+		while(data >> type){
+			if(strcmp(type.c_str(), "double") == 0){
+				data >> param_name;
+				int index = FindParam(param_name, PNames);
+				if(index != -1){ //returns -1 if not found
+					data >> Datamean[index]; //Mean
+					data >> Dataerror[index]; //Error
+					count++;
+					cout << param_name << " index: " << index << " " << Datamean[index] << endl;
+				}else{
+					data >> dump; //we aren't using the observable, so we need to get the data out of the stream
+					data >> dump;
+				}
+			}else{
+				if(strncmp(type.c_str(), "#", 1) == 0){
+					string temp;
+					getline(data, temp, '\n');
+				}
+				else{
+					cout << "Unrecognized variable type " << type << endl;
+					exit(1);
+				}
+			}
+		}
+		data.close();
+	}else{
+		cout << "Warning: Unable to open data file in model directory." << endl;
+		 exit(1);
+	}
+
+	if(count!=numparams){
+		cout << "Not all emulated observables found!" << endl;
+		exit(1);
+	}
+
+	dataerrors.assign(Dataerror,Dataerror+numparams);
+
+	if(VERBOSE){
+		for(int i = 0; i<numparams; i++){
+			cout << "Error array: " << endl;
+			cout << "i: " << i << " Error: " << dataerrors[i] << endl;
+		}
+	}
+	return dataerrors;
 }
 
 int LikelihoodDistribution_RHIC::FindParam(string name, vector<string> PNames){ 
