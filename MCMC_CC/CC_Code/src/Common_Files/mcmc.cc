@@ -290,8 +290,10 @@ double MCMCRun::Run(){
 		}*/
 		if(mcmcconfig->LOGLIKE){
 			printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
-			LOGBF = Likelihood_New-Likelihood_Current;
-			alpha = min(1.0,exp(LOGBF));
+			//LOGBF = Likelihood_New-Likelihood_Current;
+			//alpha = min(1.0,exp(LOGBF));
+			LOGBF = Likelihood_New/Likelihood_Current;
+			alpha = min(1.0,LOGBF);
 		}
 		else{
 			printf(" l_new=%g, l_current=%g\n",Likelihood_New,Likelihood_Current);

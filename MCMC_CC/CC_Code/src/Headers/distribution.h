@@ -33,8 +33,10 @@ public:
 	parameterMap * parmap;
 	
 	double Normal(double x, double mu, double sigma);
+	double IntegratedNormal(double x, double mu, double sigma, double data_sigma);
 	double Gaussian(double x, double mu, double sigma);
 	double Gaussian(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
+	double Gaussian(gsl_vector x, gsl_vector mu, gsl_matrix sigma, gsl_matrix data_sigma);
 	double Log_MVNormal(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
 	double MVNormal(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
 	double LogNormal(double x, double mu, double sigma);
@@ -106,7 +108,9 @@ public:
 	//private:
 	vector<double> GetFakeData();
 	vector<double> GetRealData(); 
+	vector<double> GetRealError(); 
 	vector<double> DATA;
+	vector<double> ERROR;
 	bool UseEmulator;
 	ofstream emulator_test;
 	EmulatorHandler * emulator;

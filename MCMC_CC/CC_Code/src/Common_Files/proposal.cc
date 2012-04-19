@@ -74,7 +74,7 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
 		cout << "Count: " << count << " NumParams: " << numparams << endl;
 		exit(1);
 	}
-	
+	/* //This seems to be a copy of what is above, so I have commented it out. JN 4/19/12
 	count=0;
 	string emulator_ranges = mcmc->dir_name + "/ranges.dat";
 	ranges.open(emulator_ranges.c_str(), fstream::in);
@@ -113,7 +113,7 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
 	else{
 		cout << "Warning:Unable to open /ranges.dat" << endl;
 	}
-	
+	*/
 	if(!Ranges){
 		cout << "Unable to find any ranges.dat file." << endl;
 		exit(-1);
