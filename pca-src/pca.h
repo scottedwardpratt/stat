@@ -6,8 +6,8 @@ using namespace std;
 
 class CPCA{
 public:
-	string yname[10000];
-	double sigmay[10000];
+	string yname[1000];
+	double sigmay[1000];
 	int nruns,ny,nnames;
 	CQualifiers qualifiers;
 	CPCA(int nruns_set);
@@ -19,6 +19,15 @@ public:
 	bool namecheck(string varname);
 	string pcaname[10000];
 	void Calc();
+};
+
+class CRHICStat{
+	string yname[1000];
+	string xname[1000];
+	int NX,NY,NRUNS;
+	double *xbar,*ybar,**x,**y,**xprime,**yprime;
+	CRHICStat(int NRUNS);
+	void CalcSensitivity();
 };
 
 #endif
