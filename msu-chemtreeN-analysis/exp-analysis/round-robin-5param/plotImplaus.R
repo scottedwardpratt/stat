@@ -51,7 +51,13 @@ fnData$exp.obs = expData
 combs <- combn(nparams, 3)
 ncombs <- dim(combs)[2]
 for(i in 1:ncombs){
+  ## this will set fixedValVec to be (0,0,0,0,0) and then the various
+  ## projections are made around this point, if you want to project about some
+  ## other location you should comment this line
   fixedValVec <- rep(0, nparams)
+  ## and uncommment the next one
+  ## eg a custom location would be
+  ## fixedValVec <- c(0.4, 0.3, 0.1, 0.2, 0.5)
   fixedValVec[combs[1,i]] <- NA
   fixedValVec[combs[2,i]] <- NA
   fixedValVec[combs[3,i]] <- NA
