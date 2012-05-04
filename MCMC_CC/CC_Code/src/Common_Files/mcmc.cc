@@ -49,7 +49,7 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 			getline(Emparams,line,' ');
 			ParamNames.push_back(line);
 		} while(!Emparams.eof());
-		if(strcmp(ParamNames.back().c_str()," ")==0){ // if for some reason the last element is empty, drop it
+		if(ParamNames.back().compare(0,1," ")==0 || ParamNames.back().empty()){ // if for some reason the last element is empty, drop it
 			ParamNames.pop_back();
 		}
 		//ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "blah blah blah");
@@ -168,7 +168,7 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 			getline(Emparams,line,' ');
 			ParamNames.push_back(line);
 		} while(!Emparams.eof());
-		if(strcmp(ParamNames.back().c_str()," ")==0){ // if for some reason the last element is empty, drop it
+		if(ParamNames.back().compare(0,1," ")==0 || ParamNames.back().empty()){ // if for some reason the last element is empty, drop it
 			ParamNames.pop_back();
 		}
 		//ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "blah blah blah");
