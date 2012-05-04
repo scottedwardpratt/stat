@@ -153,33 +153,6 @@ void VizHandler::FinalTrace(){
 	ss << "set term postscipt\n" << "set ouput " << mcmc->tracedir << "/trace.ps\n" << "replot\n" << "set term x11\n"; //This last may need to be changed to "set term win" on windows machines
 	fprintf(gnuplotpipe, "%s", gnuplotcmd.c_str());
 	fflush(gnuplotpipe);
-
-	//The hope is that if I pass gnuplot a bunch of commands throught the pipe it will split them up if there 
-	// are newlines in between. if it turns out that doesn't work then we have to do it the long way (see below)
-	/*
-	ss << "set term postscipt\n";
-	string gnuplotcmd = ss.str() + "\n";
-	fprintf(gnuplotpipe, "%s", gnuplotcmd.c_str());
-	fflush(gnuplotpipe);
-	ss.str(string()); //clears the stringstream
-
-	ss << "set ouput " << mcmc->tracedir << "/trace.ps\n";
-	string gnuplotcmd = ss.str() + "\n";
-	fprintf(gnuplotpipe, "%s", gnuplotcmd.c_str());
-	fflush(gnuplotpipe);
-	ss.str(string()); //clears the stringstream
-
-	ss << "replot\n";
-	string gnuplotcmd = ss.str() + "\n";
-	fprintf(gnuplotpipe, "%s", gnuplotcmd.c_str());
-	fflush(gnuplotpipe);
-	ss.str(string()); //clears the stringstream
-
-	ss << "set term x11\n"; //This may need to be changed to "set term win" on windows machines
-	string gnuplotcmd = ss.str() + "\n";
-	fprintf(gnuplotpipe, "%s", gnuplotcmd.c_str());
-	fflush(gnuplotpipe);
-	*/
 }
 
 #endif

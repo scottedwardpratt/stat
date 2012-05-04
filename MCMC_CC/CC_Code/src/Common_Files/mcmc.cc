@@ -45,10 +45,12 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 		string line;
 		stringstream Emparams;
 		Emparams << EmulatorParams;
-		do {
+		getline(Emparams,line,' ');
+		ParamNames.push_back(line);
+		while(!Emparams.eof()){
 			getline(Emparams,line,' ');
-			ParamNames.push_back(line);
-		} while(!Emparams.eof());
+			if(line.compare(ParamNames.back())!=0) {ParamNames.push_back(line);}
+		} 
 		if(ParamNames.back().compare(0,1," ")==0 || ParamNames.back().empty()){ // if for some reason the last element is empty, drop it
 			ParamNames.pop_back();
 		}
@@ -73,12 +75,12 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 			stringstream Observableslist;
 			Observableslist << line;
 			
-			do {
+			while(!Observableslist.eof()){
 				getline(Observableslist,name,' ');
 				if(!name.empty() || name!=" ")
 				ObservablesNames.push_back(name);
 				//cout << "Observable:" << ObservablesNames.back() << "." << endl;
-			} while(!Observableslist.eof());
+			}
 			if(ObservablesNames.back().compare(0,1," ")==0 || ObservablesNames.back().empty()){ // if for some reason the last element is empty, drop it
 				ObservablesNames.pop_back();
 			}
@@ -164,10 +166,12 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 		string line;
 		stringstream Emparams;
 		Emparams << EmulatorParams;
-		do {
+		getline(Emparams,line,' ');
+		ParamNames.push_back(line);
+		while(!Emparams.eof()){
 			getline(Emparams,line,' ');
-			ParamNames.push_back(line);
-		} while(!Emparams.eof());
+			if(line.compare(ParamNames.back())!=0) {ParamNames.push_back(line);}
+		} 
 		if(ParamNames.back().compare(0,1," ")==0 || ParamNames.back().empty()){ // if for some reason the last element is empty, drop it
 			ParamNames.pop_back();
 		}
@@ -192,12 +196,12 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 			stringstream Observableslist;
 			Observableslist << line;
 			
-			do {
+			while(!Observableslist.eof()){
 				getline(Observableslist,name,' ');
 				if(!name.empty() || name!=" ")
 				ObservablesNames.push_back(name);
 				//cout << "Observable:" << ObservablesNames.back() << "." << endl;
-			} while(!Observableslist.eof());
+			}
 			if(ObservablesNames.back().compare(0,1," ")==0 || ObservablesNames.back().empty()){ // if for some reason the last element is empty, drop it
 				ObservablesNames.pop_back();
 			}
