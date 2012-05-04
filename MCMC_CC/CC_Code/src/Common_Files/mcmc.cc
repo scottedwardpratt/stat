@@ -19,8 +19,76 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 	LOGPRIOR = parameter::getB(parmap, "LOGPRIOR", true);
 	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
 	
-	EmulatorParams = parameter::getS(parmap, "EMULATOR_PARAMETERS", "");
-	ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "blah blah blah");
+	//============================================
+	// Reading the parameters out of ranges.dat
+	string filename = info_dir + "/ranges.dat";
+	fstream ranges;
+	ranges.open(filename.c_str(),fstream::in);
+	if(ranges){
+		string temps,name,line;
+		do {
+			stringstream ss;
+			getline(ranges,line,'\n');
+			ss << line;
+			ss >> temps >> name >> temps >> temps;
+			EmulatorParams = EmulatorParams + name + " ";
+			ss.flush();
+		} while(!ranges.eof());
+		ranges.close();
+	}
+	else{
+		cout << "Ranges.dat wont open" << endl;
+		exit(1);
+	}
+	//EmulatorParams = parameter::getS(parmap, "EMULATOR_PARAMETERS", "");
+	if(EmulatorParams!=""){
+		string line;
+		stringstream Emparams;
+		Emparams << EmulatorParams;
+		do {
+			getline(Emparams,line,' ');
+			ParamNames.push_back(line);
+		} while(!Emparams.eof());
+		if(strcmp(ParamNames.back().c_str()," ")==0){ // if for some reason the last element is empty, drop it
+			ParamNames.pop_back();
+		}
+		//ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "blah blah blah");
+	}
+
+	Observables = parameter::getS(parmap, "OBSERVABLES", "Observables not specified");
+	cout << "The observables are: " << Observables << endl;
+
+	if(Observables!="Observables not specified"){
+		// Right here I want it to load a vector string of the observables from a emulator file
+		string observables_filename = info_dir + "/" + Observables + ".dat";
+		fstream Observablesdotdat;
+		Observablesdotdat.open(observables_filename.c_str(),fstream::in);
+
+		if(Observablesdotdat){
+			string line,name;
+
+			getline(Observablesdotdat,line,'\n');
+			while(line.compare(0,1,"#") == 0 || line.empty() ) { getline(Observablesdotdat,line,'\n'); } // keep reading until it's not a comment
+
+			stringstream Observableslist;
+			Observableslist << line;
+			
+			do {
+				getline(Observableslist,name,' ');
+				if(!name.empty() || name!=" ")
+				ObservablesNames.push_back(name);
+				//cout << "Observable:" << ObservablesNames.back() << "." << endl;
+			} while(!Observableslist.eof());
+			if(ObservablesNames.back().compare(0,1," ")==0 || ObservablesNames.back().empty()){ // if for some reason the last element is empty, drop it
+				ObservablesNames.pop_back();
+			}
+		}
+		else{
+			cout << "Could not open " << Observables << ".dat (<Observables>.dat)" << endl;
+			exit(1);
+		}
+	}
+	
 	vector<string> temp_logparam = parameter::getVS(parmap, "LOG_PARAMETERS", "");
 	
 	
@@ -70,8 +138,77 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 	LOGPRIOR = parameter::getB(parmap, "LOGPRIOR", true);
 	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
 	
-	EmulatorParams = parameter::getS(parmap, "EMULATOR_PARAMETERS", "");
-	ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "blah blah blah");
+	//============================================
+	// Reading the parameters out of ranges.dat
+	string filename = info_dir + "/ranges.dat";
+	fstream ranges;
+	ranges.open(filename.c_str(),fstream::in);
+	if(ranges){
+		string temps,name,line;
+		do {
+			stringstream ss;
+			getline(ranges,line,'\n');
+			ss << line;
+			ss >> temps >> name >> temps >> temps;
+			EmulatorParams = EmulatorParams + name + " ";
+			ss.flush();
+		} while(!ranges.eof());
+		ranges.close();
+	}
+	else{
+		cout << "Ranges.dat wont open" << endl;
+		exit(1);
+	}
+	//EmulatorParams = parameter::getS(parmap, "EMULATOR_PARAMETERS", "");
+	if(EmulatorParams!=""){
+		string line;
+		stringstream Emparams;
+		Emparams << EmulatorParams;
+		do {
+			getline(Emparams,line,' ');
+			ParamNames.push_back(line);
+		} while(!Emparams.eof());
+		if(strcmp(ParamNames.back().c_str()," ")==0){ // if for some reason the last element is empty, drop it
+			ParamNames.pop_back();
+		}
+		//ParamNames = parameter::getVS(parmap, "PARAMETER_NAMES", "blah blah blah");
+	}
+
+	Observables = parameter::getS(parmap, "OBSERVABLES", "Observables not specified");
+	cout << "The observables are: " << Observables << endl;
+
+	if(Observables!="Observables not specified"){
+		// Right here I want it to load a vector string of the observables from a emulator file
+		string observables_filename = info_dir + "/" + Observables + ".dat";
+		fstream Observablesdotdat;
+		Observablesdotdat.open(observables_filename.c_str(),fstream::in);
+
+		if(Observablesdotdat){
+			string line,name;
+
+			getline(Observablesdotdat,line,'\n');
+			while(line.compare(0,1,"#") == 0 || line.empty() ) { getline(Observablesdotdat,line,'\n'); } // keep reading until it's not a comment
+
+			stringstream Observableslist;
+			Observableslist << line;
+			
+			do {
+				getline(Observableslist,name,' ');
+				if(!name.empty() || name!=" ")
+				ObservablesNames.push_back(name);
+				//cout << "Observable:" << ObservablesNames.back() << "." << endl;
+			} while(!Observableslist.eof());
+			if(ObservablesNames.back().compare(0,1," ")==0 || ObservablesNames.back().empty()){ // if for some reason the last element is empty, drop it
+				ObservablesNames.pop_back();
+			}
+		}
+		else{
+			cout << "Could not open " << Observables << ".dat (<Observables>.dat)" << endl;
+			exit(1);
+		}
+	}
+	
+	//====================================================
 	for(int i=0;i<ParamNames.size();i++) printf("%s ",ParamNames[i].c_str());
 	printf("\n");
 	vector<string> temp_logparam = parameter::getVS(parmap, "LOG_PARAMETERS", "");

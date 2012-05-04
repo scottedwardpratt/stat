@@ -46,6 +46,8 @@ public:
 	vector<bool> LogParam;
 	string EmulatorParams;
 	vector<string> ParamNames;
+	string Observables;
+	vector<string> ObservablesNames;
 	
 	CRandom *randnum;
 	LikelihoodDistribution *Likelihood;

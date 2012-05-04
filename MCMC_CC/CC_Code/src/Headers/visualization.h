@@ -24,5 +24,6 @@ private:
 	string *paramvalues;
 	deque<string> *DequeParameterValues;
 	FILE * gnuplotpipe;
+	FILE * gnuplotmultipipe;
 };
 #endif

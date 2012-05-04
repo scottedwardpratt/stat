@@ -183,8 +183,8 @@ ParameterSet ProposalDistribution::Iterate(ParameterSet current){
 				 */
 				//proposed.Values[i] = proposed.Values[i] + 0.025*gsl_ran_gaussian(randy, MixingStdDev[i]);
 				//proposed.Values[i] = proposed.Values[i] + 0.5*gsl_ran_gaussian(randy, MixingStdDev[i]);
-				//proposed.Values[i] = proposed.Values[i] + 2*gsl_ran_gaussian(randy, MixingStdDev[i]);
-				proposed.Values[i] = proposed.Values[i] + gsl_ran_gaussian(randy, MixingStdDev[i]);
+				proposed.Values[i] = proposed.Values[i] + 2*gsl_ran_gaussian(randy, MixingStdDev[i]);
+				//proposed.Values[i] = proposed.Values[i] + gsl_ran_gaussian(randy, MixingStdDev[i]);
 			}while((proposed.Values[i] < Min_Ranges[i]) || (proposed.Values[i]>Max_Ranges[i]));
 		}
 	}

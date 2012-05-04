@@ -7,16 +7,7 @@ int main(int argc, char *argv[]){
 		printf("Usage: mcmc run_file\n");
 		exit(-1);
 	}
-	/*
-	double HYDRO_T0 0.6 1.1
-	double GLAUBER_WNBIN_RATIO 0.6 1.0  
-	double GLAUBER_K_TAU 2.4 3.3
-	double HYDRO_INIT_NS 0.5 2.0
-	double HYDRO_INIT_FLOW 0.4 1.2
-	double HYDRO_SVRATIO 0.03 0.25
-	double EQOFST_BUMP_HEIGHT 0.2 0.8
-	*/
-
+	
 	string run_file = argv[1];
 	MCMCConfiguration *mcmcdefault = new MCMCConfiguration(run_file, "default");
 	// cout << "Config done." << endl;

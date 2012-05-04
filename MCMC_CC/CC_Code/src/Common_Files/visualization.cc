@@ -15,6 +15,7 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 		exit(1);
 	}
 
+	// Setting up the pipe for the trace plot
 	gnuplotpipe = popen("gnuplot -persist", "w");
 	if(!gnuplotpipe){
 		cout << "Gnuplot not found!" << endl;
@@ -24,12 +25,22 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 	gnuplotstyle = parameter::getS(mcmc->local_parmap, "GNUPLOT_TRACESTYLE", "linespoints");
 	
 	fprintf(gnuplotpipe, "%s\n", ("set term " + gnuplotterm).c_str());
-	// fprintf(gnuplotpipe, "%s\n", ("set title '" + mcmc->runnickname + "'").c_str());
 	fprintf(gnuplotpipe, "%s\n", "set xlabel 'iteration'");
 	fprintf(gnuplotpipe, "%s\n", "set ylabel 'parameter value'");
 	fprintf(gnuplotpipe, "%s\n", "set key out vert right top");
 	fflush(gnuplotpipe);
+
+	// Setting up the pipe for the density plots
+	gnuplotmultipipe = popen("gnuplot -persist", "w");
+	if(!gnuplotmultipipe){
+		cout << "Gnuplot not found!" << endl;
+		exit(1);
+	}
+
+	fprintf(gnuplotmultipipe, "%s\n", ("set term " + gnuplotterm + " set multiplot").c_str());
+	fflush(gnuplotmultipipe);
 	
+	// The header for the trace plot
 	header = "plot ";
 	for(int i = 0; i < mcmc->ThetaList->ParamNames.size(); i++){
 		header = header + "'-' w " + gnuplotstyle + " t '" + mcmc->ThetaList->ParamNames[i]+ "'";
@@ -37,7 +48,6 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 			header = header + ", ";
 		}
 	}
-	//header = header + ", '-' w "+ gnuplotstyle + " t 'Likelihood'"; //Adding the Likelihood to the plot
 	header = header + "\n";
 	
 	//cout << "The gnuplot header is: \n" << header << endl;
@@ -64,7 +74,6 @@ void VizHandler::operator() (const string& command) {
 void VizHandler::UpdateTraceFig(){
 	stringstream ss;
 	string plotcommand = header;
-	//string likelihood;
 	
 	if(MovingWindow){
 		int DequeSize = 500;
@@ -74,7 +83,6 @@ void VizHandler::UpdateTraceFig(){
 				for(int j = 0; j< mcmc->ThetaList->Theta[i]->Values.size(); j++){
 					k = mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1;
 					ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << mcmc->ThetaList->Theta[i]->Values[j] << "\n";
-					//cout << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << mcmc->ThetaList->Theta[i]->Values[j] << "\n";
 					if(DequeParameterValues[j].size() > DequeSize){
 						DequeParameterValues[j].pop_front();
 						DequeParameterValues[j].push_back(ss.str());
@@ -83,7 +91,6 @@ void VizHandler::UpdateTraceFig(){
 						DequeParameterValues[j].push_back(ss.str());
 					}
 					ss.str(string()); //clears the stringstream.
-					//cout << i << " " << j << " " << ThetaListSize << " " << mcmc->ThetaList->Theta[i]->Values.size() << endl;
 				}
 				mcmc->ThetaList->Theta[i]->VizTrace();
 			}

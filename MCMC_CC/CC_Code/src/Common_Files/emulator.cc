@@ -11,7 +11,8 @@ EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMCConfiguration * mcmc_
 	// cout << "EmulatorHandler: Constructor Start" << endl;
 	
 	EmulatorScriptHome = parameter::getS(*parmap, "EMULATORFILEPATH", "./");
-	Observables = parameter::getS(mcmc->parmap, "OBSERVABLES", "Observables not specified");
+	//Observables = parameter::getS(mcmc->parmap, "OBSERVABLES", "Observables not specified");
+	//Observables = mcmc->Observables;
 
 	// cout << "The emulator is located at " << EmulatorScriptHome << endl;
 	EmInputFile = EmulatorScriptHome + "/src/InputPts.txt";
@@ -34,16 +35,17 @@ EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMCConfiguration * mcmc_
 	f.close();
 	
 	//check if emulator has been run yet.
-	string checkfilename = mcmc->dir_name + "/" + Observables + "-thetas.txt";
-	// cout << checkfilename << endl;
+	string checkfilename = mcmc->dir_name + "/" + mcmc->Observables + "-thetas.txt";
+	//cout << checkfilename << endl;
 	
 	f.open(checkfilename.c_str());
 	if(f){
 		f.close();
 		// cout << "Emulator exists." << endl;
-	}else{ //If it can't find it:
+	}else{ //If the code can't find the emulator:
 		f.close();
-		string checkfilename = "./" + Observables + "-thetas.txt"; //Check the base directory
+		string checkfilename = "./" + mcmc->Observables + "-thetas.txt"; //Check the base directory
+		//cout << checkfilename << endl;
 		f.open(checkfilename.c_str());
 		if(f){
 			f.close();
@@ -110,7 +112,7 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 	// + mcmc->dir_name + " > "+ EmOutputFile + " 2> " + EmErrorFile;
 	
 	command = EmulatorScriptHome + "/src/computePoints.sh " + mcmc->dir_name + " "\
-	+ mcmc->dir_name + "/fn-data-" + Observables + ".dat < " + EmInputFile + " > "+ EmOutputFile + " 2> " + EmErrorFile;
+	+ mcmc->dir_name + "/fn-data-" + mcmc->Observables + ".dat < " + EmInputFile + " > "+ EmOutputFile + " 2> " + EmErrorFile;
 
 	// cout << command << endl;
 	

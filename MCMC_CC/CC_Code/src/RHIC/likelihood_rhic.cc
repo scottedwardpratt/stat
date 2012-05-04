@@ -150,8 +150,8 @@ vector<double> LikelihoodDistribution_RHIC::GetFakeData(){
 
 vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 	vector<double> datameans;
-	string EmulatorObservables=emulator->Observables;
-	//cout << "Observables: " << EmulatorObservables << endl;
+	string EmulatorObservables=mcmc->Observables;
+	/*//cout << "Observables: " << EmulatorObservables << endl;
 	string observables_filename = mcmc->dir_name + "/" + EmulatorObservables + ".datnames";
 	cout << "Observables being read from: " << observables_filename << endl;
 	string data_filename = mcmc->dir_name + "/exp_data/results.dat";
@@ -165,17 +165,14 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 	parameter::ReadParsFromFile(observablesparmap, observables_filename.c_str());
 	vector<string> PNames;
 	PNames = parameter::getVS(observablesparmap,"NAMES","blah blah");
-	/*ifstream emulated_observables (observables_filename.c_str());
+	*/
+	string data_filename = mcmc->dir_name + "/exp_data/results.dat";
+	fstream data;
+	string type, param_name;
+	int count=0;
+	vector<string> PNames;
+	PNames = mcmc->ObservablesNames;
 
-	while(!emulated_observables.eof()){
-		string line;
-		getline(emulated_observables, line, '\n');
-		if(line.compare(0,1,"#") != 0 && !line.empty() ){ //if the line is not a comment
-			PNames.push_back(line);
-		}
-	}
-	emulated_observables.close();
-*/
 	int numparams = PNames.size();
 	cout << "There are " << numparams  << " parameters used in the emulator." << endl;
 	Datamean=new double[numparams];
@@ -235,7 +232,7 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 
 vector<double> LikelihoodDistribution_RHIC::GetRealError(){
 	vector<double> dataerrors;
-	string EmulatorObservables=emulator->Observables;
+	string EmulatorObservables=mcmc->Observables;
 	string observables_filename = mcmc->dir_name + "/" + EmulatorObservables + ".datnames";
 	string data_filename = mcmc->dir_name + "/exp_data/results.dat";
 	
@@ -243,6 +240,7 @@ vector<double> LikelihoodDistribution_RHIC::GetRealError(){
 	string type, param_name;
 	int count = 0;
 	
+	// Right here we load the names of the observables
 	parameter::ReadParsFromFile(observablesparmap, observables_filename.c_str());
 	vector<string> PNames;
 	PNames = parameter::getVS(observablesparmap,"NAMES","blah blah");
