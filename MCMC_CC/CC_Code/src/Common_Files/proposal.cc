@@ -34,7 +34,7 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
 	string filename = mcmc->dir_name + "/ranges.dat";
 	ranges.open(filename.c_str(), fstream::in);
 	
-	if(ranges){
+	/*if(ranges){
 		Ranges = true;
 		while(ranges >> type){
 			if(strcmp(type.c_str(), "double") == 0){
@@ -73,7 +73,7 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
 		cout << "Error: number of parameters in ranges data and total number of parameters are different." << endl;
 		cout << "Count: " << count << " NumParams: " << numparams << endl;
 		exit(1);
-	}
+	}*/
 	/* //This seems to be a copy of what is above, so I have commented it out. JN 4/19/12
 	count=0;
 	string emulator_ranges = mcmc->dir_name + "/ranges.dat";
@@ -114,7 +114,7 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
 		cout << "Warning:Unable to open /ranges.dat" << endl;
 	}
 	*/
-	if(!Ranges){
+	/*if(!Ranges){
 		cout << "Unable to find any ranges.dat file." << endl;
 		exit(-1);
 	}
@@ -122,10 +122,8 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
 		cout << "Error: number of parameters in ranges data and total number of parameters are different." << endl;
 		cout << "Count: " << count << " NumParams: " << numparams << endl;
 		exit(1);
-	}
+	}*/
 
-	
-	
 	//gsl_rng * r;
 	
 	/*
@@ -192,12 +190,12 @@ ParameterSet ProposalDistribution::Iterate(ParameterSet current){
 		for(int i=0; i<proposed.Values.size(); i++){
 			do{
 				proposed.Values[i] = current.Values[i];
-				proposed.Values[i] = (proposed.Values[i] - Min_Ranges[i])/(Max_Ranges[i]-Min_Ranges[i]); //scale to between 0 and 1
+				proposed.Values[i] = (proposed.Values[i] - mcmc->Min_Ranges[i])/(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]); //scale to between 0 and 1
 				
 				proposed.Values[i] = proposed.Values[i] + gsl_ran_gaussian(randy, MixingStdDev[0]/sqrt((double)proposed.Names.size()));
 			}while((proposed.Values[i] < 0.0) || proposed.Values[i] > 1.0);
 			
-			proposed.Values[i] = (proposed.Values[i]*(Max_Ranges[i]-Min_Ranges[i]))+Min_Ranges[i];
+			proposed.Values[i] = (proposed.Values[i]*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]))+mcmc->Min_Ranges[i];
 		}
 	}
 	

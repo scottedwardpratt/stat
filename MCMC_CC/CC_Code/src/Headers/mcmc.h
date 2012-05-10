@@ -38,6 +38,8 @@ public:
 	bool LOGLIKE;
 	bool LOGPRIOR;
 	bool LOGPROPOSAL;
+	bool VIZTRACE;
+	bool APPEND_TRACE;
 	parameterMap parmap;
 	string dir_name;
 	string parameterfile;
@@ -54,6 +56,7 @@ public:
 	ProposalDistribution *Proposal;
 	PriorDistribution *Prior;
 	ParameterSetList *DummyList;
+	double Max_Ranges[10],Min_Ranges[10]; // 
 };
 
 class MCMCRun{
@@ -65,15 +68,14 @@ public:
 	double Run();
 	
 	ParameterSet *BestParameterSetPtr;
+	vector<double> ParamValues;
 	double bestlikelihood;
 	double Likelihood_Current;
 	
-	bool VIZTRACE;
 	int  WRITEOUT;
-	bool APPEND_TRACE;
-	int MAXITERATIONS;
+	int  MAXITERATIONS;
 	bool RANDOM_THETA0;
-	int SEED;
+	bool RESCALED_TRACE;
 	
 	string tracedir;
 	MCMCConfiguration *mcmcconfig;

@@ -151,21 +151,7 @@ vector<double> LikelihoodDistribution_RHIC::GetFakeData(){
 vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 	vector<double> datameans;
 	string EmulatorObservables=mcmc->Observables;
-	/*//cout << "Observables: " << EmulatorObservables << endl;
-	string observables_filename = mcmc->dir_name + "/" + EmulatorObservables + ".datnames";
-	cout << "Observables being read from: " << observables_filename << endl;
-	string data_filename = mcmc->dir_name + "/exp_data/results.dat";
-	//string data_filename = mcmc->dir_name + "/analysis/exp_data/" + "cent20to30" + "/results.dat";
-	cout << "Results being read from: " << data_filename << endl;
 	
-	fstream data;
-	string type, param_name;
-	int count = 0;
-	
-	parameter::ReadParsFromFile(observablesparmap, observables_filename.c_str());
-	vector<string> PNames;
-	PNames = parameter::getVS(observablesparmap,"NAMES","blah blah");
-	*/
 	string data_filename = mcmc->dir_name + "/exp_data/results.dat";
 	fstream data;
 	string type, param_name;

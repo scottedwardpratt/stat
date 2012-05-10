@@ -13,17 +13,22 @@ public:
 	void operator() (const string& command);
 	void UpdateTraceFig();
 	void FinalTrace();
-	string header;
 private:
 	string gnuplotterm;
 	string gnuplotstyle;
 	int ThetaListSize;
 	int HighestItnReadIn;
 	bool MovingWindow;
+	bool DensityPlot;
 	MCMCRun *mcmc;
 	string *paramvalues;
 	deque<string> *DequeParameterValues;
 	FILE * gnuplotpipe;
-	FILE * gnuplotmultipipe;
+	//FILE * gnuplotmultipipe;
+	vector<string> DensityPlotFileNames;
+	vector<string> DensityPlotCommands;
+	string header;
+	int Densities[7][7][100][100]; //This is the array which is holding the density plot data. In principle the first two indices should be NUM_PARAMS, and NUM_PARAMS-1, but I don't know how to do that here. The last two are the number of bins.
+	int BINS;
 };
 #endif
