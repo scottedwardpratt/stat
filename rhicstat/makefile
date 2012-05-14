@@ -4,9 +4,11 @@ include ../../makefile_defs.mk
 #########################################################################
 #HOPEFULLY, everything below need not be touched
 
-INC=-I include -I${MADAI_GSLPATH}/include -I${MADAI_INSTALLDIR}/include -I${MADAI_HDF5_HOME}/include
+INC=-I include -I${MADAI_GSLPATH}/include -I${MADAI_INSTALLDIR}/include -I${MADAI_HDF5_HOME}/include -I${MADAI_GSLPATH}/include
 
-all : lib/librhicstat.a parmaker
+LB=-L${MADAI_INSTALLDIR}/lib -L${MADAI_GSLPATH}/lib -lcoralutils -lgsl
+
+all : lib/librhicstat.a parmaker_random parmaker_latin
 
 statdirs :
 	mkdir -p lib;\
@@ -39,14 +41,17 @@ build/qualifier.o : src/qualifier.cc include/qualifier.h include/rhicstat.h
 include/qualifier.h : src/qualifier.h
 	cp src/qualifier.h include/qualifier.h
 
-parmaker : statdirs bin/parmaker
+parmaker : statdirs bin/parmaker_latin bin/parmaker_random
 
-bin/parmaker : latinhyper3/parmaker.cc
-	${MADAI_CPP} ${MADAI_CFLAGS} latinhyper3/parmaker.cc -o bin/parmaker
+bin/parmaker_latin : latinhyper3/parmaker_latin.cc
+	${MADAI_CPP} ${MADAI_CFLAGS} latinhyper3/parmaker_latin.cc -o bin/parmaker_latin
+
+bin/parmaker_random : src/parmaker_random.cc
+	${MADAI_CPP} ${MADAI_CFLAGS} ${INC} ${LB} src/parmaker_random.cc -o bin/parmaker_random
 
 #########################
 
-install : ${MADAI_INSTALLDIR}/lib/librhicstat.a ${MADAI_INSTALLDIR}/include/rhicstat.h ${MADAI_INSTALLDIR}/include/qualifier.h ${MADAI_INSTALLDIR}/bin/parmaker ${MADAI_INSTALLDIR}/progdata/genSamples.R ${MADAI_INSTALLDIR}/bin/latin3.sh ${MADAI_INSTALLDIR}/bin/latin3.sh
+install : ${MADAI_INSTALLDIR}/lib/librhicstat.a ${MADAI_INSTALLDIR}/include/rhicstat.h ${MADAI_INSTALLDIR}/include/qualifier.h ${MADAI_INSTALLDIR}/bin/parmaker_latin ${MADAI_INSTALLDIR}/bin/parmaker_random ${MADAI_INSTALLDIR}/progdata/genSamples.R ${MADAI_INSTALLDIR}/bin/latin3.sh ${MADAI_INSTALLDIR}/bin/latin3.sh
 
 ${MADAI_INSTALLDIR}/lib/librhicstat.a : lib/librhicstat.a
 	rm -f ${MADAI_INSTALLDIR}/lib/librhicstat.a;
@@ -59,8 +64,12 @@ ${MADAI_INSTALLDIR}/include/rhicstat.h : include/rhicstat.h
 ${MADAI_INSTALLDIR}/include/qualifier.h : include/qualifier.h
 	cp include/qualifier.h ${MADAI_INSTALLDIR}/include
 
-${MADAI_INSTALLDIR}/bin/parmaker : bin/parmaker
-	cp -f bin/parmaker ${MADAI_INSTALLDIR}/bin/
+${MADAI_INSTALLDIR}/bin/parmaker_random : bin/parmaker_random
+	cp -f bin/parmaker_random ${MADAI_INSTALLDIR}/bin/
+
+${MADAI_INSTALLDIR}/bin/parmaker_latin : bin/parmaker_latin
+	cp -f bin/parmaker_latin ${MADAI_INSTALLDIR}/bin/
+
 
 ${MADAI_INSTALLDIR}/progdata/genSamples.R : latinhyper3/genSamples.R
 	cp -f latinhyper3/genSamples.R ${MADAI_INSTALLDIR}/progdata/
@@ -72,4 +81,4 @@ clean :
 	rm -f include/* build/* lib/* bin/*
 
 uninstall :
-	rm -f ${MADAI_INSTALLDIR}/lib/librhicstat.a ${MADAI_INSTALLDIR}/include/rhicstat.h ${MADAI_INSTALLDIR}/include/qualifier.h ${MADAI_INSTALLDIR}/bin/parmaker ${MADAI_INSTALLDIR}/progdata/genSamples.R ${MADAI_INSTALLDIR}/bin/latin3.sh ${MADAI_INSTALLDIR}/bin/latin3.sh
+	rm -f ${MADAI_INSTALLDIR}/lib/librhicstat.a ${MADAI_INSTALLDIR}/include/rhicstat.h ${MADAI_INSTALLDIR}/include/qualifier.h ${MADAI_INSTALLDIR}/bin/parmaker_latin ${MADAI_INSTALLDIR}/bin/parmaker_random  ${MADAI_INSTALLDIR}/progdata/genSamples.R ${MADAI_INSTALLDIR}/bin/latin3.sh ${MADAI_INSTALLDIR}/bin/latin3.sh

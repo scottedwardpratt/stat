@@ -19,6 +19,7 @@ void CRHICStat::CalcSensitivity(){
 		}
 	}
 	gslmatrix_NY->EigenFind(sigmayy,Uytoz,eigenvalyy);
+	gslmatrix_NY->Invert_NonSymm(Uytoz,Uytoz_inv);
 	for(irun=0;irun<NRUNS;irun++){
 		for(ix=0;ix<NX;ix++){
 			runinfo[irun]->z[ix]=0.0;
@@ -31,7 +32,7 @@ void CRHICStat::CalcSensitivity(){
 	printf("-------- PCA values -----------\n");
 	for(iy=0;iy<NY;iy++) printf("%2d: %g\n",iy,eigenvalyy[iy]);
 	for(iy=0;iy<NY;iy++){
-		printf("%2d %40s: %8.5f %8.5f %8.5f %8.5f\n", iy,yname[iy].c_str(),Uytoz[iy][0],Uytoz[iy][1],Uytoz[iy][2],Uytoz[iy][3]);
+		printf("%2d %40s: %8.5f %8.5f %8.5f %8.5f %8.5f %8.5f\n", iy,yname[iy].c_str(),Uytoz[iy][0],Uytoz[iy][1],Uytoz[iy][2],Uytoz[iy][3],Uytoz[iy][4],Uytoz[iy][5]);
 	}
 
 	/** Check dxdx */
@@ -124,6 +125,7 @@ void CRHICStat::CalcSensitivity(){
 				*(runinfo[irun]->z[iz]-runinfo[irun]->zlinear[iz]);
 		}
 		chiperfreedom+=totalerror;
+		/**
 		if(totalerror>5.0){
 			printf("------------------------  irun=%d ------------------------------\n",irun);
 			printf("%7.3f: ",totalerror);
@@ -134,6 +136,7 @@ void CRHICStat::CalcSensitivity(){
 			//PrintXlinear(runinfo[irun]);
 			//PrintX(runinfo[irun]);
 		}
+		*/
 	}
 	//printf("chiperfreedom=%g\n",chiperfreedom/double(NRUNS*3)); // roughly 3 PCA values 
 
@@ -170,10 +173,11 @@ int iy,iz;
 	for(iz=0;iz<NY;iz++) zz[iz]=runinfo->zlinear[iz];
 	for(iz=NX;iz<NY;iz++) zz[iz]=0.0;
 	for(iy=0;iy<NY;iy++){
-		runinfo->y[iy]=0.0;
+		runinfo->ylinear[iy]=0.0;
 		for(iz=0;iz<NY;iz++){
 			runinfo->ylinear[iy]+=zz[iz]*Uytoz_inv[iz][iy];
 		}
+		//printf("ylinear[%d]=%g, zlinear[%d]=%g\n",iy,runinfo->ylinear[iy],iy,runinfo->zlinear[iy]);
 	}
 	delete [] zz;
 }
@@ -253,10 +257,10 @@ void CRHICStat::GetXlinearFromW(CRunInfo *runinfo){
 
 void CRHICStat::PrintY(CRunInfo *runinfo){
 	int iy;
-	printf("                         observable     : yprime    y\n");
+	printf("                         observable     :    yprime      y        yexp\n");
 	for(iy=0;iy<NY;iy++){
-		printf("%40s: %9.4f  %g\n",yname[iy].c_str(),
-			runinfo->y[iy],ybar[iy]+runinfo->y[iy]*runinfo->sigmay[iy]);
+		printf("%40s: %9.4f  %9.4f  %9.4f\n",yname[iy].c_str(),
+			runinfo->y[iy],ybar[iy]+runinfo->y[iy]*runinfo->sigmay[iy],ybar[iy]+expinfo->y[iy]*expinfo->sigmay[iy]);
 	}
 }
 
@@ -270,10 +274,10 @@ void CRHICStat::PrintZ(CRunInfo *runinfo){
 
 void CRHICStat::PrintYlinear(CRunInfo *runinfo){
 	int iy;
-	printf("                         observable     : yprime    y\n");
+	printf("                         observable     :    ylinear   yexp\n");
 	for(iy=0;iy<NY;iy++){
-		printf("%40s: %9.4f  %g\n",yname[iy].c_str(),
-			runinfo->ylinear[iy],ybar[iy]+runinfo->ylinear[iy]*runinfo->sigmay[iy]);
+		printf("%40s: %9.4f  %9.4f\n",yname[iy].c_str(),
+			ybar[iy]+runinfo->ylinear[iy]*runinfo->sigmay[iy],ybar[iy]+expinfo->y[iy]*expinfo->sigmay[iy]);
 	}
 }
 
@@ -305,27 +309,17 @@ void CRHICStat::PrintX(CRunInfo *runinfo){
 
 void CRHICStat::FitExpData(){
 	int ix,iy;
-	ReadY("exp_data/results.dat",expinfo);
-	//ReadY("model_results/default/results.dat",expinfo);
 	
-	for(iy=0;iy<NY;iy++){
-		/** if(yname[iy]=="cent20to30_STAR_V2_PION_PTWEIGHT" || yname[iy]=="cent20to30_STAR_V2_KAON_PTWEIGHT" ||yname[iy]=="cent20to30_STAR_V2_PROTON_PTWEIGHT"){
-			expinfo->y[iy]*=0.85;
-		}*/
-		
-		expinfo->sigmay[iy]=sigmaybar[iy];
-		expinfo->y[iy]=(expinfo->y[iy]-ybar[iy])/expinfo->sigmay[iy];
-	}
-	GetXlinearFromY(expinfo);
+	GetXlinearFromY(fitinfo);
 	printf("Fit of Parameters to Data\n");
-	PrintXlinear(expinfo);
+	//PrintXlinear(fitinfo);
 	
 	int irun,ibest=-1;
 	double error,besterror=1.0E79;
 	for(irun=0;irun<NRUNS;irun++){
 		error=0.0;
 		for(iy=0;iy<NY;iy++){
-			error+=pow(expinfo->y[iy]-runinfo[irun]->y[iy],2);
+			error+=pow(fitinfo->y[iy]-runinfo[irun]->y[iy],2);
 		}
 		if(error<besterror){
 			ibest=irun;
@@ -338,16 +332,48 @@ void CRHICStat::FitExpData(){
 	PrintY(runinfo[ibest]);
 	printf("-----------------------------------------------\n");
 	
-	GetWFromXlinear(expinfo);
+	//fitinfo->xlinear[1]+=50;
+	GetWFromXlinear(fitinfo);
 	for(ix=0;ix<NX;ix++){
-		expinfo->w[ix]*=1.0/(1.0+eigenvalxx[ix]*eigenvalxx[ix]);
+		fitinfo->w[ix]*=1.0/(1.0+eigenvalxx[ix]*eigenvalxx[ix]);
 	}
-	GetXlinearFromW(expinfo);
-	GetZlinearFromXlinear(expinfo);
-	GetYlinearFromZlinear(expinfo);
+	GetXlinearFromW(fitinfo);
+	GetZlinearFromXlinear(fitinfo);
+	GetYlinearFromZlinear(fitinfo);
 	
-	PrintXlinear(expinfo);
-	PrintYlinear(expinfo);
+	
+	PrintXlinear(fitinfo);
+	PrintYlinear(fitinfo);
 }
 
+void CRHICStat::PlotZvsX(){
+	double **xhat=new double*[NX];
+	double xx,norm;
+	int ix,iz,irun;
+	for(iz=0;iz<NX;iz++){
+		xhat[iz]=new double[NX];
+		norm=0.0;
+		for(ix=0;ix<NX;ix++){
+			xhat[iz][ix]=dxdz[ix][iz];
+			norm+=xhat[iz][ix]*xhat[iz][ix];
+		}
+		norm=1.0/sqrt(norm);
+		for(ix=0;ix<NX;ix++) xhat[iz][ix]=norm*xhat[iz][ix];
+	}
+	
+	char filename[80];
+	FILE *fptr;
+	for(iz=0;iz<NX;iz++){
+		sprintf(filename,"figs/z%dvsx.dat",iz);
+		fptr=fopen(filename,"w");
+		for(irun=0;irun<NRUNS;irun++){
+			xx=0.0;
+			for(ix=0;ix<NX;ix++) xx+=runinfo[irun]->x[ix]*xhat[iz][ix];
+			fprintf(fptr,"%8.4f %g\n",xx,runinfo[irun]->z[iz]);
+		}
+		fclose(fptr);
+	}
+	for(ix=0;ix<NX;ix++) delete [] xhat[ix];
+	delete [] xhat;
+}
 #endif

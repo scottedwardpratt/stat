@@ -56,6 +56,7 @@ void CRHICStat::InitArrays(){
 	gslmatrix_NY=new CGSLMatrix_Real(NY);
 	gslmatrix_NX=new CGSLMatrix_Real(NX);
 	expinfo=new CRunInfo(NX,NY);
+	fitinfo=new CRunInfo(NX,NY);
 }
 
 void CRHICStat::InitX(){
@@ -92,6 +93,10 @@ void CRHICStat::InitX(){
 			fscanf(fptr,"%s",dummy);
 			xname[ix]=dummy;
 			fscanf(fptr,"%lf %lf",&xmin[ix],&xmax[ix]);
+			//if(ix==1){
+				//xmin[ix]=0.0;
+				//xmax[ix]=8.0;
+			//}
 			ix+=1;
 		}
 		fgets(dummy,200,fptr);
@@ -174,12 +179,17 @@ void CRHICStat::ReadAllY(){
 		filename="model_results/run"+string(runchars)+"/results.dat";
 		ReadY(filename,runinfo[irun]);
 	}
+	ReadY("exp_data/results.dat",expinfo);
 	for(iy=0;iy<NY;iy++){
 		sigmaybar[iy]=0.0;
 		for(irun=0;irun<NRUNS;irun++) sigmaybar[iy]+=runinfo[irun]->sigmay[iy];
 		sigmaybar[iy]=sigmaybar[iy]/double(NRUNS);
 		for(irun=0;irun<NRUNS;irun++) runinfo[irun]->sigmay[iy]=sigmaybar[iy];
-	}
+		fitinfo->sigmay[iy]=expinfo->sigmay[iy]=sigmaybar[iy];
+		/** if(yname[iy]=="cent20to30_STAR_V2_PION_PTWEIGHT" || yname[iy]=="cent20to30_STAR_V2_KAON_PTWEIGHT" ||yname[iy]=="cent20to30_STAR_V2_PROTON_PTWEIGHT"){
+			expinfo->y[iy]*=0.9;
+		}*/
+	}	
 }
 	
 void CRHICStat::ReadY(string filename,CRunInfo *runinfo){
@@ -224,6 +234,12 @@ void CRHICStat::ScaleXY(){
 			runinfo[irun]->y[iy]=(runinfo[irun]->y[iy]-ybar[iy])/runinfo[irun]->sigmay[iy];
 		}
 	}
+	
+	for(iy=0;iy<NY;iy++){
+		expinfo->y[iy]=(expinfo->y[iy]-ybar[iy])/expinfo->sigmay[iy];
+		fitinfo->y[iy]=expinfo->y[iy];
+	}
+	
 }
 
 #endif

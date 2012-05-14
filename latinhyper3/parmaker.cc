@@ -46,7 +46,7 @@ int main(int argc, char *argv[]){
 		//printf("making directory %s\n",dirname);
 		command="mkdir -p "+string(dirname);
 		system(command.c_str());
-		command="cp defaultpars/fixed.param "+string(dirname)+"/";
+		command="cp parameters/default/fixed.param "+string(dirname)+"/";
 		system(command.c_str());
 		statsfilename=string(dirname)+"/stats.param";
 		output=fopen(statsfilename.c_str(),"w");

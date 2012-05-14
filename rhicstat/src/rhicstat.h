@@ -42,7 +42,7 @@ public:
 	double *eigenvalyy,*eigenvalxx;
 	double *uncertainty;
 	CRunInfo **runinfo;
-	CRunInfo *expinfo;
+	CRunInfo *expinfo,*fitinfo;
 	CGSLMatrix_Real *gslmatrix_NY;
 	CGSLMatrix_Real *gslmatrix_NX;
 	void FitExpData();
@@ -72,6 +72,7 @@ public:
 	void PrintZ(CRunInfo *runinfo);
 	void PrintZlinear(CRunInfo *runinfo);
 	void PrintYlinear(CRunInfo *runinfo);
+	void PlotZvsX();
 };
 
 
