@@ -23,6 +23,9 @@ CRunInfo::CRunInfo(int NX,int NY){
 	xlinear=new double[NX];
 	ylinear=new double[NY];
 	zlinear=new double[NY];
+	zquad=new double[NY]();
+	yquad=new double[NY]();
+	xquad=new double[NX]();
 }
 
 void CRHICStat::InitArrays(){
@@ -57,6 +60,7 @@ void CRHICStat::InitArrays(){
 	gslmatrix_NX=new CGSLMatrix_Real(NX);
 	expinfo=new CRunInfo(NX,NY);
 	fitinfo=new CRunInfo(NX,NY);
+	Aquad=NULL; Bquad=NULL; Cquad=NULL;
 }
 
 void CRHICStat::InitX(){

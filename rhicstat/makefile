@@ -19,9 +19,9 @@ statdirs :
 	mkdir -p ${MADAI_INSTALLDIR}/include;\
 	mkdir -p ${MADAI_INSTALLDIR}/bin
 
-lib/librhicstat.a : build/pca.o build/qualifier.o build/rhicstat.o build/calcsens.o
+lib/librhicstat.a : build/pca.o build/qualifier.o build/rhicstat.o build/calcsens.o build/quadfit.o
 	rm -f lib/librhicstat.a;\
-	ar -ru lib/librhicstat.a build/pca.o build/qualifier.o build/rhicstat.o build/calcsens.o
+	ar -ru lib/librhicstat.a build/pca.o build/qualifier.o build/rhicstat.o build/calcsens.o build/quadfit.o
 
 build/pca.o : src/pca.cc include/rhicstat.h include/qualifier.h
 	${MADAI_CPP} -c src/pca.cc ${MADAI_CFLAGS} ${INC} -o build/pca.o
@@ -31,6 +31,9 @@ build/rhicstat.o : src/rhicstat.cc include/rhicstat.h include/qualifier.h
 
 build/calcsens.o : src/calcsens.cc include/rhicstat.h include/qualifier.h
 	${MADAI_CPP} -c src/calcsens.cc ${MADAI_CFLAGS} ${INC} -o build/calcsens.o
+
+build/quadfit.o : src/quadfit.cc include/rhicstat.h include/qualifier.h
+	${MADAI_CPP} -c src/quadfit.cc ${MADAI_CFLAGS} ${INC} -o build/quadfit.o
 
 include/rhicstat.h : src/rhicstat.h
 	cp src/rhicstat.h include/rhicstat.h

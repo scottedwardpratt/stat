@@ -1,5 +1,5 @@
-#ifndef __PCA_H__
-#define __PCA_H__
+#ifndef __RHICSTAT_H__
+#define __RHICSTAT_H__
 #include "coralutils.h"
 #include "qualifier.h"
 using namespace std;
@@ -26,7 +26,7 @@ public:
 	double *x,*w;
 	double *y,*z;
 	double *sigmay;
-	double *ylinear,*zlinear,*xlinear;
+	double *ylinear,*zlinear,*xlinear,*zquad,*yquad,*xquad;
 };
 
 class CRHICStat{
@@ -41,6 +41,7 @@ public:
 	double **Uytoz,**Uytoz_inv,**Uxtow,**Uxtow_inv;
 	double *eigenvalyy,*eigenvalxx;
 	double *uncertainty;
+	double ***Aquad,**Bquad,*Cquad;
 	CRunInfo **runinfo;
 	CRunInfo *expinfo,*fitinfo;
 	CGSLMatrix_Real *gslmatrix_NY;
@@ -55,6 +56,7 @@ public:
 	void ReadAllY();
 	void ReadY(string filename,CRunInfo *runinfo);
 	void CalcSensitivity();
+	void QuadFit();
 	void GetZFromY(CRunInfo *runinfo);
 	void GetYFromZ(CRunInfo *runinfo);
 	void GetXlinearFromZ(CRunInfo *runinfo);
