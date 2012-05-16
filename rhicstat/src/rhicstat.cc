@@ -26,6 +26,7 @@ CRunInfo::CRunInfo(int NX,int NY){
 	zquad=new double[NY]();
 	yquad=new double[NY]();
 	xquad=new double[NX]();
+	good=true;
 }
 
 void CRHICStat::InitArrays(){
@@ -178,22 +179,27 @@ void CRHICStat::ReadAllY(){
 	int irun,iy;
 	char runchars[5];
 	string filename;
+	NGOODRUNS=0;
 	for(irun=0;irun<NRUNS;irun++){
 		sprintf(runchars,"%d",irun+1);
 		filename="model_results/run"+string(runchars)+"/results.dat";
 		ReadY(filename,runinfo[irun]);
+		if(runinfo[irun]->good==false) printf("irun=%d is useless\n",irun);
 	}
 	ReadY("exp_data/results.dat",expinfo);
 	for(iy=0;iy<NY;iy++){
 		sigmaybar[iy]=0.0;
-		for(irun=0;irun<NRUNS;irun++) sigmaybar[iy]+=runinfo[irun]->sigmay[iy];
-		sigmaybar[iy]=sigmaybar[iy]/double(NRUNS);
+		for(irun=0;irun<NRUNS;irun++){
+			if(runinfo[irun]->good) sigmaybar[iy]+=runinfo[irun]->sigmay[iy];
+		}
+		sigmaybar[iy]=sigmaybar[iy]/double(NGOODRUNS);
 		for(irun=0;irun<NRUNS;irun++) runinfo[irun]->sigmay[iy]=sigmaybar[iy];
 		fitinfo->sigmay[iy]=expinfo->sigmay[iy]=sigmaybar[iy];
 		/** if(yname[iy]=="cent20to30_STAR_V2_PION_PTWEIGHT" || yname[iy]=="cent20to30_STAR_V2_KAON_PTWEIGHT" ||yname[iy]=="cent20to30_STAR_V2_PROTON_PTWEIGHT"){
 			expinfo->y[iy]*=0.9;
 		}*/
 	}	
+	printf("NGOODRUNS=%d\n",NGOODRUNS);
 }
 	
 void CRHICStat::ReadY(string filename,CRunInfo *runinfo){
@@ -208,12 +214,22 @@ void CRHICStat::ReadY(string filename,CRunInfo *runinfo){
 			if(string(dummy)==yname[iy]){
 				fscanf(fptr,"%lf",&(runinfo->y[iy]));
 				fscanf(fptr,"%lf",&runinfo->sigmay[iy]);
+				if(string(dummy)=="cent0to5_PHENIX_SPECTRA_PION_YIELD"){
+					if(runinfo->y[iy]>300.0 && runinfo->y[iy]<500.0){
+						runinfo->good=true;
+					}
+					else{
+						runinfo->good=false;
+							//printf("run from filename %s is useless, pion yield for central coll.s = %g\n",filename.c_str(),runinfo->y[iy]);
+					}
+				}
 				iy+=1;
 			}
 		}
 		fgets(dummy,200,fptr);
 	}
 	fclose(fptr);
+	if(runinfo->good) NGOODRUNS+=1;
 }
 
 void CRHICStat::ScaleXY(){
@@ -221,9 +237,9 @@ void CRHICStat::ScaleXY(){
 	for(ix=0;ix<NX;ix++){
 		xbar[ix]=0.0;
 		for(irun=0;irun<NRUNS;irun++){
-			xbar[ix]+=runinfo[irun]->x[ix];
+			if(runinfo[irun]->good) xbar[ix]+=runinfo[irun]->x[ix];
 		}
-		xbar[ix]=xbar[ix]/double(NRUNS);
+		xbar[ix]=xbar[ix]/double(NGOODRUNS);
 		for(irun=0;irun<NRUNS;irun++){
 			runinfo[irun]->x[ix]=sqrt(12.0)*(runinfo[irun]->x[ix]-xbar[ix])/(xmax[ix]-xmin[ix]);
 		}
@@ -231,9 +247,9 @@ void CRHICStat::ScaleXY(){
 	for(iy=0;iy<NY;iy++){
 		ybar[iy]=0.0;
 		for(irun=0;irun<NRUNS;irun++){
-			ybar[iy]+=runinfo[irun]->y[iy];
+			if(runinfo[irun]->good) ybar[iy]+=runinfo[irun]->y[iy];
 		}
-		ybar[iy]=ybar[iy]/double(NRUNS);
+		ybar[iy]=ybar[iy]/double(NGOODRUNS);
 		for(irun=0;irun<NRUNS;irun++){
 			runinfo[irun]->y[iy]=(runinfo[irun]->y[iy]-ybar[iy])/runinfo[irun]->sigmay[iy];
 		}

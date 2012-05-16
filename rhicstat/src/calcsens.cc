@@ -13,9 +13,11 @@ void CRHICStat::CalcSensitivity(){
 	for(iy=0;iy<NY;iy++){
 		for(iyy=0;iyy<NY;iyy++){
 			for(irun=0;irun<NRUNS;irun++){
-				sigmayy[iy][iyy]+=runinfo[irun]->y[iy]*runinfo[irun]->y[iyy];
+				if(runinfo[irun]->good){
+					sigmayy[iy][iyy]+=runinfo[irun]->y[iy]*runinfo[irun]->y[iyy];
+				}
 			}
-			sigmayy[iy][iyy]=sigmayy[iy][iyy]/double(NRUNS);
+			sigmayy[iy][iyy]=sigmayy[iy][iyy]/double(NGOODRUNS);
 		}
 	}
 	gslmatrix_NY->EigenFind(sigmayy,Uytoz,eigenvalyy);
@@ -44,9 +46,9 @@ void CRHICStat::CalcSensitivity(){
 		dxdx[ix]=new double[NX];
 		for(ixx=0;ixx<NX;ixx++){
 			for(irun=0;irun<NRUNS;irun++){
-				dxdx[ix][ixx]+=runinfo[irun]->x[ix]*runinfo[irun]->x[ixx];
+				if(runinfo[irun]->good) dxdx[ix][ixx]+=runinfo[irun]->x[ix]*runinfo[irun]->x[ixx];
 			}
-			dxdx[ix][ixx]=dxdx[ix][ixx]/double(NRUNS);
+			dxdx[ix][ixx]=dxdx[ix][ixx]/double(NGOODRUNS);
 		}
 	}
 	//gslmatrix_NX->Invert(dxdx,dxdx_inv);
@@ -60,9 +62,9 @@ void CRHICStat::CalcSensitivity(){
 		for(ixx=0;ixx<NX;ixx++){
 			dxdz[ix][ixx]=0.0;
 			for(irun=0;irun<NRUNS;irun++){
-				dxdz[ix][ixx]+=runinfo[irun]->x[ix]*runinfo[irun]->z[ixx];
+				if(runinfo[irun]->good) dxdz[ix][ixx]+=runinfo[irun]->x[ix]*runinfo[irun]->z[ixx];
 			}
-			dxdz[ix][ixx]=dxdz[ix][ixx]/double(NRUNS);
+			dxdz[ix][ixx]=dxdz[ix][ixx]/double(NGOODRUNS);
 		}
 	}
 	gslmatrix_NX->Invert_NonSymm(dxdz,dxdz_inv);
@@ -114,29 +116,31 @@ void CRHICStat::CalcSensitivity(){
 	
 	double chiperfreedom=0.0;
 	for(irun=0;irun<NRUNS;irun++){
-		totalerror=0.0;
-		//if(irun==73) PrintX(runinfo[irun]);
-		GetZlinearFromX(runinfo[irun]);
-		//GetXlinearFromZlinear(runinfo[irun]);
-		//if(irun==73) PrintXlinear(runinfo[irun]);
-		
-		for(iz=0;iz<NX;iz++){
-			totalerror+=(runinfo[irun]->z[iz]-runinfo[irun]->zlinear[iz])
+		if(runinfo[irun]->good){
+			totalerror=0.0;
+				//if(irun==73) PrintX(runinfo[irun]);
+			GetZlinearFromX(runinfo[irun]);
+				//GetXlinearFromZlinear(runinfo[irun]);
+				//if(irun==73) PrintXlinear(runinfo[irun]);
+			
+			for(iz=0;iz<NX;iz++){
+				totalerror+=(runinfo[irun]->z[iz]-runinfo[irun]->zlinear[iz])
 				*(runinfo[irun]->z[iz]-runinfo[irun]->zlinear[iz]);
+			}
+			chiperfreedom+=totalerror;
+			/**
+			 if(totalerror>5.0){
+			 printf("------------------------  irun=%d ------------------------------\n",irun);
+			 printf("%7.3f: ",totalerror);
+			 for(iz=0;iz<NX;iz++) printf("%6.3f ",runinfo[irun]->zlinear[iz]-runinfo[irun]->z[iz]);
+			 printf("\nXvalues: ");
+			 for(ix=0;ix<NX;ix++) printf("%6.3f ",runinfo[irun]->x[ix]/sqrt(12.0));
+			 printf("\n");
+			 //PrintXlinear(runinfo[irun]);
+			 //PrintX(runinfo[irun]);
+			 }
+			 */
 		}
-		chiperfreedom+=totalerror;
-		/**
-		if(totalerror>5.0){
-			printf("------------------------  irun=%d ------------------------------\n",irun);
-			printf("%7.3f: ",totalerror);
-			for(iz=0;iz<NX;iz++) printf("%6.3f ",runinfo[irun]->zlinear[iz]-runinfo[irun]->z[iz]);
-			printf("\nXvalues: ");
-			for(ix=0;ix<NX;ix++) printf("%6.3f ",runinfo[irun]->x[ix]/sqrt(12.0));
-			printf("\n");
-			//PrintXlinear(runinfo[irun]);
-			//PrintX(runinfo[irun]);
-		}
-		*/
 	}
 	//printf("chiperfreedom=%g\n",chiperfreedom/double(NRUNS*3)); // roughly 3 PCA values 
 
@@ -309,7 +313,7 @@ void CRHICStat::PrintX(CRunInfo *runinfo){
 
 void CRHICStat::FitExpData(){
 	int ix,iy;
-	
+
 	GetXlinearFromY(fitinfo);
 	printf("Fit of Parameters to Data\n");
 	//PrintXlinear(fitinfo);
@@ -317,13 +321,15 @@ void CRHICStat::FitExpData(){
 	int irun,ibest=-1;
 	double error,besterror=1.0E79;
 	for(irun=0;irun<NRUNS;irun++){
-		error=0.0;
-		for(iy=0;iy<NY;iy++){
-			error+=pow(fitinfo->y[iy]-runinfo[irun]->y[iy],2);
-		}
-		if(error<besterror){
-			ibest=irun;
-			besterror=error;
+		if(runinfo[irun]->good){
+			error=0.0;
+			for(iy=0;iy<NY;iy++){
+				error+=pow(fitinfo->y[iy]-runinfo[irun]->y[iy],2);
+			}
+			if(error<besterror){
+				ibest=irun;
+				besterror=error;
+			}
 		}
 		
 	}
@@ -367,9 +373,11 @@ void CRHICStat::PlotZvsX(){
 		sprintf(filename,"figs/z%dvsx.dat",iz);
 		fptr=fopen(filename,"w");
 		for(irun=0;irun<NRUNS;irun++){
-			xx=0.0;
-			for(ix=0;ix<NX;ix++) xx+=runinfo[irun]->x[ix]*xhat[iz][ix];
-			fprintf(fptr,"%8.4f %g\n",xx,runinfo[irun]->z[iz]);
+			if(runinfo[irun]->good){
+				xx=0.0;
+				for(ix=0;ix<NX;ix++) xx+=runinfo[irun]->x[ix]*xhat[iz][ix];
+				fprintf(fptr,"%8.4f %g\n",xx,runinfo[irun]->z[iz]);
+			}
 		}
 		fclose(fptr);
 	}

@@ -27,6 +27,7 @@ public:
 	double *y,*z;
 	double *sigmay;
 	double *ylinear,*zlinear,*xlinear,*zquad,*yquad,*xquad;
+	bool good;
 };
 
 class CRHICStat{
@@ -35,7 +36,7 @@ public:
 	string *yname;
 	string *xname;
 	double *xmin,*xmax;
-	int NX,NY,NRUNS;
+	int NX,NY,NRUNS,NGOODRUNS;
 	double *xbar,*ybar,*sigmaybar;
 	double **sigmaxx,**sigmayy,**dxdz,**dxdz_inv;
 	double **Uytoz,**Uytoz_inv,**Uxtow,**Uxtow_inv;
