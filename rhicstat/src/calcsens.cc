@@ -186,6 +186,21 @@ int iy,iz;
 	delete [] zz;
 }
 
+void CRHICStat::GetYquadFromZquad(CRunInfo *runinfo){
+	int iy,iz;
+	double *zz=new double[NY];
+	for(iz=0;iz<NY;iz++) zz[iz]=runinfo->zquad[iz];
+	for(iz=NX;iz<NY;iz++) zz[iz]=0.0;
+	for(iy=0;iy<NY;iy++){
+		runinfo->yquad[iy]=0.0;
+		for(iz=0;iz<NY;iz++){
+			runinfo->yquad[iy]+=zz[iz]*Uytoz_inv[iz][iy];
+		}
+			//printf("ylinear[%d]=%g, zlinear[%d]=%g\n",iy,runinfo->ylinear[iy],iy,runinfo->zlinear[iy]);
+	}
+	delete [] zz;
+}
+
 void CRHICStat::GetXlinearFromZ(CRunInfo *runinfo){
 	int ix,iz;
 	for(ix=0;ix<NX;ix++){
@@ -261,10 +276,10 @@ void CRHICStat::GetXlinearFromW(CRunInfo *runinfo){
 
 void CRHICStat::PrintY(CRunInfo *runinfo){
 	int iy;
-	printf("                         observable     :    yprime      y        yexp\n");
+	printf("                         observable     :    yprime      y        yexp     Dely/sigma\n");
 	for(iy=0;iy<NY;iy++){
-		printf("%40s: %9.4f  %9.4f  %9.4f\n",yname[iy].c_str(),
-			runinfo->y[iy],ybar[iy]+runinfo->y[iy]*runinfo->sigmay[iy],ybar[iy]+expinfo->y[iy]*expinfo->sigmay[iy]);
+		printf("%40s: %9.4f  %9.4f  %9.4f  %9.4f\n",yname[iy].c_str(),
+			runinfo->y[iy],ybar[iy]+runinfo->y[iy]*runinfo->sigmay[iy],ybar[iy]+expinfo->y[iy]*expinfo->sigmay[iy],runinfo->y[iy]-expinfo->y[iy]);
 	}
 }
 
@@ -293,6 +308,25 @@ void CRHICStat::PrintZlinear(CRunInfo *runinfo){
 	}
 }
 
+void CRHICStat::PrintYquad(CRunInfo *runinfo){
+	int iy;
+	printf("                         observable     :    yquad    y         yexp\n");
+	for(iy=0;iy<NY;iy++){
+		printf("%40s: %9.4f  %9.4f  %9.4f\n",yname[iy].c_str(),
+					 ybar[iy]+runinfo->yquad[iy]*runinfo->sigmay[iy],
+					 ybar[iy]+runinfo->y[iy]*runinfo->sigmay[iy],
+					 ybar[iy]+expinfo->y[iy]*expinfo->sigmay[iy]);
+	}
+}
+
+void CRHICStat::PrintZquad(CRunInfo *runinfo){
+	int iz;
+	printf("iz:   zquad     z\n");
+	for(iz=0;iz<NX;iz++){
+		printf("%2d:  %9.4f =? %9.4f\n",iz,runinfo->zquad[iz],runinfo->z[iz]);
+	}
+}
+
 void CRHICStat::PrintXlinear(CRunInfo *runinfo){
 	int ix;
 	printf("      parameter name  : xlinearprime xlinear\n");
@@ -307,12 +341,12 @@ void CRHICStat::PrintX(CRunInfo *runinfo){
 	printf("       parameter name  :       xprime      x\n");
 	for(ix=0;ix<NX;ix++){
 		printf("%25s: %9.4f  %g\n",xname[ix].c_str(),
-			runinfo->x[ix]/sqrt(12.0),0.5*(xmin[ix]+xmax[ix])+runinfo->x[ix]*(xmax[ix]-xmin[ix])/sqrt(12.0));
+			runinfo->x[ix],xbar[ix]+runinfo->x[ix]*(xmax[ix]-xmin[ix])/sqrt(12.0));
 	}
 }
 
 void CRHICStat::FitExpData(){
-	int ix,iy;
+	int ix,iy,iz;
 
 	GetXlinearFromY(fitinfo);
 	printf("Fit of Parameters to Data\n");
@@ -323,9 +357,10 @@ void CRHICStat::FitExpData(){
 	for(irun=0;irun<NRUNS;irun++){
 		if(runinfo[irun]->good){
 			error=0.0;
-			for(iy=0;iy<NY;iy++){
-				error+=pow(fitinfo->y[iy]-runinfo[irun]->y[iy],2);
-			}
+			/** for(iy=0;iy<NY;iy++){
+				error+=pow(expinfo->y[iy]-runinfo[irun]->y[iy],2);
+			}*/
+			for(iz=0;iz<NX;iz++) error+=pow(expinfo->z[iz]-runinfo[irun]->z[iz],2);
 			if(error<besterror){
 				ibest=irun;
 				besterror=error;
@@ -384,4 +419,25 @@ void CRHICStat::PlotZvsX(){
 	for(ix=0;ix<NX;ix++) delete [] xhat[ix];
 	delete [] xhat;
 }
+
+void CRHICStat::CheckTestRuns(){
+	int irun,iz;
+	CRunInfo *ri;
+	double error;
+	for(irun=0;irun<NTESTRUNS;irun++){
+		ri=testinfo[irun];
+		if(ri->good){
+			error=0.0;
+			GetZFromY(ri);
+			GetZquad(ri->x,ri->zquad);
+			GetYquadFromZquad(ri);
+			for(iz=0;iz<NX;iz++) error+=pow(ri->zquad[iz]-ri->z[iz],2.0);
+			printf("--- itestrun=%d, error=%g ---\n",irun,error);
+			PrintZquad(ri);
+			PrintYquad(ri);
+			PrintX(ri);
+		}
+	}
+}
+
 #endif

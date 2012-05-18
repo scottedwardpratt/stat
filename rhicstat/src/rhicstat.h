@@ -32,18 +32,18 @@ public:
 
 class CRHICStat{
 public:
-	CRHICStat(int NRUNS);
+	CRHICStat(int NRUNS,int NTESTRUNS);
 	string *yname;
 	string *xname;
 	double *xmin,*xmax;
-	int NX,NY,NRUNS,NGOODRUNS;
+	int NX,NY,NRUNS,NTESTRUNS,NGOODRUNS;
 	double *xbar,*ybar,*sigmaybar;
 	double **sigmaxx,**sigmayy,**dxdz,**dxdz_inv;
 	double **Uytoz,**Uytoz_inv,**Uxtow,**Uxtow_inv;
 	double *eigenvalyy,*eigenvalxx;
 	double *uncertainty;
 	double ***Aquad,**Bquad,*Cquad;
-	CRunInfo **runinfo;
+	CRunInfo **runinfo,**testinfo;
 	CRunInfo *expinfo,*fitinfo;
 	CGSLMatrix_Real *gslmatrix_NY;
 	CGSLMatrix_Real *gslmatrix_NX;
@@ -58,6 +58,7 @@ public:
 	void ReadY(string filename,CRunInfo *runinfo);
 	void CalcSensitivity();
 	void QuadFit();
+	void GetZquad(double *x,double *z);
 	void GetZFromY(CRunInfo *runinfo);
 	void GetYFromZ(CRunInfo *runinfo);
 	void GetXlinearFromZ(CRunInfo *runinfo);
@@ -67,6 +68,7 @@ public:
 	void GetYlinearFromX(CRunInfo *runinfo);
 	void GetXlinearFromZlinear(CRunInfo *runinfo);
 	void GetYlinearFromZlinear(CRunInfo *runinfo);
+	void GetYquadFromZquad(CRunInfo *runinfo);
 	void GetWFromXlinear(CRunInfo *runinfo);
 	void GetXlinearFromW(CRunInfo *runinfo);
 	void PrintXlinear(CRunInfo *runinfo);
@@ -75,7 +77,11 @@ public:
 	void PrintZ(CRunInfo *runinfo);
 	void PrintZlinear(CRunInfo *runinfo);
 	void PrintYlinear(CRunInfo *runinfo);
+	void PrintZquad(CRunInfo *runinfo);
+	void PrintYquad(CRunInfo *runinfo);
+	void CheckTestRuns();
 	void PlotZvsX();
+	void PrintQuadCode();
 };
 
 
