@@ -53,11 +53,22 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 	}
 	header = header + "\n";
 
+	//Check if DensityPlots file exists
+	string tempfile;
+	struct stat st;
+	tempfile = mcmc->mcmcconfig->dir_name + "/DensityPlots";
+	if(stat(tempfile.c_str(), &st)!=0){
+		string command = "mkdir -p " + tempfile;
+		system(command.c_str());
+	}
+
 	// The plot commands for the density plots
 	for(int i = 0; i < mcmc->ThetaList->ParamNames.size(); i++){
+		//cout << mcmc->ThetaList->ParamNames[i] << endl;
 		stringstream command;
 		command << "clear\nset size square " << 1./float(mcmc->ThetaList->ParamNames.size()-2) << "," << 1./float(mcmc->ThetaList->ParamNames.size()-2) << "\n";
 		for(int j = i+1; j < mcmc->ThetaList->ParamNames.size(); j++){
+			//cout << "     " << mcmc->ThetaList->ParamNames[j] << endl
 			//Now we mke our 2d plots
 			string filename = mcmc->mcmcconfig->dir_name + "/DensityPlots/" + mcmc->ThetaList->ParamNames[i] + "_" + mcmc->ThetaList->ParamNames[j];
 			DensityPlotFileNames.push_back(filename);
@@ -75,10 +86,10 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 				if(densityfile){
 					for(int l = 0; l < 100; l++){
 						getline(densityfile,line,'\n');
-						ss2 << line << " ";
+						ss2 << line;
 						for(int k = 0; k < 100; k++){
 							getline(ss2,val,' ');
-							Densities[i][j][l][k]=atoi(val.c_str());
+							Densities[i][j][k][l]=atoi(val.c_str());
 						}
 					}
 				}
@@ -92,7 +103,7 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 			}
 		}
 	}
-	
+
 	//cout << "The gnuplot header is: \n" << header << endl;
 
 	paramvalues = new string[mcmc->ThetaList->ParamNames.size()];
@@ -124,13 +135,11 @@ void VizHandler::UpdateTraceFig(){
 	
 	if(MovingWindow){
 		int DequeSize = 500;
-		int k;
 		for(int i = 0; i < ThetaListSize; i++){
 			if(mcmc->ThetaList->Theta[i]->Used && !(mcmc->ThetaList->Theta[i]->InTrace)){
 				for(int j = 0; j< mcmc->ThetaList->Theta[i]->Values.size(); j++){
-					k = mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1;
 					if(mcmc->RESCALED_TRACE){
-						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << (mcmc->ThetaList->Theta[i]->Values[j]-mcmc->mcmcconfig->Min_Ranges[i])/(mcmc->mcmcconfig->Max_Ranges[i]-mcmc->mcmcconfig->Min_Ranges[i])<< "\n";
+						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << (mcmc->ThetaList->Theta[i]->Values[j]-mcmc->mcmcconfig->Min_Ranges[j])/(mcmc->mcmcconfig->Max_Ranges[j]-mcmc->mcmcconfig->Min_Ranges[j])<< "\n";
 					}
 					else{
 						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << mcmc->ThetaList->Theta[i]->Values[j] << "\n";
@@ -166,7 +175,7 @@ void VizHandler::UpdateTraceFig(){
 						paramvalues[j] = "";
 					}
 					if(mcmc->RESCALED_TRACE){
-						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << (mcmc->ThetaList->Theta[i]->Values[j]-mcmc->mcmcconfig->Min_Ranges[i])/(mcmc->mcmcconfig->Max_Ranges[i]-mcmc->mcmcconfig->Min_Ranges[i])<< "\n";
+						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << (mcmc->ThetaList->Theta[i]->Values[j]-mcmc->mcmcconfig->Min_Ranges[j])/(mcmc->mcmcconfig->Max_Ranges[j]-mcmc->mcmcconfig->Min_Ranges[j])<< "\n";
 					}
 					else{
 						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << mcmc->ThetaList->Theta[i]->Values[j] << "\n";
@@ -179,37 +188,31 @@ void VizHandler::UpdateTraceFig(){
 		}
 		for(int i = 0; i < mcmc->ThetaList->ParamNames.size(); i++){
 			plotcommand = plotcommand + paramvalues[i]+ "e\n";
+			cout << paramvalues[i] << endl;
 		}
 	}
 	
-	//cout << "The plot command is: \n" << plotcommand << endl;
-	fprintf(gnuplotpipe, "%s", plotcommand.c_str());
-	fflush(gnuplotpipe);
+	if(mcmc->VIZTRACE){
+		//cout << "The plot command is: \n" << plotcommand << endl;
+		fprintf(gnuplotpipe, "%s", plotcommand.c_str());
+		fflush(gnuplotpipe);
+	}
 
 	if(DensityPlot){
-		//Then we make the plot
 		int index = 0;
 		for(int i = 0; i < mcmc->ThetaList->ParamNames.size(); i++){
 			for(int j = i+1; j < mcmc->ThetaList->ParamNames.size(); j++){
-				//cout << int(mcmc->ParamValues[i]*100) << " " << int(mcmc->ParamValues[j]*100) << endl;
-				//First, update the array
-				//cout << "here goes nothing" << endl; cout.flush();
-				//cout << ThetaListSize << " " << mcmc->ParamValues[i] << endl; cout.flush();
-				//cout << i << " " << j << " " << endl; cout.flush();
-				//cout << int(mcmc->ParamValues[i]) << " " << int(mcmc->ParamValues[j]) << endl; cout.flush();
 				Densities[i][j][int(mcmc->ParamValues[i]*100)][int(mcmc->ParamValues[j]*100)]++;
-				//Second, dump the data to the file
 				ofstream outputfile;
 				string filename = DensityPlotFileNames[index] + ".txt";
 				outputfile.open(filename.c_str());
 				for(int k = 0; k < BINS; k++){
-					for(int l = 0; l < BINS-1; l++){
+					for(int l = 0; l < BINS; l++){
 						outputfile << Densities[i][j][l][k] << " ";
 					}
-					outputfile << Densities[i][j][BINS][k] << endl;
+					outputfile << endl;
 				}
 				outputfile.close();
-				//Then call the plot command
 				//cout << DensityPlotCommands[index].c_str() << endl;
 				//fprintf(gnuplotmultipipe, "%s", DensityPlotCommands[index].c_str());
 				//fflush(gnuplotmultipipe);

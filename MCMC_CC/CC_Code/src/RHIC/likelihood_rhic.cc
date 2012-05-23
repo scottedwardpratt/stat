@@ -80,10 +80,12 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 		//ModelErrors[i]=ModelErrors[i]*2;
 //		if (ModelErrors[i] < 0.5*fabs(DATA[i]-ModelMeans[i])) { ModelErrors[i]=0.5*fabs(DATA[i]-ModelMeans[i]); }
 //		if (ModelErrors[i] > 5*fabs(DATA[i]-ModelMeans[i])) { ModelErrors[i]=5*fabs(DATA[i]-ModelMeans[i]); }
+		if(mcmc->SUPPRESS_ERRORS){
+			ModelErrors[i]=ModelMeans[i]*0.1; //What a reasonable error is depends on the observable
+		}
 		gsl_matrix_set(sigma,i,i,ModelErrors[i]);
 		gsl_vector_set(model, i,ModelMeans[i]);
 		gsl_vector_set(mu, i, DATA[i]);
-		//gsl_matrix_set(sigma_data,i,i,ERROR[i]);
 		//cout << "i: " << i << " Data: " << DATA[i] <<  " Mean: " << ModelMeans[i] << " Error: " << ModelErrors[i] << endl;
 	}
 	
@@ -154,13 +156,13 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 	
 	string data_filename = mcmc->dir_name + "/exp_data/results.dat";
 	fstream data;
-	string type, param_name;
+	string type, obsv_name;
 	int count=0;
 	vector<string> PNames;
 	PNames = mcmc->ObservablesNames;
 
 	int numparams = PNames.size();
-	cout << "There are " << numparams  << " parameters used in the emulator." << endl;
+	cout << "There are " << numparams  << " observables used in the emulator." << endl;
 	Datamean=new double[numparams];
 	Dataerror=new double[numparams];
 	vector<double> temp (numparams, .01);
@@ -170,15 +172,15 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 	if(data){
 		while(data >> type){
 			if(strcmp(type.c_str(), "double") == 0){
-				data >> param_name;
-				int index = FindParam(param_name, PNames);
+				data >> obsv_name;
+				int index = FindParam(obsv_name, PNames);
 				if(index != -1){ //returns -1 if not found
 					data >> Datamean[index]; //Mean
 					data >> Dataerror[index]; //Error
 					count++;
-					cout << param_name << " index: " << index << " " << Datamean[index] << endl;
+					cout << obsv_name << " index: " << index << " " << Datamean[index] << endl;
 				}else{
-					cout << "Not using observable: " << param_name << endl;
+					cout << "Not using observable: " << obsv_name << endl;
 					data >> dump; //we aren't using the observable, so we need to get the data out of the stream
 					data >> dump;
 					//exit(1);
@@ -219,17 +221,14 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 vector<double> LikelihoodDistribution_RHIC::GetRealError(){
 	vector<double> dataerrors;
 	string EmulatorObservables=mcmc->Observables;
-	string observables_filename = mcmc->dir_name + "/" + EmulatorObservables + ".datnames";
 	string data_filename = mcmc->dir_name + "/exp_data/results.dat";
 	
 	fstream data;
-	string type, param_name;
+	string type, obsv_name;
 	int count = 0;
 	
-	// Right here we load the names of the observables
-	parameter::ReadParsFromFile(observablesparmap, observables_filename.c_str());
 	vector<string> PNames;
-	PNames = parameter::getVS(observablesparmap,"NAMES","blah blah");
+	PNames = mcmc->ObservablesNames;
 
 	int numparams = PNames.size();
 	Datamean=new double[numparams];
@@ -241,13 +240,13 @@ vector<double> LikelihoodDistribution_RHIC::GetRealError(){
 	if(data){
 		while(data >> type){
 			if(strcmp(type.c_str(), "double") == 0){
-				data >> param_name;
-				int index = FindParam(param_name, PNames);
+				data >> obsv_name;
+				int index = FindParam(obsv_name, PNames);
 				if(index != -1){ //returns -1 if not found
 					data >> Datamean[index]; //Mean
 					data >> Dataerror[index]; //Error
 					count++;
-					cout << param_name << " index: " << index << " " << Datamean[index] << endl;
+					cout << obsv_name << " index: " << index << " " << Datamean[index] << endl;
 				}else{
 					data >> dump; //we aren't using the observable, so we need to get the data out of the stream
 					data >> dump;

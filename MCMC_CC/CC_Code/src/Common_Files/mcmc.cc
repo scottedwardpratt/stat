@@ -17,8 +17,10 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 	LOGLIKE = parameter::getB(parmap, "LOGLIKE", true);
 	LOGPRIOR = parameter::getB(parmap, "LOGPRIOR", true);
 	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
-	VIZTRACE = parameter::getB(parmap, "VISUALIZE_TRACE", true);
+	CREATE_TRACE = parameter::getB(parmap, "CREATE_TRACE", true);
 	APPEND_TRACE = parameter::getB(parmap, "APPEND_TRACE", false);
+	SUPPRESS_ERRORS = parameter::getB(parmap, "SUPPRESS_ERRORS", false);
+	MODEL = parameter::getS(parmap,"MODEL","NOMODEL");
 	
 	//============================================
 	// Reading the parameters out of ranges.dat
@@ -121,15 +123,19 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 	randnum = new CRandom(1234);
 	Proposal = new ProposalDistribution(this);
 	
-	if(parameter::getS(parmap,"MODEL","NOMODEL")=="CosmoSurvey"){
+	if(strcmp(MODEL.c_str(),"CosmoSurvey")==0){
 		Likelihood = new LikelihoodDistribution_Cosmo(this);
 		Prior = new PriorDistribution_Cosmo(this);
 	}
-	else if(parameter::getS(parmap,"MODEL","NOMODEL")=="RHIC"){
+	else if(strcmp(MODEL.c_str(),"RHIC")==0){
 	 Likelihood = new LikelihoodDistribution_RHIC(this);
 	 Prior = new PriorDistribution_RHIC(this);
 	 }
-	else if((parameter::getS(parmap,"MODEL","NOMODEL")=="TEST")||(parameter::getS(parmap,"MODEL","NOMODEL")=="Test")){
+	else if(strcmp(MODEL.c_str(),"RHIC_PCA")==0){
+	 Likelihood = new LikelihoodDistribution_RHIC_PCA(this);
+	 Prior = new PriorDistribution_RHIC_PCA(this);
+	 }
+	else if(strcmp(MODEL.c_str(),"TEST")==0){
 	 Likelihood = new LikelihoodDistribution_Test(this);
 	 Prior = new PriorDistribution_Test(this);
 	 }
@@ -151,8 +157,10 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 	LOGLIKE = parameter::getB(parmap, "LOGLIKE", true);
 	LOGPRIOR = parameter::getB(parmap, "LOGPRIOR", true);
 	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
-	VIZTRACE = parameter::getB(parmap, "VISUALIZE_TRACE", true);
+	CREATE_TRACE = parameter::getB(parmap, "CREATE_TRACE", true);
 	APPEND_TRACE = parameter::getB(parmap, "APPEND_TRACE", false);
+	SUPPRESS_ERRORS = parameter::getB(parmap, "SUPPRESS_ERRORS", false);
+	MODEL = parameter::getS(parmap,"MODEL","NOMODEL");
 	
 	//============================================
 	// Reading the parameters out of ranges.dat
@@ -256,15 +264,19 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 	
 	// cout << "stuff done." << endl;
 	randnum = new CRandom(1234);
-	if(parameter::getS(parmap,"MODEL","NOMODEL")=="CosmoSurvey"){
+	if(strcmp(MODEL.c_str(),"CosmoSurvey")==0){
 		Likelihood = new LikelihoodDistribution_Cosmo(this);
 		Prior = new PriorDistribution_Cosmo(this);
 	}
-	else if(parameter::getS(parmap,"MODEL","NOMODEL")=="RHIC"){
+	else if(strcmp(MODEL.c_str(),"RHIC")==0){
 	 Likelihood = new LikelihoodDistribution_RHIC(this);
 	 Prior = new PriorDistribution_RHIC(this);
 	 }
-	else if((parameter::getS(parmap,"MODEL","NOMODEL")=="TEST")||(parameter::getS(parmap,"MODEL","NOMODEL")=="Test")){
+	else if(strcmp(MODEL.c_str(),"RHIC_PCA")==0){
+	 Likelihood = new LikelihoodDistribution_RHIC_PCA(this);
+	 Prior = new PriorDistribution_RHIC_PCA(this);
+	 }
+	else if(strcmp(MODEL.c_str(),"TEST")==0){
 	 Likelihood = new LikelihoodDistribution_Test(this);
 	 Prior = new PriorDistribution_Test(this);
 	 }
@@ -295,6 +307,8 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 	WRITEOUT = parameter::getI(local_parmap, "WRITEOUT", 100);
 	RANDOM_THETA0 = parameter::getB(local_parmap, "RANDOM_THETA0", false);
 	RESCALED_TRACE = parameter::getB(local_parmap, "RESCALED_TRACE", false);
+	VIZTRACE = parameter::getB(local_parmap, "VISUALIZE_TRACE", true);
+	QUIET = parameter::getB(local_parmap, "QUIET", false);
 	
 	if(RANDOM_THETA0){
 		string filler="filler";
@@ -305,7 +319,7 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 	}
 	//Likelihood_Current=0;
 
-	if(mcmcconfig->VIZTRACE){
+	if(mcmcconfig->CREATE_TRACE){
 		Visualizer = new VizHandler(this);
 		Viz_Count = parameter::getI(local_parmap, "VIZ_COUNT", floor(MAXITERATIONS/200));
 		//Visualizer->UpdateTraceFig();
@@ -341,7 +355,9 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 	string command = "mkdir -p "+ tracedir;
 	
 	system(command.c_str());
-	printf("Iteration\tAlpha\tResult\n");
+	if(!QUIET){
+		printf("Iteration\tAlpha\tResult\n");
+	}
 }
 
 MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
@@ -353,6 +369,8 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
 	WRITEOUT = parameter::getI(local_parmap, "WRITEOUT", 100);
 	RANDOM_THETA0 = parameter::getB(local_parmap, "RANDOM_THETA0", false);
 	RESCALED_TRACE = parameter::getB(local_parmap, "RESCALED_TRACE", false);
+	VIZTRACE = parameter::getB(local_parmap, "VISUALIZE_TRACE", true);
+	QUIET = parameter::getB(local_parmap, "QUIET", false);
 	
 	if(RANDOM_THETA0){
 		string filler="filler";
@@ -363,7 +381,7 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
 	}
 	//Likelihood_Current=0;
 	
-	if(mcmcconfig->VIZTRACE){
+	if(mcmcconfig->CREATE_TRACE){
 		Visualizer = new VizHandler(this);
 		Viz_Count = parameter::getI(local_parmap, "VIZ_COUNT", floor(MAXITERATIONS/200));
 		//Visualizer->UpdateTraceFig();
@@ -399,7 +417,9 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
 	string command = "mkdir -p "+ tracedir;
 	
 	system(command.c_str());
-	printf("Iteration\tAlpha\tResult\n");
+	if(!QUIET){
+		printf("Iteration\tAlpha\tResult\n");
+	}
 }
 
 MCMCRun::~MCMCRun(){
@@ -455,14 +475,18 @@ double MCMCRun::Run(){
 			LOGBF +=log(Likelihood_New/Likelihood_Current);
 		}*/
 		if(mcmcconfig->LOGLIKE){
-			printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
+			if(!QUIET){
+				printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
+			}
 			//LOGBF = Likelihood_New-Likelihood_Current;
 			//alpha = min(1.0,exp(LOGBF));
 			LOGBF = Likelihood_New/Likelihood_Current;
 			alpha = min(1.0,LOGBF);
 		}
 		else{
-			printf(" l_new=%g, l_current=%g\n",Likelihood_New,Likelihood_Current);
+			if(!QUIET){
+				printf(" l_new=%g, l_current=%g\n",Likelihood_New,Likelihood_Current);
+			}
 			LOGBF = Likelihood_New/Likelihood_Current;
 			alpha = min(1.0,LOGBF);
 		}
@@ -484,11 +508,15 @@ double MCMCRun::Run(){
 		//alpha = min(1.0,exp(LOGBF));
 		//alpha = min(0.97,exp(LOGBF));
 		// cout << "exp(LOGBF): " << exp(LOGBF) << endl;
-		printf("%5d\talpha=%6.5f\t",i,alpha);
+		if(!QUIET){
+			printf("%5d\talpha=%6.5f\t",i,alpha);
+		}
 		if(alpha > (mcmcconfig->randnum->ran())) { //Accept the proposed set.
 		//if(alpha > 1){
 		//if(exp(LOGBF) > 1){ //Accept the proposed set.
-			printf("Accept\n");
+			if(!QUIET){
+				printf("Accept\n");
+			}
 			Accept_Count++;
 			Likelihood_Current = Likelihood_New;
 			Prior_Current = Prior_New;
@@ -497,31 +525,38 @@ double MCMCRun::Run(){
 			if(Likelihood_Current>bestlikelihood && i>1){
 				bestlikelihood=Likelihood_New;
 				BestParameterSetPtr=&CurrentParameters;
-				if(mcmcconfig->LOGLIKE){
-					printf("XXXXXXXXX YIPPEE!! Best parameters so far, loglikelihood=%g\n",bestlikelihood);
-				}
-				else{
-					printf("XXXXXXXXX YIPPEE!! Best parameters so far, likelihood=%g\n",bestlikelihood);
+				if(!QUIET){
+					if(mcmcconfig->LOGLIKE){
+						printf("XXXXXXXXX YIPPEE!! Best parameters so far, loglikelihood=%g\n",bestlikelihood);
+					}
+					else{
+						printf("XXXXXXXXX YIPPEE!! Best parameters so far, likelihood=%g\n",bestlikelihood);
+					}
 				}
 			}
 		}else{
-			printf("Reject\n");
+			if(!QUIET){
+				printf("Reject\n");
+			}
 		}
 		
 		ThetaList->Add(CurrentParameters);
 		for(int k = 0; k < ThetaList->ParamNames.size(); k++){
+			//cout << ThetaList->ParamNames[k] << " " << CurrentParameters.Values[k] << endl;
 			//cout << "(" << CurrentParameters.Values[k] << " - " << mcmcconfig->Min_Ranges[k] << ") / (" << mcmcconfig->Max_Ranges[k] << " - " << mcmcconfig->Min_Ranges[k] << ")" << endl; cout.flush();
+			//cout << mcmcconfig->Max_Ranges[k] << " " << mcmcconfig->Min_Ranges[k] << endl;
 			ParamValues[k] = (CurrentParameters.Values[k] - mcmcconfig->Min_Ranges[k])/(mcmcconfig->Max_Ranges[k]-mcmcconfig->Min_Ranges[k]);
+			//cout << ParamValues[k] << endl;
 		}
 
-		if(mcmcconfig->VIZTRACE && (i>3)){
+		if(mcmcconfig->CREATE_TRACE && (i>10)){
 			if((i+1) % Viz_Count == 0){
 				Visualizer->UpdateTraceFig();
 			}
 		}
 		if((i+1) % WRITEOUT == 0){
 			cout << "Writing out." << endl;
-			if(mcmcconfig->VIZTRACE &&(i!=1)){
+			if(mcmcconfig->CREATE_TRACE &&(i!=1)){
 				Visualizer->UpdateTraceFig();
 			}
 			ThetaList->WriteOut();
@@ -530,7 +565,7 @@ double MCMCRun::Run(){
 	
 	ThetaList->WriteOut();
 	ThetaList->MakeTrace();
-	if(mcmcconfig->VIZTRACE){
+	if(mcmcconfig->CREATE_TRACE){
 		Visualizer->FinalTrace();
 	}
 	double ratio = (double)Accept_Count/(double)MAXITERATIONS;

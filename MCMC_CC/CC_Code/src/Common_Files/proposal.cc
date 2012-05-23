@@ -181,7 +181,7 @@ ParameterSet ProposalDistribution::Iterate(ParameterSet current){
 				 */
 				//proposed.Values[i] = proposed.Values[i] + 0.025*gsl_ran_gaussian(randy, MixingStdDev[i]);
 				//proposed.Values[i] = proposed.Values[i] + 0.5*gsl_ran_gaussian(randy, MixingStdDev[i]);
-				proposed.Values[i] = proposed.Values[i] + 2*gsl_ran_gaussian(randy, MixingStdDev[i]);
+				proposed.Values[i] = proposed.Values[i] + 1000*gsl_ran_gaussian(randy, MixingStdDev[i]);
 				//proposed.Values[i] = proposed.Values[i] + gsl_ran_gaussian(randy, MixingStdDev[i]);
 			}while((proposed.Values[i] < Min_Ranges[i]) || (proposed.Values[i]>Max_Ranges[i]));
 		}
@@ -192,7 +192,7 @@ ParameterSet ProposalDistribution::Iterate(ParameterSet current){
 				proposed.Values[i] = current.Values[i];
 				proposed.Values[i] = (proposed.Values[i] - mcmc->Min_Ranges[i])/(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]); //scale to between 0 and 1
 				
-				proposed.Values[i] = proposed.Values[i] + gsl_ran_gaussian(randy, MixingStdDev[0]/sqrt((double)proposed.Names.size()));
+				proposed.Values[i] = proposed.Values[i] + 500*gsl_ran_gaussian(randy, MixingStdDev[0]/sqrt((double)proposed.Names.size()));
 			}while((proposed.Values[i] < 0.0) || proposed.Values[i] > 1.0);
 			
 			proposed.Values[i] = (proposed.Values[i]*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]))+mcmc->Min_Ranges[i];

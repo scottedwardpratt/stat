@@ -87,7 +87,7 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 			// cout << Theta.Names[0] << endl;
 		}
 		else{
-			cout << "Warning: Parameter " << Theta.Names[0] << " is not an emulated parameter." << endl;
+			cout << "Warning: Observable " << Theta.Names[0] << " is not an emulated observable." << endl;
 		}
 		for(int i = 1; i < Theta.Values.size(); i++){
 			if(EmulatedParams.find(Theta.Names[i]) != string::npos){
@@ -96,7 +96,7 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 				// cout << Theta.Names[i] << endl;
 			}
 			else{
-				cout << "Warning: Parameter " << Theta.Names[i] << " is not an emulated parameter." << endl;
+				cout << "Warning: Observable " << Theta.Names[i] << " is not an emulated observable." << endl;
 			}
 		}
 		outputfile << endl;
@@ -108,14 +108,9 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 		exit(1);
 	}
 	
-	// command = "cat " + EmInputFile + " | " + EmulatorScriptHome + "/src/computePoints.sh  "\
-	// + mcmc->dir_name + " > "+ EmOutputFile + " 2> " + EmErrorFile;
-	
 	command = EmulatorScriptHome + "/src/computePoints.sh " + mcmc->dir_name + " "\
 	+ mcmc->dir_name + "/fn-data-" + mcmc->Observables + ".dat < " + EmInputFile + " > "+ EmOutputFile + " 2> " + EmErrorFile;
 
-	// cout << command << endl;
-	
 	int result = system(command.c_str());
 	
 	if(result != 0){

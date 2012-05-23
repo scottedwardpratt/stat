@@ -18,16 +18,20 @@ MCMC_HFILES = mcmc.h\
 parameterset.h\
 distribution.h\
 emulator.h\
-visualization.h
+visualization.h\
+quad.h
 
 MCMC_OFILES = distribution.o\
 emulator.o\
+quad.o\
 likelihood_rhic.o\
+likelihood_rhic_pca.o\
 likelihood_cosmo.o\
 likelihood_test.o\
 mcmc.o\
 parameterset.o\
 prior_rhic.o\
+prior_rhic_pca.o\
 prior_cosmo.o\
 prior_test.o\
 proposal.o\
@@ -60,6 +64,9 @@ include/%.h: src/Headers/%.h
 build/likelihood_rhic.o: src/RHIC/likelihood_rhic.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 
+build/likelihood_rhic_pca.o: src/RHIC_PCA/likelihood_rhic_pca.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
+
 build/likelihood_cosmo.o: src/Cosmosurvey/likelihood_cosmo.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
@@ -67,6 +74,9 @@ build/likelihood_test.o: src/TEST/likelihood_test.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
 build/prior_rhic.o: src/RHIC/prior_rhic.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
+
+build/prior_rhic_pca.o: src/RHIC_PCA/prior_rhic_pca.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 
 build/prior_cosmo.o: src/Cosmosurvey/prior_cosmo.cc
