@@ -15,6 +15,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include "emulator.h"
+#include "quad.h"
 #include <time.h>
 #include <sys/stat.h>
 
@@ -38,6 +39,10 @@ public:
 	bool LOGLIKE;
 	bool LOGPRIOR;
 	bool LOGPROPOSAL;
+	bool CREATE_TRACE;
+	bool APPEND_TRACE;
+	bool SUPPRESS_ERRORS;
+	string MODEL;
 	parameterMap parmap;
 	string dir_name;
 	string parameterfile;
@@ -54,6 +59,7 @@ public:
 	ProposalDistribution *Proposal;
 	PriorDistribution *Prior;
 	ParameterSetList *DummyList;
+	double Max_Ranges[10],Min_Ranges[10]; // 
 };
 
 class MCMCRun{
@@ -65,15 +71,16 @@ public:
 	double Run();
 	
 	ParameterSet *BestParameterSetPtr;
+	vector<double> ParamValues;
 	double bestlikelihood;
 	double Likelihood_Current;
 	
-	bool VIZTRACE;
 	int  WRITEOUT;
-	bool APPEND_TRACE;
-	int MAXITERATIONS;
+	int  MAXITERATIONS;
 	bool RANDOM_THETA0;
-	int SEED;
+	bool RESCALED_TRACE;
+	bool VIZTRACE;
+	bool QUIET;
 	
 	string tracedir;
 	MCMCConfiguration *mcmcconfig;

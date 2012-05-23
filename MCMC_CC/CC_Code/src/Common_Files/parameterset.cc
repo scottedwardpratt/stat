@@ -3,6 +3,7 @@
 
 #include "parameterset.h"
 #include <sstream>
+#include <time.h>
 
 using namespace std;
 
@@ -108,7 +109,7 @@ ParameterSetList::ParameterSetList(MCMCRun *mcmc_in){
 	GetTheta0FromFile();
 }
 
-ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, int seed){
+ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, int seed){ //This one creates a random set of theta0s
 	mcmc = mcmc_in;
 	Theta = new ParameterSet*[mcmc->WRITEOUT+1];
 	for(int i = 0; i < mcmc->WRITEOUT; i++){
@@ -118,7 +119,7 @@ ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, int seed){
 	CurrentIteration = 0;
 	HoldOver = new ParameterSet(this);
 	
-	GetRandomTheta0(seed);
+	GetRandomTheta0(time(NULL));
 }
 
 ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, ParameterSet Theta0){
@@ -151,7 +152,7 @@ void ParameterSetList::GetTheta0FromFile(){
 	Add(temp_set);
 }
 
-void ParameterSetList::GetRandomTheta0(int seed){
+void ParameterSetList::GetRandomTheta0(int seed){ //This one creates random theta 0s
 	srand(seed);
 	cout << "We are using random theta0 values. They are:" << endl;
 	parameterMap parmap;

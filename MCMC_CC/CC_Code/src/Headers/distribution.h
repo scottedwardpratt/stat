@@ -14,6 +14,7 @@
 using namespace std;
 
 class EmulatorHandler;
+class QuadHandler;
 class MCMCConfiguration;
 class MCMCRun;
 class ParameterSet;
@@ -86,6 +87,12 @@ public:
 	double Evaluate(ParameterSet Theta);
 };
 
+class PriorDistribution_RHIC_PCA:public PriorDistribution{
+public:
+	PriorDistribution_RHIC_PCA(MCMCConfiguration *mcmc_in);
+	double Evaluate(ParameterSet Theta);
+};
+
 class PriorDistribution_Cosmo:public PriorDistribution {
 public:
 	PriorDistribution_Cosmo(MCMCConfiguration *mcmc_in);
@@ -116,6 +123,23 @@ public:
 	EmulatorHandler * emulator;
 	//int FindParam(string param_name, string observables_filename);
 	int FindParam(string param_name, vector<string> PNames);
+	parameterMap observablesparmap;
+};
+
+class LikelihoodDistribution_RHIC_PCA:public LikelihoodDistribution{
+public:
+	LikelihoodDistribution_RHIC_PCA(MCMCConfiguration *mcmc_in);
+	~LikelihoodDistribution_RHIC_PCA();
+	double Evaluate(ParameterSet Theta);
+	double *Datamean;
+	double *Dataerror;
+	//private:
+	vector<double> GetRealData(); 
+	vector<double> DATA;
+	vector<double> ERROR;
+	bool UseEmulator;
+	ofstream emulator_test;
+	QuadHandler * quad;
 	parameterMap observablesparmap;
 };
 
