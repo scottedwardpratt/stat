@@ -69,8 +69,8 @@ void CRHICStat::Metropolis(unsigned int nburn,unsigned int nsample){
 				}
 			}
 			if(nwrite==100){
-				for(ix=0;ix<NX;ix++) fprintf(mcmc,"%7.4f ",oldx[ix]/root12);
-				fprintf(mcmc,"\n",oldll);
+				for(ix=0;ix<NX;ix++) fprintf(mcmc,"%7.4f ",oldx[ix]/xpmax);
+				fprintf(mcmc,"\n");
 				nwrite=0;
 				norm+=1;
 				for(ix=0;ix<NX;ix++){
@@ -147,7 +147,7 @@ double CRHICStat::GetLL(double *x){
 	GetZquad(x,z);
 	double ll=0.0;
 	for(iz=0;iz<NZ;iz++){
-		ll-=pow(z[iz]-expinfo->z[iz],2);
+		ll-=0.5*pow(z[iz]-expinfo->z[iz],2);
 	}
 	delete [] z;
 	return ll;
