@@ -189,7 +189,7 @@ void CRHICStat::QuadFit(){
 			error[irun]=0.0;
 			GetZquad(ri->x,ri->zquad);
 			for(iz=0;iz<NX;iz++) error[irun]+=pow(ri->zquad[iz]-ri->z[iz],2);
-			printf("error[%d]=%g\n",irun,error[irun]);
+				//printf("error[%d]=%g\n",irun,error[irun]);
 			/**
 			 if(error[irun]>1.0){
 				printf("----- irun=%3d: error^2=%g -----\n",irun,error[irun]);
@@ -208,20 +208,52 @@ void CRHICStat::QuadFit(){
 void CRHICStat::GetZquad(double *x,double *z){
 	int iz,i1,i2;
 	for(iz=0;iz<NX;iz++){
-		z[iz]=0.0;
+		z[iz]=Cquad[iz];
 		for(i1=0;i1<NX;i1++){
-			for(i2=0;i2<=i1;i2++){
-				z[iz]+=Aquad[iz][i1][i2]*x[i1]*x[i2];
-			}
 			z[iz]+=Bquad[iz][i1]*x[i1];
+			for(i2=0;i2<=i1;i2++)	z[iz]+=Aquad[iz][i1][i2]*x[i1]*x[i2];			
 		}
-		z[iz]+=Cquad[iz];
 	}
 }
 
 void CRHICStat::PrintQuadCode(){
-	int iz,i1,i2;
+	int iz,i1,i2,iy;
 	int NZ=NX;
+	double ***A=new double **[NY];
+	double **B=new double *[NY];
+	double *C=new double[NY]();
+	for(iy=0;iy<NY;iy++){
+		A[iy]=new double *[NX];
+		B[iy]=new double [NX]();
+		for(i1=0;i1<NX;i1++) A[iy][i1]=new double[NX]();
+	}
+	for(iy=0;iy<NY;iy++){
+		for(i1=0;i1<NX;i1++){
+			for(i2=0;i2<NX;i2++){
+				A[iy][i1][i2]=0.0;
+					for(iz=0;iz<NZ;iz++) A[iy][i1][i2]+=sigmaybar[iy]*Uytoz_inv[iz][iy]*Aquad[iz][i1][i2];
+			}
+			B[iy][i1]=0.0;
+				for(iz=0;iz<NZ;iz++) B[iy][i1]+=sigmaybar[iy]*Uytoz_inv[iz][iy]*Bquad[iz][i1];
+		}
+		C[iy]=ybar[iy];
+		for(iz=0;iz<NZ;iz++) C[iy]+=sigmaybar[iy]*Uytoz_inv[iz][iy]*Cquad[iz];
+	}
+	
+	double *ytest=new double[NY];
+	int itest=28;
+	for(iy=0;iy<NY;iy++){
+		ytest[iy]=C[iy];
+		for(i1=0;i1<NX;i1++){
+			ytest[iy]+=B[iy][i1]*runinfo[itest]->x[i1];
+			for(i2=0;i2<NX;i2++){
+				ytest[iy]+=A[iy][i1][i2]*runinfo[itest]->x[i1]*runinfo[itest]->x[i2];
+			}
+		}
+		printf("ytest[%d]=%g =? %g, sigmay=%g, ybar=%g\n",iy,ytest[iy],runinfo[itest]->y[iy]*sigmaybar[iy]+ybar[iy],sigmaybar[iy],ybar[iy]);
+	}
+	delete [] ytest;
+	
 	FILE *qfile=fopen("quad.cc","w");
 	fprintf(qfile,"#include <cstdlib>\n");
 	fprintf(qfile,"#include <cstdio>\n");
@@ -229,14 +261,14 @@ void CRHICStat::PrintQuadCode(){
 	fprintf(qfile,"using namespace std;\n");
 	
 	fprintf(qfile,"int main(int argc, char *argv[]){\n");
-	fprintf(qfile,"\tconst int NX=%d,NZ=%d;\n",NX,NX);
-	fprintf(qfile,"\tint iz,i1,i2;\n");
-	fprintf(qfile,"\tdouble A[NZ][NX][NX],B[NZ][NX],C[NZ];\n");
-	for(iz=0;iz<NZ;iz++){
-		fprintf(qfile,"\tC[%d]=%g;\n",iz,Cquad[iz]);
+	fprintf(qfile,"\tconst int NX=%d,NY=%d;\n",NX,NY);
+	fprintf(qfile,"\tint iy,i1,i2;\n");
+	fprintf(qfile,"\tdouble A[NY][NX][NX],B[NY][NX],C[NY];\n");
+	for(iy=0;iy<NY;iy++){
+		fprintf(qfile,"\tC[%d]=%g;\n",iy,C[iy]);
 		for(i1=0;i1<NX;i1++){
-			fprintf(qfile,"\tB[%d][%d]=%g;\n",iz,i1,Bquad[iz][i1]);
-			for(i2=0;i2<NX;i2++)	fprintf(qfile,"\tA[%d][%d][%d]=%g;\n",iz,i1,i2,Aquad[iz][i1][i2]);
+			fprintf(qfile,"\tB[%d][%d]=%g;\n",iy,i1,B[iy][i1]);
+			for(i2=0;i2<NX;i2++)	fprintf(qfile,"\tA[%d][%d][%d]=%g;\n",iy,i1,i2,A[iy][i1][i2]);
 		}
 	}
 	
@@ -249,34 +281,48 @@ void CRHICStat::PrintQuadCode(){
 	fprintf(qfile,"\t\txprime[i1]=(x[i1]-xbar[i1])*sqrt(12.0)/(xmax[i1]-xmin[i1]);\n");
 	fprintf(qfile,"\t}\n");
 
-	fprintf(qfile,"\tdouble zexp[NZ]={");
-	for(iz=0;iz<NZ;iz++){
-		if(iz!=0) fprintf(qfile,",");
-		fprintf(qfile,"%g",expinfo->z[iz]);
+	fprintf(qfile,"\tdouble yexp[NY]={");
+	for(iy=0;iy<NY;iy++){
+		if(iy!=0) fprintf(qfile,",");
+		fprintf(qfile,"%g",ybar[iy]+sigmaybar[iy]*expinfo->y[iy]);
 	}
 	fprintf(qfile,"};\n");
 	
-	fprintf(qfile,"\tdouble z[NZ];\n");
-	fprintf(qfile,"\tfor(iz=0;iz<NZ;iz++){\n");
-	fprintf(qfile,"\t\tz[iz]=C[iz];\n");
+	fprintf(qfile,"\tdouble y[NY];\n");
+	fprintf(qfile,"\tfor(iy=0;iy<NY;iy++){\n");
+	fprintf(qfile,"\t\ty[iy]=C[iy];\n");
 	fprintf(qfile,"\t\tfor(i1=0;i1<NX;i1++){\n");
-	fprintf(qfile,"\t\t\tz[iz]+=B[iz][i1]*xprime[i1];\n");
-	fprintf(qfile,"\t\t\tfor(i2=0;i2<=i1;i2++) z[iz]+=A[iz][i1][i2]*xprime[i1]*xprime[i2];\n");
+	fprintf(qfile,"\t\t\ty[iy]+=B[iy][i1]*xprime[i1];\n");
+	fprintf(qfile,"\t\t\tfor(i2=0;i2<=i1;i2++) y[iy]+=A[iy][i1][i2]*xprime[i1]*xprime[i2];\n");
 	fprintf(qfile,"\t\t}\n\t};\n");
 	
 	fprintf(qfile,"\tprintf(\"");
-	for(iz=0;iz<NZ;iz++){
-		if(iz!=0) fprintf(qfile," ");
+	for(iy=0;iy<NY;iy++){
+		if(iy!=0) fprintf(qfile," ");
 		fprintf(qfile,"%%g");
 	}
 	fprintf(qfile,"\\n\",");
-	for(iz=0;iz<NZ;iz++){
-		if(iz!=0) fprintf(qfile,",");
-		fprintf(qfile,"z[%d]",iz);
+	for(iy=0;iy<NY;iy++){
+		if(iy!=0) fprintf(qfile,",");
+		fprintf(qfile,"y[%d]",iy);
 	}
 	fprintf(qfile,");\n");
 	
+	fprintf(qfile,"\tprintf(\"");
+	for(iy=0;iy<NY;iy++){
+		if(iy!=0) fprintf(qfile," ");
+		fprintf(qfile,"%g",sigmaybar[iy]);
+	}
+	fprintf(qfile,"\\n\");\n");
+	
 	fprintf(qfile,"\treturn 0;\n}\n");
 	fclose(qfile);
+	for(iy=0;iy<NY;iy++){
+		for(i1=0;i1<NX;i1++) delete [] A[iy][i1];
+		delete [] B[iy];
+	}
+	delete [] A;
+	delete [] B;
+	delete [] C;
 }
 #endif

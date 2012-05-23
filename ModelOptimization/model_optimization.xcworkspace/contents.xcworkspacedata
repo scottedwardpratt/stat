@@ -2,9 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:src/mcmc.cc">
-   </FileRef>
-   <FileRef
       location = "container:">
    </FileRef>
 </Workspace>

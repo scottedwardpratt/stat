@@ -25,7 +25,7 @@ class Trace {
 public:
   Trace() {};
   virtual ~Trace();
-
+	CParameterList *parlist;
   // TODO - add accessor methods
 
 protected:

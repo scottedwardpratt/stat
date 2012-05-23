@@ -82,6 +82,8 @@ public:
 	void CheckTestRuns();
 	void PlotZvsX();
 	void PrintQuadCode();
+	double GetLL(double *x);
+	void Metropolis(unsigned int nburn,unsigned int nsample);
 };
 
 

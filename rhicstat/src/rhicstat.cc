@@ -1,5 +1,5 @@
-#ifndef __PCA_CC__
-#define __PCA_CC__
+#ifndef __RHICSTAT_CC__
+#define __RHICSTAT_CC__
 #include "coral.h"
 #include "rhicstat.h"
 using namespace std;
