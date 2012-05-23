@@ -4,11 +4,14 @@
 #include "rhicstat.h"
 using namespace std;
 
-CRHICStat::CRHICStat(int nruns_set){
+CRHICStat::CRHICStat(int nruns_set,int ntestruns_set){
 	NRUNS=nruns_set;
+	NTESTRUNS=ntestruns_set;
 	InitArrays();
 	runinfo=new CRunInfo *[NRUNS];
 	for(int irun=0;irun<NRUNS;irun++) runinfo[irun]=new CRunInfo(NX,NY);
+	testinfo=new CRunInfo *[NTESTRUNS];
+	for(int irun=0;irun<NTESTRUNS;irun++) testinfo[irun]=new CRunInfo(NX,NY);
 	ReadAllX();
 	ReadAllY();
 	ScaleXY();
@@ -23,6 +26,10 @@ CRunInfo::CRunInfo(int NX,int NY){
 	xlinear=new double[NX];
 	ylinear=new double[NY];
 	zlinear=new double[NY];
+	zquad=new double[NY]();
+	yquad=new double[NY]();
+	xquad=new double[NX]();
+	good=true;
 }
 
 void CRHICStat::InitArrays(){
@@ -56,6 +63,8 @@ void CRHICStat::InitArrays(){
 	gslmatrix_NY=new CGSLMatrix_Real(NY);
 	gslmatrix_NX=new CGSLMatrix_Real(NX);
 	expinfo=new CRunInfo(NX,NY);
+	fitinfo=new CRunInfo(NX,NY);
+	Aquad=NULL; Bquad=NULL; Cquad=NULL;
 }
 
 void CRHICStat::InitX(){
@@ -92,6 +101,10 @@ void CRHICStat::InitX(){
 			fscanf(fptr,"%s",dummy);
 			xname[ix]=dummy;
 			fscanf(fptr,"%lf %lf",&xmin[ix],&xmax[ix]);
+			//if(ix==1){
+				//xmin[ix]=0.0;
+				//xmax[ix]=8.0;
+			//}
 			ix+=1;
 		}
 		fgets(dummy,200,fptr);
@@ -109,6 +122,12 @@ void CRHICStat::ReadAllX(){
 		filename="parameters/run"+string(runchars)+"/stats.param";
 		ReadX(filename,runinfo[irun]);
 	}
+	for(irun=0;irun<NTESTRUNS;irun++){
+		sprintf(runchars,"%d",irun+1);
+		filename="testpars/run"+string(runchars)+"/stats.param";
+		ReadX(filename,testinfo[irun]);
+	}
+
 }
 
 void CRHICStat::ReadX(string filename,CRunInfo *runinfo){
@@ -166,20 +185,44 @@ void CRHICStat::InitY(){
 }
 
 void CRHICStat::ReadAllY(){
-	int irun,iy;
+	int irun,iy,ngood;
 	char runchars[5];
 	string filename;
+		// Read Training Data
+	NGOODRUNS=0;
+	printf("Useless runs: ");
 	for(irun=0;irun<NRUNS;irun++){
 		sprintf(runchars,"%d",irun+1);
 		filename="model_results/run"+string(runchars)+"/results.dat";
 		ReadY(filename,runinfo[irun]);
+		if(runinfo[irun]->good==false) printf("%d,",irun+1);
 	}
+	printf("\n");
+	printf("NGOODRUNS=%d\n",NGOODRUNS);
+	ngood=NGOODRUNS;
+		//Read Testing Data
+	for(irun=0;irun<NTESTRUNS;irun++){
+		sprintf(runchars,"%d",irun+1);
+		filename="test_results/run"+string(runchars)+"/results.dat";
+		ReadY(filename,testinfo[irun]);
+	}
+	NGOODRUNS=ngood; // don't count from test runs
+		// Read Experimental Data
+	ReadY("exp_data/results.dat",expinfo);
 	for(iy=0;iy<NY;iy++){
 		sigmaybar[iy]=0.0;
-		for(irun=0;irun<NRUNS;irun++) sigmaybar[iy]+=runinfo[irun]->sigmay[iy];
-		sigmaybar[iy]=sigmaybar[iy]/double(NRUNS);
+		for(irun=0;irun<NRUNS;irun++){
+			if(runinfo[irun]->good) sigmaybar[iy]+=runinfo[irun]->sigmay[iy];
+		}
+		sigmaybar[iy]=sigmaybar[iy]/double(NGOODRUNS);
 		for(irun=0;irun<NRUNS;irun++) runinfo[irun]->sigmay[iy]=sigmaybar[iy];
-	}
+		for(irun=0;irun<NTESTRUNS;irun++) testinfo[irun]->sigmay[iy]=sigmaybar[iy];
+		fitinfo->sigmay[iy]=expinfo->sigmay[iy]=sigmaybar[iy];
+		/** if(yname[iy]=="cent20to30_STAR_V2_PION_PTWEIGHT" || yname[iy]=="cent20to30_STAR_V2_KAON_PTWEIGHT" ||yname[iy]=="cent20to30_STAR_V2_PROTON_PTWEIGHT"){
+			expinfo->y[iy]*=0.9;
+		}*/
+	}	
+	
 }
 	
 void CRHICStat::ReadY(string filename,CRunInfo *runinfo){
@@ -194,12 +237,22 @@ void CRHICStat::ReadY(string filename,CRunInfo *runinfo){
 			if(string(dummy)==yname[iy]){
 				fscanf(fptr,"%lf",&(runinfo->y[iy]));
 				fscanf(fptr,"%lf",&runinfo->sigmay[iy]);
+				if(string(dummy)=="cent0to5_PHENIX_SPECTRA_PION_YIELD"){
+					if(runinfo->y[iy]>325.0 && runinfo->y[iy]<500.0){
+						runinfo->good=true;
+					}
+					else{
+						runinfo->good=false;
+							//printf("run from filename %s is useless, pion yield for central coll.s = %g\n",filename.c_str(),runinfo->y[iy]);
+					}
+				}
 				iy+=1;
 			}
 		}
 		fgets(dummy,200,fptr);
 	}
 	fclose(fptr);
+	if(runinfo->good) NGOODRUNS+=1;
 }
 
 void CRHICStat::ScaleXY(){
@@ -207,22 +260,32 @@ void CRHICStat::ScaleXY(){
 	for(ix=0;ix<NX;ix++){
 		xbar[ix]=0.0;
 		for(irun=0;irun<NRUNS;irun++){
-			xbar[ix]+=runinfo[irun]->x[ix];
+			if(runinfo[irun]->good) xbar[ix]+=runinfo[irun]->x[ix];
 		}
-		xbar[ix]=xbar[ix]/double(NRUNS);
+		xbar[ix]=xbar[ix]/double(NGOODRUNS);
 		for(irun=0;irun<NRUNS;irun++){
 			runinfo[irun]->x[ix]=sqrt(12.0)*(runinfo[irun]->x[ix]-xbar[ix])/(xmax[ix]-xmin[ix]);
+		}
+		for(irun=0;irun<NTESTRUNS;irun++){
+			testinfo[irun]->x[ix]=sqrt(12.0)*(testinfo[irun]->x[ix]-xbar[ix])/(xmax[ix]-xmin[ix]);
 		}
 	}
 	for(iy=0;iy<NY;iy++){
 		ybar[iy]=0.0;
 		for(irun=0;irun<NRUNS;irun++){
-			ybar[iy]+=runinfo[irun]->y[iy];
+			if(runinfo[irun]->good) ybar[iy]+=runinfo[irun]->y[iy];
 		}
-		ybar[iy]=ybar[iy]/double(NRUNS);
+		ybar[iy]=ybar[iy]/double(NGOODRUNS);
 		for(irun=0;irun<NRUNS;irun++){
 			runinfo[irun]->y[iy]=(runinfo[irun]->y[iy]-ybar[iy])/runinfo[irun]->sigmay[iy];
 		}
+		for(irun=0;irun<NTESTRUNS;irun++){
+			testinfo[irun]->y[iy]=(testinfo[irun]->y[iy]-ybar[iy])/testinfo[irun]->sigmay[iy];
+		}
+	}
+	for(iy=0;iy<NY;iy++){
+		expinfo->y[iy]=(expinfo->y[iy]-ybar[iy])/expinfo->sigmay[iy];
+		fitinfo->y[iy]=expinfo->y[iy];
 	}
 }
 

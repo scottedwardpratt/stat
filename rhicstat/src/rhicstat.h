@@ -1,5 +1,5 @@
-#ifndef __PCA_H__
-#define __PCA_H__
+#ifndef __RHICSTAT_H__
+#define __RHICSTAT_H__
 #include "coralutils.h"
 #include "qualifier.h"
 using namespace std;
@@ -26,23 +26,25 @@ public:
 	double *x,*w;
 	double *y,*z;
 	double *sigmay;
-	double *ylinear,*zlinear,*xlinear;
+	double *ylinear,*zlinear,*xlinear,*zquad,*yquad,*xquad;
+	bool good;
 };
 
 class CRHICStat{
 public:
-	CRHICStat(int NRUNS);
+	CRHICStat(int NRUNS,int NTESTRUNS);
 	string *yname;
 	string *xname;
 	double *xmin,*xmax;
-	int NX,NY,NRUNS;
+	int NX,NY,NRUNS,NTESTRUNS,NGOODRUNS;
 	double *xbar,*ybar,*sigmaybar;
 	double **sigmaxx,**sigmayy,**dxdz,**dxdz_inv;
 	double **Uytoz,**Uytoz_inv,**Uxtow,**Uxtow_inv;
 	double *eigenvalyy,*eigenvalxx;
 	double *uncertainty;
-	CRunInfo **runinfo;
-	CRunInfo *expinfo;
+	double ***Aquad,**Bquad,*Cquad;
+	CRunInfo **runinfo,**testinfo;
+	CRunInfo *expinfo,*fitinfo;
 	CGSLMatrix_Real *gslmatrix_NY;
 	CGSLMatrix_Real *gslmatrix_NX;
 	void FitExpData();
@@ -55,6 +57,8 @@ public:
 	void ReadAllY();
 	void ReadY(string filename,CRunInfo *runinfo);
 	void CalcSensitivity();
+	void QuadFit();
+	void GetZquad(double *x,double *z);
 	void GetZFromY(CRunInfo *runinfo);
 	void GetYFromZ(CRunInfo *runinfo);
 	void GetXlinearFromZ(CRunInfo *runinfo);
@@ -64,6 +68,7 @@ public:
 	void GetYlinearFromX(CRunInfo *runinfo);
 	void GetXlinearFromZlinear(CRunInfo *runinfo);
 	void GetYlinearFromZlinear(CRunInfo *runinfo);
+	void GetYquadFromZquad(CRunInfo *runinfo);
 	void GetWFromXlinear(CRunInfo *runinfo);
 	void GetXlinearFromW(CRunInfo *runinfo);
 	void PrintXlinear(CRunInfo *runinfo);
@@ -72,6 +77,11 @@ public:
 	void PrintZ(CRunInfo *runinfo);
 	void PrintZlinear(CRunInfo *runinfo);
 	void PrintYlinear(CRunInfo *runinfo);
+	void PrintZquad(CRunInfo *runinfo);
+	void PrintYquad(CRunInfo *runinfo);
+	void CheckTestRuns();
+	void PlotZvsX();
+	void PrintQuadCode();
 };
 
 
