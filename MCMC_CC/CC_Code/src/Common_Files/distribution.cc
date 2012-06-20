@@ -152,7 +152,7 @@ double Distribution::Log_MVNormal(gsl_vector x, gsl_vector mu, gsl_matrix sigma)
 	
 	gsl_blas_ddot(diff, temp, &OUT);
 	
-	OUT = (-1.0/2.0)*OUT -(N/2)*log(2*M_PI) - (0.5)*log(det);
+	OUT = (-1.0/2.0)*OUT - double(N/2)*log(2*M_PI) - (0.5)*log(det);
 	
 	gsl_matrix_free(sigma_inv);
 	gsl_permutation_free(p);

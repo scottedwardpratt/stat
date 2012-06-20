@@ -76,6 +76,7 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 			command << "\nset origin " << (float(i)*(1./float(mcmc->ThetaList->ParamNames.size()))) << "," << (float(j-1)*(1./float(mcmc->ThetaList->ParamNames.size()))) << "\n";
 			command << "set xlabel \'" << mcmc->ThetaList->ParamNames[i] << "\'\nset ylabel \'" << mcmc->ThetaList->ParamNames[j] << "\'\nset view map\nsplot \'" << DensityPlotFileNames.back() << ".txt\' matrix with image\n";
 			DensityPlotCommands.push_back(command.str());
+                        //cout << command.str();
 			command.str("");
 			if(mcmc->mcmcconfig->APPEND_TRACE){
 				fstream densityfile;
@@ -89,7 +90,7 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 						ss2 << line;
 						for(int k = 0; k < 100; k++){
 							getline(ss2,val,' ');
-							Densities[i][j][k][l]=atoi(val.c_str());
+							Densities[i][j][l][k]=atoi(val.c_str());
 						}
 					}
 				}
@@ -138,7 +139,7 @@ void VizHandler::UpdateTraceFig(){
 		for(int i = 0; i < ThetaListSize; i++){
 			if(mcmc->ThetaList->Theta[i]->Used && !(mcmc->ThetaList->Theta[i]->InTrace)){
 				for(int j = 0; j< mcmc->ThetaList->Theta[i]->Values.size(); j++){
-					if(mcmc->RESCALED_TRACE){
+					if(mcmc->mcmcconfig->RESCALED_TRACE){
 						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << (mcmc->ThetaList->Theta[i]->Values[j]-mcmc->mcmcconfig->Min_Ranges[j])/(mcmc->mcmcconfig->Max_Ranges[j]-mcmc->mcmcconfig->Min_Ranges[j])<< "\n";
 					}
 					else{
@@ -174,7 +175,7 @@ void VizHandler::UpdateTraceFig(){
 					if(paramvalues[j].empty()){
 						paramvalues[j] = "";
 					}
-					if(mcmc->RESCALED_TRACE){
+					if(mcmc->mcmcconfig->RESCALED_TRACE){
 						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << (mcmc->ThetaList->Theta[i]->Values[j]-mcmc->mcmcconfig->Min_Ranges[j])/(mcmc->mcmcconfig->Max_Ranges[j]-mcmc->mcmcconfig->Min_Ranges[j])<< "\n";
 					}
 					else{
@@ -188,7 +189,7 @@ void VizHandler::UpdateTraceFig(){
 		}
 		for(int i = 0; i < mcmc->ThetaList->ParamNames.size(); i++){
 			plotcommand = plotcommand + paramvalues[i]+ "e\n";
-			cout << paramvalues[i] << endl;
+			//cout << paramvalues[i] << endl;
 		}
 	}
 	
@@ -208,7 +209,7 @@ void VizHandler::UpdateTraceFig(){
 				outputfile.open(filename.c_str());
 				for(int k = 0; k < BINS; k++){
 					for(int l = 0; l < BINS; l++){
-						outputfile << Densities[i][j][l][k] << " ";
+						outputfile << Densities[i][j][k][l] << " ";
 					}
 					outputfile << endl;
 				}
