@@ -102,7 +102,7 @@ uninstall:
 	rm  -f ${addprefix ${INSTALLDIR}/include/, ${MCMC_HFILES}}
 
 run: mcmcrun.cc
-	${CPP} ${OPT} ${INC} -o mcmc $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}
+	${CPP} ${OPT} ${INC} -o mcmc $< -lcoralutils -lgsl -lmcmc -lgslcblas -lEmuPlusPlus ${LIBS}
 	cp mcmc ~/local/include/;
 
 test: emulatortest.cc
