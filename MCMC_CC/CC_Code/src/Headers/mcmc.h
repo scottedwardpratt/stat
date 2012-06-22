@@ -14,10 +14,11 @@
 #include "visualization.h"
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
-#include "emulator.h"
+//#include "emulator.h"
 #include "quad.h"
 #include <time.h>
 #include <sys/stat.h>
+#include "EmuPlusPlus.h"
 
 using namespace std;
 

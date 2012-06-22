@@ -18,6 +18,7 @@ class QuadHandler;
 class MCMCConfiguration;
 class MCMCRun;
 class ParameterSet;
+class emulator;
 
 class Distribution{
 public:
@@ -70,7 +71,7 @@ public:
 	vector<double> DATA;
 	bool UseEmulator;
 	ofstream emulator_test;
-	EmulatorHandler * emulator;
+	//EmulatorHandler * emulator;
 };
 
 class PriorDistribution:public Distribution {
@@ -120,8 +121,9 @@ public:
 	vector<double> DATA;
 	vector<double> ERROR;
 	bool UseEmulator;
-	ofstream emulator_test;
-	EmulatorHandler * emulator;
+	emulator * My_emu;
+	//ofstream emulator_test;
+	//EmulatorHandler * emulator;
 	//int FindParam(string param_name, string observables_filename);
 	int FindParam(string param_name, vector<string> PNames);
 	parameterMap observablesparmap;
@@ -155,7 +157,7 @@ public:
 	vector<int> intDATA;
 	bool UseEmulator;
 	ofstream emulator_test;
-	EmulatorHandler * emulator;
+	//EmulatorHandler * emulator;
 };
 
 class LikelihoodDistribution_Test:public LikelihoodDistribution {
@@ -168,7 +170,7 @@ public:
 	vector<double> DATA;
 	bool UseEmulator;
 	ofstream emulator_test;
-	EmulatorHandler * emulator;
+	//EmulatorHandler * emulator;
 };
 
 #endif

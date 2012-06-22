@@ -356,9 +356,9 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 	string command = "mkdir -p "+ tracedir;
 	
 	system(command.c_str());
-	if(!QUIET){
+	/*if(!QUIET){
 		printf("Iteration\tAlpha\tResult\n");
-	}
+	}*/
 }
 
 MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
@@ -417,9 +417,9 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
 	string command = "mkdir -p "+ tracedir;
 	
 	system(command.c_str());
-	if(!QUIET){
+	/*if(!QUIET){
 		printf("Iteration\tAlpha\tResult\n");
-	}
+	}*/
 }
 
 MCMCRun::~MCMCRun(){
@@ -469,15 +469,15 @@ double MCMCRun::Run(){
 		
 		if(mcmcconfig->LOGLIKE){
 			if(!QUIET){
-				printf(" ll_new=%g, ll_current=%g\n",log(Likelihood_New),log(Likelihood_Current));
+				printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
 			}
 			LOGBF *= Likelihood_New/Likelihood_Current;
 		}
 		else{
 			if(!QUIET){
-				printf(" l_new=%g, l_current=%g\n",Likelihood_New,Likelihood_Current);
+				printf(" l_new=%g, l_current=%g\n",exp(Likelihood_New),exp(Likelihood_Current));
 			}
-			LOGBF *= log(Likelihood_New-Likelihood_Current);
+			LOGBF *= exp(Likelihood_New)/exp(Likelihood_Current);
 		}
 		/*if(mcmcconfig->LOGPRIOR){
 			LOGBF += (Prior_New-Prior_Current);
@@ -489,7 +489,7 @@ double MCMCRun::Run(){
 			LOGBF *= (Proposal_New/Proposal_Current);
 		}else
 		{
-			LOGBF *= log(Proposal_New-Proposal_Current);
+			LOGBF *= (exp(Proposal_New)/exp(Proposal_Current));
 		}
 		
 		alpha = min(1.0,exp(LOGBF));
@@ -497,6 +497,7 @@ double MCMCRun::Run(){
 
 		if(!QUIET){
 			printf("%5d\talpha=%6.5f\t",i,alpha);
+			printf("LOGBF=%6.5f\t",alpha);
 		}
 		if(alpha > (mcmcconfig->randnum->ran())) { //Accept the proposed set.
 		//if(alpha > 1){
