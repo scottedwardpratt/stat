@@ -8,6 +8,7 @@ CRHICStat::CRHICStat(int nruns_set,int ntestruns_set){
 	NRUNS=nruns_set;
 	NTESTRUNS=ntestruns_set;
 	InitArrays();
+	bestinfo=new CRunInfo(NX,NY);
 	runinfo=new CRunInfo *[NRUNS];
 	for(int irun=0;irun<NRUNS;irun++) runinfo[irun]=new CRunInfo(NX,NY);
 	testinfo=new CRunInfo *[NTESTRUNS];
@@ -189,19 +190,20 @@ void CRHICStat::ReadAllY(){
 	char runchars[5];
 	string filename;
 		// Read Training Data
+	printf("check aa, NRUNS=%d\n",NRUNS);
 	NGOODRUNS=0;
-	printf("Useless runs: ");
-	for(irun=0;irun<NRUNS;irun++){
-		sprintf(runchars,"%d",irun+1);
+	for(irun=1;irun<=NRUNS;irun++){
+		sprintf(runchars,"%d",irun);
 		filename="model_results/run"+string(runchars)+"/results.dat";
-		ReadY(filename,runinfo[irun]);
-		if(runinfo[irun]->good==false) printf("%d,",irun+1);
+		ReadY(filename,runinfo[irun-1]);
+		if(runinfo[irun-1]->good==false) printf("%d,",irun);
 	}
 	printf("\n");
 	printf("NGOODRUNS=%d\n",NGOODRUNS);
 	ngood=NGOODRUNS;
 		//Read Testing Data
 	for(irun=0;irun<NTESTRUNS;irun++){
+		
 		sprintf(runchars,"%d",irun+1);
 		filename="test_results/run"+string(runchars)+"/results.dat";
 		ReadY(filename,testinfo[irun]);
@@ -215,9 +217,6 @@ void CRHICStat::ReadAllY(){
 			if(runinfo[irun]->good) sigmaybar[iy]+=runinfo[irun]->sigmay[iy];
 		}
 		sigmaybar[iy]=sigmaybar[iy]/double(NGOODRUNS);
-		for(irun=0;irun<NRUNS;irun++) runinfo[irun]->sigmay[iy]=sigmaybar[iy];
-		for(irun=0;irun<NTESTRUNS;irun++) testinfo[irun]->sigmay[iy]=sigmaybar[iy];
-		fitinfo->sigmay[iy]=expinfo->sigmay[iy]=sigmaybar[iy];
 		/** if(yname[iy]=="cent20to30_STAR_V2_PION_PTWEIGHT" || yname[iy]=="cent20to30_STAR_V2_KAON_PTWEIGHT" ||yname[iy]=="cent20to30_STAR_V2_PROTON_PTWEIGHT"){
 			expinfo->y[iy]*=0.9;
 		}*/
@@ -236,7 +235,7 @@ void CRHICStat::ReadY(string filename,CRunInfo *runinfo){
 			fscanf(fptr,"%s",dummy);
 			if(string(dummy)==yname[iy]){
 				fscanf(fptr,"%lf",&(runinfo->y[iy]));
-				fscanf(fptr,"%lf",&runinfo->sigmay[iy]);
+				fscanf(fptr,"%lf",&(runinfo->sigmay[iy]));
 				if(string(dummy)=="cent0to5_PHENIX_SPECTRA_PION_YIELD"){
 					if(runinfo->y[iy]>325.0 && runinfo->y[iy]<500.0){
 						runinfo->good=true;
@@ -260,7 +259,7 @@ void CRHICStat::ScaleXY(){
 	for(ix=0;ix<NX;ix++){
 		xbar[ix]=0.0;
 		for(irun=0;irun<NRUNS;irun++){
-			if(runinfo[irun]->good) xbar[ix]+=runinfo[irun]->x[ix];
+			xbar[ix]+=runinfo[irun]->x[ix];
 		}
 		xbar[ix]=xbar[ix]/double(NGOODRUNS);
 		for(irun=0;irun<NRUNS;irun++){
@@ -277,14 +276,14 @@ void CRHICStat::ScaleXY(){
 		}
 		ybar[iy]=ybar[iy]/double(NGOODRUNS);
 		for(irun=0;irun<NRUNS;irun++){
-			runinfo[irun]->y[iy]=(runinfo[irun]->y[iy]-ybar[iy])/runinfo[irun]->sigmay[iy];
+			runinfo[irun]->y[iy]=(runinfo[irun]->y[iy]-ybar[iy])/sigmaybar[iy];
 		}
 		for(irun=0;irun<NTESTRUNS;irun++){
-			testinfo[irun]->y[iy]=(testinfo[irun]->y[iy]-ybar[iy])/testinfo[irun]->sigmay[iy];
+			testinfo[irun]->y[iy]=(testinfo[irun]->y[iy]-ybar[iy])/sigmaybar[iy];
 		}
 	}
 	for(iy=0;iy<NY;iy++){
-		expinfo->y[iy]=(expinfo->y[iy]-ybar[iy])/expinfo->sigmay[iy];
+		expinfo->y[iy]=(expinfo->y[iy]-ybar[iy])/sigmaybar[iy];
 		fitinfo->y[iy]=expinfo->y[iy];
 	}
 }

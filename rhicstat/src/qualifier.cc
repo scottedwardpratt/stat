@@ -2,7 +2,6 @@
 #define __QUALIFIER_CC__
 
 #include "qualifier.h"
-
 using namespace std;
 
 void CQualifiers::Read(string qfilename){

@@ -6,11 +6,12 @@
 using namespace std;
 
 void CRHICStat::Metropolis(unsigned int nburn,unsigned int nsample){
+	CRunInfo *bestrun=new CRunInfo(NX,NY);
 	int ix,ixx,iz,nwrite,ibin,NBINS=50;
 	unsigned int isample,iburn,nsuccess=0,norm=0;
 	CRandom *randy=new CRandom(-1234);
-	double ll,oldll,*x,*oldx,*bestx,*xbarbar,bestll=-1.0E99,root12=sqrt(12);
-	double xpmax=sqrt(3); // sqrt(3) corresponds to xmin and xmax as boundaries
+	double ll,oldll,*x,*oldx,*realx,*oldrealx,*bestx,*besty,*xmcmcbar,bestll=-1.0E99,root12=sqrt(12),*bestz;
+	double xpmax=1.0; // 1.0 corresponds to xmin and xmax at boundaries
 	bool success;
 	double **spread;
 	double **xdist=new double*[NX];
@@ -18,12 +19,18 @@ void CRHICStat::Metropolis(unsigned int nburn,unsigned int nsample){
 	oldx=new double[NX];
 	x=new double[NX];
 	bestx=new double[NX];
-	xbarbar=new double[NX]();
+	realx=new double[NX];
+	oldrealx=new double[NX];
+	besty=new double[NY];
+	xmcmcbar=new double[NX]();
 	spread=new double *[NX];
 	for(ix=0;ix<NX;ix++) spread[ix]=new double[NX]();
 	FILE *mcmc=fopen("mcmctrace.dat","w");
 	ll=1.0E-99;
-	for(ix=0;ix<NX;ix++) oldx[ix]=xmin[ix]+randy->ran()*(xmax[ix]-xmin[ix]);
+	for(ix=0;ix<NX;ix++){
+		oldx[ix]=0.0;
+		oldrealx[ix]=xbar[ix]+oldx[ix]*(xmax[ix]-xmin[ix])/root12;
+	}
 	oldll=GetLL(oldx);
 	iburn=0;
 	while(iburn<nburn){
@@ -31,13 +38,23 @@ void CRHICStat::Metropolis(unsigned int nburn,unsigned int nsample){
 			iburn+=1;
 			success=false;
 			for(ix=0;ix<NX;ix++) x[ix]=oldx[ix]+0.1*randy->gauss();
-			for(ix=0;ix<NX;ix++) if(fabs(x[ix])>xpmax) x[ix]-=2.0*xpmax*x[ix]/fabs(x[ix]);
+			for(ix=0;ix<NX;ix++){
+				realx[ix]=xbar[ix]+x[ix]*(xmax[ix]-xmin[ix])/root12;
+				while(realx[ix]>xmax[ix]||realx[ix]<xmin[ix]){
+					if(realx[ix]>xmax[ix]) realx[ix]=xmax[ix]-(realx[ix]-xmax[ix]);
+					if(realx[ix]<xmin[ix]) realx[ix]=xmin[ix]+(xmin[ix]-realx[ix]);
+					x[ix]=(realx[ix]-xbar[ix])*root12/(xmax[ix]-xmin[ix]);
+				}
+			}
 			ll=GetLL(x);
 				//printf("iburn=%d, ll=%g\n",iburn,oldll);
 			if((ll>oldll || randy->ran()<exp(ll-oldll)) && (ll-oldll>-40)){
 				success=true;
 				oldll=ll;
-				for(ix=0;ix<NX;ix++) oldx[ix]=x[ix];
+				for(ix=0;ix<NX;ix++){
+					oldx[ix]=x[ix];
+					oldrealx[ix]=realx[ix];
+				}
 			}
 		}while(success==false);
 	}
@@ -52,8 +69,11 @@ void CRHICStat::Metropolis(unsigned int nburn,unsigned int nsample){
 			success=false;
 			for(ix=0;ix<NX;ix++) x[ix]=oldx[ix]+0.1*randy->gauss();
 			for(ix=0;ix<NX;ix++){
-				while(fabs(x[ix])>xpmax){
-					x[ix]-=2.0*xpmax*x[ix]/fabs(x[ix]);
+				realx[ix]=xbar[ix]+x[ix]*(xmax[ix]-xmin[ix])/root12;
+				while(realx[ix]>xmax[ix]||realx[ix]<xmin[ix]){
+					if(realx[ix]>xmax[ix]) realx[ix]=xmax[ix]-(realx[ix]-xmax[ix]);
+					if(realx[ix]<xmin[ix]) realx[ix]=xmin[ix]+(xmin[ix]-realx[ix]);
+					x[ix]=(realx[ix]-xbar[ix])*root12/(xmax[ix]-xmin[ix]);
 				}
 			}
 			ll=GetLL(x);
@@ -61,7 +81,10 @@ void CRHICStat::Metropolis(unsigned int nburn,unsigned int nsample){
 				success=true;
 				nsuccess+=1;
 				oldll=ll;
-				for(ix=0;ix<NX;ix++) oldx[ix]=x[ix];
+				for(ix=0;ix<NX;ix++){
+					oldx[ix]=x[ix];
+					oldrealx[ix]=realx[ix];
+				}
 				if(ll>bestll){
 					bestll=ll;
 					for(ix=0;ix<NX;ix++) bestx[ix]=x[ix];
@@ -69,19 +92,19 @@ void CRHICStat::Metropolis(unsigned int nburn,unsigned int nsample){
 				}
 			}
 			if(nwrite==100){
-				for(ix=0;ix<NX;ix++) fprintf(mcmc,"%7.4f ",oldx[ix]/xpmax);
+				for(ix=0;ix<NX;ix++) fprintf(mcmc,"%7.4f ",(oldrealx[ix]-xmin[ix])/(xmax[ix]-xmin[ix]));
 				fprintf(mcmc,"\n");
 				nwrite=0;
 				norm+=1;
 				for(ix=0;ix<NX;ix++){
-					xbarbar[ix]+=oldx[ix];
+					xmcmcbar[ix]+=oldrealx[ix];
 					for(ixx=0;ixx<NX;ixx++){
 						spread[ix][ixx]+=oldx[ix]*oldx[ixx];
 					}
 					norm+=1;
 				}
 				for(ix=0;ix<NX;ix++){
-					ibin=lrint(floor((1.0+(oldx[ix]/xpmax))*0.5*NBINS));
+					ibin=lrint(floor(NBINS*(oldrealx[ix]-xmin[ix])/(xmax[ix]-xmin[ix])));
 					if(ibin<0 || ibin>=NBINS){
 						printf("ibin=%d is out of range\n",ibin);
 						exit(1);
@@ -93,25 +116,31 @@ void CRHICStat::Metropolis(unsigned int nburn,unsigned int nsample){
 	}
 	
 	
-	printf("----- nsuccess=%d, bestll=%g, bestx'=\n",nsuccess,bestll);
-	
+	printf("----- nsuccess=%d, bestll=%g\n",nsuccess,bestll);
+	bestz=new double[NY];
 	for(ix=0;ix<NX;ix++){
-		bestx[ix]=xbar[ix]+(xmax[ix]-xmin[ix])*bestx[ix]/root12;
-		printf("%25s= %7.4f\n",xname[ix].c_str(),bestx[ix]);
+		bestrun->x[ix]=bestx[ix];
+			//printf("%25s= %7.4f\n",xname[ix].c_str(),xbar[ix]+(xmax[ix]-xmin[ix])*bestx[ix]/root12);
 	}
+	GetZquad(bestx,bestz);
+	for(iz=0;iz<NY;iz++) bestrun->z[iz]=bestz[iz];
+	GetYFromZ(bestrun);
+	PrintX(bestrun);
+	PrintY(bestrun);
+	delete [] bestz;
 
-	printf("  xbar=(",nsuccess);
+	printf("  xbar=(");
 	for(ix=0;ix<NX;ix++){
-		xbarbar[ix]=xbarbar[ix]/(root12*double(norm));
+		xmcmcbar[ix]=xmcmcbar[ix]/double(norm);
 		if(ix!=0) printf(",");
-		printf("%7.4f",xbarbar[ix]);
+		printf("%7.4f",xmcmcbar[ix]);
 	}
 	printf(")\n");
 	printf("SPREAD = \n");
 	for(ix=0;ix<NX;ix++){
 		for(ixx=0;ixx<NX;ixx++){
 			spread[ix][ixx]=spread[ix][ixx]/(12.0*norm);
-			spread[ix][ixx]-=xbarbar[ix]*xbarbar[ixx];
+			spread[ix][ixx]-=xmcmcbar[ix]*xmcmcbar[ixx];
 			if(ixx==0) printf(" ");
 			printf("%7.4f",12.0*spread[ix][ixx]);
 		}
