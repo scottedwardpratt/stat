@@ -111,7 +111,7 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 	command = EmulatorScriptHome + "/src/computePoints.sh " + mcmc->dir_name + " "\
 	+ mcmc->dir_name + "/fn-data-" + mcmc->Observables + ".dat < " + EmInputFile + " > "+ EmOutputFile + " 2> " + EmErrorFile;
 
-	cout << command.c_str() << endl;
+	//cout << command.c_str() << endl;
 
 	int result = system(command.c_str());
 	

@@ -74,7 +74,7 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	
 	//Read in appropriate elements
 	for(int i = 0; i<N; i++){
-		cout << " Data: " << DATA[i] << " Emu: " << ModelMeans[i] << " +/-: " << ModelErrors[i] << endl;
+		//cout << " Data: " << DATA[i] << " Emu: " << ModelMeans[i] << " +/-: " << ModelErrors[i] << endl;
 		if(mcmc->SUPPRESS_ERRORS){
 			//ModelErrors[i]=ModelMeans[i]*0.1; //What a reasonable error is depends on the observable
 			ModelErrors[i]=1;
