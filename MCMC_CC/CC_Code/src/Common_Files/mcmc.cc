@@ -19,6 +19,7 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
 	CREATE_TRACE = parameter::getB(parmap, "CREATE_TRACE", true);
 	APPEND_TRACE = parameter::getB(parmap, "APPEND_TRACE", false);
+	RESCALED_TRACE = parameter::getB(parmap, "RESCALED_TRACE", false);
 	SUPPRESS_ERRORS = parameter::getB(parmap, "SUPPRESS_ERRORS", false);
 	MODEL = parameter::getS(parmap,"MODEL","NOMODEL");
 	
@@ -159,6 +160,7 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
 	CREATE_TRACE = parameter::getB(parmap, "CREATE_TRACE", true);
 	APPEND_TRACE = parameter::getB(parmap, "APPEND_TRACE", false);
+	RESCALED_TRACE = parameter::getB(parmap, "RESCALED_TRACE", false);
 	SUPPRESS_ERRORS = parameter::getB(parmap, "SUPPRESS_ERRORS", false);
 	MODEL = parameter::getS(parmap,"MODEL","NOMODEL");
 	
@@ -306,7 +308,6 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 	MAXITERATIONS = parameter::getI(local_parmap, "MAX_ITERATIONS", 500);
 	WRITEOUT = parameter::getI(local_parmap, "WRITEOUT", 100);
 	RANDOM_THETA0 = parameter::getB(local_parmap, "RANDOM_THETA0", false);
-	RESCALED_TRACE = parameter::getB(local_parmap, "RESCALED_TRACE", false);
 	VIZTRACE = parameter::getB(local_parmap, "VISUALIZE_TRACE", true);
 	QUIET = parameter::getB(local_parmap, "QUIET", false);
 	
@@ -368,7 +369,6 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
 	MAXITERATIONS = parameter::getI(local_parmap, "MAX_ITERATIONS", 500);
 	WRITEOUT = parameter::getI(local_parmap, "WRITEOUT", 100);
 	RANDOM_THETA0 = parameter::getB(local_parmap, "RANDOM_THETA0", false);
-	RESCALED_TRACE = parameter::getB(local_parmap, "RESCALED_TRACE", false);
 	VIZTRACE = parameter::getB(local_parmap, "VISUALIZE_TRACE", true);
 	QUIET = parameter::getB(local_parmap, "QUIET", false);
 	
@@ -464,50 +464,37 @@ double MCMCRun::Run(){
 		// cout << "Likelihood of current set: " << Likelihood_Current << endl;
 		// cout << "Prior of proposed set: " << Prior_New << endl;
 		// cout << "Prior of current set: " << Prior_Current << endl;
-		// cout << "Proposal of proposed set: " << Proposal_New;
+		// cout << "Proposal of proposed set: " << Proposal_New << endl;
 		// cout << " Proposal of current set: " << Proposal_Current << endl;
 		
-		/*if(mcmcconfig->LOGLIKE){
-			LOGBF += (Likelihood_New-Likelihood_Current);
-			printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
-		}
-		else{
-			LOGBF +=log(Likelihood_New/Likelihood_Current);
-		}*/
 		if(mcmcconfig->LOGLIKE){
 			if(!QUIET){
 				printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
 			}
-			//LOGBF = Likelihood_New-Likelihood_Current;
-			//alpha = min(1.0,exp(LOGBF));
-			LOGBF = Likelihood_New/Likelihood_Current;
-			alpha = min(1.0,LOGBF);
+			LOGBF += Likelihood_New-Likelihood_Current;
 		}
 		else{
 			if(!QUIET){
 				printf(" l_new=%g, l_current=%g\n",Likelihood_New,Likelihood_Current);
 			}
-			LOGBF = Likelihood_New/Likelihood_Current;
-			alpha = min(1.0,LOGBF);
+			LOGBF += log(Likelihood_New/Likelihood_Current);
 		}
-		/*
-		if(mcmcconfig->LOGPRIOR){
+		/*if(mcmcconfig->LOGPRIOR){
 			LOGBF += (Prior_New-Prior_Current);
 		}else
 		{
 			LOGBF +=log(Prior_New/Prior_Current);
-		}
+		}*/
 		if(mcmcconfig->LOGPROPOSAL){
 			LOGBF += (Proposal_New-Proposal_Current);
 		}else
 		{
 			LOGBF +=log(Proposal_New/Proposal_Current);
 		}
-		 */
 		
-		//alpha = min(1.0,exp(LOGBF));
-		//alpha = min(0.97,exp(LOGBF));
-		// cout << "exp(LOGBF): " << exp(LOGBF) << endl;
+		alpha = min(1.0,exp(LOGBF));
+		//cout << LOGBF << endl;
+
 		if(!QUIET){
 			printf("%5d\talpha=%6.5f\t",i,alpha);
 		}
@@ -549,7 +536,8 @@ double MCMCRun::Run(){
 			//cout << ParamValues[k] << endl;
 		}
 
-		if(mcmcconfig->CREATE_TRACE && (i>10)){
+		//if(mcmcconfig->CREATE_TRACE && (i>10)){
+		if(mcmcconfig->CREATE_TRACE){
 			if((i+1) % Viz_Count == 0){
 				Visualizer->UpdateTraceFig();
 			}

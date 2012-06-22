@@ -1,4 +1,3 @@
-#!/bin/zsh
 #
 # ccs, cec24@phy.duke.edu
 # computePoints: 

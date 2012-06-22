@@ -93,9 +93,9 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	//likelihood = Gaussian(*model, *mu, *sigma);
 	//likelihood = Gaussian(*model, *mu, *sigma, *sigma_data); //This is the integrated likelihood
 	
-	if(!(mcmc->LOGLIKE)){ //If you don't want the loglikelihood, and we've used Log_MVN, we have to exponentiate.
+	/*if(!(mcmc->LOGLIKE)){ //If you don't want the loglikelihood, and we've used Log_MVN, we have to exponentiate.
 		likelihood = exp(likelihood);
-	}
+	}*/
 	/*if(mcmc->LOGLIKE){ //If you do want the loglikelihood, and we've used Gaussian, we have to take the log.
 		likelihood = log(likelihood);
 	}*/
@@ -119,7 +119,7 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 		cout << "Likelihood evaluation took " << (clock()-begintime)*1000/CLOCKS_PER_SEC << " ms." << endl;
 	}
 	
-	cout << "PCA 0: " << ModelMeans[0] << endl;
+	//cout << "PCA 0: " << ModelMeans[0] << endl;
 	
 	emulator_test.open("PCA0.dat", ios_base::app);
 	emulator_test << ModelMeans[0] << endl;

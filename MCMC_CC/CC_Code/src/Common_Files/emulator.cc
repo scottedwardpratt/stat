@@ -138,6 +138,7 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 				ss << currentline;
 				if(NumDataRows % 2 == 0){
 					while(ss >> tempnum){
+						//Errors.push_back(sqrt(tempnum));
 						Errors.push_back(tempnum);
 					}
 				}else{

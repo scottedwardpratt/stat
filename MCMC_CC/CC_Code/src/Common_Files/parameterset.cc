@@ -222,9 +222,16 @@ void ParameterSetList::PrintDataToFile(){
 					outputfile << i+WriteOutCounter*mcmc->WRITEOUT << ",";
 					for(int j=0; j< Theta[i]->Values.size(); j++){
 						if(Theta[i]){
-							outputfile << Theta[i]->Values[j];
-							if(j!=Theta[i]->Values.size()-1){
-								outputfile << ",";
+							if(mcmc->mcmcconfig->RESCALED_TRACE){
+								outputfile << (Theta[i]->Values[j]-mcmc->mcmcconfig->Min_Ranges[j])/(mcmc->mcmcconfig->Max_Ranges[j]-mcmc->mcmcconfig->Min_Ranges[j]);
+								if(j!=Theta[i]->Values.size()-1){
+									outputfile << ",";
+								}
+							}else{
+								outputfile << Theta[i]->Values[j];
+								if(j!=Theta[i]->Values.size()-1){
+									outputfile << ",";
+								}
 							}
 						}
 						else{

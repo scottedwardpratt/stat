@@ -42,6 +42,7 @@ public:
 	bool CREATE_TRACE;
 	bool APPEND_TRACE;
 	bool SUPPRESS_ERRORS;
+	bool RESCALED_TRACE;
 	string MODEL;
 	parameterMap parmap;
 	string dir_name;
@@ -78,7 +79,6 @@ public:
 	int  WRITEOUT;
 	int  MAXITERATIONS;
 	bool RANDOM_THETA0;
-	bool RESCALED_TRACE;
 	bool VIZTRACE;
 	bool QUIET;
 	
