@@ -450,7 +450,7 @@ double MCMCRun::Run(){
 
 	Accept_Count = 0;
 	for(int i =1; i<=MAXITERATIONS; i++){
-		LOGBF = 0;
+		LOGBF = 1;
 		ParameterSet Temp_Theta = mcmcconfig->Proposal->Iterate(CurrentParameters);
 		Likelihood_New = mcmcconfig->Likelihood->Evaluate(Temp_Theta);
 		if(i==1){
@@ -469,15 +469,15 @@ double MCMCRun::Run(){
 		
 		if(mcmcconfig->LOGLIKE){
 			if(!QUIET){
-				printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
+				printf(" ll_new=%g, ll_current=%g\n",log(Likelihood_New),log(Likelihood_Current));
 			}
-			LOGBF += Likelihood_New-Likelihood_Current;
+			LOGBF *= Likelihood_New/Likelihood_Current;
 		}
 		else{
 			if(!QUIET){
 				printf(" l_new=%g, l_current=%g\n",Likelihood_New,Likelihood_Current);
 			}
-			LOGBF += log(Likelihood_New/Likelihood_Current);
+			LOGBF *= log(Likelihood_New-Likelihood_Current);
 		}
 		/*if(mcmcconfig->LOGPRIOR){
 			LOGBF += (Prior_New-Prior_Current);
@@ -486,10 +486,10 @@ double MCMCRun::Run(){
 			LOGBF +=log(Prior_New/Prior_Current);
 		}*/
 		if(mcmcconfig->LOGPROPOSAL){
-			LOGBF += (Proposal_New-Proposal_Current);
+			LOGBF *= (Proposal_New/Proposal_Current);
 		}else
 		{
-			LOGBF +=log(Proposal_New/Proposal_Current);
+			LOGBF *= log(Proposal_New-Proposal_Current);
 		}
 		
 		alpha = min(1.0,exp(LOGBF));

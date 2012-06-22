@@ -111,6 +111,8 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 	command = EmulatorScriptHome + "/src/computePoints.sh " + mcmc->dir_name + " "\
 	+ mcmc->dir_name + "/fn-data-" + mcmc->Observables + ".dat < " + EmInputFile + " > "+ EmOutputFile + " 2> " + EmErrorFile;
 
+	cout << command.c_str() << endl;
+
 	int result = system(command.c_str());
 	
 	if(result != 0){
@@ -138,8 +140,8 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 				ss << currentline;
 				if(NumDataRows % 2 == 0){
 					while(ss >> tempnum){
-						//Errors.push_back(sqrt(tempnum));
-						Errors.push_back(tempnum);
+						Errors.push_back(sqrt(tempnum));
+						//Errors.push_back(tempnum);
 					}
 				}else{
 					while(ss >> tempnum){
