@@ -19,7 +19,7 @@ parameterset.h\
 distribution.h\
 visualization.h\
 quad.h
-#emulator.h\
+#emulator.h\ #This is no longer used because we use the interactive emulator
 
 MCMC_OFILES = distribution.o\
 quad.o\
@@ -28,14 +28,14 @@ mcmc.o\
 parameterset.o\
 prior_rhic.o\
 proposal.o\
-visualization.o
-#emulator.o\
-#likelihood_rhic_pca.o\
-#likelihood_cosmo.o\
-#likelihood_test.o\
-#prior_rhic_pca.o\
-#prior_cosmo.o\
-#prior_test.o\
+visualization.o\
+likelihood_rhic_pca.o\
+likelihood_cosmo.o\
+likelihood_test.o\
+prior_rhic_pca.o\
+prior_cosmo.o\
+prior_test.o\
+#emulator.o\ #This is no longer used because we use the interactive emulator
 
 
 SUBDIRS= build\
@@ -64,26 +64,26 @@ include/%.h: src/Headers/%.h
 build/likelihood_rhic.o: src/RHIC/likelihood_rhic.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 
-#build/likelihood_rhic_pca.o: src/RHIC_PCA/likelihood_rhic_pca.cc
-#	${CPP} -c ${OPT} ${INC} $< -o $@
+build/likelihood_rhic_pca.o: src/RHIC_PCA/likelihood_rhic_pca.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
 
-#build/likelihood_cosmo.o: src/Cosmosurvey/likelihood_cosmo.cc
-#	${CPP} -c ${OPT} ${INC} $< -o $@
+build/likelihood_cosmo.o: src/Cosmosurvey/likelihood_cosmo.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
 	
-#build/likelihood_test.o: src/TEST/likelihood_test.cc
-#	${CPP} -c ${OPT} ${INC} $< -o $@
+build/likelihood_test.o: src/TEST/likelihood_test.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
 	
 build/prior_rhic.o: src/RHIC/prior_rhic.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 
-#build/prior_rhic_pca.o: src/RHIC_PCA/prior_rhic_pca.cc
-#	${CPP} -c ${OPT} ${INC} $< -o $@
+build/prior_rhic_pca.o: src/RHIC_PCA/prior_rhic_pca.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
 
-#build/prior_cosmo.o: src/Cosmosurvey/prior_cosmo.cc
-#	${CPP} -c ${OPT} ${INC} $< -o $@
+build/prior_cosmo.o: src/Cosmosurvey/prior_cosmo.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
 	
-#build/prior_test.o: src/TEST/prior_test.cc
-#	${CPP} -c ${OPT} ${INC} $< -o $@
+build/prior_test.o: src/TEST/prior_test.cc
+	${CPP} -c ${OPT} ${INC} $< -o $@
 	
 build/%.o: src/Common_Files/%.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
@@ -105,5 +105,5 @@ run: mcmcrun.cc
 	${CPP} ${OPT} ${INC} -o mcmc $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}
 	cp mcmc ~/local/include/;
 
-#test: emulatortest.cc
-#	${CPP} ${OPT} ${INC} -o emutest $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}
+test: emulatortest.cc
+	${CPP} ${OPT} ${INC} -o emutest $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}
