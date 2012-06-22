@@ -4,22 +4,6 @@
 #include "qualifier.h"
 using namespace std;
 
-class CPCA{
-public:
-	string yname[100];
-	double sigmay[100];
-	int nruns,ny,nnames;
-	CQualifiers qualifiers;
-	CPCA(int nruns_set);
-	double *ybar,*value,**spread;
-	void ReadResults();
-	double *eigenval;
-	double **evec;
-	CGSLMatrix_Real *gslmatrix;
-	bool namecheck(string varname);
-	void Calc();
-};
-
 class CRunInfo{  /** this is info that pertains to a specific run */
 public:
 	CRunInfo(int NX,int NY);
@@ -44,7 +28,7 @@ public:
 	double *uncertainty;
 	double ***Aquad,**Bquad,*Cquad;
 	CRunInfo **runinfo,**testinfo;
-	CRunInfo *expinfo,*fitinfo;
+	CRunInfo *expinfo,*fitinfo,*bestinfo;
 	CGSLMatrix_Real *gslmatrix_NY;
 	CGSLMatrix_Real *gslmatrix_NX;
 	void FitExpData();
@@ -84,6 +68,7 @@ public:
 	void PrintQuadCode();
 	double GetLL(double *x);
 	void Metropolis(unsigned int nburn,unsigned int nsample);
+	void PrintCoefficients();
 };
 
 

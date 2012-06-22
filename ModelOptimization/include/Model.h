@@ -80,12 +80,8 @@ namespace madai {
 											double minimumPossibleValue = -DBL_MAX,
 											double maximumPossibleValue =  DBL_MAX )
 		{
-			Parameter newParameter;
-			newParameter.m_Name = name;
-			newParameter.m_MinimumPossibleValue = minimumPossibleValue;
-			newParameter.m_MaximumPossibleValue = maximumPossibleValue;
-			
-			m_Parameters.push_back( newParameter );
+			m_Parameters.push_back(
+				Parameter(name, minimumPossibleValue, maximumPossibleValue) );
 		}
 		
 		/** Add a scalar output name. */

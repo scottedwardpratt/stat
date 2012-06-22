@@ -53,7 +53,7 @@ bin/parmaker_latin : latinhyper3/parmaker_latin.cc
 	${MADAI_CPP} ${MADAI_CFLAGS} latinhyper3/parmaker_latin.cc -o bin/parmaker_latin
 
 bin/parmaker_random : src/parmaker_random.cc
-	${MADAI_CPP} ${MADAI_CFLAGS} ${INC} ${LB} src/parmaker_random.cc -o bin/parmaker_random
+	${MADAI_CPP} ${MADAI_CFLAGS} src/parmaker_random.cc ${INC} ${LB} -o bin/parmaker_random
 
 #########################
 

@@ -2,6 +2,7 @@
 #define __Parameter_h_
 
 #include <string>
+#include <vector>
 
 namespace madai {
 	using namespace std;
@@ -17,6 +18,20 @@ namespace madai {
 		double BestValue;
 		
 	}; // end class ParameterInfo
+
+	class Parameter {
+	public:
+		Parameter(std::string nm, 
+							double mn=0.0,
+							double mx=1.0 ) :
+			m_Name(nm),
+			m_MinimumPossibleValue(mn), 
+			m_MaximumPossibleValue(mx) { }
+		virtual ~Parameter() { }
+		std::string m_Name;
+		double      m_MinimumPossibleValue;
+		double      m_MaximumPossibleValue;
+	}; // end class Parameter
 	
 	class CParameterList{
 	public:
@@ -27,8 +42,8 @@ namespace madai {
 		void DeleteParameter(string parname);
 		void DeleteParameter(int parindex);
 		int Length;
-	}
-	
+	};
+
 } // end namespace madai
 
 #endif // __Parameter_h_

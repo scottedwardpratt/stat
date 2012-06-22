@@ -162,6 +162,7 @@ void CRHICStat::QuadFit(){
 		i=-1+(NX+1)*(NX+2)/2;
 		Cquad[iz]=xx[i];
 	}
+	/**
 	for(iz=0;iz<NX;iz++){
 		printf("---------------- iz=%d ---------------------\n",iz);
 		printf("Aquad\n");
@@ -181,6 +182,7 @@ void CRHICStat::QuadFit(){
 		printf("\n");
 		printf("Cquad=%8.4f\n",Cquad[iz]);
 	}
+	 */
 	
 	
 	for(irun=0;irun<NRUNS;irun++){
@@ -189,7 +191,7 @@ void CRHICStat::QuadFit(){
 			error[irun]=0.0;
 			GetZquad(ri->x,ri->zquad);
 			for(iz=0;iz<NX;iz++) error[irun]+=pow(ri->zquad[iz]-ri->z[iz],2);
-				//printf("error[%d]=%g\n",irun,error[irun]);
+				printf("error[%d]=%g\n",irun,error[irun]);
 			/**
 			 if(error[irun]>1.0){
 				printf("----- irun=%3d: error^2=%g -----\n",irun,error[irun]);
@@ -325,4 +327,68 @@ void CRHICStat::PrintQuadCode(){
 	delete [] B;
 	delete [] C;
 }
+
+void CRHICStat::PrintCoefficients(){
+	int iz,i1,i2,iy;
+	const double root12=sqrt(12.0);
+	int NZ=NX;
+	double ***A=new double **[NY];
+	double **B=new double *[NY];
+	double *C=new double[NY]();
+	for(iy=0;iy<NY;iy++){
+		A[iy]=new double *[NX];
+		B[iy]=new double [NX]();
+		for(i1=0;i1<NX;i1++) A[iy][i1]=new double[NX]();
+	}
+	for(iy=0;iy<NY;iy++){
+		for(i1=0;i1<NX;i1++){
+			for(i2=0;i2<NX;i2++){
+				A[iy][i1][i2]=0.0;
+				for(iz=0;iz<NZ;iz++) A[iy][i1][i2]+=12.0*sigmaybar[iy]*Uytoz_inv[iz][iy]*Aquad[iz][i1][i2];
+			}
+			B[iy][i1]=0.0;
+			for(iz=0;iz<NZ;iz++) B[iy][i1]+=root12*sigmaybar[iy]*Uytoz_inv[iz][iy]*Bquad[iz][i1];
+		}
+		C[iy]=ybar[iy];
+		for(iz=0;iz<NZ;iz++) C[iy]+=sigmaybar[iy]*Uytoz_inv[iz][iy]*Cquad[iz];
+	}
+	
+	double *ytest=new double[NY];
+	int itest=28;
+	for(iy=0;iy<NY;iy++){
+		ytest[iy]=C[iy];
+		for(i1=0;i1<NX;i1++){
+			ytest[iy]+=B[iy][i1]*runinfo[itest]->x[i1]/root12;
+			for(i2=0;i2<NX;i2++){
+				ytest[iy]+=A[iy][i1][i2]*runinfo[itest]->x[i1]*runinfo[itest]->x[i2]/12.0;
+			}
+		}
+		printf("ytest[%d]=%g =? %g, sigmay=%g, ybar=%g\n",iy,ytest[iy],runinfo[itest]->y[iy]*sigmaybar[iy]+ybar[iy],sigmaybar[iy],ybar[iy]);
+	}
+	delete [] ytest;
+	
+	FILE *fptr=fopen("jeff.dat","w");
+	
+	fprintf(fptr,"%d %d\n",NX,NY);
+	for(iy=0;iy<NY;iy++){
+		for(i1=0;i1<NX;i1++){
+			for(i2=i1;i2<NX;i2++){
+				fprintf(fptr,"%g ",A[iy][i2][i1]);
+			}
+		}
+		fprintf(fptr,"\n");
+		for(i1=0;i1<NX;i1++) fprintf(fptr,"%g ",B[iy][i1]);
+		fprintf(fptr,"\n%g\n",C[iy]);
+		fprintf(fptr,"%g %g\n",expinfo->y[iy],sigmaybar[iy]);
+	}
+	fclose(fptr);
+	for(iy=0;iy<NY;iy++){
+		for(i1=0;i1<NX;i1++) delete [] A[iy][i1];
+		delete [] B[iy];
+	}
+	delete [] A;
+	delete [] B;
+	delete [] C;
+}
+
 #endif

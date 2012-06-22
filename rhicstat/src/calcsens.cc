@@ -23,13 +23,15 @@ void CRHICStat::CalcSensitivity(){
 	gslmatrix_NY->EigenFind(sigmayy,Uytoz,eigenvalyy);
 	gslmatrix_NY->Invert_NonSymm(Uytoz,Uytoz_inv);
 	for(irun=0;irun<NRUNS;irun++){
-		for(ix=0;ix<NX;ix++){
-			runinfo[irun]->z[ix]=0.0;
-			for(iy=0;iy<NY;iy++){
-				runinfo[irun]->z[ix]+=runinfo[irun]->y[iy]*Uytoz[iy][ix];
+		if(runinfo[irun]->good){
+			for(ix=0;ix<NX;ix++){
+				runinfo[irun]->z[ix]=0.0;
+				for(iy=0;iy<NY;iy++){
+					runinfo[irun]->z[ix]+=runinfo[irun]->y[iy]*Uytoz[iy][ix];
+				}
 			}
+			for(ix=NX;ix<NY;ix++) runinfo[irun]->z[ix]=0.0;
 		}
-		for(ix=NX;ix<NY;ix++) runinfo[irun]->z[ix]=0.0;
 	}
 	printf("-------- PCA values -----------\n");
 	for(iy=0;iy<NY;iy++) printf("%2d: %g\n",iy,eigenvalyy[iy]);
@@ -276,10 +278,11 @@ void CRHICStat::GetXlinearFromW(CRunInfo *runinfo){
 
 void CRHICStat::PrintY(CRunInfo *runinfo){
 	int iy;
-	printf("                         observable     :    yprime      y        yexp     Dely/sigma\n");
+	printf("                         observable     :    yprime      y        yexp     Dely/sigma    sigmay\n");
 	for(iy=0;iy<NY;iy++){
-		printf("%40s: %9.4f  %9.4f  %9.4f  %9.4f\n",yname[iy].c_str(),
-			runinfo->y[iy],ybar[iy]+runinfo->y[iy]*runinfo->sigmay[iy],ybar[iy]+expinfo->y[iy]*expinfo->sigmay[iy],runinfo->y[iy]-expinfo->y[iy]);
+			//printf("%g=?%g\n",sigmaybar[iy],sigmaybar[iy]);
+		printf("%40s: %9.4f  %9.4f  %9.4f  %9.4f  %g\n",yname[iy].c_str(),
+			runinfo->y[iy],ybar[iy]+runinfo->y[iy]*sigmaybar[iy],ybar[iy]+expinfo->y[iy]*sigmaybar[iy],runinfo->y[iy]-expinfo->y[iy],sigmaybar[iy]);
 	}
 }
 
@@ -296,7 +299,7 @@ void CRHICStat::PrintYlinear(CRunInfo *runinfo){
 	printf("                         observable     :    ylinear   yexp\n");
 	for(iy=0;iy<NY;iy++){
 		printf("%40s: %9.4f  %9.4f\n",yname[iy].c_str(),
-			ybar[iy]+runinfo->ylinear[iy]*runinfo->sigmay[iy],ybar[iy]+expinfo->y[iy]*expinfo->sigmay[iy]);
+			ybar[iy]+runinfo->ylinear[iy]*sigmaybar[iy],ybar[iy]+expinfo->y[iy]*sigmaybar[iy]);
 	}
 }
 
@@ -313,9 +316,9 @@ void CRHICStat::PrintYquad(CRunInfo *runinfo){
 	printf("                         observable     :    yquad    y         yexp\n");
 	for(iy=0;iy<NY;iy++){
 		printf("%40s: %9.4f  %9.4f  %9.4f\n",yname[iy].c_str(),
-					 ybar[iy]+runinfo->yquad[iy]*runinfo->sigmay[iy],
-					 ybar[iy]+runinfo->y[iy]*runinfo->sigmay[iy],
-					 ybar[iy]+expinfo->y[iy]*expinfo->sigmay[iy]);
+					 ybar[iy]+runinfo->yquad[iy]*sigmaybar[iy],
+					 ybar[iy]+runinfo->y[iy]*sigmaybar[iy],
+					 ybar[iy]+expinfo->y[iy]*sigmaybar[iy]);
 	}
 }
 
