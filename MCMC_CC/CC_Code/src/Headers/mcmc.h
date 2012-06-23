@@ -44,6 +44,7 @@ public:
 	bool APPEND_TRACE;
 	bool SUPPRESS_ERRORS;
 	bool RESCALED_TRACE;
+	bool PRESCALED_PARAMS;
 	string MODEL;
 	parameterMap parmap;
 	string dir_name;
@@ -61,7 +62,7 @@ public:
 	ProposalDistribution *Proposal;
 	PriorDistribution *Prior;
 	ParameterSetList *DummyList;
-	double Max_Ranges[10],Min_Ranges[10]; // 
+	double Max_Ranges[],Min_Ranges[]; // 
 };
 
 class MCMCRun{

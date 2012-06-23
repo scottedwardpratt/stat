@@ -28,7 +28,7 @@ LikelihoodDistribution_RHIC::LikelihoodDistribution_RHIC(MCMCConfiguration *mcmc
 	// cout << "params declared." << endl;
 	if(UseEmulator){
 		//emulator = new My_emuHandler(parmap, mcmc_in);
-		My_emu = new emulator(mcmc->dir_name + "/Emulatorstatefile");
+		My_emu = new emulator(mcmc->dir_name + "/Emulator.statefile");
 	}
 	else{
 		exit(1);
