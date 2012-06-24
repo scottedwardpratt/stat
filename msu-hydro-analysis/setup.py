@@ -24,7 +24,10 @@ def main():
     obsvnames=[]
     for line in obsvlist:
         if line[0] != "#":
-            obsvnames.append(line[:-1])
+            if line[-2] == '\r':
+                obsvnames.append(line[:-2])
+            else:
+                obsvnames.append(line[:-1])
     print obsvnames
     obsvlist.close()
 
@@ -71,6 +74,7 @@ def main():
                           temp.append(line.split(" ")[2][:-1])
             obsvvals.append(temp)
             obsvfile.close()
+    print obsvvals[0]
     dirlist.close()
     os.system("rm dirlist")
 
