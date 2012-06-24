@@ -12,16 +12,19 @@ import math as m
 def main():
     if len(sys.argv) != 2:
         print "This program prepares a .dat file to be used to train the Interactive Emulator"
+        print "It names the output DataSummary.dat and puts it in the model-data folder"
         print "This is meant to be run from msu-hyrdro-analysis"
         print "usage: python setup.py <model-data folder>"
+        print "   or: ./setup.py <model-data folder>"
         print "example: python setup.py model-data/June2012"
         exit(1)
 
     # Read in the names of the observables
-    obsvlist=open("data-prep/standardlong.dat","r")
+    obsvlist=open(sys.argv[1]+"/pcanames.dat","r")
     obsvnames=[]
     for line in obsvlist:
-        obsvnames.append(line[:-1])
+        if line[0] != "#":
+            obsvnames.append(line[:-1])
     print obsvnames
     obsvlist.close()
 
@@ -86,7 +89,12 @@ def main():
         stdv[i]=m.sqrt(stdv[i]/len(obsvvals))
 
     # Write out the .dat file
-    output=open(sys.argv[1].split("/")[-1]+".dat","w")
+    #if sys.argv[1][-1] == "/":
+    #    outputname = sys.argv[1][:-1].split("/")[-1]+".dat"
+    #else:
+    #    outputname = sys.argv[1].split("/")[-1]+".dat"
+    outputname = sys.argv[1]+"/DataSummary.dat"
+    output=open(outputname,"w")
     output.write(str(len(obsvvals[0]))+"\n")
     output.write(str(len(paramvals[0]))+"\n")
     output.write(str(len(obsvvals))+"\n")
@@ -107,7 +115,7 @@ def main():
             temp+=str(k)+" "
         output.write(temp+"\n")
     output.close()
-    print "Output written to",sys.argv[1].split("/")[-1]+".dat"
+    print "Output written to",outputname
 
 if __name__ == '__main__':
     main()
