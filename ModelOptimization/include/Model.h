@@ -1,3 +1,17 @@
+/*********************************************************************
+MADAI Model Statistical Tools
+Copyright 2011-2012, The University of North Carolina at Chapel Hill.
+
+This software was written in 2011-2012 by 
+	Cory Quammen <cquammen AT cs.unc.edu>
+	Russell Taylor <taylorr AT cs.unc.edu>
+	Scott Pratt <pratt AT nscl.msu.edu>
+	Kevin Novak <novakkev AT msu.edu>
+	Hal Canary <hal AT cs.unc.edu>
+while working for the MADAI project <http://madai.us/>.
+
+See copyright.txt for more information.
+*********************************************************************/
 #ifndef __Model_h_
 #define __Model_h_
 
@@ -54,7 +68,11 @@ namespace madai {
 		};
 		
 		/** Get the valid range for the parameter at parameterIndex. */
-		virtual void GetRange( unsigned int parameterIndex, double range[2] ) = 0;
+		virtual void GetRange( unsigned int parameterIndex, double range[2] ) const
+		{
+			range[0] = this->m_Parameters.at(parameterIndex).m_MinimumPossibleValue;
+			range[1] = this->m_Parameters.at(parameterIndex).m_MaximumPossibleValue;
+		}
 		
 		/** Get the scalar outputs from the model evaluated at x. */
 		virtual ErrorType GetScalarOutputs( const std::vector< double > & parameters,

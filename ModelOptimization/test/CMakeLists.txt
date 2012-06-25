@@ -13,3 +13,9 @@ add_executable(        RegularStepGradientDescentOptimizerTest
 target_link_libraries( RegularStepGradientDescentOptimizerTest ${LIBRARIES} )
 add_test(              RegularStepGradientDescentOptimizerTest
                        RegularStepGradientDescentOptimizerTest )
+
+add_executable(        external_model_plus_mhmcmc_test
+                       external_model_plus_mhmcmc_test.cxx )
+target_link_libraries( external_model_plus_mhmcmc_test ${LIBRARIES} )
+add_test(              external_model_plus_mhmcmc_test
+                       external_model_plus_mhmcmc_test )
