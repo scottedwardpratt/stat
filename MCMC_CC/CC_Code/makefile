@@ -11,31 +11,31 @@ INSTALLDIR=${MADAI_INSTALLDIR}
 GSLPATH=${MADAI_GSLPATH}
 #e.g. /usr/local
 #################################################
-INC= -I${GSLPATH}/include -I include -I ${INSTALLDIR}/include 
+INC= -I${GSLPATH}/include -I include -I ${INSTALLDIR}/include -I ${INSTALLDIR}/include/EmuPlusPlus
 LIBS= -L${GSLPATH}/lib -L${INSTALLDIR}/lib
 
 MCMC_HFILES = mcmc.h\
 parameterset.h\
 distribution.h\
-emulator.h\
 visualization.h\
 quad.h
+#emulator.h\ #This is no longer used because we use the interactive emulator
 
 MCMC_OFILES = distribution.o\
-emulator.o\
 quad.o\
 likelihood_rhic.o\
-likelihood_rhic_pca.o\
-likelihood_cosmo.o\
-likelihood_test.o\
 mcmc.o\
 parameterset.o\
 prior_rhic.o\
+proposal.o\
+visualization.o\
+likelihood_rhic_pca.o\
+likelihood_cosmo.o\
+likelihood_test.o\
 prior_rhic_pca.o\
 prior_cosmo.o\
 prior_test.o\
-proposal.o\
-visualization.o
+#emulator.o\ #This is no longer used because we use the interactive emulator
 
 
 SUBDIRS= build\
@@ -102,7 +102,7 @@ uninstall:
 	rm  -f ${addprefix ${INSTALLDIR}/include/, ${MCMC_HFILES}}
 
 run: mcmcrun.cc
-	${CPP} ${OPT} ${INC} -o mcmc $< -lcoralutils -lgsl -lmcmc -lgslcblas ${LIBS}
+	${CPP} ${OPT} ${INC} -o mcmc $< -lcoralutils -lgsl -lmcmc -lgslcblas -lEmuPlusPlus ${LIBS}
 	cp mcmc ~/local/include/;
 
 test: emulatortest.cc

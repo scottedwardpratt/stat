@@ -22,43 +22,7 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 	RESCALED_TRACE = parameter::getB(parmap, "RESCALED_TRACE", false);
 	SUPPRESS_ERRORS = parameter::getB(parmap, "SUPPRESS_ERRORS", false);
 	MODEL = parameter::getS(parmap,"MODEL","NOMODEL");
-	
-	//============================================
-	// Reading the parameters out of ranges.dat
-	string filename = info_dir + "/ranges.dat";
-	fstream ranges;
-	ranges.open(filename.c_str(),fstream::in);
-	if(ranges){
-		string temps,name,line,type;
-		int index = 0;
-		while(ranges >> type){
-			if(strcmp(type.c_str(), "double") == 0){
-				ranges >> name;
-				if(index != -1){ //returns -1 if not found
-					ranges >> Min_Ranges[index]; //minimum
-					ranges >> Max_Ranges[index]; //maximum
-					if(Min_Ranges[index] > Max_Ranges[index]){ //Flip them
-						double temp2 = Min_Ranges[index];
-						Min_Ranges[index] = Max_Ranges[index];
-						Max_Ranges[index] = temp2;
-					}
-				}
-			}else{
-				if(strncmp(type.c_str(), "#", 1) == 0){
-					string temp;
-					getline(ranges, temp, '\n');
-				}
-			}
-			EmulatorParams = EmulatorParams + name + " ";
-			index++;
-		}
 
-		ranges.close();
-	}
-	else{
-		cout << "Ranges.dat wont open" << endl;
-		exit(1);
-	}
 	if(EmulatorParams!=""){
 		string line;
 		stringstream Emparams;
@@ -71,6 +35,51 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 		} 
 		if(ParamNames.back().compare(0,1," ")==0 || ParamNames.back().empty()){ // if for some reason the last element is empty, drop it
 			ParamNames.pop_back();
+		}
+	}
+	
+	//============================================
+	// Reading the parameters out of ranges.dat
+	PRESCALED_PARAMS = parameter::getB(parmap, "PRESCALED_PARAMS", false);
+	if(PRESCALED_PARAMS){
+		//They go from zero to 1
+		fill_n(Min_Ranges,ParamNames.size(),0);
+		fill_n(Max_Ranges,ParamNames.size(),1);
+	}
+	else{
+		string filename = info_dir + "/ranges.dat";
+		fstream ranges;
+		ranges.open(filename.c_str(),fstream::in);
+		if(ranges){
+			string temps,name,line,type;
+			int index = 0;
+			while(ranges >> type){
+				if(strcmp(type.c_str(), "double") == 0){
+					ranges >> name;
+					if(index != -1){ //returns -1 if not found
+						ranges >> Min_Ranges[index]; //minimum
+						ranges >> Max_Ranges[index]; //maximum
+						if(Min_Ranges[index] > Max_Ranges[index]){ //Flip them
+							double temp2 = Min_Ranges[index];
+							Min_Ranges[index] = Max_Ranges[index];
+							Max_Ranges[index] = temp2;
+						}
+					}
+				}else{
+					if(strncmp(type.c_str(), "#", 1) == 0){
+						string temp;
+						getline(ranges, temp, '\n');
+					}
+				}
+				EmulatorParams = EmulatorParams + name + " ";
+				index++;
+			}
+
+			ranges.close();
+		}
+		else{
+			cout << "Ranges.dat wont open" << endl;
+			exit(1);
 		}
 	}
 
@@ -356,9 +365,9 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config){
 	string command = "mkdir -p "+ tracedir;
 	
 	system(command.c_str());
-	if(!QUIET){
+	/*if(!QUIET){
 		printf("Iteration\tAlpha\tResult\n");
-	}
+	}*/
 }
 
 MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
@@ -417,9 +426,9 @@ MCMCRun::MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0){
 	string command = "mkdir -p "+ tracedir;
 	
 	system(command.c_str());
-	if(!QUIET){
+	/*if(!QUIET){
 		printf("Iteration\tAlpha\tResult\n");
-	}
+	}*/
 }
 
 MCMCRun::~MCMCRun(){
@@ -450,7 +459,7 @@ double MCMCRun::Run(){
 
 	Accept_Count = 0;
 	for(int i =1; i<=MAXITERATIONS; i++){
-		LOGBF = 0;
+		LOGBF = 1;
 		ParameterSet Temp_Theta = mcmcconfig->Proposal->Iterate(CurrentParameters);
 		Likelihood_New = mcmcconfig->Likelihood->Evaluate(Temp_Theta);
 		if(i==1){
@@ -471,13 +480,13 @@ double MCMCRun::Run(){
 			if(!QUIET){
 				printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
 			}
-			LOGBF += Likelihood_New-Likelihood_Current;
+			LOGBF *= Likelihood_New/Likelihood_Current;
 		}
 		else{
 			if(!QUIET){
-				printf(" l_new=%g, l_current=%g\n",Likelihood_New,Likelihood_Current);
+				printf(" l_new=%g, l_current=%g\n",exp(Likelihood_New),exp(Likelihood_Current));
 			}
-			LOGBF += log(Likelihood_New/Likelihood_Current);
+			LOGBF *= exp(Likelihood_New)/exp(Likelihood_Current);
 		}
 		/*if(mcmcconfig->LOGPRIOR){
 			LOGBF += (Prior_New-Prior_Current);
@@ -486,10 +495,10 @@ double MCMCRun::Run(){
 			LOGBF +=log(Prior_New/Prior_Current);
 		}*/
 		if(mcmcconfig->LOGPROPOSAL){
-			LOGBF += (Proposal_New-Proposal_Current);
+			LOGBF *= (Proposal_New/Proposal_Current);
 		}else
 		{
-			LOGBF +=log(Proposal_New/Proposal_Current);
+			LOGBF *= (exp(Proposal_New)/exp(Proposal_Current));
 		}
 		
 		alpha = min(1.0,exp(LOGBF));
@@ -497,6 +506,7 @@ double MCMCRun::Run(){
 
 		if(!QUIET){
 			printf("%5d\talpha=%6.5f\t",i,alpha);
+			printf("LOGBF=%6.5f\t",alpha);
 		}
 		if(alpha > (mcmcconfig->randnum->ran())) { //Accept the proposed set.
 		//if(alpha > 1){

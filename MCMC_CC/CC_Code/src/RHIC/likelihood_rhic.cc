@@ -3,6 +3,7 @@
 
 #include "mcmc.h"
 #include <time.h>
+#include "EmuPlusPlus.h"
 
 using namespace std;
 
@@ -26,23 +27,25 @@ LikelihoodDistribution_RHIC::LikelihoodDistribution_RHIC(MCMCConfiguration *mcmc
 	
 	// cout << "params declared." << endl;
 	if(UseEmulator){
-		emulator = new EmulatorHandler(parmap, mcmc_in);
+		//emulator = new My_emuHandler(parmap, mcmc_in);
+		My_emu = new emulator(mcmc->dir_name + "/Emulator.statefile");
 	}
 	else{
 		exit(1);
 	}
 
 	DATA = GetRealData();
+	//DATA = GetFakeData();
 	//ERROR = GetRealError();
 
 	//testing the outputs of the emulator at various points	// 
-	emulator_test.open("PCA0.dat");
-	emulator_test.close();
+	//emulator_test.open("PCA0.dat");
+	//emulator_test.close();
 	
 }
 
 LikelihoodDistribution_RHIC::~LikelihoodDistribution_RHIC(){
-	delete emulator;
+	delete My_emu;
 }
 
 double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
@@ -56,7 +59,7 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	}
 	
 	if(UseEmulator){
-		emulator->QueryEmulator(Theta, ModelMeans, ModelErrors); //fills vectors with emulator output
+		My_emu->QueryEmulator(Theta.Values, ModelMeans, ModelErrors); //fills vectors with emulator output
 	}
 	else{
 		//determine another way to fill the vectors
@@ -73,17 +76,12 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	
 	//Read in appropriate elements
 	for(int i = 0; i<N; i++){
-		//gsl_matrix_set(sigma, i,i,Theta.GetValue("SIGMA"));
-		//ModelErrors[i]=0.1; //Suppressing the error of the emulator
-		//if (ModelErrors[i] < 0.001) { ModelErrors[i]=0.001; }
-		//Bad things can happen in the likelihood calculations if the errors get too large or small
-		//ModelErrors[i]=ModelErrors[i]*2;
-//		if (ModelErrors[i] < 0.5*fabs(DATA[i]-ModelMeans[i])) { ModelErrors[i]=0.5*fabs(DATA[i]-ModelMeans[i]); }
-//		if (ModelErrors[i] > 5*fabs(DATA[i]-ModelMeans[i])) { ModelErrors[i]=5*fabs(DATA[i]-ModelMeans[i]); }
+		//cout << " Data: " << DATA[i] << " Emu: " << ModelMeans[i] << " +/-: " << ModelErrors[i] << endl;
 		if(mcmc->SUPPRESS_ERRORS){
-			ModelErrors[i]=ModelMeans[i]*0.1; //What a reasonable error is depends on the observable
+			//ModelErrors[i]=ModelMeans[i]*0.1; //What a reasonable error is depends on the observable
+			ModelErrors[i]=1;
 		}
-		gsl_matrix_set(sigma,i,i,ModelErrors[i]);
+		gsl_matrix_set(sigma, i, i,ModelErrors[i]);
 		gsl_vector_set(model, i,ModelMeans[i]);
 		gsl_vector_set(mu, i, DATA[i]);
 		//cout << "i: " << i << " Data: " << DATA[i] <<  " Mean: " << ModelMeans[i] << " Error: " << ModelErrors[i] << endl;
@@ -92,13 +90,6 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	likelihood = Log_MVNormal(*model, *mu, *sigma);
 	//likelihood = Gaussian(*model, *mu, *sigma);
 	//likelihood = Gaussian(*model, *mu, *sigma, *sigma_data); //This is the integrated likelihood
-	
-	/*if(!(mcmc->LOGLIKE)){ //If you don't want the loglikelihood, and we've used Log_MVN, we have to exponentiate.
-		likelihood = exp(likelihood);
-	}*/
-	/*if(mcmc->LOGLIKE){ //If you do want the loglikelihood, and we've used Gaussian, we have to take the log.
-		likelihood = log(likelihood);
-	}*/
 	
 	if(VERBOSE){
 		double sum = 0.0;
@@ -121,10 +112,10 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	
 	//cout << "PCA 0: " << ModelMeans[0] << endl;
 	
-	emulator_test.open("PCA0.dat", ios_base::app);
-	emulator_test << ModelMeans[0] << endl;
-	emulator_test.close();
-	// emulator_test << ModelMeans[0] << endl;
+	//emulator_test.open("PCA0.dat", ios_base::app);
+	//emulator_test << ModelMeans[0] << endl;
+	//emulator_test.close();
+	//emulator_test << ModelMeans[0] << endl;
 
 	return likelihood;
 }
@@ -145,14 +136,14 @@ vector<double> LikelihoodDistribution_RHIC::GetFakeData(){
 	ParameterSet ActualParams;
 	ActualParams.Initialize(temp_names, temp_values);
 	
-	emulator->QueryEmulator(ActualParams, datameans, dataerror);
+	My_emu->QueryEmulator(ActualParams.Values, datameans, dataerror);
 
 	return datameans;
 }
 
 vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 	vector<double> datameans;
-	string EmulatorObservables=mcmc->Observables;
+	string My_emuObservables=mcmc->Observables;
 	
 	string data_filename = mcmc->dir_name + "/exp_data/results.dat";
 	fstream data;
@@ -220,7 +211,7 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 
 vector<double> LikelihoodDistribution_RHIC::GetRealError(){
 	vector<double> dataerrors;
-	string EmulatorObservables=mcmc->Observables;
+	string My_emuObservables=mcmc->Observables;
 	string data_filename = mcmc->dir_name + "/exp_data/results.dat";
 	
 	fstream data;

@@ -28,7 +28,7 @@ LikelihoodDistribution_Cosmo::LikelihoodDistribution_Cosmo(MCMCConfiguration *mc
 	if(UseEmulator){
 		cout << "Turn off USE_EMULATOR" << endl;
 		exit(-1);
-		emulator = new EmulatorHandler(parmap, mcmc_in);
+		//emulator = new EmulatorHandler(parmap, mcmc_in);
 	}
 
 	DATA = GetData();
@@ -39,7 +39,7 @@ LikelihoodDistribution_Cosmo::LikelihoodDistribution_Cosmo(MCMCConfiguration *mc
 }
 
 LikelihoodDistribution_Cosmo::~LikelihoodDistribution_Cosmo(){
-	delete emulator;
+	//delete emulator;
 }
 
 double LikelihoodDistribution_Cosmo::Evaluate(ParameterSet Theta){
