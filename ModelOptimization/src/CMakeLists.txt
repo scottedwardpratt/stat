@@ -1,7 +1,12 @@
 set( SRC_FILES
-  Gaussian2DModel.cxx
   Optimizer.cxx
+  Trace.cxx
+
+  Gaussian2DModel.cxx
   RegularStepGradientDescentOptimizer.cxx
+  ExternalModel.cxx
+  process_pipe.c
+  SimpleMetropolisHastings.cxx
 )
 
 include_directories(
