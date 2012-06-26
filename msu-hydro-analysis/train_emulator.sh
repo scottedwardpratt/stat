@@ -13,4 +13,4 @@ if [ $# -lt 1 ]; then
 fi
 
 binpath=interactive_emulator
-$binpath estimate_thetas $1/DataSummary.dat $1/Emulator.statfile --regression_order=1
+$binpath estimate_thetas $1/DataSummary.dat $1/Emulator.statefile --regression_order=1
