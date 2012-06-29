@@ -1,4 +1,6 @@
-vector MIXING_STD_DEV .01 .01 .01 .01 .01 .01
+vector MIXING_STD_DEV 6 6 6 6 6 6
 bool SYMMETRIC_PROPOSAL true
-bool RESCALED_PROPOSAL false
-
+bool RESCALED_PROPOSAL true
+double SCALE 1
+#~0.001 seems to work for Loglikelihoods
+#~1 seems to work for likelihoods

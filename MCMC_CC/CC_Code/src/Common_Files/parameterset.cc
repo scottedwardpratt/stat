@@ -4,6 +4,7 @@
 #include "parameterset.h"
 #include <sstream>
 #include <time.h>
+#include <fstream>
 
 using namespace std;
 
@@ -109,7 +110,7 @@ ParameterSetList::ParameterSetList(MCMCRun *mcmc_in){
 	GetTheta0FromFile();
 }
 
-ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, int seed){ //This one creates a random set of theta0s
+ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, int seed, bool scaled){ //This one creates a random set of theta0s
 	mcmc = mcmc_in;
 	Theta = new ParameterSet*[mcmc->WRITEOUT+1];
 	for(int i = 0; i < mcmc->WRITEOUT; i++){
@@ -119,7 +120,7 @@ ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, int seed){ //This one creat
 	CurrentIteration = 0;
 	HoldOver = new ParameterSet(this);
 	
-	GetRandomTheta0(time(NULL));
+	GetRandomTheta0(seed,scaled);
 }
 
 ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, ParameterSet Theta0){
@@ -152,7 +153,7 @@ void ParameterSetList::GetTheta0FromFile(){
 	Add(temp_set);
 }
 
-void ParameterSetList::GetRandomTheta0(int seed){ //This one creates random theta 0s
+void ParameterSetList::GetRandomTheta0(int seed, bool scaled){ //This one creates random theta 0s
 	srand(seed);
 	cout << "We are using random theta0 values. They are:" << endl;
 	parameterMap parmap;
@@ -163,19 +164,22 @@ void ParameterSetList::GetRandomTheta0(int seed){ //This one creates random thet
 	vector<string> temp_names;
 	vector<double> temp_values;
 
-	ifstream range_file;
-	range_file.open(range_filename.c_str());
+	fstream range_file;
+	range_file.open(range_filename.c_str(),fstream::in);
 	if(!range_file){
 		printf("ParameterSetList::GetRandomTheta0 says: We can't seem to open the ranges.dat file.");
 		exit(1);
 	}
 
 	getline(range_file,line,'\n');
-
 	while(!range_file.eof()){
 		stringstream ss;
 		ss << line;
 		ss >> temp >> name >> low >> high;
+		if(scaled){
+			low = 0;
+			high = 1;
+		}
 		//Now we need to pick a value between low and high and set it as a theta value.
 		temp_names.push_back(name);
 		temp_values.push_back(double(rand() % int((high-low)*1000))/1000+low);
@@ -186,11 +190,6 @@ void ParameterSetList::GetRandomTheta0(int seed){ //This one creates random thet
 		getline(range_file,line,'\n');
 	}
 
-	/*ParameterSet temp_set(this);
-	parameter::ReadParsFromFile(parmap, theta0_filename);
-	vector<string> temp_names = parameter::getVS(parmap, "NAMES", "");
-	vector<double> temp_values = parameter::getV(parmap, "VALUES", "");
-	*/
 	ParamNames = temp_names;
 	temp_set.Names = temp_names;
 	temp_set.Values = temp_values;

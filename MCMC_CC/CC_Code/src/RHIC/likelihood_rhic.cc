@@ -10,10 +10,10 @@ using namespace std;
 LikelihoodDistribution_RHIC::LikelihoodDistribution_RHIC(MCMCConfiguration *mcmc_in){
 	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "LIKELIHOOD_PARAMETER_MAP", false);
-	
 	if(SepMap){
 		string parmapfile = mcmc->parameterfile + "/likelihood.param";
 		parmap = new parameterMap;
+		//parameterMap *parmap;
 		parameter::ReadParsFromFile(*parmap, parmapfile);
 	}else{
 		parmap = &(mcmc->parmap);
@@ -24,18 +24,25 @@ LikelihoodDistribution_RHIC::LikelihoodDistribution_RHIC(MCMCConfiguration *mcmc
 	UseEmulator = parameter::getB(*parmap, "USE_EMULATOR", false);
 	TIMING = parameter::getB(*parmap, "TIMING", false) || parameter::getB(*parmap, "TIME_LIKELIHOOD", false);
 	VERBOSE = parameter::getB(*parmap, "VERBOSE", false) || parameter::getB(*parmap, "VERBOSE_LIKELIHOOD", false);
-	
+	FAKE_DATA = parameter::getB(*parmap, "FAKE_DATA", false);
+
 	// cout << "params declared." << endl;
 	if(UseEmulator){
-		//emulator = new My_emuHandler(parmap, mcmc_in);
+		cout << "Emulator is being loaded from: " << mcmc->dir_name + "/Emulator.statefile" << endl;
 		My_emu = new emulator(mcmc->dir_name + "/Emulator.statefile");
+		//emulator My_emu(mcmc->dir_name + "/Emulator.statefile");
+		cout << "Emulator loaded. Test (number of params): _" << My_emu->number_params << "_" << endl;
 	}
 	else{
+		cout << "The UseEmulator flag is set to false (or not set). We can't do anything without an emulator" << endl;
 		exit(1);
 	}
 
-	DATA = GetRealData();
-	//DATA = GetFakeData();
+	if(FAKE_DATA){
+		DATA = GetFakeData();
+	}else{
+		DATA = GetRealData();
+	}
 	//ERROR = GetRealError();
 
 	//testing the outputs of the emulator at various points	// 
@@ -45,7 +52,7 @@ LikelihoodDistribution_RHIC::LikelihoodDistribution_RHIC(MCMCConfiguration *mcmc
 }
 
 LikelihoodDistribution_RHIC::~LikelihoodDistribution_RHIC(){
-	delete My_emu;
+	//delete My_emu;
 }
 
 double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
@@ -57,14 +64,14 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	if(TIMING){
 		begintime = clock();
 	}
-	
+
 	if(UseEmulator){
 		My_emu->QueryEmulator(Theta.Values, ModelMeans, ModelErrors); //fills vectors with emulator output
 	}
 	else{
 		//determine another way to fill the vectors
 	}
-	
+
 	//Initialize GSL containers
 	int N = ModelErrors.size();
 	gsl_matrix * sigma = gsl_matrix_calloc(N,N);
@@ -73,7 +80,16 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	gsl_vector * mu = gsl_vector_alloc(N);
 	// cout << "Done allocating gsl containers." << endl;
 	
-	
+	if(VERBOSE){
+		cout << "Theta: ";
+		for(int i = 0; i < Theta.Values.size(); i++){
+			cout << Theta.Values[i] << " ";
+		}
+		cout << endl << "Observable, Model means, Model errors, Data" << endl;
+		for(int i = 0; i<N; i++){
+			cout << mcmc->ObservablesNames[i] << " " << ModelMeans[i] << " " << ModelErrors[i] << " " << DATA[i] << endl;
+		}
+	}
 	//Read in appropriate elements
 	for(int i = 0; i<N; i++){
 		//cout << " Data: " << DATA[i] << " Emu: " << ModelMeans[i] << " +/-: " << ModelErrors[i] << endl;
@@ -138,12 +154,21 @@ vector<double> LikelihoodDistribution_RHIC::GetFakeData(){
 	
 	My_emu->QueryEmulator(ActualParams.Values, datameans, dataerror);
 
+	cout << "We are using FAKE DATA!!!!!!!!" << endl;
+	cout << "The parameter values read in from actual.param are:" << endl;
+	for(int i = 0; i < ActualParams.Values.size(); i++){
+		cout << ActualParams.Values[i] << " ";
+	}
+	cout << endl << "Thses have given us parameter values of:" << endl;
+	for(int i = 0; i<datameans.size(); i++){
+		cout << mcmc->ObservablesNames[i] << " " << datameans[i] << endl;
+	}
+
 	return datameans;
 }
 
 vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 	vector<double> datameans;
-	string My_emuObservables=mcmc->Observables;
 	
 	string data_filename = mcmc->dir_name + "/exp_data/results.dat";
 	fstream data;
@@ -194,16 +219,16 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 	}
 
 	if(count!=numparams){
-		cout << "Not all emulated observables found!" << endl;
+		cout << "Not all emulated observables found! count=" << count << " numparams= " << numparams << endl;
 		exit(1);
 	}
 
 	datameans.assign(Datamean,Datamean+numparams);
 
 	if(VERBOSE){
+		cout << "Data array: " << endl;
 		for(int i = 0; i<numparams; i++){
-			cout << "Data array: " << endl;
-			cout << "i: " << i << " Data: " << datameans[i] << endl;
+			cout << mcmc->ObservablesNames[i] << " " << datameans[i] << endl;
 		}
 	}
 	return datameans;
@@ -211,7 +236,6 @@ vector<double> LikelihoodDistribution_RHIC::GetRealData(){
 
 vector<double> LikelihoodDistribution_RHIC::GetRealError(){
 	vector<double> dataerrors;
-	string My_emuObservables=mcmc->Observables;
 	string data_filename = mcmc->dir_name + "/exp_data/results.dat";
 	
 	fstream data;

@@ -71,7 +71,7 @@ public:
 	vector<double> DATA;
 	bool UseEmulator;
 	ofstream emulator_test;
-	emulator * My_emu;
+	//emulator * My_emu;
 	//EmulatorHandler * emulator;
 };
 
@@ -122,7 +122,9 @@ public:
 	vector<double> DATA;
 	vector<double> ERROR;
 	bool UseEmulator;
+	bool FAKE_DATA;
 	emulator * My_emu;
+	//parameterMap * parmap;
 	ofstream emulator_test;
 	int FindParam(string param_name, vector<string> PNames);
 	parameterMap observablesparmap;
@@ -156,7 +158,7 @@ public:
 	vector<int> intDATA;
 	bool UseEmulator;
 	ofstream emulator_test;
-	emulator * My_emu;
+	//emulator * My_emu;
 };
 
 class LikelihoodDistribution_Test:public LikelihoodDistribution {

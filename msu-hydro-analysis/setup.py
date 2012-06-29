@@ -99,9 +99,16 @@ def main():
     #    outputname = sys.argv[1].split("/")[-1]+".dat"
     outputname = sys.argv[1]+"/DataSummary.dat"
     output=open(outputname,"w")
+    output.write("#Number of outputs\n")
     output.write(str(len(obsvvals[0]))+"\n")
+    output.write("#Number of inputs\n")
     output.write(str(len(paramvals[0]))+"\n")
+    output.write("#Number of training points\n")
     output.write(str(len(obsvvals))+"\n")
+    output.write("#")
+    for i in paramnames:
+        output.write(i+" ")
+    output.write("\n")
     for i in paramvals:
         temp=""
         c=0
@@ -110,6 +117,10 @@ def main():
             c+=1
             temp+=str(k)+" "
         output.write(temp+"\n")
+    output.write("#")
+    for i in obsvnames:
+        output.write(i+" ")
+    output.write("\n")
     for i in obsvvals:
         temp=""
         c=0
@@ -120,6 +131,32 @@ def main():
         output.write(temp+"\n")
     output.close()
     print "Output written to",outputname
+
+    outputname=sys.argv[1]+"/ObservableScales.dat"
+    output=open(outputname,"w")
+    output.write("#These are the values which the observables were scaled with.\n")
+    output.write("#They were scaled as: y'=(y-<y>)/y_error.\n")
+    output.write("#The values below are: Name, <y>, y_error\n")
+    for i in range(len(obsvnames)):
+        output.write(str(obsvnames[i])+" "+str(means[i])+" "+str(stdv[i])+"\n")
+    output.close()
+    print "Observable's means and errors printed to:",outputname
+
+    os.system("mv "+sys.argv[1]+"/exp_data/results.dat "+sys.argv[1]+"/exp_data/results_unscaled.dat")
+    print "Moved experimental data to",sys.argv[1]+"/exp_data/results_unscaled.dat"
+
+    outputname=sys.argv[1]+"/exp_data/results.dat"
+    exp_data=open(sys.argv[1]+"/exp_data/results_unscaled.dat","r")
+    output=open(outputname,"w")
+    j=0
+    for line in exp_data:
+        for i in obsvnames:
+            if line.split(" ")[1] == i:
+                #print line.split(" ")[1],i,j,float(line.split(" ")[2]),means[j],stdv[j]
+                output.write("double "+i+" "+str((float(line.split(" ")[2])-means[j])/stdv[j])+" -999\n")
+                j+=1
+    output.close()
+    print "Scaled experimental data printed to ",outputname
 
 if __name__ == '__main__':
     main()

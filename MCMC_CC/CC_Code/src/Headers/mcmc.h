@@ -54,7 +54,6 @@ public:
 	vector<bool> LogParam;
 	string EmulatorParams;
 	vector<string> ParamNames;
-	string Observables;
 	vector<string> ObservablesNames;
 	
 	CRandom *randnum;
@@ -62,7 +61,7 @@ public:
 	ProposalDistribution *Proposal;
 	PriorDistribution *Prior;
 	ParameterSetList *DummyList;
-	double Max_Ranges[],Min_Ranges[]; // 
+	double Max_Ranges[30],Min_Ranges[30]; // 
 };
 
 class MCMCRun{
@@ -79,6 +78,7 @@ public:
 	double Likelihood_Current;
 	
 	int  WRITEOUT;
+	int BURN_IN;
 	int  MAXITERATIONS;
 	bool RANDOM_THETA0;
 	bool VIZTRACE;
