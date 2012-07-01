@@ -550,9 +550,9 @@ double MCMCRun::Run(){
 			if(!QUIET){
 				printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
 			}
-			//LOGBF *= Likelihood_New/Likelihood_Current;
+			LOGBF *= Likelihood_New/Likelihood_Current;
 			//LOGBF += Likelihood_New-Likelihood_Current;
-			LOGBF *= Likelihood_Current/Likelihood_New;
+			//LOGBF *= Likelihood_Current/Likelihood_New;
 		}
 		else{
 			if(!QUIET){
@@ -567,9 +567,10 @@ double MCMCRun::Run(){
 		{
 			LOGBF +=log(Prior_New/Prior_Current);
 		}*/
-		if(mcmcconfig->LOGPROPOSAL){
-			//LOGBF *= (Proposal_New/Proposal_Current);
-			LOGBF *= (Proposal_Current/Proposal_New);
+		//if(mcmcconfig->LOGPROPOSAL){
+		if(mcmcconfig->LOGLIKE){
+			LOGBF *= (Proposal_New/Proposal_Current);
+			//LOGBF *= (Proposal_Current/Proposal_New);
 			//LOGBF += (Proposal_Current-Proposal_New);
 		}else
 		{
@@ -577,7 +578,14 @@ double MCMCRun::Run(){
 			//LOGBF += (exp(Proposal_New/Proposal_Current));
 		}
 		
-		alpha = min(1.0,LOGBF);
+		if(mcmcconfig->LOGLIKE){
+			alpha = min(1.0,exp(LOGBF));
+		}else{
+			alpha = min(1.0,LOGBF);
+		}
+
+
+		//alpha = min(1.0,LOGBF);
 		//alpha = min(1.0,exp(LOGBF));
 		//cout << LOGBF << endl;
 
@@ -586,6 +594,7 @@ double MCMCRun::Run(){
 			printf("LOGBF=%6.5f\t",alpha);
 		}
 		if(alpha > (mcmcconfig->randnum->ran())) { //Accept the proposed set.
+		//if(LOGBF > log(mcmcconfig->randnum->ran())) { //Accept the proposed set.
 		//if(alpha > 1){
 		//if(exp(LOGBF) > 1){ //Accept the proposed set.
 			if(!QUIET){
@@ -637,11 +646,11 @@ double MCMCRun::Run(){
 			//cout << ParamValues[k] << endl;
 		}
 
-		/*if((i > BURN_IN) && (mcmcconfig->CREATE_TRACE)){
+		if((i > BURN_IN) && (mcmcconfig->CREATE_TRACE)){
 			if((i+1) % Viz_Count == 0){
 				Visualizer->UpdateTraceFig();
 			}
-		}*/
+		}
 		if((i > BURN_IN) && ((i+1) % WRITEOUT == 0)){
 			cout << "Writing out." << endl;
 			if(mcmcconfig->CREATE_TRACE &&(i!=1)){

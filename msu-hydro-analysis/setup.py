@@ -28,7 +28,7 @@ def main():
                 obsvnames.append(line[:-2])
             else:
                 obsvnames.append(line[:-1])
-    print obsvnames
+    print "Observables:",obsvnames
     obsvlist.close()
 
     # Read in the names and ranges of the parameters
@@ -38,8 +38,8 @@ def main():
     for line in paramlist:
         paramnames.append(line[:-1].split(" ")[1])
         ranges.append([float(line[:-2].split(" ")[2]),float(line[:-2].split(" ")[3])])
-    print paramnames
-    print ranges
+    print "Paramteres:",paramnames
+    print "Parameter ranges:",ranges
     paramlist.close()
 
     paramvals=[]
@@ -68,6 +68,7 @@ def main():
         if run[:3]=="run":
             temp=[]
             obsvfile=open(sys.argv[1]+"/model_results/"+run[:-1]+"/results.dat")
+            #print "Reading in",sys.argv[1]+"/model_results/"+run[:-1]+"/results.dat"
             for line in obsvfile:
                 for i in obsvnames:
                       if line.split(" ")[1] == i:
@@ -81,6 +82,7 @@ def main():
     # Determine the mean and standard deviation of the observables
     means=[0]*len(obsvvals[0])
     stdv=[0]*len(obsvvals[0])
+    print means,stdv
     for i in obsvvals:
         for j in range(len(i)):
             means[j]+=float(i[j]);
@@ -92,6 +94,7 @@ def main():
     for i in range(len(stdv)):
         stdv[i]=m.sqrt(stdv[i]/len(obsvvals))
 
+    print means,stdv
     # Write out the .dat file
     #if sys.argv[1][-1] == "/":
     #    outputname = sys.argv[1][:-1].split("/")[-1]+".dat"
@@ -99,16 +102,16 @@ def main():
     #    outputname = sys.argv[1].split("/")[-1]+".dat"
     outputname = sys.argv[1]+"/DataSummary.dat"
     output=open(outputname,"w")
-    output.write("#Number of outputs\n")
+    #output.write("#Number of outputs\n")
     output.write(str(len(obsvvals[0]))+"\n")
-    output.write("#Number of inputs\n")
+    #output.write("#Number of inputs\n")
     output.write(str(len(paramvals[0]))+"\n")
-    output.write("#Number of training points\n")
+    #output.write("#Number of training points\n")
     output.write(str(len(obsvvals))+"\n")
-    output.write("#")
-    for i in paramnames:
-        output.write(i+" ")
-    output.write("\n")
+    #output.write("#")
+    #for i in paramnames:
+        #output.write(i+" ")
+    #output.write("\n")
     for i in paramvals:
         temp=""
         c=0
@@ -117,10 +120,10 @@ def main():
             c+=1
             temp+=str(k)+" "
         output.write(temp+"\n")
-    output.write("#")
-    for i in obsvnames:
-        output.write(i+" ")
-    output.write("\n")
+    #output.write("#")
+    #for i in obsvnames:
+        #output.write(i+" ")
+    #output.write("\n")
     for i in obsvvals:
         temp=""
         c=0
@@ -137,6 +140,8 @@ def main():
     output.write("#These are the values which the observables were scaled with.\n")
     output.write("#They were scaled as: y'=(y-<y>)/y_error.\n")
     output.write("#The values below are: Name, <y>, y_error\n")
+    print len(obsvnames)
+    print obsvnames[0],means[0],stdv[0]
     for i in range(len(obsvnames)):
         output.write(str(obsvnames[i])+" "+str(means[i])+" "+str(stdv[i])+"\n")
     output.close()
