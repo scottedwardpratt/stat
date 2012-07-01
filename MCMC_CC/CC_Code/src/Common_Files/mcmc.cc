@@ -550,7 +550,7 @@ double MCMCRun::Run(){
 			if(!QUIET){
 				printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
 			}
-			LOGBF *= Likelihood_New/Likelihood_Current;
+			LOGBF *= Likelihood_New-Likelihood_Current;
 			//LOGBF += Likelihood_New-Likelihood_Current;
 			//LOGBF *= Likelihood_Current/Likelihood_New;
 		}
@@ -569,7 +569,7 @@ double MCMCRun::Run(){
 		}*/
 		//if(mcmcconfig->LOGPROPOSAL){
 		if(mcmcconfig->LOGLIKE){
-			LOGBF *= (Proposal_New/Proposal_Current);
+			LOGBF *= (Proposal_New-Proposal_Current);
 			//LOGBF *= (Proposal_Current/Proposal_New);
 			//LOGBF += (Proposal_Current-Proposal_New);
 		}else
