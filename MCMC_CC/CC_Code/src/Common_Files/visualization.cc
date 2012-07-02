@@ -31,6 +31,10 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 		fprintf(gnuplotpipe, "%s\n", "set key out vert right top");
 		fflush(gnuplotpipe);
 	
+
+		// JFN 7/2/12: Creating the density plots live while the MCMC runs slows things down a lot. So,
+		// I've adopted a system where they are just printed to file, and you can plot them with an external script.
+		
 		// Setting up the pipe for the density plots
 		/*gnuplotmultipipe = popen("gnuplot -persist", "w");
 		if(!gnuplotmultipipe){
@@ -78,7 +82,7 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 			command << "\nset origin " << (float(i)*(1./float(mcmc->ThetaList->ParamNames.size()))) << "," << (float(j-1)*(1./float(mcmc->ThetaList->ParamNames.size()))) << "\n";
 			command << "set xlabel \'" << mcmc->ThetaList->ParamNames[i] << "\'\nset ylabel \'" << mcmc->ThetaList->ParamNames[j] << "\'\nset view map\nsplot \'" << DensityPlotFileNames.back() << ".txt\' matrix with image\n";
 			DensityPlotCommands.push_back(command.str());
-                        //cout << command.str();
+            //cout << command.str();
 			command.str("");
 			if(mcmc->mcmcconfig->APPEND_TRACE){
 				fstream densityfile;
@@ -126,7 +130,7 @@ VizHandler::~VizHandler(){
 	}
 }
 
-//not sure if I'm going to use this, it should allow for something like:
+// KMN not sure if I'm going to use this, it should allow for something like:
 //VizHandler plotter(this);
 //plotter("plot cos(x)");
 void VizHandler::operator() (const string& command) {

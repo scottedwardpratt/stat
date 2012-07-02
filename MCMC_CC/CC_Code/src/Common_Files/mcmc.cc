@@ -507,8 +507,6 @@ double MCMCRun::Run(){
 	double Likelihood_Current, Likelihood_New;
 	double Prior_Current, Prior_New;
 	double Proposal_Current, Proposal_New;
-	
-	int rejectcount = 0;
 
 	double LOGBF,alpha;
 	ParameterSet * ThetaZeroPtr = ThetaList->Theta[0];
@@ -581,9 +579,6 @@ double MCMCRun::Run(){
 			alpha = min(1.0,LOGBF);
 		}
 
-
-		//alpha = min(1.0,LOGBF);
-		//alpha = min(1.0,exp(LOGBF));
 		//cout << LOGBF << endl;
 
 		if(!QUIET){
@@ -591,14 +586,10 @@ double MCMCRun::Run(){
 			printf("LOGBF=%6.5f\t",alpha);
 		}
 		if(alpha > (mcmcconfig->randnum->ran())) { //Accept the proposed set.
-		//if(LOGBF > log(mcmcconfig->randnum->ran())) { //Accept the proposed set.
-		//if(alpha > 1){
-		//if(exp(LOGBF) > 1){ //Accept the proposed set.
 			if(!QUIET){
 				printf("Accept\n");
 			}
 			Accept_Count++;
-			rejectcount = 0;
 			Likelihood_Current = Likelihood_New;
 			Prior_Current = Prior_New;
 			Proposal_Current = Proposal_New;
@@ -616,26 +607,16 @@ double MCMCRun::Run(){
 				}
 			}
 		}else{
-			rejectcount++;
 			if(!QUIET){
 				printf("Reject\n");
 			}
 		}
-		
-		/*if(rejectcount==15){
-			cout << "We are stuck, so we are trying a different point." << endl;
-			cout << "Generating new theta vector" << endl;
-			ParameterSetList Temp(this, time(NULL), mcmcconfig->PRESCALED_PARAMS);
-			ParameterSet * Temp2 = Temp.Theta[0];
-			CurrentParameters = *Temp2;
-			Likelihood_Current = mcmcconfig->Likelihood->Evaluate(CurrentParameters);
-			Proposal_Current = mcmcconfig->Proposal->Evaluate(CurrentParameters);
-			Prior_Current = mcmcconfig->Prior->Evaluate(CurrentParameters);
-			rejectcount=0;
-		}*/
 
-		ThetaList->Add(CurrentParameters);
-		for(int k = 0; k < ThetaList->ParamNames.size(); k++){
+		if(i > BURN_IN){ // We are just tossing everything in the burn in period.
+			ThetaList->Add(CurrentParameters);
+		}
+
+		for(int k = 0; k < ThetaList->ParamNames.size(); k++){ //These ParamValus are used for the density plots
 			//cout << ThetaList->ParamNames[k] << " " << CurrentParameters.Values[k] << endl;
 			//cout << "(" << CurrentParameters.Values[k] << " - " << mcmcconfig->Min_Ranges[k] << ") / (" << mcmcconfig->Max_Ranges[k] << " - " << mcmcconfig->Min_Ranges[k] << ")" << endl; cout.flush();
 			//cout << mcmcconfig->Max_Ranges[k] << " " << mcmcconfig->Min_Ranges[k] << endl;
@@ -643,11 +624,12 @@ double MCMCRun::Run(){
 			//cout << ParamValues[k] << endl;
 		}
 
-		if((i > BURN_IN) && (mcmcconfig->CREATE_TRACE)){
+		/*if((i > BURN_IN) && (mcmcconfig->CREATE_TRACE)){
 			if((i+1) % Viz_Count == 0){
 				Visualizer->UpdateTraceFig();
 			}
-		}
+		}*/
+
 		if((i > BURN_IN) && ((i+1) % WRITEOUT == 0)){
 			cout << "Writing out." << endl;
 			if(mcmcconfig->CREATE_TRACE &&(i!=1)){
