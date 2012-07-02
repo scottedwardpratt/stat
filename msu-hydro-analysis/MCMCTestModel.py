@@ -57,6 +57,7 @@ def main():
 
     SetUpFiles(directory)
 
+    hold=[]
     # For each run:
     for i in range(1,Number_of_runs+1):
         os.system("mkdir -p "+directory+"/parameters/run"+str(i))
@@ -66,8 +67,10 @@ def main():
         x = []
         for j in range(Num_Model_inputs):
             x.append(random.random())
+            hold.append(x)
         # Calculate the observables:
         y = ModelFunction(x)
+        hold[-1]+=y
 
         # Write out the params and observables:
         params=open(directory+"/parameters/run"+str(i)+"/stats.param","w")
@@ -76,7 +79,7 @@ def main():
         params.close()
         results=open(directory+"/model_results/run"+str(i)+"/results.dat","w")
         for j in range(Num_Model_outputs):
-            results.write("double Observable"+str(j)+" "+str(x[j])+" 0 \n")
+            results.write("double Observable"+str(j)+" "+str(y[j])+" 0 \n")
         results.close()
 
     # Tie up loose ends:
@@ -105,6 +108,14 @@ def main():
     # Create "default" folders:
     os.system("cp -r "+directory+"/parameters/run1 "+directory+"/parameters/default")
     os.system("cp -r "+directory+"/model_results/run1 "+directory+"/parameters/default")
+
+    # This makes an output for diagnostic purposes
+    output=open("TempOriginalPoints.csv","w")
+    output.write("x,y,z\n")
+    for i in hold:
+        for j in i:
+            output.write(str(j)+",")
+        output.write("\n")
 
 def SetUpFiles(directory):
 #This fucntion takes a directory as a sting and makes the necessary file structure there
