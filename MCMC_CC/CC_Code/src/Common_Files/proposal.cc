@@ -65,7 +65,7 @@ ParameterSet ProposalDistribution::Iterate(ParameterSet current){
 	
 	for(int i=0; i<proposed.Values.size(); i++){
 		proposed.Values[i] = (current.Values[i] - mcmc->Min_Ranges[i])/(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]); //scale to between 0 and 1
-		proposed.Values[i] = proposed.Values[i] + SCALE*gsl_ran_gaussian(randy, MixingStdDev[0]/sqrt((double)proposed.Names.size()));
+		proposed.Values[i] = proposed.Values[i] + SCALE*gsl_ran_gaussian(randy, MixingStdDev[i]/sqrt((double)proposed.Names.size()));
 		proposed.Values[i] = proposed.Values[i] - floor(proposed.Values[i]);
 		proposed.Values[i] = (proposed.Values[i]*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]))+mcmc->Min_Ranges[i];
 	}

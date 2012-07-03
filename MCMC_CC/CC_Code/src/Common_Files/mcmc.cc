@@ -589,7 +589,9 @@ double MCMCRun::Run(){
 			if(!QUIET){
 				printf("Accept\n");
 			}
-			Accept_Count++;
+			if(i > BURN_IN){
+				Accept_Count++;
+			}
 			Likelihood_Current = Likelihood_New;
 			Prior_Current = Prior_New;
 			Proposal_Current = Proposal_New;
@@ -644,9 +646,9 @@ double MCMCRun::Run(){
 	if(mcmcconfig->CREATE_TRACE){
 		Visualizer->FinalTrace();
 	}
-	double ratio = (double)Accept_Count/(double)MAXITERATIONS;
+	double ratio = (double)Accept_Count/((double)MAXITERATIONS-(double)BURN_IN);
 	cout << "Accepts: " << Accept_Count << endl;
-	cout << "Iterations: " << MAXITERATIONS << endl;
+	cout << "Iterations-Burn in: " << MAXITERATIONS-BURN_IN << endl;
 	cout << "Acceptance ratio: " << ratio << endl;
 	printf("-------- Best Parameter Set, likelihood=%g -------------\n",bestlikelihood);
 	BestParameterSetPtr->Print();
