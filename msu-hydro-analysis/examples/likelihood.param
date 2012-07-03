@@ -1,4 +1,4 @@
 bool USE_EMULATOR true
 bool TIMING false
 bool VERBOSE false
-bool FAKE_DATA true
+bool FAKE_DATA false

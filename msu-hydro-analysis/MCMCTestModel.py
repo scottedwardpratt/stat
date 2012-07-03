@@ -102,7 +102,7 @@ def main():
     # Write the pcanames.dat file:
     pcanames=open(directory+"/pcanames.dat","w")
     for j in range(Num_Model_outputs):
-        pcanames.write("Observable"+str(j)+"\n")
+        pcanames.write("Observable"+str(j)+" \r\n")
     pcanames.close()
 
     # Create "default" folders:
