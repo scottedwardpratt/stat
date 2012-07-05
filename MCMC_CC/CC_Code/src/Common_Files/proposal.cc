@@ -98,7 +98,7 @@ double ProposalDistribution::Evaluate(ParameterSet Theta1, ParameterSet Theta2, 
 	if(SymmetricProposal){
 		// If it's symmetric this doesn't matter
 		probability = 1.0;
-	}else{
+	} else {
 		// We need to actually calculate the proposal
 		/*cout << "ERROR: ProposalDistribution::Evaluate:" << endl;
 		cout << "Allowed for unsymmetric proposal without defining method to evaluate proposal." << endl;
@@ -108,8 +108,8 @@ double ProposalDistribution::Evaluate(ParameterSet Theta1, ParameterSet Theta2, 
 			prefactor = prefactor/(SCALE*scale*sqrt(2*M_PI));
 		}
 		/*cout << scale << endl;
-		cout << exponent << " " << prefactor << endl;
-		probability = prefactor*exp(exponent);*/
+		cout << exponent << " " << prefactor << endl;*/
+		probability = prefactor*exp(exponent);
 	}
 	
 	return probability;
