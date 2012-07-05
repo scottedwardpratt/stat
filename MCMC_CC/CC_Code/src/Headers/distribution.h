@@ -49,8 +49,8 @@ public:
 class ProposalDistribution:public Distribution {
 public:
 	ProposalDistribution(MCMCConfiguration *mcmc_in);
-	ParameterSet Iterate(ParameterSet current);
-	virtual double Evaluate(ParameterSet Theta);
+	ParameterSet Iterate(ParameterSet current, float scale);
+	virtual double Evaluate(ParameterSet Theta1, ParameterSet Theta2, float scale);
 	//protected:
 	bool SymmetricProposal;
 	bool Rescaled_Method;

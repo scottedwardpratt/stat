@@ -504,9 +504,11 @@ MCMCRun::~MCMCRun(){
 
 /** This runs MAXITERATIONS samplings */
 double MCMCRun::Run(){
+	srand(time(NULL));
 	double Likelihood_Current, Likelihood_New;
 	double Prior_Current, Prior_New;
 	double Proposal_Current, Proposal_New;
+	float Scale_Current, Scale_New;
 
 	double LOGBF,alpha;
 	ParameterSet * ThetaZeroPtr = ThetaList->Theta[0];
@@ -517,7 +519,8 @@ double MCMCRun::Run(){
 	}
 	
 	Likelihood_Current = mcmcconfig->Likelihood->Evaluate(*ThetaZeroPtr);
-	Proposal_Current = mcmcconfig->Proposal->Evaluate(*ThetaZeroPtr);
+	Scale_Current = rand() / (double(RAND_MAX));
+	//Proposal_Current = mcmcconfig->Proposal->Evaluate(*ThetaZeroPtr);
 	Prior_Current = mcmcconfig->Prior->Evaluate(*ThetaZeroPtr);
 
 	for(int i = 0; i < ThetaList->ParamNames.size(); i++){
@@ -531,14 +534,16 @@ double MCMCRun::Run(){
 		}else{
 			LOGBF = 1;
 		}
-		ParameterSet Temp_Theta = mcmcconfig->Proposal->Iterate(CurrentParameters);
+		Scale_New = rand() / (double(RAND_MAX));
+		ParameterSet Temp_Theta = mcmcconfig->Proposal->Iterate(CurrentParameters,Scale_New);
 		Likelihood_New = mcmcconfig->Likelihood->Evaluate(Temp_Theta);
 		if(i==1){
 			bestlikelihood=Likelihood_New;
 			BestParameterSetPtr=&CurrentParameters;
 		}
 		Prior_New = mcmcconfig->Prior->Evaluate(Temp_Theta);
-		Proposal_New = mcmcconfig->Proposal->Evaluate(Temp_Theta);
+		Proposal_New = mcmcconfig->Proposal->Evaluate(CurrentParameters,Temp_Theta,Scale_Current);
+		Proposal_Current = mcmcconfig->Proposal->Evaluate(Temp_Theta,CurrentParameters,Scale_New);
 		
 		// cout << "Likelihood of proposed set: " << Likelihood_New << endl;
 		// cout << "Likelihood of current set: " << Likelihood_Current << endl;
@@ -547,18 +552,21 @@ double MCMCRun::Run(){
 		// cout << "Proposal of proposed set: " << Proposal_New << endl;
 		// cout << " Proposal of current set: " << Proposal_Current << endl;
 		
+
+		// Likelihood
 		if(mcmcconfig->LOGLIKE){
 			if(!QUIET){
 				printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
 			}
 			LOGBF += Likelihood_New-Likelihood_Current;
-		}
-		else{
+		} else {
 			if(!QUIET){
 				printf(" l_new=%g, l_current=%g\n",exp(Likelihood_New),exp(Likelihood_Current));
 			}
 			LOGBF *= exp(Likelihood_New)/exp(Likelihood_Current);
 		}
+
+		// Prior
 		/*if(mcmcconfig->LOGPRIOR){
 			LOGBF += (Prior_New-Prior_Current);
 		}else
@@ -566,16 +574,21 @@ double MCMCRun::Run(){
 			LOGBF *=log(Prior_New/Prior_Current);
 		}*/
 		//if(mcmcconfig->LOGPROPOSAL){
+
+		// Proposal		
 		if(mcmcconfig->LOGLIKE){
-			LOGBF += (Proposal_New-Proposal_Current);
-		}else
-		{
-			LOGBF *= (exp(Proposal_New)/exp(Proposal_Current));
+			LOGBF += (log(Proposal_Current)-log(Proposal_New));
+		} else {
+			LOGBF *= Proposal_Current/Proposal_New;
+		}
+
+		if(!QUIET){
+			printf(" Proposal_New=%g, Proposal_Current=%g\n",Proposal_New,Proposal_Current);
 		}
 		
 		if(mcmcconfig->LOGLIKE){
 			alpha = min(1.0,exp(LOGBF));
-		}else{
+		} else {
 			alpha = min(1.0,LOGBF);
 		}
 
@@ -583,7 +596,7 @@ double MCMCRun::Run(){
 
 		if(!QUIET){
 			printf("%5d\talpha=%6.5f\t",i,alpha);
-			printf("LOGBF=%6.5f\t",alpha);
+			//printf("LOGBF=%6.5f\t",alpha);
 		}
 		if(alpha > (mcmcconfig->randnum->ran())) { //Accept the proposed set.
 			if(!QUIET){
@@ -594,8 +607,9 @@ double MCMCRun::Run(){
 			}
 			Likelihood_Current = Likelihood_New;
 			Prior_Current = Prior_New;
-			Proposal_Current = Proposal_New;
+			//Proposal_Current = Proposal_New;
 			CurrentParameters = Temp_Theta;
+			Scale_Current = Scale_New;
 			if(Likelihood_Current>bestlikelihood && i>1){
 				bestlikelihood=Likelihood_New;
 				BestParameterSetPtr=&CurrentParameters;
