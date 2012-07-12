@@ -2,6 +2,8 @@
 
 # HeatMap.py
 # This is a general plotting script which takes a text file and generates a heat map from it using gnuplot
+# WARNING: This code is not nearly as robust as some of the other plotting scripts, so it probably wont take
+# much creativity to crash.
 
 # John Novak
 # July 1, 2012
