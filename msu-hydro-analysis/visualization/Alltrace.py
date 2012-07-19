@@ -1,5 +1,9 @@
 #!/usr/bin/python -tt
 
+# This script is to be run inside a trace folder (model-data/*/trace/)
+# It creates one file named fulltrace.txt which is an aggregate of all
+# the traces in the various default folders.
+
 import sys
 import os
 import string

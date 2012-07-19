@@ -24,10 +24,10 @@ def main():
     obsvnames=[]
     for line in obsvlist:
         if line[0] != "#":
-            if line[-2] == '\r':
-                obsvnames.append(line[:-2])
-            else:
-                obsvnames.append(line[:-1])
+            line=line[:-1]
+            if line[-1] == '\r':
+                line=line[:-1]
+            obsvnames.append(line)
     print "Observables:",obsvnames
     obsvlist.close()
 
@@ -36,8 +36,12 @@ def main():
     paramnames=[]
     ranges=[]
     for line in paramlist:
-        paramnames.append(line[:-1].split(" ")[1])
-        ranges.append([float(line[:-2].split(" ")[2]),float(line[:-2].split(" ")[3])])
+        #print line.split(" ")
+        line=line[:-1]
+        if line[-1] == '\r':
+            line=line[:-1]
+        paramnames.append(line.split(" ")[1])
+        ranges.append([float(line.split(" ")[2]),float(line.split(" ")[3])])
     print "Paramteres:",paramnames
     print "Parameter ranges:",ranges
     paramlist.close()
@@ -53,12 +57,13 @@ def main():
             temp=[]
             paramfile=open(sys.argv[1]+"/parameters/"+run[:-1]+"/stats.param")
             for line in paramfile:
+                line=line[:-1]
                 for i in paramnames:
                       if line.split(" ")[1] == i:
-                          temp.append(line.split(" ")[2][:-1])
+                          temp.append(line.split(" ")[2])
             paramvals.append(temp)
             paramfile.close()
-    print paramvals[0]
+    print "A sample set of parameter values:",paramvals[0]
     dirlist.close()
 
     # Read in the observables values
@@ -70,19 +75,20 @@ def main():
             obsvfile=open(sys.argv[1]+"/model_results/"+run[:-1]+"/results.dat")
             #print "Reading in",sys.argv[1]+"/model_results/"+run[:-1]+"/results.dat"
             for line in obsvfile:
+                line=line[:-1]
                 for i in obsvnames:
                       if line.split(" ")[1] == i:
-                          temp.append(line.split(" ")[2][:-1])
+                          temp.append(line.split(" ")[2])
             obsvvals.append(temp)
             obsvfile.close()
-    print obsvvals[0]
+    print "A sample set of observable values:",obsvvals[0]
     dirlist.close()
     os.system("rm dirlist")
 
     # Determine the mean and standard deviation of the observables
     means=[0]*len(obsvvals[0])
     stdv=[0]*len(obsvvals[0])
-    print means,stdv
+    #print "Means and sigmas:",means,stdv
     for i in obsvvals:
         for j in range(len(i)):
             means[j]+=float(i[j]);
@@ -94,7 +100,7 @@ def main():
     for i in range(len(stdv)):
         stdv[i]=m.sqrt(stdv[i]/len(obsvvals))
 
-    print means,stdv
+    print "Means and sigmas:",means,stdv
     # Write out the .dat file
     #if sys.argv[1][-1] == "/":
     #    outputname = sys.argv[1][:-1].split("/")[-1]+".dat"
@@ -129,6 +135,7 @@ def main():
         c=0
         for j in i:
             k = (float(j)-means[c])/(stdv[c])
+            #spectra[c][int(float(j)] += 1
             c+=1
             temp+=str(k)+" "
         output.write(temp+"\n")
@@ -140,15 +147,16 @@ def main():
     output.write("#These are the values which the observables were scaled with.\n")
     output.write("#They were scaled as: y'=(y-<y>)/y_error.\n")
     output.write("#The values below are: Name, <y>, y_error\n")
-    print len(obsvnames)
-    print obsvnames[0],means[0],stdv[0]
+    #print len(obsvnames)
+    #print obsvnames[0],means[0],stdv[0]
     for i in range(len(obsvnames)):
         output.write(str(obsvnames[i])+" "+str(means[i])+" "+str(stdv[i])+"\n")
     output.close()
     print "Observable's means and errors printed to:",outputname
 
-    os.system("mv "+sys.argv[1]+"/exp_data/results.dat "+sys.argv[1]+"/exp_data/results_unscaled.dat")
-    print "Moved experimental data to",sys.argv[1]+"/exp_data/results_unscaled.dat"
+    if not os.path.exists(sys.argv[1]+"/exp_data/results_unscaled.dat"):
+        os.system("mv "+sys.argv[1]+"/exp_data/results.dat "+sys.argv[1]+"/exp_data/results_unscaled.dat")
+        print "Moved experimental data to",sys.argv[1]+"/exp_data/results_unscaled.dat"
 
     outputname=sys.argv[1]+"/exp_data/results.dat"
     exp_data=open(sys.argv[1]+"/exp_data/results_unscaled.dat","r")

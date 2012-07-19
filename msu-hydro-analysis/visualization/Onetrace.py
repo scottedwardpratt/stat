@@ -1,5 +1,8 @@
 #!/usr/bin/python -tt
 
+# This script is meant to be run in a sub-folder of trace (mode-data/*/trace/default*/)
+# This takes all the output*.dat files and compiles an aggreate trace file named fulltrace.csv
+
 import sys
 import os
 import string

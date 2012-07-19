@@ -5,6 +5,10 @@
 
 # This code is a more robust version of the old plotall gnuplot script
 
+# This script is meant to be run from within the DensityPlots folder (model-data/*/DensityPlots)
+# This looks at the ranges.dat file, anticipates what files should be in DensityPlots, then
+# creates gnuplot visualizations of them.
+
 import sys
 import os
 import subprocess
