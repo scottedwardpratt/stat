@@ -6,6 +6,21 @@ using namespace std;
 
 void CRHICStat::QuadFit(){
 	int i,j,i1,i2,j1,j2,iz,irun,n=(NX+1)*(NX+2)/2;
+	double *w=new double[NRUNS];
+	double besterror=1.0E99;
+	int ibestrun=0;
+	for(irun=0;irun<NRUNS;irun++){
+		if(runinfo[irun]->good)	CalcNetDiffExp(runinfo[irun]);
+		w[irun]=exp(-0.2*runinfo[irun]->netdiff_exp);
+		if(runinfo[irun]->netdiff_exp<besterror){
+			ibestrun=irun;
+			besterror=runinfo[irun]->netdiff_exp;
+		}
+	}
+	printf("best model run = run%d, besterror^2=%g\n",ibestrun+1,besterror);
+	PrintX(runinfo[ibestrun]);
+	PrintY(runinfo[ibestrun]);
+	//Misc::Pause();
 	CRunInfo *ri;
 	double **M=new double *[n];
 	double *error=new double[NRUNS];
@@ -51,6 +66,7 @@ void CRHICStat::QuadFit(){
 	*/
 	
 	for(iz=0;iz<NX;iz++){
+
 		for(i=0;i<n;i++){
 			yy[i]=xx[i]=0.0;
 		}
@@ -65,7 +81,7 @@ void CRHICStat::QuadFit(){
 				for(j1=0;j1<NX;j1++){
 					for(j2=0;j2<=j1;j2++){
 						for(irun=0;irun<NRUNS;irun++){
-							if(runinfo[irun]->good) M[i][j]+=runinfo[irun]->x[i1]*runinfo[irun]->x[i2]*runinfo[irun]->x[j1]*runinfo[irun]->x[j2];
+							if(runinfo[irun]->good) M[i][j]+=w[irun]*runinfo[irun]->x[i1]*runinfo[irun]->x[i2]*runinfo[irun]->x[j1]*runinfo[irun]->x[j2];
 						}
 						j+=1;
 					}
@@ -73,17 +89,17 @@ void CRHICStat::QuadFit(){
 				j=NX*(NX+1)/2;
 				for(j1=0;j1<NX;j1++){
 					for(irun=0;irun<NRUNS;irun++){
-						if(runinfo[irun]->good) M[i][j]+=runinfo[irun]->x[i1]*runinfo[irun]->x[i2]*runinfo[irun]->x[j1];
+						if(runinfo[irun]->good) M[i][j]+=w[irun]*runinfo[irun]->x[i1]*runinfo[irun]->x[i2]*runinfo[irun]->x[j1];
 					}
 					j+=1;
 				}
 				j=-1+(NX+1)*(NX+2)/2;
 				for(irun=0;irun<NRUNS;irun++){
-					if(runinfo[irun]->good) M[i][j]+=runinfo[irun]->x[i1]*runinfo[irun]->x[i2];
+					if(runinfo[irun]->good) M[i][j]+=w[irun]*runinfo[irun]->x[i1]*runinfo[irun]->x[i2];
 				}
 				yy[i]=0.0;
 				for(irun=0;irun<NRUNS;irun++){
-					if(runinfo[irun]->good) yy[i]+=runinfo[irun]->x[i1]*runinfo[irun]->x[i2]*runinfo[irun]->z[iz];
+					if(runinfo[irun]->good) yy[i]+=w[irun]*runinfo[irun]->x[i1]*runinfo[irun]->x[i2]*runinfo[irun]->z[iz];
 				}
 				i+=1;
 			}
@@ -95,7 +111,7 @@ void CRHICStat::QuadFit(){
 			for(j1=0;j1<NX;j1++){
 				for(j2=0;j2<=j1;j2++){
 					for(irun=0;irun<NRUNS;irun++){
-						if(runinfo[irun]->good) M[i][j]+=runinfo[irun]->x[i1]*runinfo[irun]->x[j1]*runinfo[irun]->x[j2];
+						if(runinfo[irun]->good) M[i][j]+=w[irun]*runinfo[irun]->x[i1]*runinfo[irun]->x[j1]*runinfo[irun]->x[j2];
 					}
 					j+=1;
 				}
@@ -103,17 +119,17 @@ void CRHICStat::QuadFit(){
 			j=NX*(NX+1)/2;
 			for(j1=0;j1<NX;j1++){
 				for(irun=0;irun<NRUNS;irun++){
-					if(runinfo[irun]->good) M[i][j]+=runinfo[irun]->x[i1]*runinfo[irun]->x[j1];
+					if(runinfo[irun]->good) M[i][j]+=w[irun]*runinfo[irun]->x[i1]*runinfo[irun]->x[j1];
 				}
 				j+=1;
 			}
 			j=-1+(NX+1)*(NX+2)/2;
 			for(irun=0;irun<NRUNS;irun++){
-				if(runinfo[irun]->good) M[i][j]+=runinfo[irun]->x[i1];
+				if(runinfo[irun]->good) M[i][j]+=w[irun]*runinfo[irun]->x[i1];
 			}
 			yy[i]=0.0;
 			for(irun=0;irun<NRUNS;irun++){
-				if(runinfo[irun]->good) yy[i]+=runinfo[irun]->x[i1]*runinfo[irun]->z[iz];
+				if(runinfo[irun]->good) yy[i]+=w[irun]*runinfo[irun]->x[i1]*runinfo[irun]->z[iz];
 			}
 			i+=1;
 		}
@@ -123,7 +139,7 @@ void CRHICStat::QuadFit(){
 		for(j1=0;j1<NX;j1++){
 			for(j2=0;j2<=j1;j2++){
 				for(irun=0;irun<NRUNS;irun++){
-					if(runinfo[irun]->good) M[i][j]+=runinfo[irun]->x[j1]*runinfo[irun]->x[j2];
+					if(runinfo[irun]->good) M[i][j]+=w[irun]*runinfo[irun]->x[j1]*runinfo[irun]->x[j2];
 				}
 				j+=1;
 			}
@@ -131,17 +147,17 @@ void CRHICStat::QuadFit(){
 		j=NX*(NX+1)/2;
 		for(j1=0;j1<NX;j1++){
 			for(irun=0;irun<NRUNS;irun++){
-				if(runinfo[irun]->good) M[i][j]+=runinfo[irun]->x[j1];
+				if(runinfo[irun]->good) M[i][j]+=w[irun]*runinfo[irun]->x[j1];
 			}
 			j+=1;
 		}
 		j=-1+(NX+1)*(NX+2)/2;
 		for(irun=0;irun<NRUNS;irun++){
-			if(runinfo[irun]->good) M[i][j]+=1.0;
+			if(runinfo[irun]->good) M[i][j]+=w[irun];
 		}
 		yy[i]=0.0;
 		for(irun=0;irun<NRUNS;irun++){
-			if(runinfo[irun]->good) yy[i]+=runinfo[irun]->z[iz];
+			if(runinfo[irun]->good) yy[i]+=w[irun]*runinfo[irun]->z[iz];
 		}
 		
 		gslmatrix->SolveLinearEqs(yy,M,xx);
@@ -190,21 +206,24 @@ void CRHICStat::QuadFit(){
 		if(ri->good){
 			error[irun]=0.0;
 			GetZquad(ri->x,ri->zquad);
-			for(iz=0;iz<NX;iz++) error[irun]+=pow(ri->zquad[iz]-ri->z[iz],2);
-				printf("error[%d]=%g\n",irun,error[irun]);
-			/**
-			 if(error[irun]>1.0){
+			CalcNetDiffQuad(ri);
+			CalcNetDiffQuadExp(ri);
+
+			printf("irun=%d: netdiff_quad=%g, netdiff_exp=%g, netdiff_quadexp=%g\n",irun,ri->netdiff_quad,ri->netdiff_exp,ri->netdiff_quadexp);
+			
+			 if(error[irun]>10.0){
 				printf("----- irun=%3d: error^2=%g -----\n",irun,error[irun]);
 				PrintX(ri);
-					//PrintY(ri);
+				PrintY(ri);
 				printf("zquad = %8.4f=?%8.4f %8.4f=?%8.4f %8.4f=?%8.4f, %8.4f=?%8.4f, %8.4f=?%8.4f, %8.4f=?%8.4f\n",ri->zquad[0],ri->z[0],ri->zquad[1],ri->z[1],ri->zquad[2],ri->z[2],ri->zquad[3],ri->z[3],ri->zquad[4],ri->z[4],ri->zquad[5],ri->z[5]);
 			}
-			 */
+			 
 		}
 	}
 	
 	delete gslmatrix;
 	delete [] error;
+	delete [] w;
 }
 
 void CRHICStat::GetZquad(double *x,double *z){

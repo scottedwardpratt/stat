@@ -294,6 +294,25 @@ void CRHICStat::PrintZ(CRunInfo *runinfo){
 	}
 }
 
+void CRHICStat::CalcNetDiffExp(CRunInfo *runinfo){
+	runinfo->netdiff_exp=0;
+	for(int iz=0;iz<NX;iz++){
+		runinfo->netdiff_exp+=pow(runinfo->z[iz]-expinfo->z[iz],2);
+	}
+}
+void CRHICStat::CalcNetDiffQuad(CRunInfo *runinfo){
+	runinfo->netdiff_quad=0;
+	for(int iz=0;iz<NX;iz++){
+		runinfo->netdiff_quad+=pow(runinfo->z[iz]-runinfo->zquad[iz],2);
+	}
+}
+void CRHICStat::CalcNetDiffQuadExp(CRunInfo *runinfo){
+	runinfo->netdiff_quadexp=0;
+	for(int iz=0;iz<NX;iz++){
+		runinfo->netdiff_quadexp+=pow(expinfo->z[iz]-runinfo->zquad[iz],2);
+	}
+}
+
 void CRHICStat::PrintYlinear(CRunInfo *runinfo){
 	int iy;
 	printf("                         observable     :    ylinear   yexp\n");

@@ -190,7 +190,6 @@ void CRHICStat::ReadAllY(){
 	char runchars[5];
 	string filename;
 		// Read Training Data
-	printf("check aa, NRUNS=%d\n",NRUNS);
 	NGOODRUNS=0;
 	for(irun=1;irun<=NRUNS;irun++){
 		sprintf(runchars,"%d",irun);
@@ -237,7 +236,7 @@ void CRHICStat::ReadY(string filename,CRunInfo *runinfo){
 				fscanf(fptr,"%lf",&(runinfo->y[iy]));
 				fscanf(fptr,"%lf",&(runinfo->sigmay[iy]));
 				if(string(dummy)=="cent0to5_PHENIX_SPECTRA_PION_YIELD"){
-					if(runinfo->y[iy]>325.0 && runinfo->y[iy]<500.0){
+					if(runinfo->y[iy]>0.0 && runinfo->y[iy]<100000.0){
 						runinfo->good=true;
 					}
 					else{

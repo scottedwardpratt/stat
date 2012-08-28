@@ -11,6 +11,7 @@ public:
 	double *y,*z;
 	double *sigmay;
 	double *ylinear,*zlinear,*xlinear,*zquad,*yquad,*xquad;
+	double netdiff_exp,netdiff_quad,netdiff_quadexp;
 	bool good;
 };
 
@@ -69,6 +70,10 @@ public:
 	double GetLL(double *x);
 	void Metropolis(unsigned int nburn,unsigned int nsample);
 	void PrintCoefficients();
+	void CalcError(CRunInfo*);
+	void CalcNetDiffExp(CRunInfo *runinfo);
+	void CalcNetDiffQuad(CRunInfo *runinfo);
+	void CalcNetDiffQuadExp(CRunInfo *runinfo);
 };
 
 
