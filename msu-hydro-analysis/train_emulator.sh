@@ -14,3 +14,5 @@ fi
 
 binpath=interactive_emulator
 $binpath estimate_thetas $1/DataSummary.dat $1/Emulator.statefile --regression_order=1
+#$binpath estimate_thetas $1/DataSummary.dat $1/Emulator.statefile --regression_order=1 --min_length_scale=0.2
+#interactive_emulator estimate_thetas model-data/September2012/DataSummary.dat model-data/September2012/Emulator.statefile --regression_order=1 --min_length_scale=0.2

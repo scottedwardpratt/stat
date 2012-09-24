@@ -145,7 +145,7 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 		}
 	}
 
-/*	cout << "_____________________" << endl;
+    /*cout << "_____________________" << endl;
 	cout << "parameterfile: " << parameterfile << endl;
 	cout << "MODEL: " << MODEL << endl;
 	cout << "dir_name: " << dir_name << endl;
@@ -329,7 +329,7 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 		}
 	}
 
-/*	cout << "_____________________" << endl;
+    /*cout << "_____________________" << endl;
 	cout << "parameterfile: " << parameterfile << endl;
 	cout << "MODEL: " << MODEL << endl;
 	cout << "dir_name: " << dir_name << endl;
@@ -567,13 +567,15 @@ double MCMCRun::Run(){
 		}
 
 		// Prior
-		/*if(mcmcconfig->LOGPRIOR){
-			LOGBF += (Prior_New-Prior_Current);
-		}else
-		{
-			LOGBF *=log(Prior_New/Prior_Current);
-		}*/
-		//if(mcmcconfig->LOGPROPOSAL){
+		if(mcmcconfig->LOGPRIOR){
+			LOGBF += (log(Prior_New)-log(Prior_Current));
+		} else {
+			LOGBF *= (Prior_New/Prior_Current);
+		}
+
+		if(!QUIET){
+			printf(" Prior_New=%g, Prior_Current=%g\n",Prior_New,Prior_Current);
+		}
 
 		// Proposal		
 		if(mcmcconfig->LOGLIKE){
