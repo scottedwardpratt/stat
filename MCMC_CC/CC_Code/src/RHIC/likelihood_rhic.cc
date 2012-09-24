@@ -4,7 +4,6 @@
 #include "mcmc.h"
 #include <time.h>
 #include "EmuPlusPlus.h"
-#include "rhic.h"
 
 using namespace std;
 

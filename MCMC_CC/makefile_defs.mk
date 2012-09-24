@@ -6,7 +6,7 @@ MADAI_HDF5_HOME = /opt/local
 #root of HDF5 installation
 MADAI_CPP = /usr/bin/g++
 #compiler
-MADAI_INSTALLDIR = /Users/johnnovakold/local
+MADAI_INSTALLDIR = /Users/johnnovak/local
 #location of where you want things installed
 MADAI_CFLAGS = -fast
 #compiler optimization flags, usually -O3 for linux, -fast for OSX
