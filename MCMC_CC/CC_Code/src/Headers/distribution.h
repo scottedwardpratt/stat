@@ -55,6 +55,7 @@ public:
 	bool SymmetricProposal;
 	bool Rescaled_Method;
 	double SCALE;
+	double OFFSET;
 	vector<double> MixingStdDev;
 	double *Min_Ranges;
 	double *Max_Ranges;

@@ -519,7 +519,7 @@ double MCMCRun::Run(){
 	}
 	
 	Likelihood_Current = mcmcconfig->Likelihood->Evaluate(*ThetaZeroPtr);
-	Scale_Current = rand() / double(RAND_MAX);
+	Scale_Current = (rand() / double(RAND_MAX));
 	//Proposal_Current = mcmcconfig->Proposal->Evaluate(*ThetaZeroPtr);
 	Prior_Current = mcmcconfig->Prior->Evaluate(*ThetaZeroPtr);
 
@@ -534,7 +534,7 @@ double MCMCRun::Run(){
 		}else{
 			LOGBF = 1;
 		}
-		Scale_New = rand() / double(RAND_MAX);
+		Scale_New = (rand() / double(RAND_MAX));
 		ParameterSet Temp_Theta = mcmcconfig->Proposal->Iterate(CurrentParameters,Scale_New);
 		Likelihood_New = mcmcconfig->Likelihood->Evaluate(Temp_Theta);
 		if(i==1){

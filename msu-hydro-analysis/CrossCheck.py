@@ -58,7 +58,12 @@ def main():
     output1 = open("CrossCheckSummarylong.txt", 'w')
     output2 = open("CrossCheckSummarytermwise.txt", 'w')
     index1 = 0
+    count = 1
+    print "There are",len(Xpoints),"points to process"
     for i in Xpoints:
+        print "point",count
+        count += 1
+        #print "To emulator:",i
         Emulator.stdin.write(i)
         time.sleep(1)
         meanstemp = []
@@ -68,6 +73,8 @@ def main():
             errorstemp.append(float(Emulator.stdout.readline()))
         means.append(meanstemp)
         errors.append(errorstemp)
+        #print means[-1]
+        #print errors[-1]
         diff = 0
         index2 = 0
         temp = []

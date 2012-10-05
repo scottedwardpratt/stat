@@ -10,7 +10,7 @@ PriorDistribution_RHIC::PriorDistribution_RHIC(MCMCConfiguration * mcmc_in){
 	SepMap = parameter::getB(mcmc->parmap, "PRIOR_PARAMETER_MAP", false);
 	
 	if(SepMap){
-		string parmapfile = mcmc->dir_name + "/parameters/prior.param";
+		string parmapfile = mcmc->dir_name + "/defaultpars/prior.param";
 		parmap = new parameterMap;
 		parameter::ReadParsFromFile(*parmap, parmapfile);
 		//parameter::ReadParsFromFile(*parmap, parameter_file_name);
