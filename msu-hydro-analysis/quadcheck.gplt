@@ -1,0 +1,59 @@
+clear
+set term pdf enh font "Helvetica,14" size 6,8;
+set output "quadcheck.pdf";
+#set term aqua enh font "Helvetica,14" size 800 500;
+
+set multiplot;                          # get into multiplot mode
+unset key;
+set pointsize 3;
+set border lw 6;
+set size 0.95,0.42
+set lmargin 7;
+set rmargin 0;
+
+set origin 0.0,0.57
+set tmargin 0;
+set bmargin 0;
+
+set yrange [0:120];
+set xrange [0:120];
+set xtics font "Helvetica,12";
+set ytics font "Helvetica,12";
+set xtics 0,40;
+set mxtics 4;
+set ytics 0,50;
+set mytics 5
+
+unset xlabel;
+set ylabel "Emulated LL" font "Helvetica,18" offset 2.5,0;
+
+plot "quadcheck_729.dat" using ($3):($4) with points lw 6 pointtype 4 lc 1,\
+"quadcheck_32.dat" using ($3):($4) with points lw 6 pointtype 6 lc 3;
+#,\
+#	"quadcheck_729.dat" using (0.5*$3):(0.5*$2) with points lw 6 pointtype 4 lc 3,\
+#	"quadcheck_32.dat" using (0.5*$3):(0.5*$2) with points lw 6 pointtype 6 lc 4;
+plot x with lines lw 6 lc 0;
+
+#################
+set origin 0.0,0.08
+set yrange [-6:6];
+set xrange [0:30];
+set mxtics 5;
+set mytics 3;
+set xtics 0,10;
+set ytics -9,3;
+set xlabel "Real LL" font "Helvetica,18" offset 0,0.5;
+set ylabel "Emulated LL - Real LL" offset 1,0;
+
+#plot "quadcheck_729.dat" using (0.5*$3):(0.5*$4) with points lw 6 pointtype 6 lc 1,\
+#"quadcheck_32.dat" using (0.5*$3):(0.5*$4) with points lw 6 pointtype 6 lc 2,\
+
+#plot "quadcheck_729.dat" using (0.5*$3):(0.5*$2) with points lw 6 pointtype 4 lc 3,\
+#	"quadcheck_32.dat" using (0.5*$3):(0.5*$2) with points lw 6 pointtype 6 lc 4;
+plot "quadcheck_729.dat" using ($3):(($4-$3)) with points lw 6 pointtype 4 lc 1,\
+	"quadcheck_32.dat" using ($3):(($4-$3)) with points lw 6 pointtype 6 lc 3;
+plot 0.0*x with lines lw 6 lc 0;
+
+
+unset multiplot;
+

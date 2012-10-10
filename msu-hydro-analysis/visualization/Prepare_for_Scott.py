@@ -1,33 +1,24 @@
 #!/usr/bin/python
 
-# CrossCheck.py
+# Prepare_for_Scott.py
 # John Novak
-# July 11, 2012
+# October 8, 2012 4:55 pm
 
-# This python script takes two model-data folders as arguments.
-# The first model-data folder must contain a trained interactive emulator,
-# the second need only contain a DataSummary file (which can be made using)
-# setup.py.
+# This code knocks together some '.dat' files for Scott's gunuplot script
 
-# This script compares the output of the trained emulator at the points in the
-# DataSummary file, then returns a measure of how well the emulator reproduced
-# the model values.
-
-import sys
-import subprocess
-import time
 import os
+import sys
 import math as m
-
 
 def main():
     if not (len(sys.argv) == 3):
-        print "This program requires two directories as input. The first must contain a trained interactive emulator statefile, and the second must contain a DataSummary.dat file (which can be made using setup.py"
-        print "Example: ./CrossCheck.py model-data/trained_emulator/ model-data/test-data/"
+        print "This program requires two directories as input. The first must contain an emulator statefile (named Emulator.statefile), and the second must contain everything else: a data summary file (named DataSummary.dat), a folder containing the experimental data (named exp_data), and a pcanames file (and it should be the same as the one used for the emulator. These two directories can be the same"
+        print "Example: ./Prepare_for_Scott.py model-data/trained_emulator/ model-data/emuatlor_data_file/"
         exit(0)
 
     Statefile = sys.argv[1] + "/Emulator.statefile"
     TestPoints = open(sys.argv[2] + "/DataSummary.dat", 'r')
+    Expdata = open(sys.argv[2] + "/exp_data/results.dat", 'r')
 
     # Read in the names of the observables used in the data set
     obsvlist=open(sys.argv[2]+"/pcanames.dat","r")
@@ -88,6 +79,16 @@ def main():
             if line.split(" ")[0] == i:
                 obsvscales_2.append([float(line.split(" ")[1]),float(line[:-1].split(" ")[2])])
 
+    # Read in the experimental data and unscale it
+    exp_data = []
+    exp_file = open(sys.argv[2]+"/exp_data/results.dat",'r')
+    j=0
+    for line in exp_file:
+        for i in obsvnames:
+            if line.split(" ")[1] == i:
+                exp_data.append((float(line.split(" ")[2])*obsvscales_2[j][1])+obsvscales_2[j][0])
+                j += 1
+
     # Reading in data from DataSummary.dat
     num_obsv = int(TestPoints.readline())
     num_params = int(TestPoints.readline())
@@ -108,23 +109,13 @@ def main():
             print "Parsing error. The number of parameters stated in " + sys.argv[2] + "/DataSummary.dat is not the same as the number read in. Problem with point", i, "Exiting"
             print "Expected", num_obsv, "observables. Got", len(Ypoints[-1]),Ypoints[-1], "Exiting"
             exit(1)
-    
+
     # Print just the X points to file for the emulator
     print "There are",len(Xpoints),"points to process"
     pointstofile = open("EmulatedPoints.txt",'w')
     for i in Xpoints:
         pointstofile.write(i)
     pointstofile.close()
-
-    # Run through Ypoints and toss the observables we aren't using. And unscale everything
-    for i in range(len(Ypoints)):
-        temp = []
-        count = 0
-        for j in range(len(Ypoints[i])):
-            if obsvnames[count] == obsvnames_1[j]:
-                temp.append((Ypoints[i][j]*obsvscales_1[count][1])+obsvscales_1[count][0])
-                count += 1
-        Ypoints[i] = temp
 
     # Run Emulator on points and dump output to file
     os.system("interactive_emulator interactive_mode -q "+Statefile+" < EmulatedPoints.txt > EmulatedObservables.txt")
@@ -134,10 +125,9 @@ def main():
     errors = []
     longdiff = []
     diffsum = 0
-    output1 = open("CrossCheckSummarylong.txt", 'w')
-    output2 = open("CrossCheckSummarytermwise.txt", 'w')
     index1 = 0
     observablesfromfile = open("EmulatedObservables.txt",'r')
+    print "num_obsv =",num_obsv,". number of observables used=",len(obsvnames)
     for i in Xpoints:
         meanstemp=[]
         errorstemp=[]
@@ -149,31 +139,33 @@ def main():
                 count += 1
         means.append(meanstemp)
         errors.append(errorstemp)
-        diff = 0
-        index2 = 0
-        temp = []
-        output2.write("Point #" + str(index1) + "\n")
-        for j in means[-1]:
-            diff += m.pow((j - Ypoints[index1][index2])/obsvscales_1[index2][1],2)/2
-            temp.append(m.fabs(j - Ypoints[index1][index2])/obsvscales_1[index2][1])
-            output2.write("Observable #" + str(index2) + " diff: " + str(m.fabs(j - Ypoints[index1][index2])/obsvscales_1[index2][1]) + " Model: " + str(Ypoints[index1][index2]) + " Emulator: " + str(j) + "\n")
-            index2 += 1
-        diffsum += m.sqrt(diff / num_obsv)
-        longdiff.append(temp)
-        output1.write("Point: " + str(i[:-1]) + "\nModel Values: " + str(Ypoints[index1]) + "\nEmultor Values: " + str(means[-1]) + " \nave diff: " + str(m.sqrt(diff / num_obsv)) + "\n")
-        index1 += 1
-    output1.close()
-    output2.close()
     observablesfromfile.close()
 
-    output = open("CrossCheckSummaryshort.txt", 'w')
-    output.write("Average difference: " + str(diffsum / len(Ypoints)) + "\n")
-    for i in range(len(longdiff[0])):
-        termdiff = 0
-        for j in range(len(longdiff)):
-            termdiff += longdiff[j][i]
-        termdiff = termdiff / len(longdiff)
-        output.write("Observable #" + str(i) + " deviated on average " + str(termdiff) + "\n")
+    # Run through Ypoints and toss the observables we aren't using. And unscale everything
+    for i in range(len(Ypoints)):
+        temp = []
+        count = 0
+        for j in range(len(Ypoints[i])):
+            if obsvnames[count] == obsvnames_1[j]:
+                temp.append((Ypoints[i][j]*obsvscales_1[count][1])+obsvscales_1[count][0])
+                count += 1
+        Ypoints[i] = temp
+
+    # Burn through the points and make the output
+    output = open("quadcheck_num.dat",'w')
+    output.write("#irun netdiff_quad netdiff_exp netdiff_quadexp\n") #runnum model-emu model-exp emu-exp
+    #print exp_data
+    for i in range(num_points):
+        model_emu = 0
+        model_exp = 0
+        emu_exp   = 0
+        #print Ypoints[i],means[i]
+        for j in range(len(obsvnames)):
+            model_emu += m.pow((means[i][j]-Ypoints[i][j])/(obsvscales_1[j][1]),2)/2
+            model_exp += m.pow((means[i][j]-exp_data[j])/(obsvscales_1[j][1]),2)/2
+            emu_exp   += m.pow((exp_data[j]-Ypoints[i][j])/(obsvscales_1[j][1]),2)/2
+        #output.write(str(i+1)+" "+str(model_emu)+" "+str(model_exp)+" "+str(emu_exp)+"\n")
+        output.write(str(i+1)+" "+str(model_emu)+" "+str(model_exp)+" "+str(emu_exp)+"\n")
     output.close()
 
 if __name__ == '__main__':

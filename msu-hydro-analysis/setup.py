@@ -27,6 +27,8 @@ def main():
             line=line[:-1]
             if line[-1] == '\r':
                 line=line[:-1]
+            if line[-1] == ' ':
+                line=line[:-1]
             obsvnames.append(line)
     print "Observables:",obsvnames
     obsvlist.close()
@@ -39,6 +41,8 @@ def main():
         #print line.split(" ")
         line=line[:-1]
         if line[-1] == '\r':
+            line=line[:-1]
+        if line[-1] == ' ':
             line=line[:-1]
         paramnames.append(line.split(" ")[1])
         ranges.append([float(line.split(" ")[2]),float(line.split(" ")[3])])
@@ -58,6 +62,7 @@ def main():
             paramfile=open(sys.argv[1]+"/parameters/"+run[:-1]+"/stats.param")
             for line in paramfile:
                 line=line[:-1]
+                #print line
                 for i in paramnames:
                       if line.split(" ")[1] == i:
                           temp.append(line.split(" ")[2])
@@ -76,11 +81,18 @@ def main():
             #print "Reading in",sys.argv[1]+"/model_results/"+run[:-1]+"/results.dat"
             for line in obsvfile:
                 line=line[:-1]
+                #print line
                 for i in obsvnames:
                       if line.split(" ")[1] == i:
+                          #print i,line.split(" ")[2],line
                           temp.append(line.split(" ")[2])
             obsvvals.append(temp)
             obsvfile.close()
+    if len(paramvals) != len(obsvvals):
+        print "You have a differnt number of parameter sets than observable sets! ABORT! ABORT! OH, THE HUMANITY!!!"
+        print "Number of parameter sets:",len(paramvals)
+        print "Number of observable sets:",len(obsvvals)
+        exit(1)
     print "A sample set of observable values:",obsvvals[0]
     dirlist.close()
     os.system("rm dirlist")
