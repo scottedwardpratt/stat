@@ -63,10 +63,6 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 	}
 
 	cout << "Ranges loaded" << endl;
-	cout << "They are:" << endl;
-	for( int i =0; i< Min_Ranges.size(); i++){
-		cout << Min_Ranges[i] << " " << Max_Ranges[i] << endl;
-	}
 
 	if(EmulatorParams!=""){
 		string line;
@@ -88,7 +84,13 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 	}
 	printf("\n");
 
+	cout << "Parameter Ranges:" << endl;
+	for( int i =0; i< ParamNames.size(); i++){
+		cout << Min_Ranges[i] << " " << Max_Ranges[i] << endl;
+	}
+
 	if(PRESCALED_PARAMS){
+                cout << "WARNING: PRESCALED_PARAMS = True. This means all parameter ranges are forced to be [0,1]" << endl;
 		for(int i=0; i < ParamNames.size(); i++){
 			//They go from zero to 1
 			Min_Ranges[i]=0;
