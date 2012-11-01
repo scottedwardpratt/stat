@@ -63,6 +63,10 @@ MCMCConfiguration::MCMCConfiguration(string info_dir){
 	}
 
 	cout << "Ranges loaded" << endl;
+	cout << "They are:" << endl;
+	for( int i =0; i< Min_Ranges.size(); i++){
+		cout << Min_Ranges[i] << " " << Max_Ranges[i] << endl;
+	}
 
 	if(EmulatorParams!=""){
 		string line;
