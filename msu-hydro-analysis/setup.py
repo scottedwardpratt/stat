@@ -85,7 +85,7 @@ def main():
                 for i in obsvnames:
                       if line.split(" ")[1] == i:
                           #print i,line.split(" ")[2],line
-                          temp.append(line.split(" ")[2])
+                          temp.append(line.split(" ")[2:3])
             obsvvals.append(temp)
             obsvfile.close()
     if len(paramvals) != len(obsvvals):
@@ -103,14 +103,16 @@ def main():
     #print "Means and sigmas:",means,stdv
     for i in obsvvals:
         for j in range(len(i)):
-            means[j]+=float(i[j]);
+            means[j]+=float(i[j][0]);
     for i in range(len(means)):
         means[i]=means[i]/len(obsvvals)
     for i in obsvvals:
         for j in range(len(i)):
-            stdv[j]+=(float(i[j])-means[j])*(float(i[j])-means[j]);
+            stdv[j]+=float(i[j][1]);
+            #stdv[j]+=(float(i[j])-means[j])*(float(i[j])-means[j]);
     for i in range(len(stdv)):
-        stdv[i]=m.sqrt(stdv[i]/len(obsvvals))
+        stdv[i]=stdv[i]/len(obsvvals)
+        #stdv[i]=m.sqrt(stdv[i]/len(obsvvals))
 
     print "Means and sigmas:",means,stdv
     # Write out the .dat file

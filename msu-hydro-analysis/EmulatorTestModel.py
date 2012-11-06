@@ -77,7 +77,7 @@ def main():
     os.system("cp -r "+directory+"/model_results/run1 "+directory+"/model_results/default")
     os.system("cp -r "+directory+"/parameters/run1 "+directory+"/model_results/default")
 
-    x = [0.5,0.5]
+    x = [0.25,0.25]
     y = Function(x)
     exp = open(directory+"/exp_data/results.dat",'w')
     pca = open(directory+"/pcanames.dat",'w')
@@ -98,19 +98,26 @@ def SetUpFiles(directory):
     os.system("mkdir -p "+directory+"/exp_data")
     os.system("mkdir -p "+directory+"/defaultpars")
 
-def Functiona(x):
+def Function1(x):
     """ This is the underlying function of the data which the emulator will try and emulate.
     It takes a vector x and returns a vector y."""
     m = np.array([[2,3],[4,5]])
     y = np.dot(m,x)
     return y
 
-def Function(x):
+def Function2(x):
     """ This is the underlying function of the data which the emulator will try and emulate.
     It takes a vector x and returns a vector y."""
     y = []
     y.append(m.exp(-(((x[0]-.25)*(x[0]-.25))+((x[1]-.25)*(x[1]-.25)))/(2*.25)))
     y.append(m.exp(-(((x[0]-.75)*(x[0]-.75))+((x[1]-.75)*(x[1]-.75)))/(2*.25)))
+    return y
+
+def Function(x):
+    """ This is the underlying function of the data which the emulator will try and emulate.
+    It takes a vector x and returns a vector y."""
+    y = []
+    y.append(3*m.exp(-(((x[0]-.25)*(x[0]-.25))+((x[1]-.25)*(x[1]-.25)))/(2*.4)))
     return y
 
 if __name__ == '__main__':
