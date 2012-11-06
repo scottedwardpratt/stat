@@ -85,7 +85,7 @@ def main():
                 for i in obsvnames:
                       if line.split(" ")[1] == i:
                           #print i,line.split(" ")[2],line
-                          temp.append(line.split(" ")[2:3])
+                          temp.append(line.split(" ")[2:])
             obsvvals.append(temp)
             obsvfile.close()
     if len(paramvals) != len(obsvvals):
@@ -100,6 +100,7 @@ def main():
     # Determine the mean and standard deviation of the observables
     means=[0]*len(obsvvals[0])
     stdv=[0]*len(obsvvals[0])
+
     #print "Means and sigmas:",means,stdv
     for i in obsvvals:
         for j in range(len(i)):
@@ -148,7 +149,7 @@ def main():
         temp=""
         c=0
         for j in i:
-            k = (float(j)-means[c])/(stdv[c])
+            k = (float(j[0])-means[c])/(stdv[c])
             #spectra[c][int(float(j)] += 1
             c+=1
             temp+=str(k)+" "
