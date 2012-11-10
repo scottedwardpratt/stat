@@ -81,12 +81,14 @@ def main():
         for i in obsvnames:
             if line.split(" ")[0] == i:
                 obsvscales_1.append([float(line.split(" ")[1]),float(line[:-1].split(" ")[2])])
+    obsvscalesfile_1.close()
     obsvscalesfile_2 = open(sys.argv[2]+"/ObservableScales.dat",'r')
     obsvscales_2 = []
     for line in obsvscalesfile_2:
         for i in obsvnames:
             if line.split(" ")[0] == i:
                 obsvscales_2.append([float(line.split(" ")[1]),float(line[:-1].split(" ")[2])])
+    obsvscalesfile_2.close()
 
     # Reading in data from DataSummary.dat
     num_obsv = int(TestPoints.readline())
@@ -145,7 +147,7 @@ def main():
         for j in range(num_obsv):
             if obsvnames[count] == obsvnames_1[j]:
                 meanstemp.append((float(observablesfromfile.readline())*obsvscales_1[count][1])+obsvscales_1[count][0])
-                errorstemp.append(float(observablesfromfile.readline()))
+                errorstemp.append((float(observablesfromfile.readline())*obsvscales_1[count][1])+obsvscales_1[count][0])
                 count += 1
         means.append(meanstemp)
         errors.append(errorstemp)

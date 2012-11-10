@@ -273,6 +273,20 @@ MCMCConfiguration::MCMCConfiguration(string info_dir, string configuration){
 	}
 	printf("\n");
 
+	cout << "Parameter Ranges:" << endl;
+	for( int i =0; i< ParamNames.size(); i++){
+		cout << Min_Ranges[i] << " " << Max_Ranges[i] << endl;
+	}
+
+	if(PRESCALED_PARAMS){
+                cout << "WARNING: PRESCALED_PARAMS = True. This means all parameter ranges are forced to be [0,1]" << endl;
+		for(int i=0; i < ParamNames.size(); i++){
+			//They go from zero to 1
+			Min_Ranges[i]=0;
+			Max_Ranges[i]=1;
+		}
+	}
+
 	if(PRESCALED_PARAMS){
 		for(int i=0; i < ParamNames.size(); i++){
 			//They go from zero to 1
@@ -573,7 +587,7 @@ double MCMCRun::Run(){
 		}
 
 		// Prior
-		if(mcmcconfig->LOGPRIOR){
+		/*if(mcmcconfig->LOGPRIOR){
 			LOGBF += (log(Prior_New)-log(Prior_Current));
 		} else {
 			LOGBF *= (Prior_New/Prior_Current);
@@ -581,7 +595,7 @@ double MCMCRun::Run(){
 
 		if(!QUIET){
 			printf(" Prior_New=%g, Prior_Current=%g\n",Prior_New,Prior_Current);
-		}
+		}*/
 
 		// Proposal		
 		if(mcmcconfig->LOGLIKE){

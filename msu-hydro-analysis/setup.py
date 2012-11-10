@@ -110,17 +110,10 @@ def main():
     for i in obsvvals:
         for j in range(len(i)):
             stdv[j]+=float(i[j][1]);
-            #stdv[j]+=(float(i[j])-means[j])*(float(i[j])-means[j]);
     for i in range(len(stdv)):
         stdv[i]=stdv[i]/len(obsvvals)
-        #stdv[i]=m.sqrt(stdv[i]/len(obsvvals))
 
     print "Means and sigmas:",means,stdv
-    # Write out the .dat file
-    #if sys.argv[1][-1] == "/":
-    #    outputname = sys.argv[1][:-1].split("/")[-1]+".dat"
-    #else:
-    #    outputname = sys.argv[1].split("/")[-1]+".dat"
     outputname = sys.argv[1]+"/DataSummary.dat"
     output=open(outputname,"w")
     #output.write("#Number of outputs\n")
