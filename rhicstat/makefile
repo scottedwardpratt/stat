@@ -8,7 +8,7 @@ INC=-I include -I${MADAI_GSLPATH}/include -I${MADAI_INSTALLDIR}/include -I${MADA
 
 LB=-L${MADAI_INSTALLDIR}/lib -L${MADAI_GSLPATH}/lib -lcoralutils -lgsl -lgslcblas
 
-all : lib/librhicstat.a parmaker_random parmaker_latin
+all : lib/librhicstat.a bin/parmaker_random bin/parmaker_latin
 
 statdirs :
 	mkdir -p lib;\
@@ -19,9 +19,9 @@ statdirs :
 	mkdir -p ${MADAI_INSTALLDIR}/include;\
 	mkdir -p ${MADAI_INSTALLDIR}/bin
 
-lib/librhicstat.a : build/pca.o build/qualifier.o build/rhicstat.o build/calcsens.o build/quadfit.o build/mcmc.o
+lib/librhicstat.a : build/pca.o build/qualifier.o build/rhicstat.o build/rhicstat_pca.o build/quadfit.o build/mcmc.o build/covariance.o build/interpolator.o build/locallinear.o build/zgetter.o build/runinfo.o
 	rm -f lib/librhicstat.a;\
-	ar -ru lib/librhicstat.a build/pca.o build/qualifier.o build/rhicstat.o build/calcsens.o build/quadfit.o build/mcmc.o
+	ar -ru lib/librhicstat.a build/pca.o build/qualifier.o build/rhicstat.o build/rhicstat_pca.o build/quadfit.o build/mcmc.o build/covariance.o build/interpolator.o build/locallinear.o build/zgetter.o build/runinfo.o
 
 build/pca.o : src/pca.cc include/rhicstat.h include/qualifier.h
 	${MADAI_CPP} -c src/pca.cc ${MADAI_CFLAGS} ${INC} -o build/pca.o
@@ -29,14 +29,29 @@ build/pca.o : src/pca.cc include/rhicstat.h include/qualifier.h
 build/rhicstat.o : src/rhicstat.cc include/rhicstat.h include/qualifier.h
 	${MADAI_CPP} -c src/rhicstat.cc ${MADAI_CFLAGS} ${INC} -o build/rhicstat.o
 
-build/calcsens.o : src/calcsens.cc include/rhicstat.h include/qualifier.h
-	${MADAI_CPP} -c src/calcsens.cc ${MADAI_CFLAGS} ${INC} -o build/calcsens.o
+build/rhicstat_pca.o : src/rhicstat_pca.cc include/rhicstat.h include/qualifier.h
+	${MADAI_CPP} -c src/rhicstat_pca.cc ${MADAI_CFLAGS} ${INC} -o build/rhicstat_pca.o
 
 build/quadfit.o : src/quadfit.cc include/rhicstat.h include/qualifier.h
 	${MADAI_CPP} -c src/quadfit.cc ${MADAI_CFLAGS} ${INC} -o build/quadfit.o
 
 build/mcmc.o : src/mcmc.cc include/rhicstat.h include/qualifier.h
 	${MADAI_CPP} -c src/mcmc.cc ${MADAI_CFLAGS} ${INC} -o build/mcmc.o
+
+build/covariance.o : src/covariance.cc include/rhicstat.h include/qualifier.h
+	${MADAI_CPP} -c src/covariance.cc ${MADAI_CFLAGS} ${INC} -o build/covariance.o
+
+build/interpolator.o : src/interpolator.cc include/rhicstat.h include/qualifier.h
+	${MADAI_CPP} -c src/interpolator.cc ${MADAI_CFLAGS} ${INC} -o build/interpolator.o
+
+build/locallinear.o : src/locallinear.cc include/rhicstat.h include/qualifier.h
+	${MADAI_CPP} -c src/locallinear.cc ${MADAI_CFLAGS} ${INC} -o build/locallinear.o
+
+build/zgetter.o : src/zgetter.cc include/rhicstat.h include/qualifier.h
+	${MADAI_CPP} -c src/zgetter.cc ${MADAI_CFLAGS} ${INC} -o build/zgetter.o
+
+build/runinfo.o : src/runinfo.cc include/rhicstat.h include/qualifier.h
+	${MADAI_CPP} -c src/runinfo.cc ${MADAI_CFLAGS} ${INC} -o build/runinfo.o
 
 include/rhicstat.h : src/rhicstat.h
 	cp src/rhicstat.h include/rhicstat.h
@@ -58,7 +73,7 @@ bin/parmaker_random : src/parmaker_random.cc
 
 #########################
 
-install : ${MADAI_INSTALLDIR}/lib/librhicstat.a ${MADAI_INSTALLDIR}/include/rhicstat.h ${MADAI_INSTALLDIR}/include/qualifier.h ${MADAI_INSTALLDIR}/bin/parmaker_latin ${MADAI_INSTALLDIR}/bin/parmaker_random ${MADAI_INSTALLDIR}/progdata/genSamples.R ${MADAI_INSTALLDIR}/bin/latin3.sh ${MADAI_INSTALLDIR}/bin/latin3.sh
+install : ${MADAI_INSTALLDIR}/lib/librhicstat.a ${MADAI_INSTALLDIR}/include/rhicstat.h ${MADAI_INSTALLDIR}/include/qualifier.h ${MADAI_INSTALLDIR}/bin/parmaker_latin 
 
 ${MADAI_INSTALLDIR}/lib/librhicstat.a : lib/librhicstat.a
 	rm -f ${MADAI_INSTALLDIR}/lib/librhicstat.a;
@@ -83,4 +98,4 @@ clean :
 	rm -f build/* lib/* bin/* include/*
 
 uninstall :
-	rm -f ${MADAI_INSTALLDIR}/lib/librhicstat.a ${MADAI_INSTALLDIR}/include/rhicstat.h ${MADAI_INSTALLDIR}/include/qualifier.h ${MADAI_INSTALLDIR}/bin/parmaker_latin ${MADAI_INSTALLDIR}/bin/parmaker_random  ${MADAI_INSTALLDIR}/progdata/genSamples.R ${MADAI_INSTALLDIR}/bin/latin3.sh ${MADAI_INSTALLDIR}/bin/latin3.sh
+	rm -f ${MADAI_INSTALLDIR}/lib/librhicstat.a ${MADAI_INSTALLDIR}/include/rhicstat.h ${MADAI_INSTALLDIR}/include/qualifier.h ${MADAI_INSTALLDIR}/bin/parmaker_latin ${MADAI_INSTALLDIR}/bin/parmaker_random

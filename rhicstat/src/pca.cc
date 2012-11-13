@@ -1,6 +1,5 @@
 #ifndef __PCA_CC__
 #define __PCA_CC__
-#include "coral.h"
 #include "pca.h"
 using namespace std;
 
@@ -17,51 +16,57 @@ CPCA::CPCA(int nruns_set){
 	int iy,jy,iqual,iname;
 	nnames=0;
 	//for(iqual=0;iqual<qualifiers.nqualifiers;iqual++){
-		fptr=fopen("pcanames.dat","r");
-		while(!feof(fptr)){
-			fscanf(fptr,"%s",dummy);
-			if(dummy[0]!='#'){
-				pcaname[nnames]=dummy;
-				//printf("pca name=%s\n",dummy);
-				nnames+=1;
-			}
+	fptr=fopen("pcanames.dat","r");
+	while(!feof(fptr)){
+		fscanf(fptr,"%s",dummy);
+		if(dummy[0]!='#'){
+			pcaname[nnames]=dummy;
+			printf("pca name=%s\n",dummy);
+			nnames+=1;
 		}
-		fclose(fptr);
+	}
+	fclose(fptr);
 		//}
 	printf("nnames=%d\n",nnames);
 	ny=0;
 	//for(iqual=0;iqual<qualifiers.nqualifiers;iqual++){
-		filename="model_results/run1/results.dat";
-		printf("reading %s\n",filename.c_str());
-		fptr=fopen(filename.c_str(),"r");
-		do{
-			fscanf(fptr,"%s",type);
-			if(!feof(fptr)){
-				if(type[0]!='#'){
-					fscanf(fptr,"%s",dummy);
-					if(namecheck(dummy)){
-						yname[ny]=string(dummy);
-						fscanf(fptr,"%lf",&dummyvalue);
-						fscanf(fptr,"%lf",&sigmay[ny]);
-						dumbstring=dummy;
-						segment=dumbstring.substr(dumbstring.length()-6,dumbstring.length()-1);
+	filename="model_results/run1/results.dat";
+	printf("reading %s\n",filename.c_str());
+	fptr=fopen(filename.c_str(),"r");
+	do{
+		fscanf(fptr,"%s",type);
+		if(!feof(fptr)){
+			if(type[0]!='#'){
+				fscanf(fptr,"%s",dummy);
+				//printf("varname=%s\n",dummy);
+				if(namecheck(dummy)){
+					yname[ny]=string(dummy);
+					fscanf(fptr,"%lf",&dummyvalue);
+					fscanf(fptr,"%lf",&sigmay[ny]);
+					dumbstring=dummy;
+					segment=dumbstring.substr(dumbstring.length()-6,dumbstring.length()-1);
 						//printf("segment=%s\n",segment.c_str());
-						if(segment=="_YIELD") sigmay[ny]=0.075*dummyvalue;
-						if(segment=="MEANPT")	sigmay[ny]=0.075*dummyvalue;
-						if(segment=="PCAVAL") sigmay[ny]=0.1*dummyvalue;
-						segment=dumbstring.substr(dumbstring.length()-8,dumbstring.length()-1);
-						if(segment=="PTWEIGHT") sigmay[ny]=0.01+0.05*dummyvalue;
-						segment=dumbstring.substr(dumbstring.length()-5,dumbstring.length()-1);
-						if(segment=="_PION") sigmay[ny]=0.2+0.05*dummyvalue;
+					if(segment=="_YIELD") sigmay[ny]=0.075*dummyvalue;
+					if(segment=="MEANPT")	sigmay[ny]=0.075*dummyvalue;
+					if(segment=="PCAVAL") sigmay[ny]=0.1*dummyvalue;
+					segment=dumbstring.substr(dumbstring.length()-8,dumbstring.length()-1);
+					if(segment=="PTWEIGHT") sigmay[ny]=0.01+0.05*dummyvalue;
+					segment=dumbstring.substr(dumbstring.length()-5,dumbstring.length()-1);
+					if(segment=="_PION") sigmay[ny]=0.2+0.05*dummyvalue;
 						//printf("yname[%d]=%s\n",ny,yname[ny].c_str());
-						ny+=1;
-					}
-					else fgets(dummy,100,fptr);
+					segment=dumbstring.substr(0,23);
+					if(segment=="cent20to30_STAR_PION_V2") sigmay[ny]=0.05;//*dummyvalue;//0.07*dummyvalue;
+					//printf("segment=%s\n",segment.c_str());
+					ny+=1;
 				}
 				else fgets(dummy,100,fptr);
 			}
-		}while(!feof(fptr));
-		fclose(fptr);
+			else fgets(dummy,100,fptr);
+		}
+	}while(!feof(fptr));
+	fclose(fptr);
+	printf("_______ ny=%d___________\n",ny);
+
 		//}
 	ybar=new double[ny];
 	value=new double[ny];
@@ -71,7 +76,7 @@ CPCA::CPCA(int nruns_set){
 		spread[iy]=new double[ny];
 		for(jy=0;jy<ny;jy++) spread[iy][jy]=0.0;
 	}
-	gslmatrix=new CGSLMatrix_Real(ny);
+gslmatrix=new CGSLMatrix_Real(ny);
 	//printf("CPCA initialized\n");
 }
 
@@ -84,40 +89,40 @@ void CPCA::ReadResults(){
 	for(irun=0;irun<nruns;irun++){
 		iy=0;
 		//for(iqual=0;iqual<qualifiers.nqualifiers;iqual++){
-			sprintf(dummy,"%d",irun+1);
-			filename="model_results/run"+string(dummy)+"/results.dat";
+		sprintf(dummy,"%d",irun+1);
+		filename="model_results/run"+string(dummy)+"/results.dat";
 			//printf("reading %s\n",filename.c_str());
-			fptr=fopen(filename.c_str(),"r");
-			valsum=0.0;
-			do{
-				fscanf(fptr,"%s",type);
-				if(!feof(fptr)){
-					if(type[0]!='#'){
-						fscanf(fptr,"%s",dummy);
-						varname=dummy;
-						if(namecheck(varname)){
-							fscanf(fptr,"%lf",&value[iy]);
-							fscanf(fptr,"%lf",&dummysigma);
-							dummysigma=0.075*value[iy];
-							if(irun==0) printf("%s[%d]= %g+/-%g\n",yname[iy].c_str(),irun,value[iy],sigmay[iy]);
+		fptr=fopen(filename.c_str(),"r");
+		valsum=0.0;
+		do{
+			fscanf(fptr,"%s",type);
+			if(!feof(fptr)){
+				if(type[0]!='#'){
+					fscanf(fptr,"%s",dummy);
+					varname=dummy;
+					if(namecheck(varname)){
+						fscanf(fptr,"%lf",&value[iy]);
+						fscanf(fptr,"%lf",&dummysigma);
+						dummysigma=0.075*value[iy];
+						if(irun==0) printf("%s[%d]= %g+/-%g\n",yname[iy].c_str(),irun,value[iy],sigmay[iy]);
 							//if(fabs(value[iy])>1.0) Misc::Pause();
-							ybar[iy]+=value[iy];
-							valsum+=value[iy];
-							for(jy=0;jy<=iy;jy++){
-								spread[iy][jy]+=value[iy]*value[jy];
-							}
-							iy+=1;
+						ybar[iy]+=value[iy];
+						valsum+=value[iy];
+						for(jy=0;jy<=iy;jy++){
+							spread[iy][jy]+=value[iy]*value[jy];
 						}
-						else fgets(dummy,100,fptr);
+						iy+=1;
 					}
 					else fgets(dummy,100,fptr);
 				}
-				if(iy>ny){
-					printf("iy=%d, but ny=%d\n",iy,ny);
-					exit(1);
-				}
-			}while(!feof(fptr));
-			fclose(fptr);
+				else fgets(dummy,100,fptr);
+			}
+			if(iy>ny){
+				printf("iy=%d, but ny=%d\n",iy,ny);
+				exit(1);
+			}
+		}while(!feof(fptr));
+		fclose(fptr);
 			//printf("valsum=%g\n",valsum);
 			//}
 	}
@@ -137,8 +142,8 @@ void CPCA::ReadResults(){
 	for(iy=0;iy<ny;iy++){
 		for(jy=0;jy<ny;jy++) spreadtest+=spread[iy][jy];
 	}
-	printf("spreadtest=%g, ny=%d\n",spreadtest,ny);
-	
+printf("spreadtest=%g, ny=%d\n",spreadtest,ny);
+
 	/* 
 	printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	 for(iy=0;iy<ny;iy++) printf("ybar[%d]=%g, name=%s\n",iy,ybar[iy],yname[iy].c_str());
@@ -149,26 +154,26 @@ void CPCA::ReadResults(){
 	 }
 	 printf("---------------------------------------------------------\n");
 	 */
-}
-
-void CPCA::Calc(){
-	int iy,jy;
-	printf("CPCA::Calc(), ny=%d\n",ny);
-	eigenval=new double[ny];
-	evec=new double*[ny];
-	for(iy=0;iy<ny;iy++) evec[iy]=new double[ny];
-	double trace=0.0;
-	for(iy=0;iy<ny;iy++) trace+=spread[iy][iy];
-	
-	CGSLMatrix_Real *gslmatrix=new CGSLMatrix_Real(ny);
-	gslmatrix->EigenFind(spread,evec,eigenval);
-	double etrace=0.0;
-	for(iy=0;iy<ny;iy++){
-		etrace+=eigenval[iy];
-		printf("eigenval[%d]=%g\n",iy,eigenval[iy]);
 	}
-	printf("trace=%g=%g\n",trace,etrace);
-	
+
+	void CPCA::Calc(){
+		int iy,jy;
+		printf("CPCA::Calc(), ny=%d\n",ny);
+		eigenval=new double[ny];
+		evec=new double*[ny];
+		for(iy=0;iy<ny;iy++) evec[iy]=new double[ny];
+			double trace=0.0;
+		for(iy=0;iy<ny;iy++) trace+=spread[iy][iy];
+
+			CGSLMatrix_Real *gslmatrix=new CGSLMatrix_Real(ny);
+		gslmatrix->EigenFind(spread,evec,eigenval);
+		double etrace=0.0;
+		for(iy=0;iy<ny;iy++){
+			etrace+=eigenval[iy];
+			printf("eigenval[%d]=%g\n",iy,eigenval[iy]);
+		}
+		printf("trace=%g=%g\n",trace,etrace);
+
 	/*
 	printf("0000000000000 checking 0000000000000000\n");
 	double *yy=new double[ny];
@@ -194,16 +199,21 @@ void CPCA::Calc(){
 	delete [] respower;*/
 	
 	double sumcheck0=0,sumcheck1=0,sumcheck2=0,normcheck=0;
-	double *enorm=new double[ny];
+	double *enorm=new double[ny],*ynorm=new double[ny];
 	for(jy=0;jy<ny;jy++){
 		enorm[jy]=0.0;
-		for(iy=0;iy<ny;iy++) enorm[jy]+=pow(evec[iy][jy]/sigmay[iy],2);
+		ynorm[jy]=0.0;
+		for(iy=0;iy<ny;iy++){
+			enorm[jy]+=pow(evec[iy][jy],2);
+			ynorm[jy]+=pow(evec[iy][jy]*sigmay[iy],2);
+		}
 		enorm[jy]=sqrt(enorm[jy]);
+		printf("enorm[%d]=%g\n",jy,enorm[jy]);
+		ynorm[jy]=sqrt(ynorm[jy]);
 	}
 	printf("    ------------------- component --------------------   evec[0]  evec[1]  evec[2]  evec[3]\n");
 	for(iy=0;iy<ny;iy++){
-		//printf("%3d %50s: %8.5f %8.5f %8.5f %9.5f\n", iy,yname[iy].c_str(),evec[iy][0]/(sigmay[iy]*enorm[0]),evec[iy][1]/(sigmay[iy]*enorm[1]),evec[iy][2]/(sigmay[iy]*enorm[2])evec[iy][3]/(sigmay[iy]*enorm[3]));
-		printf("%3d %50s: %8.5f %8.5f %8.5f %8.5f\n", iy,yname[iy].c_str(),evec[iy][0],evec[iy][1],evec[iy][2],evec[iy][3]);
+		printf("%3d %50s: %8.5f %8.5f %8.5f %8.5f\n", iy,yname[iy].c_str(),evec[iy][0]*sigmay[iy]/ynorm[iy],evec[iy][1]*sigmay[iy]/ynorm[iy],evec[iy][2]*sigmay[iy]/ynorm[iy],evec[iy][3]/ynorm[iy]*sigmay[iy]);
 		sumcheck0+=evec[iy][0]*evec[iy][0];
 		sumcheck1+=evec[iy][1]*evec[iy][1];
 		sumcheck2+=evec[iy][2]*evec[iy][2];
@@ -212,10 +222,16 @@ void CPCA::Calc(){
 	printf("sumchecks = %g, %g, %g, %g = ?0\n",sumcheck0,sumcheck1,sumcheck2,normcheck);
 	normcheck=0.0;
 	for(iy=0;iy<ny;iy++) normcheck+=evec[iy][0]*evec[iy][0];
-	printf("normalizations=%g = ?1\n",normcheck);
+		printf("normalizations=%g = ?1\n",normcheck);
 	normcheck=0.0;
-	for(iy=0;iy<ny;iy++) normcheck+=evec[iy][0]*evec[iy][0]/(enorm[0]*enorm[0]*sigmay[iy]*sigmay[iy]);
-	printf("normalizations=%g = ?1\n",normcheck);
+	for(iy=0;iy<ny;iy++) normcheck+=evec[iy][0]*evec[iy][0]/(enorm[0]*enorm[0]);
+		printf("normalizations=%g = ?1\n",normcheck);
+	normcheck=0.0;
+	for(iy=0;iy<ny;iy++) normcheck+=(evec[iy][0]*evec[iy][0]*sigmay[iy]*sigmay[iy])/(ynorm[0]*ynorm[0]);
+		printf("normalizations=%g = ?1\n",normcheck);
+
+	delete [] enorm;
+	delete [] ynorm;
 
 }
 

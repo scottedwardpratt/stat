@@ -1,42 +1,52 @@
 #ifndef __RHICSTAT_CC__
 #define __RHICSTAT_CC__
-#include "coral.h"
 #include "rhicstat.h"
 using namespace std;
 
-CRHICStat::CRHICStat(int nruns_set,int ntestruns_set){
-	NRUNS=nruns_set;
-	NTESTRUNS=ntestruns_set;
+CRHICStat *CRunInfo::rhicstat=NULL;
+
+CRHICStat::CRHICStat(){
+	parameter::ReadParsFromFile(parmap,"statinfo/statpars.dat");
+	NRUNS=parameter::getI(parmap,"NRUNS",729);
+	NTESTRUNS=parameter::getI(parmap,"NTESTRUNS",32);
+	FIT_TYPE=parameter::getS(parmap,"FIT_TYPE","INTERPOLATOR");
+	NBURN=parameter::getD(parmap,"NBURN",10000);
+	NMCMC=parameter::getD(parmap,"NMCMC",1000000);
+	SIGMA2_EMULATOR=parameter::getD(parmap,"SIGMA2_EMULATOR",0.1);
+	int irun;
 	InitArrays();
 	bestinfo=new CRunInfo(NX,NY);
 	runinfo=new CRunInfo *[NRUNS];
-	for(int irun=0;irun<NRUNS;irun++) runinfo[irun]=new CRunInfo(NX,NY);
+	for(irun=0;irun<NRUNS;irun++)
+		runinfo[irun]=new CRunInfo(NX,NY);
+	CRunInfo::rhicstat=this;
 	testinfo=new CRunInfo *[NTESTRUNS];
-	for(int irun=0;irun<NTESTRUNS;irun++) testinfo[irun]=new CRunInfo(NX,NY);
+	for(irun=0;irun<NTESTRUNS;irun++)
+		testinfo[irun]=new CRunInfo(NX,NY);
 	ReadAllX();
+	
 	ReadAllY();
 	ScaleXY();
-}
-
-CRunInfo::CRunInfo(int NX,int NY){
-	x=new double[NX];
-	w=new double[NX];
-	y=new double[NY];
-	z=new double[NY];
-	sigmay=new double[NY];
-	xlinear=new double[NX];
-	ylinear=new double[NY];
-	zlinear=new double[NY];
-	zquad=new double[NY]();
-	yquad=new double[NY]();
-	xquad=new double[NX]();
-	good=true;
+	PCA();
+	GetZFromY(expinfo);
+	if(FIT_TYPE=="INTERPOLATOR"){
+		zgetter=new CZGetter_Interpolated(this);
+		PerformFits();
+	}
+	if(FIT_TYPE=="QUAD"){
+		zgetter=new CZGetter_QuadFit(this);
+		PerformFits();
+	}
+	if(FIT_TYPE=="LOCALLINEAR"){
+		zgetter =new CZGetter_LocalLinear(this);
+		PerformFits();
+	}
 }
 
 void CRHICStat::InitArrays(){
 	InitX();
 	InitY();
-	int ix,iy;
+	int ix,iy,iz,irun1,irun2;
 	eigenvalxx=new double[NX];
 	uncertainty=new double[NX];
 	eigenvalyy=new double[NY];
@@ -65,7 +75,7 @@ void CRHICStat::InitArrays(){
 	gslmatrix_NX=new CGSLMatrix_Real(NX);
 	expinfo=new CRunInfo(NX,NY);
 	fitinfo=new CRunInfo(NX,NY);
-	Aquad=NULL; Bquad=NULL; Cquad=NULL;
+
 }
 
 void CRHICStat::InitX(){
@@ -88,6 +98,7 @@ void CRHICStat::InitX(){
 	xbar=new double[NX];
 	xmin=new double[NX];
 	xmax=new double[NX];
+	xmcmc=NULL;
 	fclose(fptr);
 	/** Now go back and read in names and ranges */
 	fptr=fopen(filename.c_str(),"r");
@@ -111,6 +122,7 @@ void CRHICStat::InitX(){
 		fgets(dummy,200,fptr);
 	}
 	fclose(fptr);
+	NZ=NX;
 }
 
 void CRHICStat::ReadAllX(){
@@ -195,36 +207,33 @@ void CRHICStat::ReadAllY(){
 		sprintf(runchars,"%d",irun);
 		filename="model_results/run"+string(runchars)+"/results.dat";
 		ReadY(filename,runinfo[irun-1]);
-		if(runinfo[irun-1]->good==false) printf("%d,",irun);
+		if(runinfo[irun-1]->good==false)
+			printf("%d,",irun);
 	}
 	printf("\n");
 	printf("NGOODRUNS=%d\n",NGOODRUNS);
 	ngood=NGOODRUNS;
 		//Read Testing Data
 	for(irun=0;irun<NTESTRUNS;irun++){
-		
 		sprintf(runchars,"%d",irun+1);
 		filename="test_results/run"+string(runchars)+"/results.dat";
 		ReadY(filename,testinfo[irun]);
 	}
-	NGOODRUNS=ngood; // don't count from test runs
 		// Read Experimental Data
 	ReadY("exp_data/results.dat",expinfo);
+	NGOODRUNS=ngood; // don't count from test runs
 	for(iy=0;iy<NY;iy++){
 		sigmaybar[iy]=0.0;
 		for(irun=0;irun<NRUNS;irun++){
 			if(runinfo[irun]->good) sigmaybar[iy]+=runinfo[irun]->sigmay[iy];
 		}
 		sigmaybar[iy]=sigmaybar[iy]/double(NGOODRUNS);
-		/** if(yname[iy]=="cent20to30_STAR_V2_PION_PTWEIGHT" || yname[iy]=="cent20to30_STAR_V2_KAON_PTWEIGHT" ||yname[iy]=="cent20to30_STAR_V2_PROTON_PTWEIGHT"){
-			expinfo->y[iy]*=0.9;
-		}*/
 	}	
-	
 }
-	
+
 void CRHICStat::ReadY(string filename,CRunInfo *runinfo){
 	char dummy[200];
+	runinfo->good=false;
 	int iy;
 	FILE *fptr=fopen(filename.c_str(),"r");
 	iy=0;
@@ -241,7 +250,7 @@ void CRHICStat::ReadY(string filename,CRunInfo *runinfo){
 					}
 					else{
 						runinfo->good=false;
-							//printf("run from filename %s is useless, pion yield for central coll.s = %g\n",filename.c_str(),runinfo->y[iy]);
+						printf("run from filename %s is useless, pion yield for central coll.s = %g\n",filename.c_str(),runinfo->y[iy]);
 					}
 				}
 				iy+=1;
@@ -255,6 +264,7 @@ void CRHICStat::ReadY(string filename,CRunInfo *runinfo){
 
 void CRHICStat::ScaleXY(){
 	int ix,iy,irun;
+	double ybartest;
 	for(ix=0;ix<NX;ix++){
 		xbar[ix]=0.0;
 		for(irun=0;irun<NRUNS;irun++){
@@ -271,12 +281,19 @@ void CRHICStat::ScaleXY(){
 	for(iy=0;iy<NY;iy++){
 		ybar[iy]=0.0;
 		for(irun=0;irun<NRUNS;irun++){
-			if(runinfo[irun]->good) ybar[iy]+=runinfo[irun]->y[iy];
+			if(runinfo[irun]->good){
+				ybar[iy]+=runinfo[irun]->y[iy];
+			}
 		}
 		ybar[iy]=ybar[iy]/double(NGOODRUNS);
+		ybartest=0.0;
 		for(irun=0;irun<NRUNS;irun++){
 			runinfo[irun]->y[iy]=(runinfo[irun]->y[iy]-ybar[iy])/sigmaybar[iy];
+			if(runinfo[irun]->good){
+				ybartest+=runinfo[irun]->y[iy];
+			}
 		}
+			//printf("ybartest=%12.5f=?0, ybar=%12.5f, sigmaybar=%g\n",ybartest,ybar[iy],sigmaybar[iy]);
 		for(irun=0;irun<NTESTRUNS;irun++){
 			testinfo[irun]->y[iy]=(testinfo[irun]->y[iy]-ybar[iy])/sigmaybar[iy];
 		}
@@ -284,6 +301,42 @@ void CRHICStat::ScaleXY(){
 	for(iy=0;iy<NY;iy++){
 		expinfo->y[iy]=(expinfo->y[iy]-ybar[iy])/sigmaybar[iy];
 		fitinfo->y[iy]=expinfo->y[iy];
+	}
+}
+
+void CRHICStat::WritePars(string filename){
+	int ix;
+	FILE *fptr=fopen(filename.c_str(),"w");
+	for(ix=0;ix<NX;ix++){
+		fprintf(fptr,"double %s %g\n",xname[ix].c_str(),xmcmc[ix]);
+	}
+	fclose(fptr);
+}
+
+void CRHICStat::PerformFits(){
+	CRunInfo *ri;
+	int irun,iz;
+	for(irun=0;irun<NRUNS;irun++){
+		ri=runinfo[irun];
+		zgetter->GetZ(ri->x,ri->zfit);
+		GetYFromZ(ri);
+		GetYfitFromZfit(ri);
+		CalcNetDiffFit(ri);
+		CalcNetDiffExp(ri);
+		CalcNetDiffFitExp(ri);
+		for(iz=0;iz<NZ;iz++){
+			if(fabs(runinfo[irun]->z[iz]-runinfo[irun]->zfit[iz])>0.02)
+				printf("z[%d]=%g =? %g\n",iz,runinfo[irun]->z[iz],runinfo[irun]->zfit[iz]);
+		}
+	}
+	for(irun=0;irun<NTESTRUNS;irun++){
+		ri=testinfo[irun];
+		zgetter->GetZ(ri->x,ri->zfit);
+		GetYFromZ(ri);
+		GetYfitFromZfit(ri);
+		CalcNetDiffFit(ri);
+		CalcNetDiffExp(ri);
+		CalcNetDiffFitExp(ri);
 	}
 }
 

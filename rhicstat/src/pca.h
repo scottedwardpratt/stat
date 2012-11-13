@@ -1,6 +1,6 @@
 #ifndef __PCA_H__
 #define __PCA_H__
-#include "coral.h"
+#include "coralutils.h"
 #include "qualifier.h"
 using namespace std;
 
