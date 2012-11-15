@@ -9,11 +9,11 @@ void CRHICStat::Metropolis(){
 	int ix,ixx,iz,nwrite,ibin,NBINS=50;
 	unsigned long long int isample,iburn,nsuccess=0,norm=0;
 	CRandom *randy=new CRandom(-1234);
-	double ll,oldll,*x,*oldx,*realx,*oldrealx,*bestx,*besty,*xmcmcbar,bestll=-1.0E99,root12=sqrt(12),*bestz;
+	double ll,oldll,*x,*oldx,*realx,*oldrealx,*bestx,*besty,*xmcmcbar,bestll=-1.0E99;
+	double root12=sqrt(12),*bestz;
 	double xpmax=1.0; // 1.0 corresponds to xmin and xmax at boundaries
 	bool success;
-	double **spread;
-	double **xdist=new double*[NX];
+	double **spread,**xdist=new double*[NX];
 	for(ix=0;ix<NX;ix++){
 		xdist[ix]=new double[NBINS]();
 	}
@@ -131,7 +131,7 @@ void CRHICStat::Metropolis(){
 	}
 
 
-	printf("----- nsuccess=%lld, bestll=%g\n",nsuccess,bestll);
+	printf("----- nsuccess=%lld, success rate=%g, bestll=%g\n",nsuccess,double(nsuccess)/double(NMCMC),bestll);
 	bestz=new double[NY];
 	for(ix=0;ix<NX;ix++){
 		bestrun->x[ix]=bestx[ix];

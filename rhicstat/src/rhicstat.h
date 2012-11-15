@@ -50,7 +50,7 @@ public:
 	void ReadHyperPars();
 	void GetCovDerivs(int iz,double *x1,double *x2,double &C,double *DC,double **DDC);
 	double ***Cov,***CovInv,**CovInvDotZ,**alphanorm;
-	double **hyperR,*hyperTheta0;
+	double **hyperR,*hyperTheta0,*hyperNugget;
 	double **mlinear,*blinear;
 	bool LINEAROFF;
 	double hyperPower;
