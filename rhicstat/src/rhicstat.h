@@ -92,6 +92,7 @@ public:
 	CRunInfo *expinfo,*fitinfo,*bestinfo;
 	CGSLMatrix_Real *gslmatrix_NY;
 	CGSLMatrix_Real *gslmatrix_NX;
+	CRandom *randy;
 
 	void FitExpData();
 	void ScaleXY();
@@ -128,6 +129,7 @@ public:
 	void PlotZvsX();
 	double GetLL(double *x);
 	void Metropolis();
+	void Metropolis(long long int nburn,long long int nmcmc);
 	void CalcError(CRunInfo*);
 	void CalcNetDiffExp(CRunInfo *runinfo);
 	void CalcNetDiffFit(CRunInfo *runinfo);

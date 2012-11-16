@@ -326,7 +326,7 @@ void CZGetter_Interpolated::CalcHyperPars(){
 	for(iz=0;iz<NZ;iz++){
 		// Initial guess
 		for(ix1=0;ix1<NX;ix1++){
-			xx[ix1]=0.2;
+			xx[ix1]=0.3;
 		}
 	}
 

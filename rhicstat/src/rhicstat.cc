@@ -13,6 +13,8 @@ CRHICStat::CRHICStat(){
 	NBURN=parameter::getD(parmap,"NBURN",10000);
 	NMCMC=parameter::getD(parmap,"NMCMC",1000000);
 	SIGMA2_EMULATOR=parameter::getD(parmap,"SIGMA2_EMULATOR",0.1);
+//
+	randy=new CRandom(-1234);
 	int irun;
 	InitArrays();
 	bestinfo=new CRunInfo(NX,NY);
