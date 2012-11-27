@@ -45,6 +45,8 @@ void
 Optimizer
 ::ActivateParameter( const std::string & parameterName )
 {
+  // TODO - check that parameter name is valid
+
   m_ActiveParameters.insert( parameterName );
 }
 
@@ -54,6 +56,14 @@ Optimizer
 ::DeactivateParameter( const std::string & parameterName )
 {
   m_ActiveParameters.erase( parameterName );
+}
+
+
+unsigned int
+Optimizer
+::GetNumberOfActiveParameters() const
+{
+  return static_cast< unsigned int >( m_ActiveParameters.size() );
 }
 
 

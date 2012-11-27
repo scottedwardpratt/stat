@@ -40,6 +40,9 @@ public:
   void ActivateParameter( const std::string & parameterName );
   void DeactivateParameter( const std::string & parameterName );
 
+  /** Get the number of active parameters. */
+  unsigned int GetNumberOfActiveParameters() const;
+
   /** Resets a parameter value. */
   virtual ErrorType SetParameterValue( const std::string & parameterName,
                                        double value );
