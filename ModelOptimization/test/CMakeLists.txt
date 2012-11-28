@@ -1,6 +1,13 @@
-include_directories( ../include )
+include_directories( 
+  ../include 
+  /opt/local/include
+  ~/local/include
+)
 
-set( LIBRARIES ModelOptimization )
+set( LIBRARIES 
+  IHU
+  ${CORELIBS} 
+)
 
 add_executable(        Gaussian2DModelTest
                        Gaussian2DModelTest.cxx )

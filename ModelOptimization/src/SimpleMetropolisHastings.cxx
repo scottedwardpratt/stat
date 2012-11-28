@@ -33,6 +33,13 @@ double uniform_rand() {
 	return R * static_cast<double>(rand());
 }
 
+// Not implemented for this subclass
+void madai::SimpleMetropolisHastings::NextIteration(){
+    std::cerr << "NextIteration() not implemented for the SMH" << std::endl;
+    std::cerr << "Use instead NextIteration(Trace*)" << std::endl;
+    exit(1);
+}
+
 void madai::SimpleMetropolisHastings::NextIteration(madai::Trace *trace)
 {
 	// xc is x_candidate

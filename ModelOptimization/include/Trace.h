@@ -18,18 +18,34 @@ See copyright.txt for more information.
 #include <vector>
 #include <string>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "Parameter.h"
 
 namespace madai {
+    
+class Trace;
+class TraceElement;
+class MCMCRun;
 
 class TraceElement {
 public:
-	TraceElement(const std::vector< double > & parameterValues,
-							 const std::vector< double > & OutputValues );
-  std::vector< double >      m_ParameterValues;
-  std::vector< double >      m_OutputValues;
-
+  TraceElement(const std::vector< double > & parameterValues,
+               const std::vector< double > & OutputValues );
+	TraceElement(const std::vector< double > & parameterValues);
+  TraceElement(Trace *list);
+  void Reset();
+  void Print();
+  void VizTrace();
+  void Initialize(TraceElement TElement);
+    
+  std::vector< double > m_ParameterValues;
+  std::vector< double > m_OutputValues;
+  Trace*                m_LocalTrace;
+  bool                  m_InTrace;
+  bool                  m_Used;
+    
   /** Comments may be used to store human-readable comments *or*
   record changes to state, such as changing an optimizer type,
   which parameters are activated, etc.. */
@@ -38,18 +54,21 @@ public:
 }; // class TraceElement
 
 
-
 /** Traces contain all the state of the optimization required to
  * replay it. */
 class Trace {
 public:
   Trace() {};
+  Trace(MCMCRun *mcmc_in);
   virtual ~Trace() {}
+
 	CParameterList *parlist;
 
 	unsigned int length() const;
-	void add(const std::vector< double > & parameterValues,
-					 const std::vector< double > & OutputValues );
+  void add(const std::vector< double > & parameterValues,
+           const std::vector< double > & OutputValues );
+	void add(const std::vector< double > & parameterValues);
+  void add(TraceElement TElement);
 	TraceElement & operator[](unsigned int idx);
 	const TraceElement & operator[](unsigned int idx) const;
 
@@ -62,11 +81,23 @@ public:
 	      this->m_TraceElements[i].m_OutputValues.size() == outputs.size()
 	*/
 	void writeHead(std::ostream & o, 
-	               const std::vector<madai::Parameter> & params,
-	               const std::vector<std::string> & outputs) const;  
+	               const std::vector<madai::Parameter> & params) const;
+  void writeHead(std::ostream & o,
+                 const std::vector<madai::Parameter> & params,
+                 const std::vector<std::string> & outputs) const;
+  void PrintDataToFile();
+  void WriteOut();
+  void MakeTrace();
+  std::vector<std::string> GetParNames();
+    
+  int      m_WriteOutCounter;
+  int      m_CurrentIteration;
+  MCMCRun* m_MCMC;
+
 protected:
+
   std::vector< TraceElement > m_TraceElements;
-  std::vector< std::string > m_ParameterNames;
+  std::vector< std::string >  m_ParameterNames;
 
 }; // class Trace
 

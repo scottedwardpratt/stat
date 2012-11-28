@@ -22,6 +22,8 @@ See copyright.txt for more information.
 
 namespace madai {
 
+class Model;
+
 class Optimizer {
 public:
   typedef enum {
@@ -32,13 +34,14 @@ public:
 
   Optimizer( const Model *model );
   virtual ~Optimizer();
+  const Model * GetModel() const;
 
   void ActivateParameter( const std::string & parameterName );
   void DeactivateParameter( const std::string & parameterName );
 
   /** Resets a parameter value. */
   virtual ErrorType SetParameterValue( const std::string & parameterName,
-                                  double value );
+                                       double value );
 
   /** Sets the output scalar value to optimize. */
   ErrorType SetOutputScalarToOptimize( const std::string & scalarName );
@@ -49,7 +52,11 @@ public:
 
   /** Compute the next set of parameters and the output scalar values,
    * and save them in the trace file. */
+  
   virtual void NextIteration(Trace *trace) = 0;
+    
+    
+  virtual void NextIteration()=0;
   //{  /* suggested structure for this function */
   //std::vector< double > scalarOutputs;
   //std::vector< double > gradient;
@@ -83,8 +90,9 @@ public:
 
   /** Get the current parameter values. */
   const std::vector< double > & GetCurrentParameters() const;
-
+    
 protected:
+
   const Model *m_Model;
 
   std::set< std::string > m_ActiveParameters;

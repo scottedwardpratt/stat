@@ -16,12 +16,16 @@ See copyright.txt for more information.
 #define __Model_h_
 
 #include "Parameter.h"
+#include "random.h"
+#include <gsl/gsl_randist.h>
+#include "parametermap.h"
+#include "Distribution.h"
 
 #include <cfloat>
 #include <vector>
 
 namespace madai {
-	
+
 	class Model {
 	public:
 		typedef enum {
@@ -35,7 +39,7 @@ namespace madai {
 		Model() {};
 		virtual ~Model() {};
 		
-		/** Loads a configuration from a file. */
+		/** Loads a configuration from a file. **/
 		virtual ErrorType LoadConfigurationFile( const std::string fileName ) = 0;
 		
 		/** Get the number of parameters. */
@@ -76,13 +80,26 @@ namespace madai {
 		
 		/** Get the scalar outputs from the model evaluated at x. */
 		virtual ErrorType GetScalarOutputs( const std::vector< double > & parameters,
-																			 std::vector< double > & scalars ) const = 0;
+                                            std::vector< double > & scalars ) const = 0;
 		
 		/** Get both scalar values and the gradient of the parameters. */
 		virtual ErrorType GetScalarAndGradientOutputs( const std::vector< double > & parameters,
-																									const std::vector< bool > & activeParameters,
-																									std::vector< double > & scalars,
-																									unsigned int outputIndex, std::vector< double > & gradient) const = 0;
+                                                      const std::vector< bool > & activeParameters,
+                                                      std::vector< double > & scalars,
+                                                      unsigned int outputIndex, 
+                                                      std::vector< double > & gradient) const = 0;
+  
+    LikelihoodDistribution* m_Likelihood;
+    ProposalDistribution*   m_Proposal;
+    PriorDistribution*      m_Prior;      
+  
+    std::string   m_DirectoryName;
+    std::string   m_ParameterFile;
+    std::string   m_ConfigurationName;
+    std::string   m_ParameterFileName;
+    bool          m_LogLike;
+    bool          m_ProcessPipe;
+    parameterMap  m_ParameterMap;
 		
 	protected:
 		/** Subclasses must populate this vector with the names of the

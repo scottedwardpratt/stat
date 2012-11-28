@@ -27,6 +27,14 @@ Optimizer
 }
 
 
+const Model *
+Optimizer
+::GetModel() const
+{
+  return m_Model;
+}
+
+
 void
 Optimizer
 ::ActivateParameter( const std::string & parameterName )

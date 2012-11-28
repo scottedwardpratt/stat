@@ -28,7 +28,6 @@ Gaussian2DModel
   return Model::NO_ERROR;
 }
 
-
 void
 Gaussian2DModel
 ::GetRange( unsigned int parameterIndex, double range[2] )

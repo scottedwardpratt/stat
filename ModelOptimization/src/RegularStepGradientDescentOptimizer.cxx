@@ -15,6 +15,13 @@ RegularStepGradientDescentOptimizer
 {
 }
 
+    //Not implemented for this subclass
+void
+RegularStepGradientDescentOptimizer
+::NextIteration(){
+    std::cerr << "Not defined" << std::endl;
+    exit(1);
+}
 
 void
 RegularStepGradientDescentOptimizer

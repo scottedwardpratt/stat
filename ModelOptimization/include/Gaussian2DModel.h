@@ -16,7 +16,7 @@ public:
    * the mean in x, mean in y, standard deviation in x and standard
    * devaition in y of the 2D Gaussian function. */
   ErrorType LoadConfigurationFile( const std::string fileName );
-
+    
   /** Get the valid range for the parameter at parameterIndex. */
   void GetRange( unsigned int parameterIndex, double range[2] );
 

@@ -73,7 +73,6 @@ namespace madai {
 			const std::vector< bool > & activeParameters,
 			std::vector< double > & scalars,
 			unsigned int outputIndex, std::vector< double > & gradient) const;
-
 	}; // end Model
 } // end namespace madai
 
