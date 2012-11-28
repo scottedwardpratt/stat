@@ -25,10 +25,8 @@ class TraceElement;
 class MCMCRun : public Optimizer {
 public:
   MCMCRun(const Model *in_model);
-  MCMCRun(const Model *in_model, std::vector<double> Theta0);
   ~MCMCRun();
 
-  void NextIteration();
   void NextIteration(Trace *trace);
         
   std::vector<double> GetRandomTheta0(int seed);
@@ -38,9 +36,7 @@ public:
   std::vector<double> m_BestParameterSet;
   std::vector<double> m_ParameterValues;
   std::vector<double> m_InitialTheta;
-  int                 m_Writeout;
   int                 m_BurnIn;
-  int                 m_MaxIterations;
   bool                m_RandomTheta0;
   bool                m_VizTrace;
   bool                m_Quiet;
@@ -50,27 +46,22 @@ public:
   bool                m_LogProposal;
   bool                m_CreateTrace;
   
-  std::string         m_TraceDirectory;
-  Trace*              m_ThetaOutsList;
-  TraceElement*       m_ThetaZeroPtr;
   VizHandler*         m_Visualizer;
   CRandom*            m_RandomNumber;
   
   std::vector<double> m_CurrentParameters;
-  double              m_Likelihood_Current;
-  double              m_Likelihood_New;
-  double              m_Prior_Current;
-  double              m_Prior_New;
-  double              m_Proposal_Current;
-  double              m_Proposal_New;
+  double              m_LikelihoodCurrent;
+  double              m_LikelihoodNew;
+  double              m_PriorCurrent;
+  double              m_PriorNew;
+  double              m_ProposalCurrent;
+  double              m_ProposalNew;
   double              m_BestLikelihood;
-  float               m_Scale_Current;
-  float               m_Scale_New;
+  float               m_ScaleCurrent;
+  float               m_ScaleNew;
   int                 m_AcceptCount;
   int                 m_VizCount;
   int                 m_IterationNumber;
-
-  double RescaleTheta(int i, int j);
 protected:
 };
 

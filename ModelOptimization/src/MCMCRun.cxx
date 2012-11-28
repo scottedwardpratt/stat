@@ -1,19 +1,15 @@
 #include "MCMCRun.h"
 
 madai::MCMCRun::MCMCRun(const madai::Model *in_model) :
-Optimizer( in_model ) {
+  Optimizer( in_model ) {
 	m_LocalParameterMap = m_Model->m_ParameterMap;
-	m_TraceDirectory = m_Model->m_DirectoryName + "/trace/" + m_Model->m_ConfigurationName;
-	
-	m_MaxIterations = parameter::getI(m_LocalParameterMap, "MAX_ITERATIONS", 500);
-	m_Writeout = parameter::getI(m_LocalParameterMap, "WRITEOUT", 100);
+  
 	m_BurnIn = parameter::getI(m_LocalParameterMap, "BURN_IN", 0);
 	m_RandomTheta0 = parameter::getB(m_LocalParameterMap, "RANDOM_THETA0", false);
 	m_VizTrace = parameter::getB(m_LocalParameterMap, "VISUALIZE_TRACE", true);
 	m_Quiet = parameter::getB(m_LocalParameterMap, "QUIET", false);
+  m_AppendTrace = parameter::getB(m_LocalParameterMap, "APPEND_TRACE", false);
   m_RescaledTrace = parameter::getB(m_LocalParameterMap, "RESCALED_TRACE", false);
-	m_AppendTrace = parameter::getB(m_LocalParameterMap, "APPEND_TRACE", false);
-  //m_LogLike = parameter::getB(m_LocalParameterMap, "LOGLIKE", true);
 	m_LogPrior = parameter::getB(m_LocalParameterMap, "LOGPRIOR", true);
 	m_LogProposal = parameter::getB(m_LocalParameterMap, "LOGPROPOSAL", true);
 	m_CreateTrace = parameter::getB(m_LocalParameterMap, "CREATE_TRACE", true);
@@ -26,215 +22,82 @@ Optimizer( in_model ) {
   else{
     m_InitialTheta = this->GetTheta0FromFile();
   }
-  m_ThetaOutsList = new madai::Trace(this);
-  m_ThetaOutsList->add(m_InitialTheta);
-  //CurrentEl = madai::TraceElement(ThetaOutsList);
-    
-  //Likelihood_Current=0;
-    
-	if(m_CreateTrace){
-		m_Visualizer = new VizHandler(this);
-		m_VizCount = parameter::getI(m_LocalParameterMap, "VIZ_COUNT", floor(m_MaxIterations/200));
-		//Visualizer->UpdateTraceFig();
-	}
-    
-	if(m_AppendTrace){
-    std::string addon = "";
-		bool Done = false;
-		int filecount = 0;
-		while(!Done){
-			struct stat st;
-      std::stringstream ss;
-      std::string tempfile = m_TraceDirectory + addon;
-			if(stat(tempfile.c_str(), &st)==0){
-				//directory exists.
-        std::cout << tempfile << " exists, trying next option..." << std::endl;
-				filecount++;
-				ss << "_" << filecount;
-				addon = ss.str();
-				ss.str(string());
-			}else{
-				//doesn't exist
-				Done = true;
-				m_TraceDirectory = tempfile;
-			}
-		}
-	}else{
-    std::cout << "Deleting prior trace data." << std::endl;
-    std::string cmd = "rm " + m_TraceDirectory + "/output*.dat " + m_TraceDirectory + "/trace.dat";
-    std::system(cmd.c_str());
-	}
-	
-  std::string command = "mkdir -p "+ m_TraceDirectory;
-	
-  std::system(command.c_str());
-	/*if(!m_Quiet){
-     printf("Iteration\tAlpha\tResult\n");
-     }*/
-}
-
-
-madai::MCMCRun::MCMCRun(const madai::Model *in_model, const std::vector<double> Theta0) :
-Optimizer( in_model ) {
-  m_LocalParameterMap = m_Model->m_ParameterMap;
-	m_TraceDirectory = m_Model->m_DirectoryName + "/trace/" + m_Model->m_ConfigurationName;
-	
-	m_MaxIterations = parameter::getI(m_LocalParameterMap, "MAX_ITERATIONS", 500);
-	m_Writeout = parameter::getI(m_LocalParameterMap, "WRITEOUT", 100);
-	m_BurnIn = parameter::getI(m_LocalParameterMap, "BURN_IN", 0);
-	m_RandomTheta0 = parameter::getB(m_LocalParameterMap, "RANDOM_THETA0", false);
-	m_VizTrace = parameter::getB(m_LocalParameterMap, "VISUALIZE_TRACE", true);
-	m_Quiet = parameter::getB(m_LocalParameterMap, "QUIET", false);
-  m_RescaledTrace = parameter::getB(m_LocalParameterMap, "RESCALED_TRACE", false);
-	m_AppendTrace = parameter::getB(m_LocalParameterMap, "APPEND_TRACE", false);
-  //m_LogLike = parameter::getB(m_LocalParameterMap, "LOGLIKE", true);
-	m_LogPrior = parameter::getB(m_LocalParameterMap, "LOGPRIOR", true);
-	m_LogProposal = parameter::getB(m_LocalParameterMap, "LOGPROPOSAL", true);
-	m_CreateTrace = parameter::getB(m_LocalParameterMap, "CREATE_TRACE", true);
-    
-  m_RandomNumber = new CRandom(1234);
-    
-	if(m_RandomTheta0){
-    m_InitialTheta = this->GetRandomTheta0(time(NULL));
-  }
-	else{
-    m_InitialTheta = Theta0;
-	}
-  m_ThetaOutsList = new madai::Trace(this);
-  m_ThetaOutsList->add(m_InitialTheta);
-  //CurrentEl = madai::TraceElement(ThetaOutsList);
-    
-	//Likelihood_Current=0;
-    
-	if(m_CreateTrace){
-		m_Visualizer = new VizHandler(this);
-		m_VizCount = parameter::getI(m_LocalParameterMap, "VIZ_COUNT", floor(m_MaxIterations/200));
-		//Visualizer->UpdateTraceFig();
-	}
-	
-	if(m_AppendTrace){
-    std::string addon = "";
-		bool Done = false;
-		int filecount = 0;
-		while(!Done){
-			struct stat st;
-        std::stringstream ss;
-        std::string tempfile = m_TraceDirectory + addon;
-			if(stat(tempfile.c_str(), &st)==0){
-				//directory exists.
-        std::cout << tempfile << " exists, trying next option..." << std::endl;
-				filecount++;
-				ss << "_" << filecount;
-				addon = ss.str();
-				ss.str(string());
-			}else{
-				//doesn't exist
-				Done = true;
-				m_TraceDirectory = tempfile;
-			}
-		}
-	}else{
-    std::cout << "Deleting prior trace data." << std::endl;
-    std::string cmd = "rm " + m_TraceDirectory + "/output*.dat " + m_TraceDirectory + "/trace.dat";
-    std::system(cmd.c_str());
-	}
-	
-  std::string command = "mkdir -p "+ m_TraceDirectory;
-	
-  std::system(command.c_str());
-	/*if(!m_Quiet){
-     printf("Iteration\tAlpha\tResult\n");
-     }*/
+  m_CurrentParameters = m_InitialTheta;
 }
 
 madai::MCMCRun::~MCMCRun(){
     
 }
 
-// Not implemented yet. May change over NextIteration() funct to this at some point
-// don't know if structure is conducive to the change though.
 void madai::MCMCRun::NextIteration(madai::Trace *ThetaOutsList){
-  std::cerr << "MCMCRun::NextIteration(Trace*) not defined" << std::endl;
-  exit(1);
-}
-
-void madai::MCMCRun::NextIteration(){
   double LOGBF, alpha;
   if(m_Model->m_LogLike){
     LOGBF = 0;
   }else{
     LOGBF = 1;
   }
-  m_Scale_New = (rand() / double(RAND_MAX));
-    
+  m_ScaleNew = (rand() / double(RAND_MAX));
+  
   std::vector<double> Temp_Theta;
-  Temp_Theta = m_Model->m_Proposal->Iterate(m_CurrentParameters,m_Scale_New,m_ActiveParameters);
-    
-  m_Likelihood_New = m_Model->m_Likelihood->Evaluate(Temp_Theta);
-  if(m_IterationNumber==1){
-    m_BestLikelihood=m_Likelihood_New;
-    m_BestParameterSet = m_ThetaZeroPtr->m_ParameterValues;
-    //BestParameterSetPtr=ThetaZeroPtr;
+  Temp_Theta = m_Model->m_Proposal->Iterate(m_CurrentParameters,m_ScaleNew,m_ActiveParameters);
+  m_LikelihoodNew = m_Model->m_Likelihood->Evaluate(Temp_Theta);
+  if(m_IterationNumber == 1){
+    m_BestLikelihood=m_LikelihoodNew;
+    m_BestParameterSet = m_InitialTheta;
+    if(m_CreateTrace){
+      m_Visualizer = new VizHandler(this);
+      m_VizCount = parameter::getI(m_LocalParameterMap, "VIZ_COUNT", floor(ThetaOutsList->m_MaxIterations/200));
+    }
   }
-  m_Prior_New = m_Model->m_Prior->Evaluate(Temp_Theta);
-  m_Proposal_New = m_Model->m_Proposal->Evaluate(m_CurrentParameters,Temp_Theta,m_Scale_Current);
-  m_Proposal_Current = m_Model->m_Proposal->Evaluate(Temp_Theta,m_CurrentParameters,m_Scale_New);
-    
-    //std::cerr << "Likelihood of proposed set: " << m_Likelihood_New << std::endl;
-    //std::cerr << "Likelihood of current set: " << m_Likelihood_Current << std::endl;
-    //std::cerr << "Prior of proposed set: " << m_Prior_New << std::endl;
-    //std::cerr << "Prior of current set: " << m_Prior_Current << std::endl;
-    //std::cerr << "Proposal of proposed set: " << m_Proposal_New << std::endl;
-    //std::cerr << " Proposal of current set: " << m_Proposal_Current << std::endl;
-    
-    
-    // Likelihood
+  m_PriorNew = m_Model->m_Prior->Evaluate(Temp_Theta);
+  m_ProposalNew = m_Model->m_Proposal->Evaluate(m_CurrentParameters,Temp_Theta,m_ScaleCurrent);
+  m_ProposalCurrent = m_Model->m_Proposal->Evaluate(Temp_Theta,m_CurrentParameters,m_ScaleNew);
+  
+  // Likelihood
   if(m_Model->m_LogLike){
     if(!m_Quiet){
-      printf(" ll_new=%g, ll_current=%g\n",m_Likelihood_New,m_Likelihood_Current);
+      printf(" ll_new=%g, ll_current=%g\n",m_LikelihoodNew,m_LikelihoodCurrent);
     }
-    LOGBF += m_Likelihood_New-m_Likelihood_Current;
+    LOGBF += m_LikelihoodNew-m_LikelihoodCurrent;
   } else {
     if(!m_Quiet){
-      printf(" l_new=%g, l_current=%g\n",exp(m_Likelihood_New),exp(m_Likelihood_Current));//200
+      printf(" l_new=%g, l_current=%g\n",exp(m_LikelihoodNew),exp(m_LikelihoodCurrent));
     }
-    LOGBF *= exp(m_Likelihood_New)/exp(m_Likelihood_Current);
+    LOGBF *= exp(m_LikelihoodNew)/exp(m_LikelihoodCurrent);
   }
-    
+  
   // Prior
   if(m_LogPrior){
-    LOGBF += (log(m_Prior_New)-log(m_Prior_Current));
+    LOGBF += (log(m_PriorNew)-log(m_PriorCurrent));
   } else {
-    LOGBF *= (m_Prior_New/m_Prior_Current);
+    LOGBF *= (m_PriorNew/m_PriorCurrent);
   }
-    
+  
   if(!m_Quiet){
-    printf(" Prior_New=%g, Prior_Current=%g\n",m_Prior_New,m_Prior_Current);
+    printf(" Prior_New=%g, Prior_Current=%g\n",m_PriorNew,m_PriorCurrent);
   }
-    
+  
   // Proposal		
   if(m_Model->m_LogLike){
-    LOGBF += (log(m_Proposal_Current)-log(m_Proposal_New));
+    LOGBF += (log(m_ProposalCurrent)-log(m_ProposalNew));
   } else {
-    LOGBF *= m_Proposal_Current/m_Proposal_New;
+    LOGBF *= m_ProposalCurrent/m_ProposalNew;
   }
-    
+  
   if(!m_Quiet){
-    printf(" Proposal_New=%g, Proposal_Current=%g\n",m_Proposal_New,m_Proposal_Current);
+    printf(" Proposal_New=%g, Proposal_Current=%g\n",m_ProposalNew,m_ProposalCurrent);
   }
-    
+  
   if(m_Model->m_LogLike){
     alpha = min(1.0,exp(LOGBF));
   } else {
     alpha = min(1.0,LOGBF);
   }
-    
-  //std::cout << LOGBF << std::endl;
-    
+  
   if(!m_Quiet){
     printf("%5d\talpha=%6.5f\t",m_IterationNumber,alpha);
-    //printf("LOGBF=%6.5f\t",alpha);
   }
+  
   if(alpha > (this->m_RandomNumber->ran())) { //Accept the proposed set.
     if(!m_Quiet){
       printf("Accept\n");
@@ -242,13 +105,12 @@ void madai::MCMCRun::NextIteration(){
     if(m_IterationNumber > m_BurnIn){
       m_AcceptCount++;
     }
-    m_Likelihood_Current = m_Likelihood_New;
-    m_Prior_Current = m_Prior_New;
-    //m_Proposal_Current = m_Proposal_New;
+    m_LikelihoodCurrent = m_LikelihoodNew;
+    m_PriorCurrent = m_PriorNew;
     m_CurrentParameters = Temp_Theta;
-    m_Scale_Current = m_Scale_New;
-    if(m_Likelihood_Current>m_BestLikelihood && m_IterationNumber>1){
-      m_BestLikelihood=m_Likelihood_New;
+    m_ScaleCurrent = m_ScaleNew;
+    if(m_LikelihoodCurrent > m_BestLikelihood && m_IterationNumber > 1){
+      m_BestLikelihood=m_LikelihoodNew;
       m_BestParameterSet=m_CurrentParameters;
       if(!m_Quiet){
         if(m_Model->m_LogLike){
@@ -264,59 +126,58 @@ void madai::MCMCRun::NextIteration(){
       printf("Reject\n");
     }
   }
-    
+  
   if(m_IterationNumber > m_BurnIn){ // We are just tossing everything in the burn in period.
-    m_ThetaOutsList->add(m_CurrentParameters);
+    if(m_RescaledTrace){
+      std::vector<double> RescaledParameters;
+      double* range = new double[2]();
+      for( int k = 0; k < m_CurrentParameters.size(); k++){
+        m_Model->GetRange(k, range);
+        RescaledParameters.push_back((m_CurrentParameters[k]-range[0])/(range[1]-range[0]));
+      }
+      ThetaOutsList->add(RescaledParameters);
+    }else{
+      ThetaOutsList->add(m_CurrentParameters);
+    }
   }
-    
+  
   double range[2];
   for(int k = 0; k < m_Model->GetNumberOfParameters(); k++){ //These ParamValus are used for the density plots
     m_Model->GetRange(k,range);
-    //cout << ThetaList->ParamNames[k] << " " << CurrentParameters.Values[k] << endl;
-    //cout << "(" << CurrentParameters.Values[k] << " - " << mcmcconfig->Min_Ranges[k] << ") / (" << mcmcconfig->Max_Ranges[k] << " - " << mcmcconfig->Min_Ranges[k] << ")" << endl; cout.flush();
-    //cout << mcmcconfig->Max_Ranges[k] << " " << mcmcconfig->Min_Ranges[k] << endl;
     m_ParameterValues[k] = (m_CurrentParameters[k] - range[0])/(range[1]-range[0]);
-    //cout << ParamValues[k] << endl;
   }
-    
-    /*if((niter > BURN_IN) && CREATE_TRACE){
-        if((niter+1) % 5 == 0){
-            Visualizer->UpdateTraceFig();
-        }
-    }*/
-    
-  if((m_IterationNumber > m_BurnIn) && ((m_IterationNumber+1) % m_Writeout == 0)){
+  
+  if((m_IterationNumber > m_BurnIn) && ((m_IterationNumber+1) % (ThetaOutsList->m_Writeout) == 0)){
     std::cout << "Writing out." << std::endl;
-    if(m_CreateTrace &&(m_IterationNumber!=1)){
-      m_Visualizer->UpdateTraceFig();
+    if(m_CreateTrace && (m_IterationNumber!=1)){
+      m_Visualizer->UpdateTraceFig(ThetaOutsList);
     }
-    m_ThetaOutsList->WriteOut();
-    //BestParameterSetPtr->Print();
+    ThetaOutsList->WriteOut(m_Model->GetParameters());
   }
 }
 
-std::vector<double> madai::MCMCRun::GetRandomTheta0(int seed){ //This creates random theta 0s
+std::vector<double> 
+madai::MCMCRun::GetRandomTheta0(int seed){ //This creates random theta 0s
 	srand(seed);
   std::cout << "We are using random theta0 values. They are:" << std::endl;
 	double *range = new double[2];
   std::vector<double> temp_values(this->m_Model->GetNumberOfParameters(), 0.0);
     
   for(unsigned int i = 0; i<this->m_Model->GetNumberOfParameters();i++){
-    //This might be redundant
-    /*if(m_Model->PRESCALED_PARAMS){
+    if(m_Model->m_PrescaledParams){
       range[0]=0;
       range[1]=1;
     }else{
       this->m_Model->GetRange(i,range);
-    }*/
-    this->m_Model->GetRange(i,range);
+    }
     temp_values[i] = double(rand() % int((range[1] - range[0])*1000))/1000+range[0];
   }
     
   return temp_values;
 }
 
-std::vector<double> madai::MCMCRun::GetTheta0FromFile(){
+std::vector<double> 
+madai::MCMCRun::GetTheta0FromFile(){
   parameterMap parmap;
   std::string theta0_filename = this->m_Model->m_ParameterFile + "/theta0.param";
   parameter::ReadParsFromFile(parmap, theta0_filename);
@@ -329,10 +190,10 @@ std::vector<double> madai::MCMCRun::GetTheta0FromFile(){
     double *range = new double[2];
     std::vector<madai::Parameter>::const_iterator itr = (m_Model->GetParameters()).begin();
     std::vector<std::string>::const_iterator titr;
-    for(itr;itr<(m_Model->GetParameters()).end();itr++){
+    for( itr; itr < (m_Model->GetParameters()).end(); itr++){
       j=0;
-      for(titr=temp_names.begin();titr<temp_names.end();titr++){
-        if((itr->m_Name)==*titr){
+      for( titr = temp_names.begin(); titr < temp_names.end(); titr++){
+        if((itr->m_Name) == *titr){
           read_theta.push_back(temp_values[j]);
           break;
         }else{
@@ -340,10 +201,10 @@ std::vector<double> madai::MCMCRun::GetTheta0FromFile(){
         }
       }
       m_Model->GetRange(i,range);
-      if(read_theta[i]<range[0]){
+      if(read_theta[i] < range[0]){
         std::cout << "Parameter below min value.\n\n";
         exit(1);
-      } else if(read_theta[i]>range[1]){
+      } else if(read_theta[i] > range[1]){
         std::cout << "Parameter above max value.\n\n";
         exit(1);
       }
@@ -351,11 +212,5 @@ std::vector<double> madai::MCMCRun::GetTheta0FromFile(){
     }
   }
   return read_theta;
-}
-
-double madai::MCMCRun::RescaleTheta(int itern, int parn){
-  double range[2];
-  m_Model->GetRange(parn,range);
-  return (((*m_ThetaOutsList)[itern].m_ParameterValues[parn]-range[0])/(range[1]-range[0]));
 }
 

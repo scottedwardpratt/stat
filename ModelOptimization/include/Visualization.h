@@ -2,6 +2,7 @@
 #define __VISUALIZATION_H__
 
 #include "MCMCRun.h"
+#include "Trace.h"
 #include <deque>
 
 namespace madai {
@@ -14,14 +15,13 @@ public:
 	~VizHandler();
 
 	void operator() (const std::string& command);
-	void UpdateTraceFig();
-	void FinalTrace();
+	void UpdateTraceFig(Trace* ThetaOutsList);
+	void FinalTrace(Trace* ThetaOutsList);
 
 private:
 
   std::string              m_GNUPlotTerm;
   std::string              m_GNUPlotStyle;
-	int                      m_ThetaListSize;
 	int                      m_HighestItnReadIn;
 	bool                     m_MovingWindow;
 	bool                     m_DensityPlot;

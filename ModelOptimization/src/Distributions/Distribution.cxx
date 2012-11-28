@@ -1,6 +1,3 @@
-#ifndef __DISTRIBUTION_CC__
-#define __DISTRIBUTION_CC__
-
 #include "MultiModel.h"
 #include "MCMCRun.h"
 
@@ -170,5 +167,3 @@ double madai::Distribution::LogNormal(double x, double mu, double sigma){
 	double OUT = (1.0/(x*sigma))*(1.0/sqrt(2.0*M_PI))*exp((-1.0/(2.0*pow(sigma,2)))*(pow((log(x)-mu), 2)));
 	return OUT;
 }
-
-#endif

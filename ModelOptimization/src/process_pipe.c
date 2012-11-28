@@ -10,8 +10,7 @@ See copyright.txt for more information.
 TO DO:
 	Implement Win32.
 *********************************************************************/
-#include "../include/process_pipe.h"
-//#include "process_pipe.h"
+#include "process_pipe.h"
 
 #ifdef __unix__
 

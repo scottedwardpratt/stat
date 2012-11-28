@@ -31,14 +31,12 @@ private:
         
 public:
   std::vector<bool> m_LogParam;
-  bool              m_PrescaledParams;
   std::string       m_ModelType;
         
   bool good() { return (this->stateFlag == READY);}
   
   MultiModel();
   MultiModel(std::string info_dir);
-  MultiModel(std::string info_dir, std::string configuration);
   virtual ~MultiModel();
 
   /**
@@ -47,7 +45,6 @@ public:
    **/
   virtual ErrorType LoadConfigurationFile( const std::string fileName );
   virtual ErrorType LoadConfiguration(const std::string info_dir);
-  virtual ErrorType LoadConfiguration(const std::string info_dir, const std::string configuration);
   /** 
    * Load a process pipe for emulation handling
    **/
@@ -69,4 +66,4 @@ public:
 
 } // end namespace madai
 
-#endif // end __RHICModel_h__
+#endif // end __MultiModel_h__

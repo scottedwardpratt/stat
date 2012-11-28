@@ -1,6 +1,3 @@
-#ifndef __PRIOR_CC__
-#define __PRIOR_CC__
-
 #include "Model.h"
 #include "distribution.h"
 
@@ -41,4 +38,3 @@ double madai::PriorDistribution_Test::Evaluate(std::vector<double> Theta){
   return 1.0;
   //return Normal(log(Theta.GetValue("SIGMA")), mean, sigma);
 }
-#endif

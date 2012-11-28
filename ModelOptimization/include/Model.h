@@ -95,10 +95,10 @@ namespace madai {
   
     std::string   m_DirectoryName;
     std::string   m_ParameterFile;
-    std::string   m_ConfigurationName;
     std::string   m_ParameterFileName;
     bool          m_LogLike;
     bool          m_ProcessPipe;
+    bool          m_PrescaledParams;
     parameterMap  m_ParameterMap;
 		
 	protected:

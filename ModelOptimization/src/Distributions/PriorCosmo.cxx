@@ -1,6 +1,3 @@
-#ifndef __PRIOR_CC__
-#define __PRIOR_CC__
-
 #include "Model.h"
 #include "Distribution.h"
 
@@ -21,4 +18,3 @@ madai::PriorDistribution_Cosmo::PriorDistribution_Cosmo(madai::Model * in_Model)
 double madai::PriorDistribution_Cosmo::Evaluate(std::vector<double> Theta){
 	return 1.0;
 }
-#endif

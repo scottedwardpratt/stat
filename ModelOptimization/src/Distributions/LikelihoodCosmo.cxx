@@ -1,6 +1,3 @@
-#ifndef __LIKELIHOOD_CC__
-#define __LIKELIHOOD_CC__
-
 #include "Model.h"
 #include "Distribution.h"
 #include <time.h>
@@ -143,4 +140,3 @@ std::vector<double> madai::LikelihoodDistribution_Cosmo::GetData(){
 	}
 	return datameans;
 }
-#endif

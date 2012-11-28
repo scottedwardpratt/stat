@@ -1,6 +1,3 @@
-#ifndef __LIKELIHOOD_CC__
-#define __LIKELIHOOD_CC__
-
 #include "Model.h"
 #include <time.h>
 
@@ -116,5 +113,3 @@ vector<double> madai::LikelihoodDistribution_RHIC_PCA::GetRealData(){
 	//datameans.assign (myints,myints+6);
 	return datameans;
 }
-
-#endif

@@ -9,12 +9,12 @@ madai::MultiModel::MultiModel(const std::string info_dir){
   this->LoadConfiguration(info_dir);
 }
 
-madai::MultiModel::MultiModel(const std::string info_dir, const std::string configuration){
-  this->stateFlag = UNINITIALIZED;
-  this->LoadConfiguration(info_dir, configuration);
+madai::MultiModel::~MultiModel()
+{
+  delete m_Likelihood;
+  delete m_Proposal;
+  delete m_Prior;
 }
-
-madai::MultiModel::~MultiModel(){}
 
 void discard_line(std::FILE * fp) {
 	static int buffersize = 1024;
@@ -71,17 +71,8 @@ bool discard_comments(std::istream & i, char comment_character) {
 	}
 }
 
-/*
-madai::RHICModel::ErrorType
-madai::RHICModel::LoadConfiguration(std::string info_dir){
-    ErrorType r = this->LoadConfiguration(info_dir, "default");
-    return r;
-}
- */
-
 madai::MultiModel::ErrorType
 madai::MultiModel::LoadConfiguration(std::string info_dir){
-  m_ConfigurationName = "default";
 	m_DirectoryName = info_dir;
 	m_ParameterFile = info_dir+"/defaultpars/";
   std::cout << "There should be something here ->" << m_ParameterFile << "<-" << std::endl;
@@ -91,10 +82,6 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
     
 	parameter::ReadParsFromFile(m_ParameterMap, m_ParameterFileName.c_str());
 	m_LogLike = parameter::getB(m_ParameterMap, "LOGLIKE", true);
-	/*LOGPRIOR = parameter::getB(parmap, "LOGPRIOR", true);
-	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
-	CREATE_TRACE = parameter::getB(parmap, "CREATE_TRACE", true);*/
-	//m_SuppressErrors = parameter::getB(m_ParameterMap, "SUPPRESS_ERRORS", false);
   m_ProcessPipe = parameter::getB(m_ParameterMap, "PROCESS_PIPE", false);
   m_ModelType = parameter::getS(m_ParameterMap,"MODEL","NOMODEL");
    
@@ -107,8 +94,8 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
     
   if(!(this->m_Parameters.empty())){
     std::vector<madai::Parameter>::const_iterator itr = this->m_Parameters.begin();
-    for(itr++;itr<this->m_Parameters.end();itr++)
-      std::cout << itr->m_Name << " " << itr->m_MinimumPossibleValue << " " << itr->m_MaximumPossibleValue << std::endl;
+    for( itr++; itr < this->m_Parameters.end(); itr++)
+      std::cout << itr->m_Name << " ";
   }else{
     std::cout << "Parameters were not read in!" << std::endl;
     this->stateFlag = ERROR;
@@ -122,7 +109,7 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
   std::cout << "Emulated Observables Are:" << std::endl;
   if(!(this->m_ScalarOutputNames.empty())){
     std::vector<std::string>::const_iterator itr = this->m_ScalarOutputNames.begin();
-    for(itr;itr<this->m_ScalarOutputNames.end();itr++)
+    for( itr; itr < this->m_ScalarOutputNames.end(); itr++)
       std::cout << *itr << " ";
     std::cout << std::endl;
   }else{
@@ -133,8 +120,8 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
     
   std::vector<std::string> temp_logparam = parameter::getVS(m_ParameterMap, "LOG_PARAMETERS", "");
 	
-	for(int i =0; i<temp_logparam.size(); i++){
-		if(std::strcmp(temp_logparam[i].c_str(), "true") == 0 || std::strcmp(temp_logparam[i].c_str(), "True") == 0){
+	for(int i = 0; i < temp_logparam.size(); i++){
+		if( std::strcmp(temp_logparam[i].c_str(), "true") == 0 || std::strcmp(temp_logparam[i].c_str(), "True") == 0){
 			m_LogParam.push_back(true);
 		}else if(std::strcmp(temp_logparam[i].c_str(), "false") == 0 || std::strcmp(temp_logparam[i].c_str(), "False") == 0){
 			m_LogParam.push_back(false);
@@ -147,18 +134,6 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
     
   if(m_ProcessPipe)
     this->LoadProcess();
-    
-    /*cout << "_____________________" << endl;
-     cout << "parameterfile: " << parameterfile << endl;
-     cout << "MODEL: " << MODEL << endl;
-     cout << "dir_name: " << dir_name << endl;
-     cout << "parameterfile: " << parameterfile << endl;
-     cout << "configname: " << configname << endl;
-     cout << "parameter_file_name: " << parameter_file_name << endl;
-     cout << "EmulatorParams: " << EmulatorParams << endl;
-     cout << "---------------------" << endl;*/
-    
-	// cout << "stuff done." << endl;
 	
   if(std::strcmp(m_ModelType.c_str(),"RHIC")==0){
     m_Likelihood = new LikelihoodDistribution_RHIC(this);
@@ -183,112 +158,6 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
   return NO_ERROR;
 }
 
-madai::MultiModel::ErrorType
-madai::MultiModel::LoadConfiguration(std::string info_dir, std::string configuration){
-  m_ConfigurationName = configuration;
-	m_DirectoryName = info_dir;
-	m_ParameterFile = info_dir+"/defaultpars/";
-  std::cout << "There should be something here ->" << m_ParameterFile << "<-" << std::endl;
-  std::cout << "In config: " << m_ParameterFile << std::endl;
-	m_ParameterFileName = m_ParameterFile + "/mcmc.param";
-  std::cout << "Reading in " << m_ParameterFileName << std::endl;
-	
-	parameter::ReadParsFromFile(m_ParameterMap, m_ParameterFileName.c_str());
-	m_LogLike = parameter::getB(m_ParameterMap, "LOGLIKE", true);
-	/*LOGPRIOR = parameter::getB(parmap, "LOGPRIOR", true);
-	LOGPROPOSAL = parameter::getB(parmap, "LOGPROPOSAL", true);
-	CREATE_TRACE = parameter::getB(parmap, "CREATE_TRACE", true);*/
-	//m_SuppressErrors = parameter::getB(m_ParameterMap, "SUPPRESS_ERRORS", false);
-  m_ProcessPipe = parameter::getB(m_ParameterMap, "PROCESS_PIPE", false);
-  m_ModelType = parameter::getS(m_ParameterMap,"MODEL","NOMODEL");
-	
-	//============================================
-	// Reading the parameters out of ranges.dat
-	m_PrescaledParams = parameter::getB(m_ParameterMap, "PRESCALED_PARAMS", false);
-  std::string filename = info_dir + "/ranges.dat";
-  this->LoadConfigurationFile(filename);
-  std::cout << "Ranges loaded" << std::endl;
-    
-  if(!(this->m_Parameters.empty())){
-    std::vector<madai::Parameter>::const_iterator itr = this->m_Parameters.begin();
-    for(itr++;itr<this->m_Parameters.end();itr++)
-    std::cout << itr->m_Name << " ";
-  }else{
-    std::cout << "The parameters were not read in." << std::endl;
-    this->stateFlag=ERROR;
-    return OTHER_ERROR;
-  }
-  std::cout << std::endl;
-    
-  std::string observables_filename = info_dir + "/pcanames.dat";
-  this->LoadConfigurationFile(observables_filename);
-    
-  std::cout << "The emulated observables are: " << std::endl;
-	if(!(this->m_ScalarOutputNames.empty())){
-    std::vector<std::string>::const_iterator itr = this->m_ScalarOutputNames.begin();
-    for(itr;itr<this->m_ScalarOutputNames.end();itr++)
-      std::cout << *itr << " ";
-    std::cout << std::endl;
-  }else{
-    std::cout << "The observables were not read in." << std::endl;
-    this->stateFlag=ERROR;
-    return OTHER_ERROR;
-  }
-    
-	//====================================================
-	
-  std::vector<std::string> temp_logparam = parameter::getVS(m_ParameterMap, "LOG_PARAMETERS", "");
-	
-	for(int i =0; i<temp_logparam.size(); i++){
-		if(std::strcmp(temp_logparam[i].c_str(), "true") == 0 || std::strcmp(temp_logparam[i].c_str(), "True") == 0){
-			m_LogParam.push_back(true);
-		}else if(std::strcmp(temp_logparam[i].c_str(), "false") == 0 || std::strcmp(temp_logparam[i].c_str(), "False") == 0){
-			m_LogParam.push_back(false);
-		}else{
-      std::cout << "Unrecognized LogParam value " << temp_logparam[i] << std::endl;
-			this->stateFlag=ERROR;
-      return OTHER_ERROR;
-		}
-	}
-    
-  if(m_ProcessPipe)
-    this->LoadProcess();
-    
-    /*cout << "_____________________" << endl;
-     cout << "parameterfile: " << parameterfile << endl;
-     cout << "MODEL: " << MODEL << endl;
-     cout << "dir_name: " << dir_name << endl;
-     cout << "parameterfile: " << parameterfile << endl;
-     cout << "configname: " << configname << endl;
-     cout << "parameter_file_name: " << parameter_file_name << endl;
-     cout << "EmulatorParams: " << EmulatorParams << endl;
-     cout << "---------------------" << endl;*/
-    
-	// cout << "stuff done." << endl;
-    
-  if(std::strcmp(m_ModelType.c_str(),"RHIC")==0){
-    m_Likelihood = new LikelihoodDistribution_RHIC(this);
-    m_Prior = new PriorDistribution_RHIC(this);
-  }else if(std::strcmp(m_ModelType.c_str(), "Cosmosurvey")==0){
-    m_Likelihood = new LikelihoodDistribution_Cosmo(this);
-    m_Prior = new PriorDistribution_Cosmo(this);
-  }else if(std::strcmp(m_ModelType.c_str(), "RHIC_PCA")==0){
-    m_Likelihood = new LikelihoodDistribution_RHIC_PCA(this);
-    m_Prior = new PriorDistribution_RHIC_PCA(this);
-  }else if(std::strcmp(m_ModelType.c_str(), "TEST")==0){
-    m_Likelihood = new LikelihoodDistribution_Test(this);
-    m_Prior = new PriorDistribution_Test(this);
-  }else{
-    printf("Must define parameter MODEL in parameter file, or yours is unrecognized\n");
-    this->stateFlag = ERROR;
-    return OTHER_ERROR;
-  } 
-  m_Proposal = new ProposalDistribution(this);
-	
-  this->stateFlag=READY;
-  return NO_ERROR;
-}
-
 /** 
  * Loads a configuration from a file. Reads pcanames.dat or ranges.dat based on fileName
  */
@@ -300,7 +169,7 @@ madai::MultiModel::LoadConfigurationFile( const std::string fileName )
   if(config_file){
     int num_inputs;
     config_file >> num_inputs;
-    if(num_inputs<1){
+    if(num_inputs < 1){
       std::cerr << "Number of inputs is < 1" << std::endl;
       this->stateFlag = ERROR;
       return OTHER_ERROR;
@@ -310,12 +179,12 @@ madai::MultiModel::LoadConfigurationFile( const std::string fileName )
     std::string name, type;
         
     // Check for type of file
-    if(fileName==(m_DirectoryName + "/pcanames.dat")){
+    if(fileName == (m_DirectoryName + "/pcanames.dat")){
       fs = false; //File switch to determine how the data is read in
       ro = true; //Tells the program whether to keep reading a line or not
       this->number_of_outputs = num_inputs;
       this->m_ScalarOutputNames.reserve(num_inputs);
-    }else if(fileName==(m_DirectoryName+ "/ranges.dat")){
+    }else if(fileName == (m_DirectoryName+ "/ranges.dat")){
       fs = true; ro = false;
       this->number_of_parameters = num_inputs;
       this->m_Parameters.reserve(num_inputs);
@@ -383,6 +252,7 @@ madai::MultiModel::LoadConfigurationFile( const std::string fileName )
     return OTHER_ERROR;
   }
 	config_file.close();
+  
   return NO_ERROR;
 }
 
@@ -396,8 +266,7 @@ madai::MultiModel::LoadProcess(){
   std::string cmd = "~/local/bin/interactive_emulator interactive_mode " + EmuSnapFile_Name;
   shell_script << cmd;
   shell_script.close();
-  /*std::string cmd2 = "chmod +x " + ssname;
-  std::system(cmd2.c_str());*/
+  
   unsigned int command_line_length=1;
   char ** argv = new char* [command_line_length + 1];
   argv[command_line_length] = NULL;

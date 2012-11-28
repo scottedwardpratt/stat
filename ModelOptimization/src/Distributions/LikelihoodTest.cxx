@@ -1,6 +1,3 @@
-#ifndef __LIKELIHOOD_CC__
-#define __LIKELIHOOD_CC__
-
 #include "Model.h"
 #include <time.h>
 
@@ -146,4 +143,3 @@ std::vector<double> madai::LikelihoodDistribution_Test::GetData(){
 
 	return datameans;
 }
-#endif

@@ -1,6 +1,3 @@
-#ifndef __PROPOSAL_CC__
-#define __PROPOSAL_CC__ 
-
 #include "Model.h"
 #include "MultiModel.h"
 
@@ -117,4 +114,3 @@ double madai::ProposalDistribution::Evaluate(std::vector<double> Theta1, std::ve
 	
 	return probability;
 }
-#endif

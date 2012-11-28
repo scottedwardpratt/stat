@@ -20,29 +20,30 @@ See copyright.txt for more information.
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <sys/stat.h>
+#include "math.h"
+#include <map>
 
 #include "Parameter.h"
+#include "parametermap.h"
 
 namespace madai {
     
 class Trace;
 class TraceElement;
-class MCMCRun;
 
 class TraceElement {
 public:
   TraceElement(const std::vector< double > & parameterValues,
                const std::vector< double > & OutputValues );
 	TraceElement(const std::vector< double > & parameterValues);
-  TraceElement(Trace *list);
+  TraceElement();
   void Reset();
   void Print();
   void VizTrace();
-  void Initialize(TraceElement TElement);
     
   std::vector< double > m_ParameterValues;
   std::vector< double > m_OutputValues;
-  Trace*                m_LocalTrace;
   bool                  m_InTrace;
   bool                  m_Used;
     
@@ -59,7 +60,8 @@ public:
 class Trace {
 public:
   Trace() {};
-  Trace(MCMCRun *mcmc_in);
+  Trace(const std::string info_dir, 
+        const std::string configuration);
   virtual ~Trace() {}
 
 	CParameterList *parlist;
@@ -68,7 +70,6 @@ public:
   void add(const std::vector< double > & parameterValues,
            const std::vector< double > & OutputValues );
 	void add(const std::vector< double > & parameterValues);
-  void add(TraceElement TElement);
 	TraceElement & operator[](unsigned int idx);
 	const TraceElement & operator[](unsigned int idx) const;
 
@@ -85,14 +86,18 @@ public:
   void writeHead(std::ostream & o,
                  const std::vector<madai::Parameter> & params,
                  const std::vector<std::string> & outputs) const;
-  void PrintDataToFile();
-  void WriteOut();
+  void PrintDataToFile(const std::vector<madai::Parameter> & params);
+  void WriteOut(const std::vector<madai::Parameter> & params);
   void MakeTrace();
   std::vector<std::string> GetParNames();
     
-  int      m_WriteOutCounter;
-  int      m_CurrentIteration;
-  MCMCRun* m_MCMC;
+  std::string  m_TraceDirectory;
+  int          m_Writeout;
+  int          m_MaxIterations;
+  int          m_WriteOutCounter;
+  int          m_CurrentIteration;
+  bool         m_AppendTrace;
+  parameterMap m_TraceParameterMap;
 
 protected:
 

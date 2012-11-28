@@ -54,9 +54,6 @@ public:
    * and save them in the trace file. */
   
   virtual void NextIteration(Trace *trace) = 0;
-    
-    
-  virtual void NextIteration()=0;
   //{  /* suggested structure for this function */
   //std::vector< double > scalarOutputs;
   //std::vector< double > gradient;

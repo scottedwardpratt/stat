@@ -1,6 +1,3 @@
-#ifndef __LIKELIHOOD_CC__
-#define __LIKELIHOOD_CC__
-
 #include "Model.h"
 #include <time.h>
 #include "EmuPlusPlus/EmuPlusPlus.h"
@@ -332,4 +329,3 @@ int madai::LikelihoodDistribution_RHIC::FindParam(std::string name, std::vector<
 	}
 	return out;
 }
-#endif

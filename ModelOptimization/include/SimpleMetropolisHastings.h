@@ -21,7 +21,6 @@ public:
   ~SimpleMetropolisHastings();
 
   void NextIteration(Trace *trace);
-  void NextIteration();
 
   /** Set the step size. */
   void SetStepSize( double stepSize );

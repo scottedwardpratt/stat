@@ -1,6 +1,3 @@
-#ifndef __QUAD_CC__
-#define __QUAD_CC__
-
 #include "Model.h"
 
 madai::QuadHandler::QuadHandler(parameterMap *parmap, Model * in_Model){
@@ -112,4 +109,3 @@ void madai::QuadHandler::QueryQuad(std::vector<double> Theta, std::vector<double
 	}
 	
 }
-#endif
