@@ -16,9 +16,7 @@ Optimizer( in_model ) {
   //m_LogLike = parameter::getB(m_LocalParameterMap, "LOGLIKE", true);
 	m_LogPrior = parameter::getB(m_LocalParameterMap, "LOGPRIOR", true);
 	m_LogProposal = parameter::getB(m_LocalParameterMap, "LOGPROPOSAL", true);
-  //SUPPRESS_ERRORS = parameter::getB(m_LocalParameterMap, "SUPPRESS_ERRORS", false);
 	m_CreateTrace = parameter::getB(m_LocalParameterMap, "CREATE_TRACE", true);
-  //MODEL = parameter::getS(m_LocalParameterMap,"MODEL","NOMODEL");
     
   m_RandomNumber = new CRandom(1234);
     
@@ -92,21 +90,9 @@ Optimizer( in_model ) {
   //m_LogLike = parameter::getB(m_LocalParameterMap, "LOGLIKE", true);
 	m_LogPrior = parameter::getB(m_LocalParameterMap, "LOGPRIOR", true);
 	m_LogProposal = parameter::getB(m_LocalParameterMap, "LOGPROPOSAL", true);
-  //SUPPRESS_ERRORS = parameter::getB(m_LocalParameterMap, "SUPPRESS_ERRORS", false);
 	m_CreateTrace = parameter::getB(m_LocalParameterMap, "CREATE_TRACE", true);
-  //MODEL = parameter::getS(m_LocalParameterMap,"MODEL","NOMODEL");
     
   m_RandomNumber = new CRandom(1234);
-  /*if(std::strcmp(MODEL.c_str(),"RHIC")==0){
-    Likelihood = new LikelihoodDistribution_RHIC(this);
-    Prior = new PriorDistribution_RHIC(this);
-  }
-	else{
-		printf("Must define parameter MODEL in parameter file, or yours is unrecognized\n");
-    std::cout << "Note that the only model supported at the moment is RHIC" << std::endl;
-    exit(1);
-	} 
-  Proposal = new ProposalDistribution(this);*/
     
 	if(m_RandomTheta0){
     m_InitialTheta = this->GetRandomTheta0(time(NULL));

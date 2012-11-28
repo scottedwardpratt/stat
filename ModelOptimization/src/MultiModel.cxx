@@ -123,7 +123,7 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
   if(!(this->m_ScalarOutputNames.empty())){
     std::vector<std::string>::const_iterator itr = this->m_ScalarOutputNames.begin();
     for(itr;itr<this->m_ScalarOutputNames.end();itr++)
-    std::cout << *itr << " ";
+      std::cout << *itr << " ";
     std::cout << std::endl;
   }else{
     std::cout << "Observables were not read in!" << std::endl;
@@ -284,14 +284,6 @@ madai::MultiModel::LoadConfiguration(std::string info_dir, std::string configura
     return OTHER_ERROR;
   } 
   m_Proposal = new ProposalDistribution(this);
-    
-	/*Likelihood = new LikelihoodDistribution(this);
-	 cout << "Like done." << endl; 
-     Prior = new PriorDistribution(this);
-	 cout << "Prior done." << endl;*/
-	
-	//Proposal = new ProposalDistribution(this);
-	//cout << "Proposal done." << endl;
 	
   this->stateFlag=READY;
   return NO_ERROR;
