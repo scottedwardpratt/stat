@@ -19,9 +19,9 @@ statdirs :
 	mkdir -p ${MADAI_INSTALLDIR}/include;\
 	mkdir -p ${MADAI_INSTALLDIR}/bin
 
-lib/librhicstat.a : build/pca.o build/qualifier.o build/rhicstat.o build/rhicstat_pca.o build/quadfit.o build/mcmc.o build/covariance.o build/interpolator.o build/locallinear.o build/zgetter.o build/runinfo.o
+lib/librhicstat.a : build/pca.o build/qualifier.o build/rhicstat.o build/rhicstat_pca.o build/quadfit.o build/mcmc.o build/covariance.o build/gp.o build/locallinear.o build/zgetter.o build/runinfo.o
 	rm -f lib/librhicstat.a;\
-	ar -ru lib/librhicstat.a build/pca.o build/qualifier.o build/rhicstat.o build/rhicstat_pca.o build/quadfit.o build/mcmc.o build/covariance.o build/interpolator.o build/locallinear.o build/zgetter.o build/runinfo.o
+	ar -ru lib/librhicstat.a build/pca.o build/qualifier.o build/rhicstat.o build/rhicstat_pca.o build/quadfit.o build/mcmc.o build/covariance.o build/gp.o build/locallinear.o build/zgetter.o build/runinfo.o
 
 build/pca.o : src/pca.cc include/rhicstat.h include/qualifier.h
 	${MADAI_CPP} -c src/pca.cc ${MADAI_CFLAGS} ${INC} -o build/pca.o
@@ -41,8 +41,8 @@ build/mcmc.o : src/mcmc.cc include/rhicstat.h include/qualifier.h
 build/covariance.o : src/covariance.cc include/rhicstat.h include/qualifier.h
 	${MADAI_CPP} -c src/covariance.cc ${MADAI_CFLAGS} ${INC} -o build/covariance.o
 
-build/interpolator.o : src/interpolator.cc include/rhicstat.h include/qualifier.h
-	${MADAI_CPP} -c src/interpolator.cc ${MADAI_CFLAGS} ${INC} -o build/interpolator.o
+build/gp.o : src/gp.cc include/rhicstat.h include/qualifier.h
+	${MADAI_CPP} -c src/gp.cc ${MADAI_CFLAGS} ${INC} -o build/gp.o
 
 build/locallinear.o : src/locallinear.cc include/rhicstat.h include/qualifier.h
 	${MADAI_CPP} -c src/locallinear.cc ${MADAI_CFLAGS} ${INC} -o build/locallinear.o

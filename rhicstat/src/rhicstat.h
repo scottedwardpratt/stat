@@ -13,7 +13,6 @@ public:
 	double *y,*z;
 	double *sigmay;
 	double *ylinear,*zlinear,*xlinear,*zfit,*yfit,*xquad;
-	double *zinterpolated,*yinterpolated;
 	double netdiff_exp,netdiff_fit,netdiff_fitexp;
 	bool good;
 	void Print();
@@ -37,9 +36,9 @@ public:
 	void PrintCoefficients();
 };
 
-class CZGetter_Interpolated : public CZGetter {
+class CZGetter_GP : public CZGetter {
 public:
-	CZGetter_Interpolated(CRHICStat *rsptr);
+	CZGetter_GP(CRHICStat *rsptr);
 	void InitInterpolator();
 	void LinearFit();
 	void GetZ(double *x,double *z);
@@ -134,7 +133,6 @@ public:
 	void CalcNetDiffExp(CRunInfo *runinfo);
 	void CalcNetDiffFit(CRunInfo *runinfo);
 	void CalcNetDiffFitExp(CRunInfo *runinfo);
-	void CalcNetDiffInterpolatedExp(CRunInfo *runinfo);
 	void CalcCovariance();
 	void PerformFits();
 };

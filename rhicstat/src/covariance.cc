@@ -8,9 +8,9 @@ void CRHICStat::CalcCovariance(){
 	double xdiff,delx=0.1,zi=0.0,zj=0.0;
 	double ***covarray=new double **[NZ];
 	double ***covnorm=new double **[NZ];
-	CZGetter_Interpolated *zg;
-	if(FIT_TYPE=="INTERPOLATOR")
-		zg=(CZGetter_Interpolated *)zgetter;
+	CZGetter_GP *zg;
+	if(FIT_TYPE=="GP")
+		zg=(CZGetter_GP *)zgetter;
 	for(iz=0;iz<NZ;iz++){
 		covarray[iz]=new double*[NX];
 		covnorm[iz]=new double*[NX];
@@ -26,11 +26,11 @@ void CRHICStat::CalcCovariance(){
 	
 	for(iz=0;iz<NZ;iz++){
 		for(irun=1;irun<NRUNS;irun++){
-			if(FIT_TYPE=="INTERPOLATOR" && !(zg->LINEAROFF)){
+			if(FIT_TYPE=="GP" && !(zg->LINEAROFF)){
 				zi=runinfo[irun]->zlinear[iz];
 			}
 			for(jrun=0;jrun<irun;jrun++){
-				if(FIT_TYPE=="INTERPOLATOR" && !(zg->LINEAROFF)){
+				if(FIT_TYPE=="GP" && !(zg->LINEAROFF)){
 					zj=runinfo[jrun]->zlinear[iz];
 				}
 				for(ix=0;ix<NX;ix++){

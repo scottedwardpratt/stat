@@ -9,7 +9,7 @@ CRHICStat::CRHICStat(){
 	parameter::ReadParsFromFile(parmap,"statinfo/statpars.dat");
 	NRUNS=parameter::getI(parmap,"NRUNS",729);
 	NTESTRUNS=parameter::getI(parmap,"NTESTRUNS",32);
-	FIT_TYPE=parameter::getS(parmap,"FIT_TYPE","INTERPOLATOR");
+	FIT_TYPE=parameter::getS(parmap,"FIT_TYPE","GP");
 	NBURN=parameter::getD(parmap,"NBURN",10000);
 	NMCMC=parameter::getD(parmap,"NMCMC",1000000);
 	SIGMA2_EMULATOR=parameter::getD(parmap,"SIGMA2_EMULATOR",0.1);
@@ -31,8 +31,8 @@ CRHICStat::CRHICStat(){
 	ScaleXY();
 	PCA();
 	GetZFromY(expinfo);
-	if(FIT_TYPE=="INTERPOLATOR"){
-		zgetter=new CZGetter_Interpolated(this);
+	if(FIT_TYPE=="GP"){
+		zgetter=new CZGetter_GP(this);
 		PerformFits();
 	}
 	if(FIT_TYPE=="QUAD"){
