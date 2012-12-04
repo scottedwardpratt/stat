@@ -35,6 +35,7 @@ public:
   Optimizer( const Model *model );
   virtual ~Optimizer();
   const Model * GetModel() const;
+  std::set< std::string > GetActiveParameters();
 
   void ActivateParameter( const std::string & parameterName );
   void DeactivateParameter( const std::string & parameterName );

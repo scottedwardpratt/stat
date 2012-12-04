@@ -38,9 +38,25 @@ void madai::MCMCRun::NextIteration(madai::Trace *ThetaOutsList){
   }
   m_ScaleNew = (rand() / double(RAND_MAX));
   
+  std::vector<double> inputs;
+  std::vector<double> outputs;
+  unsigned int l;
+  for( l = 0; l < m_CurrentParameters.size(); l++){
+    inputs.push_back(m_CurrentParameters[l]);
+  }
+  inputs.push_back(m_ScaleCurrent);
+  inputs.push_back(m_ScaleNew);
+  
+  m_Model->GetScalarOutputs(inputs, outputs);
   std::vector<double> Temp_Theta;
-  Temp_Theta = m_Model->m_Proposal->Iterate(m_CurrentParameters,m_ScaleNew,m_ActiveParameters);
-  m_LikelihoodNew = m_Model->m_Likelihood->Evaluate(Temp_Theta);
+  for( l = 0; l < outputs.size()-4; l++){
+    Temp_Theta.push_back(outputs[l]);
+  }
+  m_LikelihoodNew = outputs[l++];
+  m_PriorNew = outputs[l++];
+  m_ProposalNew = outputs[l++];
+  m_ProposalCurrent = outputs[l++];
+  
   if(m_IterationNumber == 1){
     m_BestLikelihood=m_LikelihoodNew;
     m_BestParameterSet = m_InitialTheta;
@@ -49,9 +65,6 @@ void madai::MCMCRun::NextIteration(madai::Trace *ThetaOutsList){
       m_VizCount = parameter::getI(m_LocalParameterMap, "VIZ_COUNT", floor(ThetaOutsList->m_MaxIterations/200));
     }
   }
-  m_PriorNew = m_Model->m_Prior->Evaluate(Temp_Theta);
-  m_ProposalNew = m_Model->m_Proposal->Evaluate(m_CurrentParameters,Temp_Theta,m_ScaleCurrent);
-  m_ProposalCurrent = m_Model->m_Proposal->Evaluate(Temp_Theta,m_CurrentParameters,m_ScaleNew);
   
   // Likelihood
   if(m_Model->m_LogLike){
@@ -74,7 +87,11 @@ void madai::MCMCRun::NextIteration(madai::Trace *ThetaOutsList){
   }
   
   if(!m_Quiet){
-    printf(" Prior_New=%g, Prior_Current=%g\n",m_PriorNew,m_PriorCurrent);
+    if(m_LogPrior){
+      printf(" Prior_New=%g, Prior_Current=%g\n",log(m_PriorNew),log(m_PriorCurrent));
+    } else {
+      printf(" Prior_New=%g, Prior_Current=%g\n",m_PriorNew,m_PriorCurrent);
+    }
   }
   
   // Proposal		
@@ -85,7 +102,11 @@ void madai::MCMCRun::NextIteration(madai::Trace *ThetaOutsList){
   }
   
   if(!m_Quiet){
-    printf(" Proposal_New=%g, Proposal_Current=%g\n",m_ProposalNew,m_ProposalCurrent);
+    if(m_LogProposal){
+      printf(" Proposal_New=%g, Proposal_Current=%g\n",log(m_ProposalNew),log(m_ProposalCurrent));
+    } else {
+      printf(" Proposal_New=%g, Proposal_Current=%g\n",m_ProposalNew,m_ProposalCurrent);
+    }
   }
   
   if(m_Model->m_LogLike){

@@ -29,9 +29,13 @@ int main(int argc, char ** argv){
   std::vector<madai::Parameter> const * parameters = &(m_model.GetParameters());
   for(int i=0; i<parameters->size();i++)
     run.ActivateParameter((*parameters)[i].m_Name);
+    
+  m_model.m_Proposal->SetActiveParameters(run.GetActiveParameters());
    
   madai::Trace trace(info_dir,"default");
-  trace.add(run.m_InitialTheta);
+  if(run.m_BurnIn == 0){
+    trace.add(run.m_InitialTheta);
+  }
 	
 	run.m_LikelihoodCurrent = m_model.m_Likelihood->Evaluate(run.m_CurrentParameters);
 	run.m_ScaleCurrent = (rand() / double(RAND_MAX));
@@ -41,10 +45,12 @@ int main(int argc, char ** argv){
     run.m_ParameterValues.push_back(0);
     
 	run.m_AcceptCount = 0;
-	for(run.m_IterationNumber = 1; run.m_IterationNumber <= trace.m_MaxIterations; run.m_IterationNumber++){
+	for(run.m_IterationNumber = 1; run.m_IterationNumber < trace.m_MaxIterations; run.m_IterationNumber++){
 		run.NextIteration(&trace);
   }
-	trace.WriteOut(m_model.GetParameters());
+  if(trace.m_CurrentIteration!=0){
+    trace.WriteOut(m_model.GetParameters());
+  }
 	trace.MakeTrace();
     
 	if(run.m_CreateTrace){
@@ -57,9 +63,10 @@ int main(int argc, char ** argv){
   std::cout << "Acceptance ratio: " << ratio << std::endl;
   printf("-------- Best Parameter Set, likelihood=%g -------------\n",run.m_BestLikelihood);
   std::cout << "This parameter set contains " << parameters->size() << " parameters." << std::endl;
-  for(int i=0;i<parameters->size();i++)
+  for(int i=0;i<parameters->size();i++){
     std::cout << (*parameters)[i].m_Name << ":\t" << run.m_BestParameterSet[i] << std::endl;
-    
+  }
+  
   std::cout << "Done Successfully." << std::endl;
   return 0;
 }

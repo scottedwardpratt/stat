@@ -1,6 +1,7 @@
-#include "Model.h"
 #include <time.h>
 #include "EmuPlusPlus/EmuPlusPlus.h"
+#include "process_pipe.h"
+#include "Distribution.h"
 
 madai::LikelihoodDistribution_RHIC::LikelihoodDistribution_RHIC(madai::Model *in_Model){
   m_Model = in_Model;
@@ -15,17 +16,17 @@ madai::LikelihoodDistribution_RHIC::LikelihoodDistribution_RHIC(madai::Model *in
   }
 
   m_UseEmulator = parameter::getB(*m_ParameterMap, "USE_EMULATOR", false);
+  m_ProcessPipe = parameter::getB(*m_ParameterMap, "PROCESS_PIPE", false);
   m_Timing = parameter::getB(*m_ParameterMap, "TIMING", false) || parameter::getB(*m_ParameterMap, "TIME_LIKELIHOOD", false);
   m_Verbose = parameter::getB(*m_ParameterMap, "VERBOSE", false) || parameter::getB(*m_ParameterMap, "VERBOSE_LIKELIHOOD", false);
   m_FakeData = parameter::getB(*m_ParameterMap, "FAKE_DATA", false);
 
-  if(m_UseEmulator && !(m_Model->m_ProcessPipe)){
-    std::cout << "Emulator is being loaded from: " << m_Model->m_DirectoryName + "/Emulator.statefile" << std::endl;
+  if(m_UseEmulator && !m_ProcessPipe){
+    std::cout << "Emulator is being loaded from: " << m_Model->m_DirectoryName + "/Emulator.statefile" << " using the EmuPlusPlus.h emulation handler" << std::endl;
     m_Emulator = new ::emulator(m_Model->m_DirectoryName + "/Emulator.statefile");
-    //emulator m_Emulator(mcmc->dir_name + "/Emulator.statefile");
     std::cout << "Emulator loaded. Test (number of params): _" << m_Emulator->number_params << "_" << std::endl;
-  }else if(m_Model->m_ProcessPipe){
-    std::cout << "Emulator loaded in MultiModel" << std::endl;
+  }else if(m_ProcessPipe){
+    this->LoadProcess();
   }else{
     std::cout << "The UseEmulator flag is set to false (or not set). We can't do anything without an emulator" << std::endl;
     exit(1);
@@ -46,7 +47,7 @@ madai::LikelihoodDistribution_RHIC::LikelihoodDistribution_RHIC(madai::Model *in
 }
 
 madai::LikelihoodDistribution_RHIC::~LikelihoodDistribution_RHIC(){
-  if(m_UseEmulator && !(m_Model->m_ProcessPipe)){
+  if(m_UseEmulator && !m_ProcessPipe){
     delete m_Emulator;
   }
 }
@@ -61,15 +62,10 @@ double madai::LikelihoodDistribution_RHIC::Evaluate(std::vector<double> Theta){
     begintime = clock();
   }
 
-  if(m_UseEmulator && !(m_Model->m_ProcessPipe)){
+  if(m_UseEmulator && !m_ProcessPipe){
     m_Emulator->QueryEmulator(Theta, ModelMeans, ModelErrors); //fills vectors with emulator output
-  }else if(m_Model->m_ProcessPipe){
-    std::vector<double> temp_outs;
-    m_Model->GetScalarOutputs(Theta, temp_outs); //fills temp_outs with emulator output
-    for(int i = 0; i < int(temp_outs.size()/2); i++){ //have to sort the means and variances
-      ModelMeans.push_back(temp_outs[2*i]);
-      ModelErrors.push_back(temp_outs[2*i+1]);
-    }
+  }else if(m_ProcessPipe){
+    this->GetMeansAndErrors(Theta, ModelMeans, ModelErrors);
   }else{
     //determine another way to fill the vectors
   }
@@ -80,7 +76,6 @@ double madai::LikelihoodDistribution_RHIC::Evaluate(std::vector<double> Theta){
   //gsl_matrix * sigma_data = gsl_matrix_calloc(N,N);
   gsl_vector * model = gsl_vector_alloc(N);
   gsl_vector * mu = gsl_vector_alloc(N);
-  // cout << "Done allocating gsl containers." << endl;
 
   if(m_Verbose){
     std::cout << "Theta: ";
@@ -94,15 +89,16 @@ double madai::LikelihoodDistribution_RHIC::Evaluate(std::vector<double> Theta){
   }
   //Read in appropriate elements
   for(int i = 0; i<N; i++){
-    //cout << " Data: " << DATA[i] << " Emu: " << ModelMeans[i] << " +/-: " << ModelErrors[i] << endl;
     if(m_SuppressErrors){
       //ModelErrors[i]=ModelMeans[i]*0.1; //What a reasonable error is depends on the observable
       ModelErrors[i]=1;
+      if(m_Verbose) {
+        std::cerr << "Model errors suppressed to value 1" << std::endl;
+      }
     }
     gsl_matrix_set(sigma, i, i,ModelErrors[i]);
     gsl_vector_set(model, i, ModelMeans[i]);
     gsl_vector_set(mu, i, m_Data[i]);
-    //cout << "i: " << i << " Data: " << DATA[i] <<  " Mean: " << ModelMeans[i] << " Error: " << ModelErrors[i] << endl;
   }
 
   likelihood = Log_MVNormal(*model, *mu, *sigma);
@@ -127,9 +123,7 @@ double madai::LikelihoodDistribution_RHIC::Evaluate(std::vector<double> Theta){
   if(m_Timing){
     std::cout << "Likelihood evaluation took " << (clock()-begintime)*1000/CLOCKS_PER_SEC << " ms." << std::endl;
   }
-
-  //cout << "PCA 0: " << ModelMeans[0] << endl;
-
+  
   //emulator_test.open("PCA0.dat", ios_base::app);
   //emulator_test << ModelMeans[0] << endl;
   //emulator_test.close();
@@ -151,15 +145,10 @@ std::vector<double> madai::LikelihoodDistribution_RHIC::GetFakeData(){
   std::vector<std::string> temp_names = parameter::getVS(actualparmap, "NAMES", "");
   std::vector<double> temp_values = parameter::getV(actualparmap, "VALUES", "");
 	
-  if(m_UseEmulator && !(m_Model->m_ProcessPipe)){
+  if(m_UseEmulator && !m_ProcessPipe){
     m_Emulator->QueryEmulator(temp_values, datameans, dataerror);
-  }else if(m_Model->m_ProcessPipe){
-    std::vector<double> temp_outs;
-    m_Model->GetScalarOutputs(temp_values, temp_outs);
-    for(int i = 0; i < int(temp_outs.size()/2); i++){
-      datameans.push_back(temp_outs[2*i]);
-      dataerror.push_back(temp_outs[2*i+1]);
-    }
+  }else if(m_ProcessPipe){
+    this->GetMeansAndErrors(temp_values, datameans, dataerror);
 	}
 
   std::cout << "We are using FAKE DATA!!!!!!!!" << std::endl;
@@ -313,15 +302,14 @@ int madai::LikelihoodDistribution_RHIC::FindParam(std::string name, std::vector<
 	bool Found = false;
 	
 	while(i < PNames.size()){
-		// cout << "FindParam: Comparing " << name << " to " << PNames[i] << endl;
 		if(std::strcmp(PNames[i].c_str(), name.c_str()) == 0){
 			if(!Found){
 				out = i;
 				Found = true;
 			}else{ //A matching parameter has already been found, multiple parameters with the same name.
-                std::cout << PNames[out] << std::endl;
-                std::cout << PNames[i] << std::endl;
-                std::cout << "In ProposalName::FindParam; Duplicate parameter names found. Please change parameter names." << std::endl;
+        std::cout << PNames[out] << std::endl;
+        std::cout << PNames[i] << std::endl;
+        std::cout << "In ProposalName::FindParam; Duplicate parameter names found. Please change parameter names." << std::endl;
 				exit(1);
 			}
 		}
@@ -329,3 +317,151 @@ int madai::LikelihoodDistribution_RHIC::FindParam(std::string name, std::vector<
 	}
 	return out;
 }
+
+void DiscardLine(std::FILE * fp) {
+	static int buffersize = 1024;
+	char buffer[buffersize];
+	std::fgets(buffer, buffersize, fp);
+}
+
+bool DiscardComments(std::FILE * fp, char comment_character) {
+	int c = std::getc(fp);
+	if ((c == EOF) || std::ferror(fp)) {
+		std::cerr << "premature end of file:(\n";
+		return false;
+	}
+	while (c == comment_character) {
+		DiscardLine(fp);
+		c = std::getc(fp);
+	}
+	if (EOF == std::ungetc(c, fp)) {
+		std::cerr << "ungetc error :(\n";
+		return false;
+	}
+	return true;	
+}
+
+#include <cctype>
+
+void EatWhitespace(std::istream & i) {
+  while (true) {
+    if (! std::isspace(i.peek()))
+      return;
+    if (i.get() == '\n')
+      return;
+  }
+}
+void EatWhitespace(std::FILE * fp) {
+  while (true) {
+    int c = std::fgetc(fp);
+    if (! std::isspace(c)) {
+      std::ungetc(c,fp);
+      return;
+    }
+    if (c == '\n')
+      return;
+  }
+}
+
+void madai::LikelihoodDistribution_RHIC::LoadProcess(){
+  std::string EmuSnapFile_Name = m_Model->m_DirectoryName + "/Emulator.statefile";
+  std::cerr << "Loading emulator from " << EmuSnapFile_Name << " as a running process_pipe" << std::endl;
+  std::ofstream shell_script;
+  std::string ssname = "begin_int_emu.sh";
+  shell_script.open(ssname.c_str());
+  std::string cmd = "~/local/bin/interactive_emulator interactive_mode " + EmuSnapFile_Name;
+  shell_script << cmd;
+  shell_script.close();
+  std::string mfe = "chmod +x begin_int_emu.sh";
+  std::system(mfe.c_str());
+  
+  unsigned int command_line_length=1;
+  char ** argv = new char* [command_line_length + 1];
+  argv[command_line_length] = NULL;
+  unsigned int stringsize = ssname.size();
+  argv[0] = new char[stringsize+1];
+  ssname.copy(argv[0], stringsize);
+  argv[0][stringsize] = '\0';
+  
+	/*
+   Command for loading the emulator is set. We will noew open a pipe
+   to the emulator and leave it going
+   */
+  
+	/** function returns EXIT_FAILURE on error, EXIT_SUCCESS otherwise */
+  if(EXIT_FAILURE == create_process_pipe(&(this->m_Process), argv)){
+    std::cerr << "create_process_pipe returned failure.\n";
+    exit(1);
+  }
+  for (unsigned int i = 0; i < command_line_length; i++) {
+		delete argv[i];
+	}
+	delete[] argv;
+  
+	if (this->m_Process.answer == NULL || this->m_Process.question == NULL) {
+		std::cerr << "create_process_pipe returned NULL fileptrs.\n";
+    exit(1);
+	}
+  
+	DiscardComments(this->m_Process.answer, '#');
+	// allow comment lines to BEGIN the interactive process
+  
+ 	unsigned int n;
+	if (1 != std::fscanf(this->m_Process.answer, "%u", &n)) {
+		std::cerr << "fscanf failure reading from the external process [1]\n";
+    exit(1);
+	}
+	if (n != m_Model->GetNumberOfParameters()) {
+		std::cerr << "number_of_parameters mismatch\n";
+    exit(1);
+	}
+	EatWhitespace(this->m_Process.answer);
+	for (unsigned int i = 0; i < m_Model->GetNumberOfParameters(); i++) {
+		DiscardLine(this->m_Process.answer);
+	}
+	if (1 != std::fscanf(this->m_Process.answer,"%d", &n)) {
+		std::cerr << "fscanf failure reading from the external process [2]\n";
+    exit(1);
+	}
+	if (n != (2*(m_Model->GetNumberOfScalarOutputs()))) {
+		std::cerr << "number_of_outputs mismatch";
+    exit(1);
+	}
+	EatWhitespace(this->m_Process.answer);
+	for (unsigned int i = 0; i < (2*(m_Model->GetNumberOfScalarOutputs())); i++) {
+		DiscardLine(this->m_Process.answer);
+	}
+}
+
+void madai::LikelihoodDistribution_RHIC::GetMeansAndErrors(std::vector< double >& parameters,
+                                                           std::vector< double >& Means,
+                                                           std::vector< double >& Errors)
+{
+  std::vector<double> temp_outs;
+  unsigned int index=0;
+  double * range = new double[2]();
+  for(std::vector<double>::const_iterator par_it = parameters.begin(); par_it < parameters.end(); par_it++){
+    m_Model->GetRange(index,range);
+    if((*par_it)<range[0] || (*par_it)>range[1]){
+      std::cerr << "Parameter out of bounds" << std::endl;
+      exit(1);
+    }
+    std::fprintf(this->m_Process.question, "%.17lf\n", *par_it);
+    index++;
+  }
+  std::fflush(this->m_Process.question);
+  double dtemp;
+  for(unsigned int i = 0; i<(2*(m_Model->GetNumberOfScalarOutputs())); i++){
+    if(1!=fscanf(this->m_Process.answer, "%lf%*c", &dtemp)){
+      std::cerr << "interprocess communication error [cj83A]n";
+      exit(1);
+    }
+    if( i%2 == 0 ){
+      Means.push_back(dtemp);
+    } else {
+      Errors.push_back(dtemp);
+    }
+  }
+}
+
+

@@ -11,6 +11,8 @@
 #include "parametermap.h"
 #include <set>
 #include "Quad.h"
+#include "process_pipe.h"
+#include "Model.h"
 
 class emulator;
 
@@ -49,22 +51,24 @@ protected:
 class ProposalDistribution:public Distribution {
 public:
 	ProposalDistribution(Model *m_Model);
+  void SetActiveParameters(std::set<std::string> activeParameters);
   std::vector<double> Iterate(std::vector<double>& current,
-                              float& scale, 
-                              std::set<std::string>& activeParameters);
+                              double& scale/*, 
+                              std::set<std::string>& activeParameters*/);
 	virtual double Evaluate(std::vector<double> Theta1, 
                           std::vector<double> Theta2, 
-                          float scale);
+                          double scale);
 
 	protected:
 
-	bool                m_SymmetricProposal;
-	bool                m_RescaledMethod;
-	double              m_Scale;
-	double              m_Offset;
-  std::vector<double> m_MixingStdDev;
-	double*             m_Min_Ranges;
-	double*             m_Max_Ranges;
+	bool                  m_SymmetricProposal;
+	bool                  m_RescaledMethod;
+	double                m_Scale;
+	double                m_Offset;
+  std::vector<double>   m_MixingStdDev;
+	double*               m_Min_Ranges;
+	double*               m_Max_Ranges;
+  std::set<std::string> m_ActiveParameters;
 
 	int FindParam(std::string param_name);
 };
@@ -81,6 +85,7 @@ public:
 
   std::vector<double> m_Data;
 	bool                m_UseEmulator;
+  bool                m_ProcessPipe;
   std::ofstream       m_EmulatorTest;
 };
 
@@ -131,6 +136,10 @@ public:
   LikelihoodDistribution_RHIC(Model *in_Model);
   ~LikelihoodDistribution_RHIC();
   double Evaluate(std::vector<double> Theta);//ParameterSet Theta
+  void LoadProcess();
+  void GetMeansAndErrors(std::vector< double >& parameters,
+                         std::vector< double >& Means,
+                         std::vector< double >& Errors);
 
   private:
 
@@ -145,6 +154,7 @@ public:
   bool                 m_FakeData;
   bool                 m_SuppressErrors;
   emulator*            m_Emulator;
+  process_pipe         m_Process;
   parameterMap         m_ObservablesParamMap;
 
   int FindParam(std::string param_name, std::vector<std::string> PNames);

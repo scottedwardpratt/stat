@@ -13,15 +13,14 @@
 #include <time.h>
 #include <sys/stat.h>
 #include "EmuPlusPlus/EmuPlusPlus.h"
-#include "process_pipe.h"
 #include "Model.h"
+#include "Distribution.h"
 
 namespace madai {
     
 class MultiModel : public Model {
 private:
   unsigned int number_of_parameters, number_of_outputs;
-  process_pipe process;
   typedef enum {
     UNINITIALIZED,
     READY,
@@ -30,8 +29,11 @@ private:
   internal_state stateFlag;
         
 public:
-  std::vector<bool> m_LogParam;
-  std::string       m_ModelType;
+  std::vector<bool>       m_LogParam;
+  std::string             m_ModelType;
+  LikelihoodDistribution* m_Likelihood;
+  ProposalDistribution*   m_Proposal;
+  PriorDistribution*      m_Prior; 
         
   bool good() { return (this->stateFlag == READY);}
   
@@ -46,12 +48,8 @@ public:
   virtual ErrorType LoadConfigurationFile( const std::string fileName );
   virtual ErrorType LoadConfiguration(const std::string info_dir);
   /** 
-   * Load a process pipe for emulation handling
-   **/
-  virtual ErrorType LoadProcess();
-  /** 
-   * Get the scalar outputs from the model evaluated at x.  If an
-   * error happens, the scalar output array will be left incomplete.
+   * Take a step in parameter space and find the LikelihoodNew, PriorNew,
+   * ProposalNew, and ProposalCurrent at that point.
    **/
   virtual ErrorType GetScalarOutputs( const std::vector< double > & parameters,
                                      std::vector< double > & scalars ) const;

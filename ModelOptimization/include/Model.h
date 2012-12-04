@@ -19,7 +19,6 @@ See copyright.txt for more information.
 #include "random.h"
 #include <gsl/gsl_randist.h>
 #include "parametermap.h"
-#include "Distribution.h"
 
 #include <cfloat>
 #include <vector>
@@ -89,15 +88,10 @@ namespace madai {
                                                       unsigned int outputIndex, 
                                                       std::vector< double > & gradient) const = 0;
   
-    LikelihoodDistribution* m_Likelihood;
-    ProposalDistribution*   m_Proposal;
-    PriorDistribution*      m_Prior;      
-  
     std::string   m_DirectoryName;
     std::string   m_ParameterFile;
     std::string   m_ParameterFileName;
     bool          m_LogLike;
-    bool          m_ProcessPipe;
     bool          m_PrescaledParams;
     parameterMap  m_ParameterMap;
 		

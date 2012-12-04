@@ -57,8 +57,8 @@ public:
   double              m_ProposalCurrent;
   double              m_ProposalNew;
   double              m_BestLikelihood;
-  float               m_ScaleCurrent;
-  float               m_ScaleNew;
+  double              m_ScaleNew;
+  double              m_ScaleCurrent;
   int                 m_AcceptCount;
   int                 m_VizCount;
   int                 m_IterationNumber;

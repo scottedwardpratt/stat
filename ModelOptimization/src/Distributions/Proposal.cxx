@@ -56,7 +56,11 @@ int madai::ProposalDistribution::FindParam(std::string name){
   return out;
 }
 
-std::vector<double> madai::ProposalDistribution::Iterate(std::vector<double>& current, float& scale, std::set<std::string>& activeParameters){
+void madai::ProposalDistribution::SetActiveParameters(std::set<std::string> activeParameters){
+  m_ActiveParameters = activeParameters;
+}
+
+std::vector<double> madai::ProposalDistribution::Iterate(std::vector<double>& current, double& scale/*, std::set<std::string>& activeParameters*/){
   if(m_SymmetricProposal){
     //We use the scale set in the parameter file
     std::vector<double> proposed = current;
@@ -64,7 +68,7 @@ std::vector<double> madai::ProposalDistribution::Iterate(std::vector<double>& cu
 
     for(int i=0; i<proposed.size(); i++){
       //std::vector<std::string>::const_iterator itr = activeParameters.begin();
-      if(activeParameters.find( m_Model->GetParameters()[i].m_Name ) != activeParameters.end() ){
+      if(m_ActiveParameters.find( m_Model->GetParameters()[i].m_Name ) != m_ActiveParameters.end() ){
         m_Model->GetRange(i, range);
         proposed[i] = (current[i] - range[0])/(range[1]-range[0]); //scale to between 0 and 1
         //proposed[i] = proposed[i] + gsl_ran_gaussian(randy, SCALE*MixingStdDev[i]/sqrt((double)proposed.size()));
@@ -81,8 +85,8 @@ std::vector<double> madai::ProposalDistribution::Iterate(std::vector<double>& cu
     double range[2];
 
     for(int i=0; i<proposed.size(); i++){
-      if(activeParameters.find(m_Model->GetParameters()[i].m_Name)!=
-         activeParameters.end() ){
+      if(m_ActiveParameters.find(m_Model->GetParameters()[i].m_Name)!=
+         m_ActiveParameters.end() ){
         m_Model->GetRange(i,range);
         proposed[i] = (current[i] - range[0])/(range[1]-range[0]); //scale to between 0 and 1
         //proposed[i] = proposed[i] + gsl_ran_gaussian(randy, scale*MixingStdDev[i]/sqrt((double)proposed.size()));
@@ -96,7 +100,7 @@ std::vector<double> madai::ProposalDistribution::Iterate(std::vector<double>& cu
   }
 }
 
-double madai::ProposalDistribution::Evaluate(std::vector<double> Theta1, std::vector<double> Theta2, float scale){
+double madai::ProposalDistribution::Evaluate(std::vector<double> Theta1, std::vector<double> Theta2, double scale){
 	// At the moment we are using a gaussian proposal distribution, so the scale is the standard deviation
 	double probability;
 	double exponent = 0, prefactor = 1;

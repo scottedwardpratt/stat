@@ -82,7 +82,6 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
     
 	parameter::ReadParsFromFile(m_ParameterMap, m_ParameterFileName.c_str());
 	m_LogLike = parameter::getB(m_ParameterMap, "LOGLIKE", true);
-  m_ProcessPipe = parameter::getB(m_ParameterMap, "PROCESS_PIPE", false);
   m_ModelType = parameter::getS(m_ParameterMap,"MODEL","NOMODEL");
    
     //============================================
@@ -131,9 +130,6 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
       return OTHER_ERROR;
 		}
 	}
-    
-  if(m_ProcessPipe)
-    this->LoadProcess();
 	
   if(std::strcmp(m_ModelType.c_str(),"RHIC")==0){
     m_Likelihood = new LikelihoodDistribution_RHIC(this);
@@ -256,112 +252,30 @@ madai::MultiModel::LoadConfigurationFile( const std::string fileName )
   return NO_ERROR;
 }
 
-madai::MultiModel::ErrorType
-madai::MultiModel::LoadProcess(){
-  std::string EmuSnapFile_Name = m_DirectoryName + "/Emulator.statefile";
-  std::cerr << "Loading emulator from " << EmuSnapFile_Name << std::endl;
-  std::ofstream shell_script;
-  std::string ssname = "begin_int_emu.sh";
-  shell_script.open(ssname.c_str());
-  std::string cmd = "~/local/bin/interactive_emulator interactive_mode " + EmuSnapFile_Name;
-  shell_script << cmd;
-  shell_script.close();
-  
-  unsigned int command_line_length=1;
-  char ** argv = new char* [command_line_length + 1];
-  argv[command_line_length] = NULL;
-  unsigned int stringsize = ssname.size();
-  argv[0] = new char[stringsize+1];
-  ssname.copy(argv[0], stringsize);
-  argv[0][stringsize] = '\0';
-    
-	/*
-     Command for loading the emulator is set. We will noew open a pipe
-     to the emulator and leave it going
-     */
-    
-	/** function returns EXIT_FAILURE on error, EXIT_SUCCESS otherwise */
-  if(EXIT_FAILURE == create_process_pipe(&(this->process), argv)){
-    std::cerr << "create_process_pipe returned failure.\n";
-    this->stateFlag=ERROR;
-    return OTHER_ERROR;
-  }
-  for (unsigned int i = 0; i < command_line_length; i++) {
-		delete argv[i];
-	}
-	delete[] argv;
-    
-	if (this->process.answer == NULL || this->process.question == NULL) {
-		std::cerr << "create_process_pipe returned NULL fileptrs.\n";
-		this->stateFlag = ERROR;
-		return OTHER_ERROR;
-	}
-    
-	discard_comments(this->process.answer, '#');
-	// allow comment lines to BEGIN the interactive process
-    
- 	unsigned int n;
-	if (1 != std::fscanf(this->process.answer, "%u", &n)) {
-		std::cerr << "fscanf failure reading from the external process [1]\n";
-		this->stateFlag = ERROR;
-		return OTHER_ERROR;
-	}
-	if (n != this->number_of_parameters) {
-		std::cerr << "number_of_parameters mismatch\n";
-		this->stateFlag = ERROR;
-		return OTHER_ERROR;
-	}
-	eat_whitespace(this->process.answer);
-	for (unsigned int i = 0; i < this->number_of_parameters; i++) {
-		discard_line(this->process.answer);
-	}
-	if (1 != std::fscanf(this->process.answer,"%d", &n)) {
-		std::cerr << "fscanf failure reading from the external process [2]\n";
-		this->stateFlag = ERROR;
-		return OTHER_ERROR;
-	}
-	if (n != (2*(this->number_of_outputs))) {
-		std::cerr << "number_of_outputs mismatch";
-		this->stateFlag = ERROR;
-		return OTHER_ERROR;
-	}
-	eat_whitespace(this->process.answer);
-	for (unsigned int i = 0; i < (2*(this->number_of_outputs)); i++) {
-		discard_line(this->process.answer);
-	}
-	return NO_ERROR;
-
-}
-
 /** 
- * Get the scalar outputs from the model evaluated at x.  If an
- * error happens, the scalar output array will be left incomplete.
+ * Take a step in parameter space and calculate LiklihoodNew, PriorNew, ProposalNew,
+ * and ProposalCurrent.
  */
 madai::MultiModel::ErrorType 
 madai::MultiModel::GetScalarOutputs(const std::vector< double > & parameters,
                                     std::vector< double > & scalars ) const
 {
-  unsigned int index=0;
-  double * range = new double[2]();
-  for(std::vector<double>::const_iterator par_it = parameters.begin(); par_it < parameters.end(); par_it++){
-    this->GetRange(index,range);
-    if((*par_it)<range[0] || (*par_it)>range[1]){
-      std::cerr << "Parameter out of bounds" << std::endl;
-      return OTHER_ERROR;
-    }
-    std::fprintf(this->process.question, "%.17lf\n", *par_it);
-    index++;
+  double ScaleC = parameters[parameters.size()-2];
+  double ScaleN = parameters[parameters.size()-1];
+  std::vector<double> Temp_Theta; 
+  std::vector<double> CurrentTheta;
+  for(std::vector<double>::const_iterator par_it = parameters.begin(); par_it < parameters.end()-2; par_it++){
+    CurrentTheta.push_back(*par_it);
   }
-  std::fflush(this->process.question);
-  double dtemp;
-  for(unsigned int i = 0; i<(2*(this->number_of_outputs)); i++){
-    if(1!=fscanf(this->process.answer, "%lf%*c", &dtemp)){
-      scalars.push_back(dtemp);
-      std::cerr << "interprocess communication error [cj83A]n";
-      return OTHER_ERROR;
-    }
-    scalars.push_back(dtemp);
+  Temp_Theta = m_Proposal->Iterate(CurrentTheta, ScaleN);
+  unsigned int i;
+  for( i = 0; i < Temp_Theta.size(); i++){
+    scalars.push_back(Temp_Theta[i]);
   }
+  scalars.push_back( m_Likelihood->Evaluate(Temp_Theta) ); // m_LikelihoodNew
+  scalars.push_back( m_Prior->Evaluate(Temp_Theta) ); // m_PriorNew
+  scalars.push_back( m_Proposal->Evaluate(CurrentTheta, Temp_Theta, ScaleC) ); // m_ProposalNew
+  scalars.push_back( m_Proposal->Evaluate(Temp_Theta, CurrentTheta, ScaleN) ); // m_ProposalCurrent
 	return NO_ERROR;
 }
 

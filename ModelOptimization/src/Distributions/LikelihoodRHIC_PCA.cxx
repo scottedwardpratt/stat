@@ -1,4 +1,4 @@
-#include "Model.h"
+#include "Distribution.h"
 #include <time.h>
 
 madai::LikelihoodDistribution_RHIC_PCA::LikelihoodDistribution_RHIC_PCA(madai::Model *in_Model){
@@ -12,14 +12,11 @@ madai::LikelihoodDistribution_RHIC_PCA::LikelihoodDistribution_RHIC_PCA(madai::M
 	}else{
 		m_ParameterMap = &(m_Model->m_ParameterMap);
 	}
-
-	// cout << "Like param map made." << endl;
 	
 	m_UseEmulator = parameter::getB(*m_ParameterMap, "USE_EMULATOR", false);
 	m_Timing = parameter::getB(*m_ParameterMap, "TIMING", false) || parameter::getB(*m_ParameterMap, "TIME_LIKELIHOOD", false);
 	m_Verbose = parameter::getB(*m_ParameterMap, "VERBOSE", false) || parameter::getB(*m_ParameterMap, "VERBOSE_LIKELIHOOD", false);
 	
-	// cout << "params declared." << endl;
 	if(m_UseEmulator){
 		m_Quad = new QuadHandler(m_ParameterMap, m_Model);
 	}
@@ -53,12 +50,9 @@ double madai::LikelihoodDistribution_RHIC_PCA::Evaluate(std::vector<double> Thet
 	
 	//Initialize GSL containers
 	int N = ModelErrors.size();
-	//cout << "ModelErrors.size() = " << N << endl;
 	gsl_matrix * sigma = gsl_matrix_calloc(N,N);
-	//gsl_matrix * sigma_data = gsl_matrix_calloc(N,N);
 	gsl_vector * model = gsl_vector_alloc(N);
 	gsl_vector * mu = gsl_vector_alloc(N);
-	// cout << "Done allocating gsl containers." << endl;
 	
 	
 	//Read in appropriate elements
@@ -66,20 +60,13 @@ double madai::LikelihoodDistribution_RHIC_PCA::Evaluate(std::vector<double> Thet
 		gsl_matrix_set(sigma,i,i,ModelErrors[i]);
 		gsl_vector_set(model, i,ModelMeans[i]);
 		gsl_vector_set(mu, i, m_Data[i]);
-		//cout << "ModelErrors " << ModelErrors[i] << " ModelMeans " << ModelMeans[i] << " Data " << DATA[i] << endl;
-		//cout << "i: " << i << " Data: " << DATA[i] <<  " Mean: " << ModelMeans[i] << " Error: " << ModelErrors[i] << endl;
 	}
 	
 	likelihood = Log_MVNormal(*model, *mu, *sigma);
-	//likelihood = Gaussian(*model, *mu, *sigma);
-	//likelihood = Gaussian(*model, *mu, *sigma, *sigma_data); //This is the integrated likelihood
 	
 	if(!(m_Model->m_LogLike)){ //If you don't want the loglikelihood, and we've used Log_MVN, we have to exponentiate.
 		likelihood = exp(likelihood);
 	}
-	/*if(mcmc->LOGLIKE){ //If you do want the loglikelihood, and we've used Gaussian, we have to take the log.
-		likelihood = log(likelihood);
-	}*/
 	
 	if(m_Verbose){
 		double sum = 0.0;

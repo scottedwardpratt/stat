@@ -1,3 +1,4 @@
+#include "Quad.h"
 #include "Model.h"
 
 madai::QuadHandler::QuadHandler(parameterMap *parmap, Model * in_Model){

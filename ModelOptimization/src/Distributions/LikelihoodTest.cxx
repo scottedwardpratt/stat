@@ -1,4 +1,4 @@
-#include "Model.h"
+#include "Distribution.h"
 #include <time.h>
 
 madai::LikelihoodDistribution_Test::LikelihoodDistribution_Test(madai::Model *in_Model){
@@ -21,10 +21,11 @@ madai::LikelihoodDistribution_Test::LikelihoodDistribution_Test(madai::Model *in
 	
 	// cout << "params declared." << endl;
 	if(m_UseEmulator){
-		std::cout << "This is a guassian test. The UseEmulator flag will be ignored." << std::endl;
+		std::cout << "This is a guassian test. The UseEmulator flag should be turned to false." << std::endl;
+    exit(1);
 	}
 	else{
-		exit(1);
+		std::cerr << "UseEmulator is set to false. This is a gaussian test." << std::endl;
 	}
 
 	m_Data = GetData();
@@ -52,24 +53,25 @@ double madai::LikelihoodDistribution_Test::Evaluate(std::vector<double> Theta){
 	if(m_UseEmulator){
 		// This is a gaussian test, so there shouldn't be an 'emulator' per say.
 		//emulator->QueryEmulator(Theta, ModelMeans, ModelErrors); //fills vectors with emulator output
+    std::cerr << "This should not use an emulator. Set the UseEmulator flag to false" << std::endl;
+    exit(1);
 	}
 	else{
-		int errors[]={0,0,0,0}; //For now
+		double errors[]={0,0,0,0}; //For now
 		ModelErrors.assign (errors,errors+4);
-		int means[4];
+		double means[4];
 		for(int i=0;i<4;i++){
 			means[i]=Theta[i];
 		}
 		ModelMeans.assign(means,means+4);
 	}
 	
-	
 	//Initialize GSL containers
 	int N = ModelErrors.size();
+  std::cerr << "Length of ModelErrors = " << N << std::endl;
 	//gsl_matrix * sigma = gsl_matrix_calloc(N,N);
 	gsl_vector * model = gsl_vector_alloc(N);
 	gsl_vector * mu = gsl_vector_alloc(N);
-	// cout << "Done allocating gsl containers." << endl;
 	
 	
 	//Read in appropriate elements

@@ -35,6 +35,12 @@ Optimizer
 }
 
 
+std::set< std::string >
+Optimizer
+::GetActiveParameters(){
+  return m_ActiveParameters;
+}
+
 void
 Optimizer
 ::ActivateParameter( const std::string & parameterName )
