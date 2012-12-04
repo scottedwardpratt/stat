@@ -304,7 +304,8 @@ const double root3=sqrt(3.0);
 }
 
 // Dead below
-void CZGetter_GP::CalcHyperPars(){
+//JFN 11/30/12- Well then. lets just comment it out
+/*void CZGetter_GP::CalcHyperPars(){
 	//Use Newton's method
 	int iz,ix1,ix2,irun1,irun2;
 	// solve eqs for delxx, yy=MM*xx+b, delyy=MM*delxx=-yy, 
@@ -348,6 +349,6 @@ void CZGetter_GP::CalcHyperPars(){
 	delete [] DDC;
 
 
-}
+}*/
 
 #endif
