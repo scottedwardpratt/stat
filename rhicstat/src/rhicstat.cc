@@ -9,6 +9,48 @@ CRHICStat::CRHICStat(){
 	parameter::ReadParsFromFile(parmap,"statinfo/statpars.dat");
 	NRUNS=parameter::getI(parmap,"NRUNS",729);
 	NTESTRUNS=parameter::getI(parmap,"NTESTRUNS",32);
+	MODEL_DIR=parameter::getS(parmap,"MODEL_DIR","./");
+	FIT_TYPE=parameter::getS(parmap,"FIT_TYPE","GP");
+	NBURN=parameter::getD(parmap,"NBURN",10000);
+	NMCMC=parameter::getD(parmap,"NMCMC",1000000);
+	SIGMA2_EMULATOR=parameter::getD(parmap,"SIGMA2_EMULATOR",0.1);
+//
+	randy=new CRandom(-1234);
+	int irun;
+	InitArrays();
+	bestinfo=new CRunInfo(NX,NY);
+	runinfo=new CRunInfo *[NRUNS];
+	for(irun=0;irun<NRUNS;irun++)
+		runinfo[irun]=new CRunInfo(NX,NY);
+	CRunInfo::rhicstat=this;
+	testinfo=new CRunInfo *[NTESTRUNS];
+	for(irun=0;irun<NTESTRUNS;irun++)
+		testinfo[irun]=new CRunInfo(NX,NY);
+	ReadAllX();
+	
+	ReadAllY();
+	ScaleXY();
+	PCA();
+	GetZFromY(expinfo);
+	if(FIT_TYPE=="GP"){
+		zgetter=new CZGetter_GP(this);
+		PerformFits();
+	}
+	if(FIT_TYPE=="QUAD"){
+		zgetter=new CZGetter_QuadFit(this);
+		PerformFits();
+	}
+	if(FIT_TYPE=="LOCALLINEAR"){
+		zgetter =new CZGetter_LocalLinear(this);
+		PerformFits();
+	}
+}
+
+CRHICStat::CRHICStat(string pathname){
+	parameter::ReadParsFromFile(parmap,pathname+"/statinfo/statpars.dat");
+	NRUNS=parameter::getI(parmap,"NRUNS",729);
+	NTESTRUNS=parameter::getI(parmap,"NTESTRUNS",32);
+	MODEL_DIR=pathname+"/";
 	FIT_TYPE=parameter::getS(parmap,"FIT_TYPE","GP");
 	NBURN=parameter::getD(parmap,"NBURN",10000);
 	NMCMC=parameter::getD(parmap,"NMCMC",1000000);
@@ -83,7 +125,7 @@ void CRHICStat::InitArrays(){
 void CRHICStat::InitX(){
 	char dummy[120];
 	string filename;
-	filename="ranges.dat";
+	filename=MODEL_DIR+"ranges.dat";
 	FILE *fptr=fopen(filename.c_str(),"r");
 	/** First Get NX */
 	NX=0;
@@ -134,12 +176,12 @@ void CRHICStat::ReadAllX(){
 	int irun;
 	for(irun=0;irun<NRUNS;irun++){
 		sprintf(runchars,"%d",irun+1);
-		filename="parameters/run"+string(runchars)+"/stats.param";
+		filename=MODEL_DIR+"parameters/run"+string(runchars)+"/stats.param";
 		ReadX(filename,runinfo[irun]);
 	}
 	for(irun=0;irun<NTESTRUNS;irun++){
 		sprintf(runchars,"%d",irun+1);
-		filename="testpars/run"+string(runchars)+"/stats.param";
+		filename=MODEL_DIR+"testpars/run"+string(runchars)+"/stats.param";
 		ReadX(filename,testinfo[irun]);
 	}
 
@@ -170,7 +212,7 @@ void CRHICStat::InitY(){
 	string filename;
 	char dummy[200],runchars[5];
 	int i,irun,iy;
-	filename="pcanames.dat";
+	filename=MODEL_DIR+"pcanames.dat";
 	FILE *fptr=fopen(filename.c_str(),"r");
 	/** First Get NY */
 	NY=0;
@@ -207,7 +249,7 @@ void CRHICStat::ReadAllY(){
 	NGOODRUNS=0;
 	for(irun=1;irun<=NRUNS;irun++){
 		sprintf(runchars,"%d",irun);
-		filename="model_results/run"+string(runchars)+"/results.dat";
+		filename=MODEL_DIR+"model_results/run"+string(runchars)+"/results.dat";
 		ReadY(filename,runinfo[irun-1]);
 		if(runinfo[irun-1]->good==false)
 			printf("%d,",irun);
@@ -218,11 +260,11 @@ void CRHICStat::ReadAllY(){
 		//Read Testing Data
 	for(irun=0;irun<NTESTRUNS;irun++){
 		sprintf(runchars,"%d",irun+1);
-		filename="test_results/run"+string(runchars)+"/results.dat";
+		filename=MODEL_DIR+"test_results/run"+string(runchars)+"/results.dat";
 		ReadY(filename,testinfo[irun]);
 	}
 		// Read Experimental Data
-	ReadY("exp_data/results.dat",expinfo);
+	ReadY(MODEL_DIR+"exp_data/results.dat",expinfo);
 	NGOODRUNS=ngood; // don't count from test runs
 	for(iy=0;iy<NY;iy++){
 		sigmaybar[iy]=0.0;

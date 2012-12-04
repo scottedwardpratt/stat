@@ -73,8 +73,10 @@ public:
 class CRHICStat{
 public:
 	CRHICStat();
+	CRHICStat(string pathname);
 	parameterMap parmap;
 	string FIT_TYPE;
+	string MODEL_DIR;
 	long long int NMCMC,NBURN;
 	CZGetter *zgetter;
 	string *yname;
