@@ -75,7 +75,6 @@ double LikelihoodDistribution_Interpolator::Evaluate(ParameterSet Theta){
 		//cout << "Using 'x': " << likelihood << endl;
 		likelihood = My_emu->GetLL(&Theta.Values[0]);
 		//cout << "Using '&Theta.Values[0]': " << likelihood << endl;
-		a;klsdfja;sldkf'a;ldskf';lk
 	}
 	else{
 		//determine another way to fill the vectors
