@@ -71,7 +71,7 @@ def main():
         for j in range(len(x)):
             param.write("double param"+str(j)+" "+str(x[j])+" 0.1 \n")
         for j in range(len(y)):
-            obser.write("double obser"+str(j)+" "+str(y[j])+" \n")
+            obser.write("double obser"+str(j)+" "+str(y[j])+" 0.1 \n")
         param.close()
         obser.close()
     os.system("cp -r "+directory+"/model_results/run1 "+directory+"/model_results/default")
