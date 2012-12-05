@@ -8,7 +8,7 @@ using namespace std;
 MCMC::MCMC(string info_dir, string configuration){
 	configname = configuration;
 	dir_name = info_dir;
-	parameterfile = info_dir+"/defaultpars/";
+	parameterfile = dir_name+"/defaultpars/";
 	cout << "There should be something here ->" << parameterfile << "<-" << endl;
 	cout << "In config: " << parameterfile << endl;
 	parameter_file_name = parameterfile + "/mcmc.param";
@@ -99,7 +99,7 @@ MCMC::MCMC(string info_dir, string configuration){
 }
 
 MCMC::~MCMC(){
-	
+
 }
 
 void MCMC::FirstPass(){
@@ -351,7 +351,7 @@ void MCMC::LoadParams(){
 }
 
 void MCMC::GetRanges(){
-	string filename = info_dir + "/ranges.dat";
+	string filename = dir_name + "/ranges.dat";
 	fstream ranges;
 	ranges.open(filename.c_str(),fstream::in);
 	if(ranges){
@@ -391,7 +391,7 @@ void MCMC::GetRanges(){
 }
 
 void MCMC::LoadObservables(){
-	string observables_filename = info_dir + "/pcanames.dat";
+	string observables_filename = dir_name + "/pcanames.dat";
 	fstream PcaNames;
 	PcaNames.open(observables_filename.c_str(),fstream::in);
 
