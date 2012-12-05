@@ -34,6 +34,7 @@ class MCMC{
 public:
 	MCMC(string run_file, string configuration);
 	~MCMC();
+	LoadParams();
 	GetRanges();
 	FirstPass();
 	Run();

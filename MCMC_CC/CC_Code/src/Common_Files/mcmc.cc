@@ -25,22 +25,9 @@ MCMC::MCMC(string info_dir, string configuration){
 	MODEL = parameter::getS(parmap,"MODEL","NOMODEL");
 	PRESCALED_PARAMS = parameter::getB(parmap, "PRESCALED_PARAMS", false);
 	
-	GetRanges();
+	LoadParams();
 
-	if(EmulatorParams!=""){
-		string line;
-		stringstream Emparams;
-		Emparams << EmulatorParams;
-		getline(Emparams,line,' ');
-		ParamNames.push_back(line);
-		while(!Emparams.eof()){
-			getline(Emparams,line,' ');
-			if(line.compare(ParamNames.back())!=0) {ParamNames.push_back(line);}
-		} 
-		if(ParamNames.back().compare(0,1," ")==0 || ParamNames.back().empty()){ // if for some reason the last element is empty, drop it
-			ParamNames.pop_back();
-		}
-	}
+	GetRanges();
 
 	for(int i=0;i<ParamNames.size();i++) {
 		printf("%s ",ParamNames[i].c_str());
@@ -94,7 +81,6 @@ MCMC::MCMC(string info_dir, string configuration){
 	for(int i=0;i<ObservablesNames.size();i++) {
 		cout << ObservablesNames[i] << endl;
 	}
-	//====================================================
 	
 	vector<string> temp_logparam = parameter::getVS(parmap, "LOG_PARAMETERS", "");
 	
@@ -383,6 +369,23 @@ MCMC::Run(){
 	cout << "Acceptance ratio: " << ratio << endl;
 	printf("-------- Best Parameter Set, likelihood=%g -------------\n",bestlikelihood);
 	BestParameterSetPtr->Print();
+}
+
+MCMC::LoadParams(){
+	if(EmulatorParams!=""){
+		string line;
+		stringstream Emparams;
+		Emparams << EmulatorParams;
+		getline(Emparams,line,' ');
+		ParamNames.push_back(line);
+		while(!Emparams.eof()){
+			getline(Emparams,line,' ');
+			if(line.compare(ParamNames.back())!=0) {ParamNames.push_back(line);}
+		} 
+		if(ParamNames.back().compare(0,1," ")==0 || ParamNames.back().empty()){ // if for some reason the last element is empty, drop it
+			ParamNames.pop_back();
+		}
+	}
 }
 
 MCMC::GetRanges(){
