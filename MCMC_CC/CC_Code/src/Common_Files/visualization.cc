@@ -22,8 +22,8 @@ VizHandler::VizHandler(MCMC *mcmc_in){
 			cout << "Gnuplot not found!" << endl;
 			exit(1);
 		}
-		gnuplotterm = parameter::getS(mcmc->local_parmap, "GNUPLOT_TERMINAL", "x11");
-		gnuplotstyle = parameter::getS(mcmc->local_parmap, "GNUPLOT_TRACESTYLE", "linespoints");
+		gnuplotterm = parameter::getS(mcmc->parmap, "GNUPLOT_TERMINAL", "x11");
+		gnuplotstyle = parameter::getS(mcmc->parmap, "GNUPLOT_TRACESTYLE", "linespoints");
 		
 		fprintf(gnuplotpipe, "%s\n", ("set term " + gnuplotterm).c_str());
 		fprintf(gnuplotpipe, "%s\n", "set xlabel 'iteration'");
