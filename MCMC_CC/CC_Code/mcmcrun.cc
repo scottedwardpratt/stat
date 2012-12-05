@@ -10,6 +10,7 @@ int main(int argc, char *argv[]){
 	
 	string run_file = argv[1];
 	MCMC *mcmc = new MCMC(run_file, "default");
+	mcmc->FirstPass();
 	mcmc->Run();
 
 	cout << "Done successfully." << endl;
