@@ -98,7 +98,11 @@ MCMC::MCMC(string info_dir, string configuration){
 	
 }
 
-MCMC::FirstPass(){
+MCMC::~MCMC(){
+	
+}
+
+void MCMC::FirstPass(){
 	tracedir = dir_name + "/trace/" + configname;
 	
 	MAXITERATIONS = parameter::getI(parmap, "MAX_ITERATIONS", 500);
@@ -158,7 +162,7 @@ MCMC::FirstPass(){
 }
 
 /** This runs MAXITERATIONS samplings */
-MCMC::Run(){
+void MCMC::Run(){
 	srand(time(NULL));
 	double Likelihood_Current, Likelihood_New;
 	double Prior_Current, Prior_New;
@@ -325,7 +329,7 @@ MCMC::Run(){
 	BestParameterSetPtr->Print();
 }
 
-MCMC::LoadParams(){
+void MCMC::LoadParams(){
 	if(EmulatorParams!=""){
 		string line;
 		stringstream Emparams;
@@ -346,7 +350,7 @@ MCMC::LoadParams(){
 	printf("\n");
 }
 
-MCMC::GetRanges(){
+void MCMC::GetRanges(){
 	string filename = info_dir + "/ranges.dat";
 	fstream ranges;
 	ranges.open(filename.c_str(),fstream::in);
@@ -386,7 +390,7 @@ MCMC::GetRanges(){
 	cout << "Ranges loaded" << endl;
 }
 
-MCMC::LoadObservables(){
+void MCMC::LoadObservables(){
 	string observables_filename = info_dir + "/pcanames.dat";
 	fstream PcaNames;
 	PcaNames.open(observables_filename.c_str(),fstream::in);
