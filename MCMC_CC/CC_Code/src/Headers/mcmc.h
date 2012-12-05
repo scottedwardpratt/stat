@@ -71,9 +71,11 @@ public:
 	double Max_Ranges[30],Min_Ranges[30];
 	
 	//ParameterSet *BestParameterSetPtr;
-	vector<double> BestParameterSetPtr;
+	vector<double> BestParameterSet;
 	vector<double> ParamValues;
 	vector<double> Theta;
+	vector<double> Proposed_Theta;
+	vector<double> Scaled_Theta; //These are scaled to [0,1] for the trace density plots
 	double bestlikelihood;
 	double Likelihood_Current;
 	

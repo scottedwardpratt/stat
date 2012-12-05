@@ -195,21 +195,18 @@ void MCMC::Run(){
 	float Scale_Current, Scale_New;
 
 	double LOGBF,alpha;
-	ParameterSet * ThetaZeroPtr = ThetaList->Theta[0];
-	ParameterSet CurrentParameters = *ThetaZeroPtr;
+	//ParameterSet * ThetaZeroPtr = ThetaList->Theta[0];
+	//ParameterSet CurrentParameters = *ThetaZeroPtr;
+	Proposed_Theta = Theta;
 	
-	if(!ThetaZeroPtr){
-		cout << "Error getting zeroth iteration parameters." << endl;
-	}
-	
-	Likelihood_Current = Likelihood->Evaluate(*ThetaZeroPtr);
+	Likelihood_Current = Likelihood->Evaluate(Theta);
 	Scale_Current = (rand() / double(RAND_MAX));
-	//Proposal_Current = Proposal->Evaluate(*ThetaZeroPtr);
-	Prior_Current = Prior->Evaluate(*ThetaZeroPtr);
+	//Proposal_Current = Proposal->Evaluate(Theta);
+	Prior_Current = Prior->Evaluate(Theta);
 
-	for(int i = 0; i < ThetaList->ParamNames.size(); i++){
+	/*for(int i = 0; i < ThetaList->ParamNames.size(); i++){
 		ParamValues.push_back(0);
-	}
+	}*/
 
 	Accept_Count = 0;
 	for(int i =1; i<=MAXITERATIONS; i++){
@@ -219,15 +216,15 @@ void MCMC::Run(){
 			LOGBF = 1;
 		}
 		Scale_New = (rand() / double(RAND_MAX));
-		ParameterSet Temp_Theta = Proposal->Iterate(CurrentParameters,Scale_New);
-		Likelihood_New = Likelihood->Evaluate(Temp_Theta);
+		Proposed_Theta = Proposal->Iterate(Theta,Scale_New);
+		Likelihood_New = Likelihood->Evaluate(Proposed_Theta);
 		if(i==1){
-			bestlikelihood=Likelihood_New;
-			BestParameterSetPtr=&CurrentParameters;
+			bestlikelihood = Likelihood_New;
+			BestParameterSet = Theta;
 		}
-		Prior_New = Prior->Evaluate(Temp_Theta);
-		Proposal_New = Proposal->Evaluate(CurrentParameters,Temp_Theta,Scale_Current);
-		Proposal_Current = Proposal->Evaluate(Temp_Theta,CurrentParameters,Scale_New);
+		Prior_New = Prior->Evaluate(Proposed_Theta);
+		Proposal_New = Proposal->Evaluate(Theta,Proposed_Theta,Scale_Current);
+		Proposal_Current = Proposal->Evaluate(Proposed_Theta,Theta,Scale_New);
 		
 		// cout << "Likelihood of proposed set: " << Likelihood_New << endl;
 		// cout << "Likelihood of current set: " << Likelihood_Current << endl;
@@ -298,11 +295,11 @@ void MCMC::Run(){
 			Likelihood_Current = Likelihood_New;
 			Prior_Current = Prior_New;
 			//Proposal_Current = Proposal_New;
-			CurrentParameters = Temp_Theta;
+			Theta = Proposed_Theta;
 			Scale_Current = Scale_New;
 			if(Likelihood_Current>bestlikelihood && i>1){
-				bestlikelihood=Likelihood_New;
-				BestParameterSetPtr=&CurrentParameters;
+				bestlikelihood = Likelihood_New;
+				BestParameterSet = Theta;
 				if(!QUIET){
 					if(LOGLIKE){
 						printf("XXXXXXXXX YIPPEE!! Best parameters so far, loglikelihood=%g\n",bestlikelihood);
@@ -319,15 +316,11 @@ void MCMC::Run(){
 		}
 
 		if(i > BURN_IN){ // We are just tossing everything in the burn in period.
-			ThetaList->Add(CurrentParameters);
+			ThetaList.push_back(Theta);
 		}
 
-		for(int k = 0; k < ThetaList->ParamNames.size(); k++){ //These ParamValus are used for the density plots
-			//cout << ThetaList->ParamNames[k] << " " << CurrentParameters.Values[k] << endl;
-			//cout << "(" << CurrentParameters.Values[k] << " - " << Min_Ranges[k] << ") / (" << Max_Ranges[k] << " - " << Min_Ranges[k] << ")" << endl; cout.flush();
-			//cout << Max_Ranges[k] << " " << Min_Ranges[k] << endl;
-			ParamValues[k] = (CurrentParameters.Values[k] - Min_Ranges[k])/(Max_Ranges[k]-Min_Ranges[k]);
-			//cout << ParamValues[k] << endl;
+		for(int k = 0; k < ParamNames.size(); k++){ //These ParamValus are used for the density plots
+			ScaledTheta[k] = (Theta[k] - Min_Ranges[k])/(Max_Ranges[k]-Min_Ranges[k]);
 		}
 
 		/*if((i > BURN_IN) && (CREATE_TRACE)){
@@ -355,7 +348,9 @@ void MCMC::Run(){
 	cout << "Iterations-Burn in: " << MAXITERATIONS-BURN_IN << endl;
 	cout << "Acceptance ratio: " << ratio << endl;
 	printf("-------- Best Parameter Set, likelihood=%g -------------\n",bestlikelihood);
-	BestParameterSetPtr->Print();
+	for(int i=0;i<ParamNames.size();i++){
+		cout << ParamNames[i] << " " << BestParameterSet[k] << endl;
+	}
 }
 
 void MCMC::GetRanges(){
