@@ -140,7 +140,7 @@ ParameterSetList::ParameterSetList(MCMC *mcmc_in, ParameterSet Theta0){
 
 void ParameterSetList::GetTheta0FromFile(){
 	parameterMap parmap;
-	string theta0_filename = (mcmc->mcmcconfig)->parameterfile + "/theta0.param";
+	string theta0_filename = mcmc->parameterfile + "/theta0.param";
 	ParameterSet temp_set(this);
 	parameter::ReadParsFromFile(parmap, theta0_filename);
 	vector<string> temp_names = parameter::getVS(parmap, "NAMES", "");
@@ -157,7 +157,7 @@ void ParameterSetList::GetRandomTheta0(int seed, bool scaled){ //This one create
 	srand(seed);
 	cout << "We are using random theta0 values. They are:" << endl;
 	parameterMap parmap;
-	string range_filename = (mcmc->mcmcconfig)->dir_name + "/ranges.dat";
+	string range_filename = mcmc->dir_name + "/ranges.dat";
 	ParameterSet temp_set(this);
 	string line,temp,name;
 	double low,high;
