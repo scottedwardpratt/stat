@@ -41,7 +41,7 @@ PriorDistribution_Interpolator::PriorDistribution_Interpolator(MCMC * mcmc_in){
 	}
 }
 
-double PriorDistribution_Interpolator::Evaluate(ParameterSet Theta){
+double PriorDistribution_Interpolator::Evaluate(vector<double> Theta){
 	/*double mean = parameter::getD(*parmap, "PRIOR_MEAN", -3.7372);
 	double sigma = parameter::getD(*parmap, "PRIOR_SIGMA", 1.6845);
 	return Normal(log(Theta.GetValue("SIGMA")), mean, sigma);*/
@@ -51,13 +51,13 @@ double PriorDistribution_Interpolator::Evaluate(ParameterSet Theta){
 	}
 	if( strcmp(PRIOR.c_str(), "GAUSSIAN")==0 ){
 		// The return value needs to be caluclated form a multivariate gaussian
-		int N = Theta.Values.size();
+		int N = Theta.size();
 		gsl_matrix * sigma = gsl_matrix_calloc(N,N);
 		gsl_vector * theta = gsl_vector_alloc(N);
 		gsl_vector * means = gsl_vector_alloc(N);
 		for(int i = 0; i<N; i++){
 			gsl_matrix_set(sigma, i, i,GAUSSIAN_STDVS[i]);
-			gsl_vector_set(theta, i, Theta.Values[i]);
+			gsl_vector_set(theta, i, Theta[i]);
 			gsl_vector_set(means, i, GAUSSIAN_MEANS[i]);
 		}
 		return MVNormal(*theta,*means,*sigma);

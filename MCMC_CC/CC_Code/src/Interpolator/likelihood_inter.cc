@@ -48,18 +48,18 @@ LikelihoodDistribution_Interpolator::~LikelihoodDistribution_Interpolator(){
 	//delete My_emu;
 }
 
-double LikelihoodDistribution_Interpolator::Evaluate(ParameterSet Theta){
+double LikelihoodDistribution_Interpolator::Evaluate(vector<double> Theta){
 	clock_t begintime;
 	double likelihood;
-	double *x = &Theta.Values[0];
+	double *x = &Theta[0];
 
 	if(VERBOSE){
 		cout << "Theta: ";
-		for(int i = 0; i < Theta.Values.size(); i++){
-			cout << Theta.Values[i] << " ";
+		for(int i = 0; i < Theta.size(); i++){
+			cout << Theta[i] << " ";
 		}
 		cout << endl;
-		/*for(int i = 0; i < Theta.Values.size(); i++){
+		/*for(int i = 0; i < Theta.size(); i++){
 			cout << x[i] << " ";
 		}
 		cout << endl;*/
@@ -70,11 +70,11 @@ double LikelihoodDistribution_Interpolator::Evaluate(ParameterSet Theta){
 	}
 
 	if(UseEmulator){
-		//GetLL takes an array of doubles, this should work, but if for some reason the values in Theta.Values are not stored contiguosly, this may barf
+		//GetLL takes an array of doubles, this should work, but if for some reason the values in Theta are not stored contiguosly, this may barf
 		//likelihood = My_emu->GetLL(x);
 		//cout << "Using 'x': " << likelihood << endl;
-		likelihood = My_emu->GetLL(&Theta.Values[0]);
-		//cout << "Using '&Theta.Values[0]': " << likelihood << endl;
+		likelihood = My_emu->GetLL(&Theta[0]);
+		//cout << "Using '&Theta[0]': " << likelihood << endl;
 	}
 	else{
 		//determine another way to fill the vectors

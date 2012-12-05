@@ -55,7 +55,7 @@ LikelihoodDistribution_RHIC::~LikelihoodDistribution_RHIC(){
 	//delete My_emu;
 }
 
-double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
+double LikelihoodDistribution_RHIC::Evaluate(vector<double> Theta){
 	clock_t begintime;
 	vector<double> ModelMeans;
 	vector<double> ModelErrors;
@@ -66,7 +66,7 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	}
 
 	if(UseEmulator){
-		My_emu->QueryEmulator(Theta.Values, ModelMeans, ModelErrors); //fills vectors with emulator output
+		My_emu->QueryEmulator(Theta, ModelMeans, ModelErrors); //fills vectors with emulator output
 	}
 	else{
 		//determine another way to fill the vectors
@@ -82,8 +82,8 @@ double LikelihoodDistribution_RHIC::Evaluate(ParameterSet Theta){
 	
 	if(VERBOSE){
 		cout << "Theta: ";
-		for(int i = 0; i < Theta.Values.size(); i++){
-			cout << Theta.Values[i] << " ";
+		for(int i = 0; i < Theta.size(); i++){
+			cout << Theta[i] << " ";
 		}
 		cout << endl << "Observable, Model means, Model errors, Data" << endl;
 		for(int i = 0; i<N; i++){
@@ -149,15 +149,15 @@ vector<double> LikelihoodDistribution_RHIC::GetFakeData(){
 	vector<string> temp_names = parameter::getVS(actualparmap, "NAMES", "");
 	vector<double> temp_values = parameter::getV(actualparmap, "VALUES", "");
 	
-	ParameterSet ActualParams;
+	vector<double> ActualParams;
 	ActualParams.Initialize(temp_names, temp_values);
 	
-	My_emu->QueryEmulator(ActualParams.Values, datameans, dataerror);
+	My_emu->QueryEmulator(ActualParams, datameans, dataerror);
 
 	cout << "We are using FAKE DATA!!!!!!!!" << endl;
 	cout << "The parameter values read in from actual.param are:" << endl;
-	for(int i = 0; i < ActualParams.Values.size(); i++){
-		cout << ActualParams.Values[i] << " ";
+	for(int i = 0; i < ActualParams.size(); i++){
+		cout << ActualParams[i] << " ";
 	}
 	cout << endl << "Thses have given us parameter values of:" << endl;
 	for(int i = 0; i<datameans.size(); i++){

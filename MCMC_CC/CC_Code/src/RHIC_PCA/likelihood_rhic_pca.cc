@@ -39,7 +39,7 @@ LikelihoodDistribution_RHIC_PCA::~LikelihoodDistribution_RHIC_PCA(){
 	delete quad;
 }
 
-double LikelihoodDistribution_RHIC_PCA::Evaluate(ParameterSet Theta){
+double LikelihoodDistribution_RHIC_PCA::Evaluate(vector<double> Theta){
 	clock_t begintime;
 	vector<double> ModelMeans;
 	vector<double> ModelErrors;

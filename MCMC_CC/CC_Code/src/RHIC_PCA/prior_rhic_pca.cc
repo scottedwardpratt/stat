@@ -19,7 +19,7 @@ PriorDistribution_RHIC_PCA::PriorDistribution_RHIC_PCA(MCMC * mcmc_in){
 	}
 }
 
-double PriorDistribution_RHIC_PCA::Evaluate(ParameterSet Theta){
+double PriorDistribution_RHIC_PCA::Evaluate(vector<double> Theta){
 	double mean = parameter::getD(*parmap, "PRIOR_MEAN", -3.7372);
 	double sigma = parameter::getD(*parmap, "PRIOR_SIGMA", 1.6845);
 	return Normal(log(Theta.GetValue("SIGMA")), mean, sigma);

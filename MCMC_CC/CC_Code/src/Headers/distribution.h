@@ -16,7 +16,7 @@ using namespace std;
 class EmulatorHandler;
 class QuadHandler;
 class MCMC;
-class ParameterSet;
+//class ParameterSet;
 class emulator;
 class CRHICStat;
 
@@ -68,7 +68,7 @@ class LikelihoodDistribution:public Distribution{
 public:
 	LikelihoodDistribution();
 	virtual ~LikelihoodDistribution();
-	virtual double Evaluate(ParameterSet Theta);
+	virtual double Evaluate(vector<double> Theta);
 	//protected:
 	virtual vector<double> GetData();
 	vector<double> DATA;
@@ -82,7 +82,7 @@ class PriorDistribution:public Distribution {
 public:
 	PriorDistribution();
 	virtual ~PriorDistribution();
-	virtual double Evaluate(ParameterSet Theta);
+	virtual double Evaluate(vector<double> Theta);
 };
 
 /** ---------------------------------------- */
@@ -90,7 +90,7 @@ public:
 class PriorDistribution_RHIC:public PriorDistribution{
 public:
         PriorDistribution_RHIC(MCMC *mcmc_in);
-        double Evaluate(ParameterSet Theta);
+        double Evaluate(vector<double> Theta);
         string PRIOR;
         bool SCALED;
         vector<double> GAUSSIAN_MEANS;
@@ -102,7 +102,7 @@ public:
 class PriorDistribution_Interpolator: public PriorDistribution{
 public:
 	PriorDistribution_Interpolator(MCMC *mcmc_in);
-	double Evaluate(ParameterSet Theta);
+	double Evaluate(vector<double> Theta);
     string PRIOR;
     bool SCALED;
     vector<double> GAUSSIAN_MEANS;
@@ -114,26 +114,26 @@ public:
 class PriorDistribution_RHIC_PCA:public PriorDistribution{
 public:
 	PriorDistribution_RHIC_PCA(MCMC *mcmc_in);
-	double Evaluate(ParameterSet Theta);
+	double Evaluate(vector<double> Theta);
 };
 
 class PriorDistribution_Cosmo:public PriorDistribution {
 public:
 	PriorDistribution_Cosmo(MCMC *mcmc_in);
-	double Evaluate(ParameterSet Theta);
+	double Evaluate(vector<double> Theta);
 };
 
 class PriorDistribution_Test:public PriorDistribution {
 public:
 	PriorDistribution_Test(MCMC *mcmc_in);
-	double Evaluate(ParameterSet Theta);
+	double Evaluate(vector<double> Theta);
 };
 
 class LikelihoodDistribution_RHIC:public LikelihoodDistribution{
 public:
         LikelihoodDistribution_RHIC(MCMC *mcmc_in);
         ~LikelihoodDistribution_RHIC();
-        double Evaluate(ParameterSet Theta);
+        double Evaluate(vector<double> Theta);
         double *Datamean;
         double *Dataerror;
         //private:
@@ -155,7 +155,7 @@ class LikelihoodDistribution_Interpolator:public LikelihoodDistribution{
 public:
 	LikelihoodDistribution_Interpolator(MCMC *mcmc_in);
 	~LikelihoodDistribution_Interpolator();
-	double Evaluate(ParameterSet Theta);
+	double Evaluate(vector<double> Theta);
 	bool UseEmulator;
 	CRHICStat *My_emu;
 };
@@ -164,7 +164,7 @@ class LikelihoodDistribution_RHIC_PCA:public LikelihoodDistribution{
 public:
 	LikelihoodDistribution_RHIC_PCA(MCMC *mcmc_in);
 	~LikelihoodDistribution_RHIC_PCA();
-	double Evaluate(ParameterSet Theta);
+	double Evaluate(vector<double> Theta);
 	double *Datamean;
 	double *Dataerror;
 	//private:
@@ -181,7 +181,7 @@ class LikelihoodDistribution_Cosmo:public LikelihoodDistribution {
 public:
 	LikelihoodDistribution_Cosmo(MCMC *mcmc_in);
 	~LikelihoodDistribution_Cosmo();
-	double Evaluate(ParameterSet Theta);
+	double Evaluate(vector<double> Theta);
 	//private:
 	vector<double> GetData();
 	vector<double> DATA;
@@ -195,7 +195,7 @@ class LikelihoodDistribution_Test:public LikelihoodDistribution {
 public:
 	LikelihoodDistribution_Test(MCMC *mcmc_in);
 	~LikelihoodDistribution_Test();
-	double Evaluate(ParameterSet Theta);
+	double Evaluate(vector<double> Theta);
 	//private:
 	vector<double> GetData();
 	vector<double> DATA;

@@ -19,7 +19,7 @@ PriorDistribution_Test::PriorDistribution_Test(MCMC * mcmc_in){
 	}
 }
 
-double PriorDistribution_Test::Evaluate(ParameterSet Theta){
+double PriorDistribution_Test::Evaluate(vector<double> Theta){
 	double mean = parameter::getD(*parmap, "PRIOR_MEAN", -3.7372);
 	double sigma = parameter::getD(*parmap, "PRIOR_SIGMA", 1.6845);
 	return Normal(log(Theta.GetValue("SIGMA")), mean, sigma);
