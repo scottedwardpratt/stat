@@ -30,13 +30,13 @@ class LikelihoodDistribution;
 class PriorDistribution;
 class VizHandler;
 
-class MCMCConfiguration{
+class MCMC{
 public:
-	MCMCConfiguration(string run_file);
-	MCMCConfiguration(string run_file, string configuration);
-	~MCMCConfiguration();
-	void Initialize();
-	
+	MCMC(string run_file, string configuration);
+	~MCMC();
+	FirstPass();
+	double Run();
+
 	bool LOGLIKE;
 	bool LOGPRIOR;
 	bool LOGPROPOSAL;
@@ -61,16 +61,7 @@ public:
 	ProposalDistribution *Proposal;
 	PriorDistribution *Prior;
 	ParameterSetList *DummyList;
-	double Max_Ranges[30],Min_Ranges[30]; // 
-};
-
-class MCMCRun{
-public:
-	parameterMap local_parmap;
-	MCMCRun(MCMCConfiguration *mcmc_config);
-	MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0);
-	~MCMCRun();
-	double Run();
+	double Max_Ranges[30],Min_Ranges[30];
 	
 	ParameterSet *BestParameterSetPtr;
 	vector<double> ParamValues;
@@ -78,7 +69,7 @@ public:
 	double Likelihood_Current;
 	
 	int  WRITEOUT;
-	int BURN_IN;
+	int  BURN_IN;
 	int  MAXITERATIONS;
 	bool RANDOM_THETA0;
 	bool VIZTRACE;
