@@ -164,7 +164,7 @@ void ParameterSetList::GetRandomTheta0(MCMC *mcmc_in, int seed){ //This one crea
 	cout << "We are using random theta0 values. They are:" << endl;
 	for(int i=0;i<mcmc->ParamNames.size();i++){
 		temp_values.push_back((double(rand())/double(RAND_MAX))*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i])+mcmc->Min_Ranges[i]);
-		//cout << mcmc->ParamNames[i] << " " << temp_values[i] << endl;
+		cout << mcmc->ParamNames[i] << " " << temp_values[i] << endl;
 	}
 
 	ParamNames = temp_names;
