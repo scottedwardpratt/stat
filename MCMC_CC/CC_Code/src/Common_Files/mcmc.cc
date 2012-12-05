@@ -222,7 +222,15 @@ void MCMC::Run(){
 		}
 
 		Scale_New = (rand() / double(RAND_MAX));
-		Proposed_Theta = Proposal->Iterate(Theta,Scale_New);
+		//Proposed_Theta = Proposal->Iterate(Theta,Scale_New);
+		//JFN 12/5/12: right from Scott's code
+		for(int k=0; k<ParamNames.size();k++){
+			Proposed_Theta[k] = Theta[k]+0.1*randnum->gauss();
+			while((Proposed_Theta[k]>Max_Ranges[k])||(Proposed_Theta[k]<Min_Ranges[k])){
+				if(Proposed_Theta[k]>Max_Ranges[k]) Proposed_Theta[k]=2*Max_Ranges[k]-Proposed_Theta[k];
+				if(Proposed_Theta[k]<Min_Ranges[k]) Proposed_Theta[k]=2*Min_Ranges[k]-Proposed_Theta[k];
+			}
+		}
 
 		Likelihood_New = Likelihood->Evaluate(Proposed_Theta);
 		if(i==1){
