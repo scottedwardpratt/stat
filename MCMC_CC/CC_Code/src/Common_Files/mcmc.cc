@@ -338,6 +338,9 @@ void MCMC::Run(){
 				VizScaled_ThetaList.clear();
 			}
 			if((i+1) % WRITEOUT == 0){
+				if(QUIET){
+					cout << "."; cout.flush();
+				}
 				PrintDataToFile();
 				ThetaList.clear();
 				Scaled_ThetaList.clear();
