@@ -24,6 +24,9 @@ MCMC::MCMC(string info_dir, string configuration){
 	SUPPRESS_ERRORS = parameter::getB(parmap, "SUPPRESS_ERRORS", false);
 	MODEL = parameter::getS(parmap,"MODEL","NOMODEL");
 	PRESCALED_PARAMS = parameter::getB(parmap, "PRESCALED_PARAMS", false);
+	WAIT_TO_PRINT_DENSITY_PLOTS = parameter::getB(parmap, "WAIT_TO_PRINT_DENSITY_PLOTS", false);
+	MOVING_WINDOW = parameter::getB(parmap, "MOVING_WINDOW", true);
+	DENSITY_PLOTS = parameter::getB(parmap, "DENSITY_PLOTS", true);
 	
 	GetRanges();
 
@@ -320,7 +323,8 @@ void MCMC::Run(){
 		}
 
 		for(int k = 0; k < ParamNames.size(); k++){ //These ParamValus are used for the density plots
-			ScaledTheta[k] = (Theta[k] - Min_Ranges[k])/(Max_Ranges[k]-Min_Ranges[k]);
+			Scaled_Theta[k] = (Theta[k] - Min_Ranges[k])/(Max_Ranges[k]-Min_Ranges[k]);
+			Scaled_ThetaList.push_back(Scaled_Theta);
 		}
 
 		/*if((i > BURN_IN) && (CREATE_TRACE)){

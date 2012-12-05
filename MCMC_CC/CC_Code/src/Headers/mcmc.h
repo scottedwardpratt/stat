@@ -53,6 +53,9 @@ public:
 	bool RANDOM_THETA0;
 	bool VIZTRACE;
 	bool QUIET;
+	bool WAIT_TO_PRINT_DENSITY_PLOTS;
+	bool MOVING_WINDOW;
+	bool DENSITY_PLOTS;
 	string MODEL;
 	parameterMap parmap;
 	string dir_name;
@@ -81,8 +84,10 @@ public:
 	
 	string tracedir;
 	VizHandler *Visualizer;
+	int WriteOutCounter;
 	//ParameterSetList *ThetaList;
 	vector<vector<double>> ThetaList;
+	vector<vector<double>> Scaled_ThetaList;
 	int Accept_Count;
 	int Viz_Count;
 };

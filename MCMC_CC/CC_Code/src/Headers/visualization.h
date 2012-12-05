@@ -18,8 +18,6 @@ private:
 	string gnuplotstyle;
 	int ThetaListSize;
 	int HighestItnReadIn;
-	bool MovingWindow;
-	bool DensityPlot;
 	MCMC *mcmc;
 	string *paramvalues;
 	deque<string> *DequeParameterValues;
