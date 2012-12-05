@@ -111,7 +111,7 @@ void MCMC::FirstPass(){
 	QUIET = parameter::getB(parmap, "QUIET", false);
 	
 	if(RANDOM_THETA0){
-		ThetaList = new ParameterSetList(this, time(NULL), PRESCALED_PARAMS);
+		ThetaList = new ParameterSetList(this, time(NULL));
 	}
 	else{
 		ThetaList = new ParameterSetList(this);

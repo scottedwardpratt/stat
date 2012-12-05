@@ -12,7 +12,7 @@ class ParameterSet;
 class ParameterSetList{
 public:
 	ParameterSetList(MCMC *mcmc_in);
-	ParameterSetList(MCMC *mcmc_in, int,bool);
+	ParameterSetList(MCMC *mcmc_in, int);
 	ParameterSetList(MCMC *mcmc_in, ParameterSet Theta0);
 	MCMC *mcmc;
 	ParameterSet **Theta;
@@ -23,7 +23,7 @@ public:
 	
 	void Add(ParameterSet Theta_In);
 	void GetTheta0FromFile();
-	void GetRandomTheta0(int,bool);
+	void GetRandomTheta0(MCMC *mcmc_in, int);
 	void PrintDataToFile();
 	void WriteOut();
 	void MakeTrace();
