@@ -86,8 +86,8 @@ public:
 	VizHandler *Visualizer;
 	int WriteOutCounter;
 	//ParameterSetList *ThetaList;
-	vector<vector<double>> ThetaList;
-	vector<vector<double>> Scaled_ThetaList;
+	vector<vector<double> > ThetaList;
+	vector<vector<double> > Scaled_ThetaList;
 	int Accept_Count;
 	int Viz_Count;
 };
