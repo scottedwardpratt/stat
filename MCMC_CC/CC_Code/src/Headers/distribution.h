@@ -16,7 +16,6 @@ using namespace std;
 class EmulatorHandler;
 class QuadHandler;
 class MCMC;
-class MCMC;
 class ParameterSet;
 class emulator;
 
