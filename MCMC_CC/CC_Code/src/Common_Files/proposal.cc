@@ -63,40 +63,40 @@ int ProposalDistribution::FindParam(string name){
 	return out;
 }
 
-ParameterSet ProposalDistribution::Iterate(ParameterSet current, float scale){
+vector<double> ProposalDistribution::Iterate(vector<double> current, float scale){
 	ParameterSet proposed = current;
 	if(SymmetricProposal){
 		//We use the scale set in the parameter file
 		
-		for(int i=0; i<proposed.Values.size(); i++){
-			proposed.Values[i] = (current.Values[i] - mcmc->Min_Ranges[i])/(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]); //scale to between 0 and 1
-			proposed.Values[i] = proposed.Values[i] + PREFACTOR*gsl_ran_gaussian(randy, SCALE*MixingStdDev[i]);
-			proposed.Values[i] = proposed.Values[i] - floor(proposed.Values[i]); //If it isn't in the range of [0,1], this will force it to be
-			proposed.Values[i] = (proposed.Values[i]*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]))+mcmc->Min_Ranges[i]; //Scale back to original range
+		for(int i=0; i<proposed.size(); i++){
+			proposed[i] = (current[i] - mcmc->Min_Ranges[i])/(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]); //scale to between 0 and 1
+			proposed[i] = proposed[i] + PREFACTOR*gsl_ran_gaussian(randy, SCALE*MixingStdDev[i]);
+			proposed[i] = proposed[i] - floor(proposed[i]); //If it isn't in the range of [0,1], this will force it to be
+			proposed[i] = (proposed[i]*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]))+mcmc->Min_Ranges[i]; //Scale back to original range
 		}	
 
 	} else {
 		// We use whatever scale we just got passed from the rest of the code and the range set in the parameter file
 		scale = (scale*(MAX-MIN))+MIN;
 		
-		for(int i=0; i<proposed.Values.size(); i++){
-			proposed.Values[i] = (current.Values[i] - mcmc->Min_Ranges[i])/(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]); //scale to between 0 and 1
-			proposed.Values[i] = proposed.Values[i] + PREFACTOR*gsl_ran_gaussian(randy, scale*MixingStdDev[i]);
-			proposed.Values[i] = proposed.Values[i] - floor(proposed.Values[i]); //If it isn't in the range of [0,1], this will force it to be
-			proposed.Values[i] = (proposed.Values[i]*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]))+mcmc->Min_Ranges[i]; //Scale back to original range
+		for(int i=0; i<proposed.size(); i++){
+			proposed[i] = (current[i] - mcmc->Min_Ranges[i])/(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]); //scale to between 0 and 1
+			proposed[i] = proposed[i] + PREFACTOR*gsl_ran_gaussian(randy, scale*MixingStdDev[i]);
+			proposed[i] = proposed[i] - floor(proposed[i]); //If it isn't in the range of [0,1], this will force it to be
+			proposed[i] = (proposed[i]*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]))+mcmc->Min_Ranges[i]; //Scale back to original range
 		}	
 	}
 
 	/*double diff = 0;
-	for(int i=0; i<proposed.Values.size(); i++){
-		diff += (proposed.Values[i]-current.Values[i])*(proposed.Values[i]-current.Values[i])/((mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i])*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]));
+	for(int i=0; i<proposed.size(); i++){
+		diff += (proposed[i]-current[i])*(proposed[i]-current[i])/((mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i])*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]));
 	}
-	cout << "Average difference between points was: " << sqrt(diff)/proposed.Values.size() << endl;*/
+	cout << "Average difference between points was: " << sqrt(diff)/proposed.size() << endl;*/
 
 	return proposed;
 }
 
-double ProposalDistribution::Evaluate(ParameterSet Theta1, ParameterSet Theta2, float scale){
+double ProposalDistribution::Evaluate(vector<double> Theta1, vector<double> Theta2, float scale){
 	// At the moment we are using a gaussian proposal distribution, so the scale is the standard deviation
 	double probability;
 	double exponent = 0, prefactor = 1;
@@ -106,8 +106,8 @@ double ProposalDistribution::Evaluate(ParameterSet Theta1, ParameterSet Theta2, 
 		probability = 1.0;
 	} else {
 		scale = (scale*(MAX-MIN))+MIN;
-		for(int i=0; i<Theta1.Values.size(); i++){
-			exponent += -(Theta1.Values[i]-Theta2.Values[i])*(Theta1.Values[i]-Theta2.Values[i])/(2*scale*scale*MixingStdDev[i]*MixingStdDev[i]);
+		for(int i=0; i<Theta1.size(); i++){
+			exponent += -(Theta1[i]-Theta2[i])*(Theta1[i]-Theta2[i])/(2*scale*scale*MixingStdDev[i]*MixingStdDev[i]);
 			prefactor = prefactor/(scale*sqrt(2*M_PI));
 		}
 		/*cout << exponent << " " << prefactor << endl;*/
