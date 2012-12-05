@@ -318,12 +318,12 @@ void MCMC::Run(){
 			}
 		}
 
-		if(i > BURN_IN){ // We are just tossing everything in the burn in period.
-			ThetaList.push_back(Theta);
-		}
-
 		for(int k = 0; k < ParamNames.size(); k++){ //These ParamValus are used for the density plots
 			Scaled_Theta[k] = (Theta[k] - Min_Ranges[k])/(Max_Ranges[k]-Min_Ranges[k]);
+		}
+
+		if(i > BURN_IN){ // We are just tossing everything in the burn in period.
+			ThetaList.push_back(Theta);
 			Scaled_ThetaList.push_back(Scaled_Theta);
 		}
 
