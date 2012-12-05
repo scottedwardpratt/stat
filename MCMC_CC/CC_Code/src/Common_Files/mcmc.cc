@@ -131,10 +131,10 @@ void MCMC::FirstPass(){
 		string theta0_filename = parameterfile + "/theta0.param";
 		cout << "We are reading theta0 from " << theta0_filename << " The values are: " << endl;
 		parameter::ReadParsFromFile(theta_parmap, theta0_filename);
-		vector<string> temp_names = parameter::getVS(parmap, "NAMES", "");
-		vector<double> temp_values = parameter::getV(parmap, "VALUES", "");
+		vector<string> temp_names = parameter::getVS(theta_parmap, "NAMES", "");
+		vector<double> temp_values = parameter::getV(theta_parmap, "VALUES", "");
 		for(int i=0;i<temp_names.size();i++){
-			if(strcmp(temp_names[i].c_str(),ParamNames[i].c_str())==0){
+			if(strcmp(ParamNames[i].c_str(),temp_names[i].c_str())==0){
 				if((temp_values[i]>Max_Ranges[i])||(temp_values[i]<Min_Ranges[i])){
 					cout << "The theta0 value given for " << ParamNames[i] << " in " << theta0_filename << " is not within the ranges specified for this parameter. " << endl;
 					cout << "The range specifed was: [" << Min_Ranges[i] << "," << Max_Ranges[i] << "] but the theta0 value given was: " << temp_values[i] << endl;
