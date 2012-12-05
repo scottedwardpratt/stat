@@ -260,8 +260,8 @@ void MCMC::Run(){
 		//if(alpha > (randnum->ran())) { //Accept the proposed set.
 		double ll = Likelihood_New;
 		double oldll = Likelihood_Current;
-		if((ll>oldll || mcmcconfig->randnum->ran()<exp(ll-oldll)) && (ll-oldll>-40)){
-		//if(ll>oldll || mcmcconfig->randnum->ran()<exp(ll-oldll)){
+		if((ll>oldll || randnum->ran()<exp(ll-oldll)) && (ll-oldll>-40)){
+		//if(ll>oldll || randnum->ran()<exp(ll-oldll)){
 			if(!QUIET){
 				printf("Accept\n");
 			}
