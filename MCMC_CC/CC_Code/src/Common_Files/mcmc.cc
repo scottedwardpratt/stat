@@ -393,17 +393,18 @@ MCMC::GetRanges(){
 	ranges.open(filename.c_str(),fstream::in);
 	if(ranges){
 		string temps,name,line,type;
-		int index = 0;
 		while(ranges >> type){
 			if(strcmp(type.c_str(), "double") == 0){
 				ranges >> name;
-				if(index != -1){ //returns -1 if not found
-					ranges >> Min_Ranges[index]; //minimum
-					ranges >> Max_Ranges[index]; //maximum
-					if(Min_Ranges[index] > Max_Ranges[index]){ //Flip them
-						double temp2 = Min_Ranges[index];
-						Min_Ranges[index] = Max_Ranges[index];
-						Max_Ranges[index] = temp2;
+				for(int i=0;i<ParamNames.size();i++){
+					if(strcmp(ParamNames[i].c_str(),name.c_str())==0){
+						ranges >> Min_Ranges[i]; //minimum
+						ranges >> Max_Ranges[i]; //maximum
+						if(Min_Ranges[i] > Max_Ranges[i]){ //Flip them
+							double temp2 = Min_Ranges[i];
+							Min_Ranges[i] = Max_Ranges[i];
+							Max_Ranges[i] = temp2;
+						}
 					}
 				}
 			}else{
