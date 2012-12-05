@@ -64,7 +64,7 @@ MCMC::MCMC(string info_dir, string configuration){
 	cout << "EmulatorParams: " << EmulatorParams << endl;
 	cout << "---------------------" << endl;*/
 
-	randnum = new CRandom(1234);
+	randnum = new CRandom(time(NULL));
 	if(strcmp(MODEL.c_str(),"CosmoSurvey")==0){
 		Likelihood = new LikelihoodDistribution_Cosmo(this);
 		Prior = new PriorDistribution_Cosmo(this);
@@ -222,15 +222,15 @@ void MCMC::Run(){
 		}
 
 		Scale_New = (rand() / double(RAND_MAX));
-		//Proposed_Theta = Proposal->Iterate(Theta,Scale_New);
+		Proposed_Theta = Proposal->Iterate(Theta,Scale_New);
 		//JFN 12/5/12: right from Scott's code
-		for(int k=0; k<ParamNames.size();k++){
+		/*for(int k=0; k<ParamNames.size();k++){
 			Proposed_Theta[k] = Theta[k]+0.1*randnum->gauss();
 			while((Proposed_Theta[k]>Max_Ranges[k])||(Proposed_Theta[k]<Min_Ranges[k])){
 				if(Proposed_Theta[k]>Max_Ranges[k]) Proposed_Theta[k]=2*Max_Ranges[k]-Proposed_Theta[k];
 				if(Proposed_Theta[k]<Min_Ranges[k]) Proposed_Theta[k]=2*Min_Ranges[k]-Proposed_Theta[k];
 			}
-		}
+		}*/
 
 		Likelihood_New = Likelihood->Evaluate(Proposed_Theta);
 		if(i==1){
@@ -297,10 +297,10 @@ void MCMC::Run(){
 			printf("%5d\talpha=%6.5f\t",i,alpha);
 			//printf("LOGBF=%6.5f\t",alpha);
 		}
-		//if(alpha > (randnum->ran())) { //Accept the proposed set.
-		double ll = Likelihood_New;
-		double oldll = Likelihood_Current;
-		if((ll>oldll || randnum->ran()<exp(ll-oldll)) && (ll-oldll>-40)){
+		if(alpha > (randnum->ran())) { //Accept the proposed set.
+		//double ll = Likelihood_New;
+		//double oldll = Likelihood_Current;
+		//if((ll>oldll || randnum->ran()<exp(ll-oldll)) && (ll-oldll>-40)){
 		//if(ll>oldll || randnum->ran()<exp(ll-oldll)){
 			if(!QUIET){
 				printf("Accept\n");
@@ -334,7 +334,7 @@ void MCMC::Run(){
 		for(int k = 0; k < ParamNames.size(); k++){ //These ParamValus are used for the density plots
 			Scaled_Theta[k] = (Theta[k] - Min_Ranges[k])/(Max_Ranges[k]-Min_Ranges[k]);
 			if(!QUIET){
-				cout << "Scale" << ParamNames[k] << ": " << Scaled_Theta[k] << endl;
+				//cout << "Scale" << ParamNames[k] << ": " << Scaled_Theta[k] << endl;
 			}
 		}
 
