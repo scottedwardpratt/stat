@@ -226,6 +226,7 @@ void MCMC::Run(){
 		if(i==1){
 			bestlikelihood = Likelihood_New;
 			BestParameterSet = Theta;
+			Scaled_Theta = Theta;
 		}
 		//Prior_New = Prior->Evaluate(Proposed_Theta);
 		//Proposal_New = Proposal->Evaluate(Theta,Proposed_Theta,Scale_Current);
@@ -301,7 +302,7 @@ void MCMC::Run(){
 			//Prior_Current = Prior_New;
 			//Proposal_Current = Proposal_New;
 			Theta = Proposed_Theta;
-			//Scale_Current = Scale_New;
+			Scale_Current = Scale_New;
 			if(Likelihood_Current>bestlikelihood && i>1){
 				bestlikelihood = Likelihood_New;
 				BestParameterSet = Theta;
