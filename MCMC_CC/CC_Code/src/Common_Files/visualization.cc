@@ -62,7 +62,7 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 	//Check if DensityPlots file exists
 	string tempfile;
 	struct stat st;
-	tempfile = mcmc->mcmcconfig->dir_name + "/DensityPlots";
+	tempfile = mcmc->dir_name + "/DensityPlots";
 	if(stat(tempfile.c_str(), &st)!=0){
 		string command = "mkdir -p " + tempfile;
 		system(command.c_str());
@@ -76,7 +76,7 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 		for(int j = i+1; j < mcmc->ThetaList->ParamNames.size(); j++){
 			//cout << "     " << mcmc->ThetaList->ParamNames[j] << endl
 			//Now we mke our 2d plots
-			string filename = mcmc->mcmcconfig->dir_name + "/DensityPlots/" + mcmc->ThetaList->ParamNames[i] + "_" + mcmc->ThetaList->ParamNames[j];
+			string filename = mcmc->dir_name + "/DensityPlots/" + mcmc->ThetaList->ParamNames[i] + "_" + mcmc->ThetaList->ParamNames[j];
 			DensityPlotFileNames.push_back(filename);
 			command << "set bmargin 0.001\n set tmargin 0.001\n set lmargin 0.001\n set rmargin 0.001\nunset key\nunset xtics\nunset ytics\n";
 			command << "\nset origin " << (float(i)*(1./float(mcmc->ThetaList->ParamNames.size()))) << "," << (float(j-1)*(1./float(mcmc->ThetaList->ParamNames.size()))) << "\n";
@@ -84,7 +84,7 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
 			DensityPlotCommands.push_back(command.str());
             //cout << command.str();
 			command.str("");
-			if(mcmc->mcmcconfig->APPEND_TRACE){
+			if(mcmc->APPEND_TRACE){
 				fstream densityfile;
 				string line,val;
 				stringstream ss2;
@@ -149,8 +149,8 @@ void VizHandler::UpdateTraceFig(){
 		for(int i = 0; i < ThetaListSize; i++){
 			if(mcmc->ThetaList->Theta[i]->Used && !(mcmc->ThetaList->Theta[i]->InTrace)){
 				for(int j = 0; j< mcmc->ThetaList->Theta[i]->Values.size(); j++){
-					if(mcmc->mcmcconfig->RESCALED_TRACE){
-						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << (mcmc->ThetaList->Theta[i]->Values[j]-mcmc->mcmcconfig->Min_Ranges[j])/(mcmc->mcmcconfig->Max_Ranges[j]-mcmc->mcmcconfig->Min_Ranges[j])<< "\n";
+					if(mcmc->RESCALED_TRACE){
+						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << (mcmc->ThetaList->Theta[i]->Values[j]-mcmc->Min_Ranges[j])/(mcmc->Max_Ranges[j]-mcmc->Min_Ranges[j])<< "\n";
 					}
 					else{
 						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << mcmc->ThetaList->Theta[i]->Values[j] << "\n";
@@ -185,8 +185,8 @@ void VizHandler::UpdateTraceFig(){
 					if(paramvalues[j].empty()){
 						paramvalues[j] = "";
 					}
-					if(mcmc->mcmcconfig->RESCALED_TRACE){
-						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << (mcmc->ThetaList->Theta[i]->Values[j]-mcmc->mcmcconfig->Min_Ranges[j])/(mcmc->mcmcconfig->Max_Ranges[j]-mcmc->mcmcconfig->Min_Ranges[j])<< "\n";
+					if(mcmc->RESCALED_TRACE){
+						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << (mcmc->ThetaList->Theta[i]->Values[j]-mcmc->Min_Ranges[j])/(mcmc->Max_Ranges[j]-mcmc->Min_Ranges[j])<< "\n";
 					}
 					else{
 						ss << mcmc->WRITEOUT*mcmc->ThetaList->WriteOutCounter + i + 1 << " " << mcmc->ThetaList->Theta[i]->Values[j] << "\n";
