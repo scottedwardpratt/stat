@@ -142,59 +142,58 @@ void VizHandler::UpdateTraceFig(){
 	stringstream ss;
 	string plotcommand = header;
 	
-	if(mcmc->MOVING_WINDOW){
-		int DequeSize = 500;
-		for(int i = 0; i < ThetaListSize; i++){
-			for(int j = 0; j< mcmc->ParamNames.size(); j++){
-				if(mcmc->RESCALED_TRACE){
-					ss << mcmc->WRITEOUT*mcmc->WriteOutCounter + i + 1 << " " << mcmc->Scaled_ThetaList[i][j]<< "\n";
-				}
-				else{
-					ss << mcmc->WRITEOUT*mcmc->WriteOutCounter + i + 1 << " " << mcmc->ThetaList[i][j] << "\n";
-				}
-				if(DequeParameterValues[j].size() > DequeSize){
-					DequeParameterValues[j].pop_front();
-					DequeParameterValues[j].push_back(ss.str());
-				}
-				else{
-					DequeParameterValues[j].push_back(ss.str());
-				}
-				ss.str(string()); //clears the stringstream.
-			}
-		}
-		for(int i = 0; i < mcmc->ParamNames.size(); i++){
-			for(int j =0; j < DequeParameterValues[i].size(); j++){
-				plotcommand = plotcommand + (DequeParameterValues[i])[j];
-			}
-			plotcommand = plotcommand + "e\n";
-			//cout << plotcommand << endl;
-		}
-	} else {
-		if(!mcmc){
-			cout << "MCMC pointer not found." << endl;
-		}
-		for(int i = 0; i < ThetaListSize; i++){
-			for(int j =0; j< mcmc->ParamNames.size(); j++){
-				if(paramvalues[j].empty()){
-					paramvalues[j] = "";
-				}
-				if(mcmc->RESCALED_TRACE){
-					ss << mcmc->WRITEOUT*mcmc->WriteOutCounter + i + 1 << " " << mcmc->Scaled_ThetaList[i][j] << "\n";
-				}
-				else{
-					ss << mcmc->WRITEOUT*mcmc->WriteOutCounter + i + 1 << " " << mcmc->ThetaList[i][j] << "\n";
-				}
-				paramvalues[j] = ss.str();
-				ss.str(string()); //clears the stringstream.
-			}
-		}
-		for(int i = 0; i < mcmc->ParamNames.size(); i++){
-			plotcommand = plotcommand + paramvalues[i]+ "e\n";
-			//cout << paramvalues[i] << endl;
-		}
-	}
-	
 	if(mcmc->VIZTRACE){
+		if(mcmc->MOVING_WINDOW){
+			int DequeSize = 500;
+			for(int i = 0; i < ThetaListSize; i++){
+				for(int j = 0; j< mcmc->ParamNames.size(); j++){
+					if(mcmc->RESCALED_TRACE){
+						ss << mcmc->WRITEOUT*mcmc->WriteOutCounter + i + 1 << " " << mcmc->Scaled_ThetaList[i][j]<< "\n";
+					}
+					else{
+						ss << mcmc->WRITEOUT*mcmc->WriteOutCounter + i + 1 << " " << mcmc->ThetaList[i][j] << "\n";
+					}
+					if(DequeParameterValues[j].size() > DequeSize){
+						DequeParameterValues[j].pop_front();
+						DequeParameterValues[j].push_back(ss.str());
+					}
+					else{
+						DequeParameterValues[j].push_back(ss.str());
+					}
+					ss.str(string()); //clears the stringstream.
+				}
+			}
+			for(int i = 0; i < mcmc->ParamNames.size(); i++){
+				for(int j =0; j < DequeParameterValues[i].size(); j++){
+					plotcommand = plotcommand + (DequeParameterValues[i])[j];
+				}
+				plotcommand = plotcommand + "e\n";
+				//cout << plotcommand << endl;
+			}
+		} else {
+			if(!mcmc){
+				cout << "MCMC pointer not found." << endl;
+			}
+			for(int i = 0; i < ThetaListSize; i++){
+				for(int j =0; j< mcmc->ParamNames.size(); j++){
+					if(paramvalues[j].empty()){
+						paramvalues[j] = "";
+					}
+					if(mcmc->RESCALED_TRACE){
+						ss << mcmc->WRITEOUT*mcmc->WriteOutCounter + i + 1 << " " << mcmc->Scaled_ThetaList[i][j] << "\n";
+					}
+					else{
+						ss << mcmc->WRITEOUT*mcmc->WriteOutCounter + i + 1 << " " << mcmc->ThetaList[i][j] << "\n";
+					}
+					paramvalues[j] = ss.str();
+					ss.str(string()); //clears the stringstream.
+				}
+			}
+			for(int i = 0; i < mcmc->ParamNames.size(); i++){
+				plotcommand = plotcommand + paramvalues[i]+ "e\n";
+				//cout << paramvalues[i] << endl;
+			}
+		}
 		//cout << "The plot command is: \n" << plotcommand << endl;
 		fprintf(gnuplotpipe, "%s", plotcommand.c_str());
 		fflush(gnuplotpipe);
