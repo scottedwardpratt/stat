@@ -35,7 +35,7 @@ public:
 	MCMC(string run_file, string configuration);
 	~MCMC();
 	FirstPass();
-	double Run();
+	Run();
 
 	bool LOGLIKE;
 	bool LOGPRIOR;
@@ -45,6 +45,12 @@ public:
 	bool SUPPRESS_ERRORS;
 	bool RESCALED_TRACE;
 	bool PRESCALED_PARAMS;
+	int  WRITEOUT;
+	int  BURN_IN;
+	int  MAXITERATIONS;
+	bool RANDOM_THETA0;
+	bool VIZTRACE;
+	bool QUIET;
 	string MODEL;
 	parameterMap parmap;
 	string dir_name;
@@ -68,15 +74,7 @@ public:
 	double bestlikelihood;
 	double Likelihood_Current;
 	
-	int  WRITEOUT;
-	int  BURN_IN;
-	int  MAXITERATIONS;
-	bool RANDOM_THETA0;
-	bool VIZTRACE;
-	bool QUIET;
-	
 	string tracedir;
-	MCMCConfiguration *mcmcconfig;
 	VizHandler *Visualizer;
 	ParameterSetList *ThetaList;
 	int Accept_Count;

@@ -263,7 +263,7 @@ MCMC::FirstPass(){
 }
 
 /** This runs MAXITERATIONS samplings */
-double MCMC::Run(){
+MCMC::Run(){
 	srand(time(NULL));
 	double Likelihood_Current, Likelihood_New;
 	double Prior_Current, Prior_New;
@@ -428,8 +428,6 @@ double MCMC::Run(){
 	cout << "Acceptance ratio: " << ratio << endl;
 	printf("-------- Best Parameter Set, likelihood=%g -------------\n",bestlikelihood);
 	BestParameterSetPtr->Print();
-	
-	return ratio;
 }
 
 #endif

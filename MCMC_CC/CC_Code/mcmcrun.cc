@@ -9,15 +9,8 @@ int main(int argc, char *argv[]){
 	}
 	
 	string run_file = argv[1];
-	MCMCConfiguration *mcmcdefault = new MCMCConfiguration(run_file, "default");
-	vector<string> Names = mcmcdefault->ParamNames;
-	MCMCRun *run;
-	ifstream input;
-	vector<double> Ratios;
-	double ratio;
-			
-	run = new MCMCRun(mcmcdefault);
-	ratio = run->Run();
+	MCMC *mcmc = new MCMC(run_file, "default");
+	mcmc->Run();
 
 	cout << "Done successfully." << endl;
 }
