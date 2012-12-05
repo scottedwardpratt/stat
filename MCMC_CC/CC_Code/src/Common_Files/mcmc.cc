@@ -41,8 +41,6 @@ MCMC::MCMC(string info_dir, string configuration){
 	LoadObservables();
 	
 	vector<string> temp_logparam = parameter::getVS(parmap, "LOG_PARAMETERS", "");
-	
-	
 	for(int i =0; i<temp_logparam.size(); i++){
 		if(strcmp(temp_logparam[i].c_str(), "true") == 0 || strcmp(temp_logparam[i].c_str(), "True") == 0){
 			LogParam.push_back(true);
@@ -64,7 +62,6 @@ MCMC::MCMC(string info_dir, string configuration){
 	cout << "EmulatorParams: " << EmulatorParams << endl;
 	cout << "---------------------" << endl;*/
 
-	// cout << "stuff done." << endl;
 	randnum = new CRandom(1234);
 	if(strcmp(MODEL.c_str(),"CosmoSurvey")==0){
 		Likelihood = new LikelihoodDistribution_Cosmo(this);
@@ -86,14 +83,8 @@ MCMC::MCMC(string info_dir, string configuration){
 		printf("Must define parameter MODEL in parameter file, or yours is unrecognized\n");
 		exit(1);
 	}
-	
-	/*Likelihood = new LikelihoodDistribution(this);
-	 cout << "Like done." << endl; 
-	Prior = new PriorDistribution(this);
-	 cout << "Prior done." << endl;*/
-	
+
 	Proposal = new ProposalDistribution(this);
-	//cout << "Proposal done." << endl;
 
 	cout << "Parameter Ranges:" << endl;
 	for( int i =0; i< ParamNames.size(); i++){
