@@ -37,6 +37,7 @@ public:
 	LoadParams(); //This loads the names of the emulator parameters
 	GetRanges(); //This loads the ranges of the emulator parameters
 	FirstPass(); //This prepares the objects necessary for the MCMC Run
+	LoadObservables(); //This loads the names of the emulator observables
 	Run(); //This performs the MAXITERATIONS sampling
 
 	bool LOGLIKE;

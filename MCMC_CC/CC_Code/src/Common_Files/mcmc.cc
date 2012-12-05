@@ -38,44 +38,7 @@ MCMC::MCMC(string info_dir, string configuration){
 		}
 	}
 
-	string observables_filename = info_dir + "/pcanames.dat";
-	fstream PcaNames;
-	PcaNames.open(observables_filename.c_str(),fstream::in);
-
-	if(PcaNames){
-		string line,name;
-		getline(PcaNames,line,'\n');
-		while(!PcaNames.eof()){
-			while(line.compare(0,1,"#") == 0 || line.empty() ) { // keep reading until it's not a comment
-				getline(PcaNames,line,'\n'); 
-			} 
-	
-			stringstream Observableslist;
-			line.erase(line.end()-1,line.end());
-			Observableslist << line;
-			
-			while(!Observableslist.eof()){
-				getline(Observableslist,name,' ');
-				if(!name.empty() || name!=" ")
-				ObservablesNames.push_back(name);
-				//cout << "Observable: " << ObservablesNames.back() << endl;
-			}
-			getline(PcaNames,line,'\n');
-		}
-		if(ObservablesNames.back().compare(0,1," ")==0 || ObservablesNames.back().empty()){ // if for some reason the last element is empty, drop it
-			ObservablesNames.pop_back();
-		}
-	}
-	else{
-		cout << "Could not open " << observables_filename.c_str() << endl;
-		exit(1);
-	}
-	PcaNames.close();
-	
-	cout << "The emulated observables are: " << endl;
-	for(int i=0;i<ObservablesNames.size();i++) {
-		cout << ObservablesNames[i] << endl;
-	}
+	LoadObservables();
 	
 	vector<string> temp_logparam = parameter::getVS(parmap, "LOG_PARAMETERS", "");
 	
@@ -425,6 +388,47 @@ MCMC::GetRanges(){
 	}
 
 	cout << "Ranges loaded" << endl;
+}
+
+MCMC::LoadObservables(){
+	string observables_filename = info_dir + "/pcanames.dat";
+	fstream PcaNames;
+	PcaNames.open(observables_filename.c_str(),fstream::in);
+
+	if(PcaNames){
+		string line,name;
+		getline(PcaNames,line,'\n');
+		while(!PcaNames.eof()){
+			while(line.compare(0,1,"#") == 0 || line.empty() ) { // keep reading until it's not a comment
+				getline(PcaNames,line,'\n'); 
+			} 
+	
+			stringstream Observableslist;
+			line.erase(line.end()-1,line.end());
+			Observableslist << line;
+			
+			while(!Observableslist.eof()){
+				getline(Observableslist,name,' ');
+				if(!name.empty() || name!=" ")
+				ObservablesNames.push_back(name);
+				//cout << "Observable: " << ObservablesNames.back() << endl;
+			}
+			getline(PcaNames,line,'\n');
+		}
+		if(ObservablesNames.back().compare(0,1," ")==0 || ObservablesNames.back().empty()){ // if for some reason the last element is empty, drop it
+			ObservablesNames.pop_back();
+		}
+	}
+	else{
+		cout << "Could not open " << observables_filename.c_str() << endl;
+		exit(1);
+	}
+	PcaNames.close();
+	
+	cout << "The emulated observables are: " << endl;
+	for(int i=0;i<ObservablesNames.size();i++) {
+		cout << ObservablesNames[i] << endl;
+	}
 }
 
 #endif
