@@ -6,7 +6,7 @@
 
 using namespace std;
 
-VizHandler::VizHandler(MCMCRun *mcmc_in){
+VizHandler::VizHandler(MCMC *mcmc_in){
 	mcmc = mcmc_in;
 	ThetaListSize = mcmc->WRITEOUT;
 	
