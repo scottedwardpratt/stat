@@ -155,8 +155,6 @@ void MCMC::FirstPass(){
 
 	if(CREATE_TRACE){
 		Visualizer = new VizHandler(this);
-		Viz_Count = parameter::getI(parmap, "VIZ_COUNT", floor(MAXITERATIONS/200));
-		//Visualizer->UpdateTraceFig();
 	}
 
 	if(APPEND_TRACE){
