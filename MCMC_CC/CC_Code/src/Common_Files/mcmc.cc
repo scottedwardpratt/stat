@@ -68,22 +68,22 @@ MCMC::MCMC(string info_dir, string configuration){
 		Prior = new PriorDistribution_Cosmo(this);
 	}
 	else if(strcmp(MODEL.c_str(),"RHIC")==0){
-	 Likelihood = new LikelihoodDistribution_RHIC(this);
-	 Prior = new PriorDistribution_RHIC(this);
-	 }
+		Likelihood = new LikelihoodDistribution_RHIC(this);
+		Prior = new PriorDistribution_RHIC(this);
+	}
 	else if(strcmp(MODEL.c_str(),"INTERPOLATOR")==0){
-	 Likelihood = new LikelihoodDistribution_Interpolator(this);
-	 Prior = new PriorDistribution_Interpolator(this);
-	 PRESCALED_PARAMS = false;
-	 }
+		Likelihood = new LikelihoodDistribution_Interpolator(this);
+		Prior = new PriorDistribution_Interpolator(this);
+		PRESCALED_PARAMS = false;
+	}
 	else if(strcmp(MODEL.c_str(),"RHIC_PCA")==0){
-	 Likelihood = new LikelihoodDistribution_RHIC_PCA(this);
-	 Prior = new PriorDistribution_RHIC_PCA(this);
-	 }
+		Likelihood = new LikelihoodDistribution_RHIC_PCA(this);
+		Prior = new PriorDistribution_RHIC_PCA(this);
+	}
 	else if(strcmp(MODEL.c_str(),"TEST")==0){
-	 Likelihood = new LikelihoodDistribution_Test(this);
-	 Prior = new PriorDistribution_Test(this);
-	 }
+		Likelihood = new LikelihoodDistribution_Test(this);
+		Prior = new PriorDistribution_Test(this);
+	}
 	else{
 		printf("Must define parameter MODEL in parameter file, or yours is unrecognized\n");
 		exit(1);
