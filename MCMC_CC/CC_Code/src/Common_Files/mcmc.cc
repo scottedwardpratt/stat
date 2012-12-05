@@ -205,7 +205,7 @@ void MCMC::Run(){
 	Likelihood_Current = Likelihood->Evaluate(Theta);
 	Scale_Current = (rand() / double(RAND_MAX));
 	//Proposal_Current = Proposal->Evaluate(Theta);
-	Prior_Current = Prior->Evaluate(Theta);
+	//Prior_Current = Prior->Evaluate(Theta);
 
 	/*for(int i = 0; i < ThetaList->ParamNames.size(); i++){
 		ParamValues.push_back(0);
@@ -218,16 +218,18 @@ void MCMC::Run(){
 		}else{
 			LOGBF = 1;
 		}
+
 		Scale_New = (rand() / double(RAND_MAX));
 		Proposed_Theta = Proposal->Iterate(Theta,Scale_New);
+
 		Likelihood_New = Likelihood->Evaluate(Proposed_Theta);
 		if(i==1){
 			bestlikelihood = Likelihood_New;
 			BestParameterSet = Theta;
 		}
-		Prior_New = Prior->Evaluate(Proposed_Theta);
-		Proposal_New = Proposal->Evaluate(Theta,Proposed_Theta,Scale_Current);
-		Proposal_Current = Proposal->Evaluate(Proposed_Theta,Theta,Scale_New);
+		//Prior_New = Prior->Evaluate(Proposed_Theta);
+		//Proposal_New = Proposal->Evaluate(Theta,Proposed_Theta,Scale_Current);
+		//Proposal_Current = Proposal->Evaluate(Proposed_Theta,Theta,Scale_New);
 		
 		// cout << "Likelihood of proposed set: " << Likelihood_New << endl;
 		// cout << "Likelihood of current set: " << Likelihood_Current << endl;
@@ -296,10 +298,10 @@ void MCMC::Run(){
 				Accept_Count++;
 			}
 			Likelihood_Current = Likelihood_New;
-			Prior_Current = Prior_New;
+			//Prior_Current = Prior_New;
 			//Proposal_Current = Proposal_New;
 			Theta = Proposed_Theta;
-			Scale_Current = Scale_New;
+			//Scale_Current = Scale_New;
 			if(Likelihood_Current>bestlikelihood && i>1){
 				bestlikelihood = Likelihood_New;
 				BestParameterSet = Theta;
