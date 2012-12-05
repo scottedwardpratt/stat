@@ -29,11 +29,6 @@ MCMC::MCMC(string info_dir, string configuration){
 
 	GetRanges();
 
-	for(int i=0;i<ParamNames.size();i++) {
-		printf("%s ",ParamNames[i].c_str());
-	}
-	printf("\n");
-
 	if(PRESCALED_PARAMS){
         cout << "WARNING: PRESCALED_PARAMS = True. This means all parameter ranges are forced to be [0,1]" << endl;
 		for(int i=0; i < ParamNames.size(); i++){
@@ -386,6 +381,10 @@ MCMC::LoadParams(){
 			ParamNames.pop_back();
 		}
 	}
+	for(int i=0;i<ParamNames.size();i++) {
+		printf("%s ",ParamNames[i].c_str());
+	}
+	printf("\n");
 }
 
 MCMC::GetRanges(){
