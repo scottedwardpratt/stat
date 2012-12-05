@@ -59,10 +59,10 @@ double LikelihoodDistribution_Interpolator::Evaluate(ParameterSet Theta){
 			cout << Theta.Values[i] << " ";
 		}
 		cout << endl;
-		for(int i = 0; i < Theta.Values.size(); i++){
+		/*for(int i = 0; i < Theta.Values.size(); i++){
 			cout << x[i] << " ";
 		}
-		cout << endl;
+		cout << endl;*/
 	}
 	
 	if(TIMING){
