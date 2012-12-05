@@ -5,7 +5,7 @@
 
 using namespace std;
 
-PriorDistribution_Test::PriorDistribution_Test(MCMCConfiguration * mcmc_in){
+PriorDistribution_Test::PriorDistribution_Test(MCMC * mcmc_in){
 	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "PRIOR_PARAMETER_MAP", false);
 	

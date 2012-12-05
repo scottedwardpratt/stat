@@ -6,7 +6,7 @@
 
 using namespace std;
 
-LikelihoodDistribution_Cosmo::LikelihoodDistribution_Cosmo(MCMCConfiguration *mcmc_in){
+LikelihoodDistribution_Cosmo::LikelihoodDistribution_Cosmo(MCMC *mcmc_in){
 	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "LIKELIHOOD_PARAMETER_MAP", false);
 	

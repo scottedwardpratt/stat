@@ -5,7 +5,7 @@
 
 using namespace std;
 
-PriorDistribution_RHIC::PriorDistribution_RHIC(MCMCConfiguration * mcmc_in){
+PriorDistribution_RHIC::PriorDistribution_RHIC(MCMC * mcmc_in){
 	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "PRIOR_PARAMETER_MAP", false);
 	
@@ -26,12 +26,12 @@ PriorDistribution_RHIC::PriorDistribution_RHIC(MCMCConfiguration * mcmc_in){
 		GAUSSIAN_MEANS = parameter::getV(*parmap, "GAUSSIAN_MEANS","");
 		GAUSSIAN_STDVS = parameter::getV(*parmap, "GAUSSIAN_STDVS","");
 		if(GAUSSIAN_MEANS.size()==0 || GAUSSIAN_STDVS.size()==0){
-			cout << "Error in prior_rhic.cc: PriorDistribution_RHIC::PriorDistribution_RHIC(MCMCConfiguration)" << endl;
+			cout << "Error in prior_rhic.cc: PriorDistribution_RHIC::PriorDistribution_RHIC(MCMC)" << endl;
 			cout << "GAUSSIAN_MEANS or GAUSSIAN_STDVS not specified. Exiting" << endl;
 			exit(1);
 		}
 		if(GAUSSIAN_MEANS.size() != GAUSSIAN_STDVS.size()){
-			cout << "Error in prior_rhic.cc: PriorDistribution_RHIC::PriorDistribution_RHIC(MCMCConfiguration)" << endl;
+			cout << "Error in prior_rhic.cc: PriorDistribution_RHIC::PriorDistribution_RHIC(MCMC)" << endl;
 			cout << "Length of GAUSSIAN_MEANS and GAUSSIAN_STDVS are not the same." << endl;
 			cout << "Lenght of GAUSSIAN_MEANS = " << GAUSSIAN_MEANS.size() << endl;
 			cout << "Lenght of GAUSSIAN_STDVS = " << GAUSSIAN_STDVS.size() << endl;
@@ -47,12 +47,12 @@ PriorDistribution_RHIC::PriorDistribution_RHIC(MCMCConfiguration * mcmc_in){
 		STEP_MEANS = parameter::getV(*parmap, "STEP_MEANS", "");
 		STEP_SIDE  = parameter::getVS(*parmap, "STEP_SIDE", "");
 		if(STEP_MEANS.size()==0 || STEP_SIDE.size()==0){
-			cout << "Error in prior_rhic.cc: PriorDistribution_RHIC::PriorDistribution_RHIC(MCMCConfiguration)" << endl;
+			cout << "Error in prior_rhic.cc: PriorDistribution_RHIC::PriorDistribution_RHIC(MCMC)" << endl;
 			cout << "STEP_MEANS or STEP_SIDE not specified. Exiting" << endl;
 			exit(1);
 		}
 		if(STEP_MEANS.size() != STEP_SIDE.size()){
-			cout << "Error in prior_rhic.cc: PriorDistribution_RHIC::PriorDistribution_RHIC(MCMCConfiguration)" << endl;
+			cout << "Error in prior_rhic.cc: PriorDistribution_RHIC::PriorDistribution_RHIC(MCMC)" << endl;
 			cout << "Length of STEP_MEANS and STEP_SIDE are not the same." << endl;
 			cout << "Lenght of STEP_MEANS = " << STEP_MEANS.size() << endl;
 			cout << "Lenght of STEP_SIDE = " << STEP_SIDE.size() << endl;

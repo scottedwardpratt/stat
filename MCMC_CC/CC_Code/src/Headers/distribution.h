@@ -15,8 +15,8 @@ using namespace std;
 
 class EmulatorHandler;
 class QuadHandler;
-class MCMCConfiguration;
-class MCMCRun;
+class MCMC;
+class MCMC;
 class ParameterSet;
 class emulator;
 
@@ -26,7 +26,7 @@ public:
 	virtual ~Distribution();
 
 	//protected:
-	MCMCConfiguration * mcmc;
+	MCMC * mcmc;
 	gsl_rng * randy;
 	bool SepMap;
 	bool TIMING;
@@ -48,7 +48,7 @@ public:
 
 class ProposalDistribution:public Distribution {
 public:
-	ProposalDistribution(MCMCConfiguration *mcmc_in);
+	ProposalDistribution(MCMC *mcmc_in);
 	ParameterSet Iterate(ParameterSet current, float scale);
 	virtual double Evaluate(ParameterSet Theta1, ParameterSet Theta2, float scale);
 	//protected:
@@ -87,7 +87,7 @@ public:
 
 class PriorDistribution_RHIC:public PriorDistribution{
 public:
-        PriorDistribution_RHIC(MCMCConfiguration *mcmc_in);
+        PriorDistribution_RHIC(MCMC *mcmc_in);
         double Evaluate(ParameterSet Theta);
         string PRIOR;
         bool SCALED;
@@ -99,25 +99,25 @@ public:
 
 class PriorDistribution_RHIC_PCA:public PriorDistribution{
 public:
-	PriorDistribution_RHIC_PCA(MCMCConfiguration *mcmc_in);
+	PriorDistribution_RHIC_PCA(MCMC *mcmc_in);
 	double Evaluate(ParameterSet Theta);
 };
 
 class PriorDistribution_Cosmo:public PriorDistribution {
 public:
-	PriorDistribution_Cosmo(MCMCConfiguration *mcmc_in);
+	PriorDistribution_Cosmo(MCMC *mcmc_in);
 	double Evaluate(ParameterSet Theta);
 };
 
 class PriorDistribution_Test:public PriorDistribution {
 public:
-	PriorDistribution_Test(MCMCConfiguration *mcmc_in);
+	PriorDistribution_Test(MCMC *mcmc_in);
 	double Evaluate(ParameterSet Theta);
 };
 
 class LikelihoodDistribution_RHIC:public LikelihoodDistribution{
 public:
-        LikelihoodDistribution_RHIC(MCMCConfiguration *mcmc_in);
+        LikelihoodDistribution_RHIC(MCMC *mcmc_in);
         ~LikelihoodDistribution_RHIC();
         double Evaluate(ParameterSet Theta);
         double *Datamean;
@@ -139,7 +139,7 @@ public:
 
 class LikelihoodDistribution_RHIC_PCA:public LikelihoodDistribution{
 public:
-	LikelihoodDistribution_RHIC_PCA(MCMCConfiguration *mcmc_in);
+	LikelihoodDistribution_RHIC_PCA(MCMC *mcmc_in);
 	~LikelihoodDistribution_RHIC_PCA();
 	double Evaluate(ParameterSet Theta);
 	double *Datamean;
@@ -156,7 +156,7 @@ public:
 
 class LikelihoodDistribution_Cosmo:public LikelihoodDistribution {
 public:
-	LikelihoodDistribution_Cosmo(MCMCConfiguration *mcmc_in);
+	LikelihoodDistribution_Cosmo(MCMC *mcmc_in);
 	~LikelihoodDistribution_Cosmo();
 	double Evaluate(ParameterSet Theta);
 	//private:
@@ -170,7 +170,7 @@ public:
 
 class LikelihoodDistribution_Test:public LikelihoodDistribution {
 public:
-	LikelihoodDistribution_Test(MCMCConfiguration *mcmc_in);
+	LikelihoodDistribution_Test(MCMC *mcmc_in);
 	~LikelihoodDistribution_Test();
 	double Evaluate(ParameterSet Theta);
 	//private:

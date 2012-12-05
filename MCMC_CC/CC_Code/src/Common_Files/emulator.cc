@@ -6,7 +6,7 @@
 
 using namespace std;
 
-EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMCConfiguration * mcmc_in){
+EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMC * mcmc_in){
 	mcmc = mcmc_in;
 	// cout << "EmulatorHandler: Constructor Start" << endl;
 	

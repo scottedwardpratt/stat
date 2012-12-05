@@ -5,7 +5,7 @@
 
 using namespace std;
 
-ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
+ProposalDistribution::ProposalDistribution(MCMC * mcmc_in){
 	mcmc=mcmc_in;
 	string type, param_name;
 	int count = 0;

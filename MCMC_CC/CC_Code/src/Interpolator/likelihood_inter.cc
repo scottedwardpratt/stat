@@ -7,7 +7,7 @@
 
 using namespace std;
 
-LikelihoodDistribution_Interpolator::LikelihoodDistribution_Interpolator(MCMCConfiguration *mcmc_in){
+LikelihoodDistribution_Interpolator::LikelihoodDistribution_Interpolator(MCMC *mcmc_in){
 	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "LIKELIHOOD_PARAMETER_MAP", false);
 	if(SepMap){

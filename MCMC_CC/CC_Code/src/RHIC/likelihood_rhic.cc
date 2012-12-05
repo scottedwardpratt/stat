@@ -7,7 +7,7 @@
 
 using namespace std;
 
-LikelihoodDistribution_RHIC::LikelihoodDistribution_RHIC(MCMCConfiguration *mcmc_in){
+LikelihoodDistribution_RHIC::LikelihoodDistribution_RHIC(MCMC *mcmc_in){
 	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "LIKELIHOOD_PARAMETER_MAP", false);
 	if(SepMap){

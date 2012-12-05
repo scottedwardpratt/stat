@@ -5,7 +5,7 @@
 
 using namespace std;
 
-PriorDistribution_Interpolator::PriorDistribution_Interpolator(MCMCConfiguration * mcmc_in){
+PriorDistribution_Interpolator::PriorDistribution_Interpolator(MCMC * mcmc_in){
 	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "PRIOR_PARAMETER_MAP", false);
 	
@@ -26,12 +26,12 @@ PriorDistribution_Interpolator::PriorDistribution_Interpolator(MCMCConfiguration
 		GAUSSIAN_MEANS = parameter::getV(*parmap, "GAUSSIAN_MEANS","");
 		GAUSSIAN_STDVS = parameter::getV(*parmap, "GAUSSIAN_STDVS","");
 		if(GAUSSIAN_MEANS.size()==0 || GAUSSIAN_STDVS.size()==0){
-			cout << "Error in prior_Interpolator.cc: PriorDistribution_Interpolator::PriorDistribution_Interpolator(MCMCConfiguration)" << endl;
+			cout << "Error in prior_Interpolator.cc: PriorDistribution_Interpolator::PriorDistribution_Interpolator(MCMC)" << endl;
 			cout << "GAUSSIAN_MEANS or GAUSSIAN_STDVS not specified. Exiting" << endl;
 			exit(1);
 		}
 		if(GAUSSIAN_MEANS.size() != GAUSSIAN_STDVS.size()){
-			cout << "Error in prior_Interpolator.cc: PriorDistribution_Interpolator::PriorDistribution_Interpolator(MCMCConfiguration)" << endl;
+			cout << "Error in prior_Interpolator.cc: PriorDistribution_Interpolator::PriorDistribution_Interpolator(MCMC)" << endl;
 			cout << "Length of GAUSSIAN_MEANS and GAUSSIAN_STDVS are not the same." << endl;
 			cout << "Lenght of GAUSSIAN_MEANS = " << GAUSSIAN_MEANS.size() << endl;
 			cout << "Lenght of GAUSSIAN_STDVS = " << GAUSSIAN_STDVS.size() << endl;

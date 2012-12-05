@@ -6,7 +6,7 @@
 
 using namespace std;
 
-QuadHandler::QuadHandler(parameterMap *parmap, MCMCConfiguration * mcmc_in){
+QuadHandler::QuadHandler(parameterMap *parmap, MCMC * mcmc_in){
 	mcmc = mcmc_in;
 	// cout << "QuadHandler: Constructor Start" << endl;
 	

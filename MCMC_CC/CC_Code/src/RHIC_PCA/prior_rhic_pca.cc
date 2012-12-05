@@ -5,7 +5,7 @@
 
 using namespace std;
 
-PriorDistribution_RHIC_PCA::PriorDistribution_RHIC_PCA(MCMCConfiguration * mcmc_in){
+PriorDistribution_RHIC_PCA::PriorDistribution_RHIC_PCA(MCMC * mcmc_in){
 	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "PRIOR_PARAMETER_MAP", false);
 	

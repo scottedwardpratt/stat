@@ -10,12 +10,12 @@ class ParameterSet;
 
 class EmulatorHandler{
 public:
-	EmulatorHandler(parameterMap *parmap, MCMCConfiguration * mcmc_in);
+	EmulatorHandler(parameterMap *parmap, MCMC * mcmc_in);
 	~EmulatorHandler();
 	void QueryEmulator(ParameterSet Theta,vector<double> &Means, vector<double> &Errors);
 private:
 	string EmulatedParams;
-	MCMCConfiguration *mcmc;
+	MCMC *mcmc;
 	string EmulatorScriptHome;
 	string EmInputFile;
 	string EmOutputFile;

@@ -6,16 +6,15 @@
 using namespace std;
 
 class ParameterSetList;
-class MCMCConfiguration;
-class MCMCRun;
+class MCMC;
 class ParameterSet;
 
 class ParameterSetList{
 public:
-	ParameterSetList(MCMCRun *mcmc_in);
-	ParameterSetList(MCMCRun *mcmc_in, int,bool);
-	ParameterSetList(MCMCRun *mcmc_in, ParameterSet Theta0);
-	MCMCRun *mcmc;
+	ParameterSetList(MCMC *mcmc_in);
+	ParameterSetList(MCMC *mcmc_in, int,bool);
+	ParameterSetList(MCMC *mcmc_in, ParameterSet Theta0);
+	MCMC *mcmc;
 	ParameterSet **Theta;
 	int WriteOutCounter;
 	vector<string> ParamNames;

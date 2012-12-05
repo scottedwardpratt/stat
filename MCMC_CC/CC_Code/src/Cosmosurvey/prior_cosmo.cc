@@ -5,7 +5,7 @@
 
 using namespace std;
 
-PriorDistribution_Cosmo::PriorDistribution_Cosmo(MCMCConfiguration * mcmc_in){
+PriorDistribution_Cosmo::PriorDistribution_Cosmo(MCMC * mcmc_in){
 	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "PRIOR_PARAMETER_MAP", false);
 	

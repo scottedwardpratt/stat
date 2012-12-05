@@ -97,7 +97,7 @@ void ParameterSet::VizTrace(){
 	}
 }
 
-ParameterSetList::ParameterSetList(MCMCRun *mcmc_in){
+ParameterSetList::ParameterSetList(MCMC *mcmc_in){
 	mcmc = mcmc_in;
 	Theta = new ParameterSet*[mcmc->WRITEOUT+1];
 	for(int i = 0; i < mcmc->WRITEOUT; i++){
@@ -110,7 +110,7 @@ ParameterSetList::ParameterSetList(MCMCRun *mcmc_in){
 	GetTheta0FromFile();
 }
 
-ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, int seed, bool scaled){ //This one creates a random set of theta0s
+ParameterSetList::ParameterSetList(MCMC *mcmc_in, int seed, bool scaled){ //This one creates a random set of theta0s
 	mcmc = mcmc_in;
 	Theta = new ParameterSet*[mcmc->WRITEOUT+1];
 	for(int i = 0; i < mcmc->WRITEOUT; i++){
@@ -123,7 +123,7 @@ ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, int seed, bool scaled){ //T
 	GetRandomTheta0(seed,scaled);
 }
 
-ParameterSetList::ParameterSetList(MCMCRun *mcmc_in, ParameterSet Theta0){
+ParameterSetList::ParameterSetList(MCMC *mcmc_in, ParameterSet Theta0){
 	mcmc = mcmc_in;
 	Theta = new ParameterSet*[mcmc->WRITEOUT+1];
 	for(int i = 0; i < mcmc->WRITEOUT; i++){

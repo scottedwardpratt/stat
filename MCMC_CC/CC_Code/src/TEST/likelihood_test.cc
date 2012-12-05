@@ -6,7 +6,7 @@
 
 using namespace std;
 
-LikelihoodDistribution_Test::LikelihoodDistribution_Test(MCMCConfiguration *mcmc_in){
+LikelihoodDistribution_Test::LikelihoodDistribution_Test(MCMC *mcmc_in){
 	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "LIKELIHOOD_PARAMETER_MAP", false);
 	
