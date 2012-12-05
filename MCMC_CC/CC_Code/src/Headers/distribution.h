@@ -54,8 +54,10 @@ public:
 	//protected:
 	bool SymmetricProposal;
 	bool Rescaled_Method;
+	double PREFACTOR;
 	double SCALE;
-	double OFFSET;
+	double MIN;
+	double MAX;
 	vector<double> MixingStdDev;
 	double *Min_Ranges;
 	double *Max_Ranges;
