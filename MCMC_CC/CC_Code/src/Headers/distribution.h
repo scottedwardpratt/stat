@@ -18,6 +18,7 @@ class QuadHandler;
 class MCMC;
 class ParameterSet;
 class emulator;
+class CRHICStat;
 
 class Distribution{
 public:
@@ -96,6 +97,18 @@ public:
         vector<string> STEP_SIDE;
 };
 
+class PriorDistribution_Interpolator: public PriorDistribution{
+public:
+	PriorDistribution_Interpolator(MCMC *mcmc_in);
+	double Evaluate(ParameterSet Theta);
+    string PRIOR;
+    bool SCALED;
+    vector<double> GAUSSIAN_MEANS;
+    vector<double> GAUSSIAN_STDVS;
+    vector<double> STEP_MEANS;
+    vector<string> STEP_SIDE;
+};
+
 class PriorDistribution_RHIC_PCA:public PriorDistribution{
 public:
 	PriorDistribution_RHIC_PCA(MCMC *mcmc_in);
@@ -134,6 +147,15 @@ public:
         ofstream emulator_test;
         int FindParam(string param_name, vector<string> PNames);
         parameterMap observablesparmap;
+};
+
+class LikelihoodDistribution_Interpolator:public LikelihoodDistribution{
+public:
+	LikelihoodDistribution_Interpolator(MCMC *mcmc_in);
+	~LikelihoodDistribution_Interpolator();
+	double Evaluate(ParameterSet Theta);
+	bool UseEmulator;
+	CRHICStat *My_emu;
 };
 
 class LikelihoodDistribution_RHIC_PCA:public LikelihoodDistribution{
