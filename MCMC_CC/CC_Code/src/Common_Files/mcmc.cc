@@ -94,15 +94,15 @@ MCMC::MCMC(string info_dir, string configuration){
 	}
 
 	string observables_filename = info_dir + "/pcanames.dat";
-	fstream Observablesdotdat;
-	Observablesdotdat.open(observables_filename.c_str(),fstream::in);
+	fstream PcaNames;
+	PcaNames.open(observables_filename.c_str(),fstream::in);
 
-	if(Observablesdotdat){
+	if(PcaNames){
 		string line,name;
-		getline(Observablesdotdat,line,'\n');
-		while(!Observablesdotdat.eof()){
+		getline(PcaNames,line,'\n');
+		while(!PcaNames.eof()){
 			while(line.compare(0,1,"#") == 0 || line.empty() ) { // keep reading until it's not a comment
-				getline(Observablesdotdat,line,'\n'); 
+				getline(PcaNames,line,'\n'); 
 			} 
 	
 			stringstream Observableslist;
@@ -115,7 +115,7 @@ MCMC::MCMC(string info_dir, string configuration){
 				ObservablesNames.push_back(name);
 				//cout << "Observable: " << ObservablesNames.back() << endl;
 			}
-			getline(Observablesdotdat,line,'\n');
+			getline(PcaNames,line,'\n');
 		}
 		if(ObservablesNames.back().compare(0,1," ")==0 || ObservablesNames.back().empty()){ // if for some reason the last element is empty, drop it
 			ObservablesNames.pop_back();
@@ -125,7 +125,7 @@ MCMC::MCMC(string info_dir, string configuration){
 		cout << "Could not open " << observables_filename.c_str() << endl;
 		exit(1);
 	}
-	Observablesdotdat.close();
+	PcaNames.close();
 	
 	cout << "The emulated observables are: " << endl;
 	for(int i=0;i<ObservablesNames.size();i++) {
