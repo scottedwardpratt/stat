@@ -22,6 +22,8 @@ PriorDistribution_Test::PriorDistribution_Test(MCMC * mcmc_in){
 double PriorDistribution_Test::Evaluate(vector<double> Theta){
 	double mean = parameter::getD(*parmap, "PRIOR_MEAN", -3.7372);
 	double sigma = parameter::getD(*parmap, "PRIOR_SIGMA", 1.6845);
-	return Normal(log(Theta.GetValue("SIGMA")), mean, sigma);
+	return Normal(log(1.6845), mean, sigma);
+	cerr << "This function is not maintained and probably doesn't work" << endl;
+	exit(-1);
 }
 #endif

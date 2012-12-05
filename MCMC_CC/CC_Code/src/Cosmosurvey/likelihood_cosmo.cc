@@ -42,7 +42,7 @@ LikelihoodDistribution_Cosmo::~LikelihoodDistribution_Cosmo(){
 	//delete emulator;
 }
 
-double LikelihoodDistribution_Cosmo::Evaluate(ParameterSet Theta){
+double LikelihoodDistribution_Cosmo::Evaluate(vector<double> Theta){
 	clock_t begintime;
 	vector<double> ModelMeans;
 	vector<double> ModelErrors;
@@ -55,8 +55,8 @@ double LikelihoodDistribution_Cosmo::Evaluate(ParameterSet Theta){
 	}
 	
 	ss << "cosmosurvey";
-	for(int i = 0; i < Theta.Names.size(); i++){
-		ss << " -" << Theta.Names[i] << " " << Theta.Values[i];
+	for(int i = 0; i < mcmc->ParamNames.size(); i++){
+		ss << " -" << mcmc->ParamNames[i] << " " << Theta[i];
 	}
 	ss << " -nz 10 -nf 10 -ob .0406 > output.dat" << endl;
 	
@@ -114,8 +114,7 @@ vector<double> LikelihoodDistribution_Cosmo::GetData(){
 	vector<string> temp_names = parameter::getVS(actualparmap, "NAMES", "");
 	vector<double> temp_values = parameter::getV(actualparmap, "VALUES", "");
 	
-	ParameterSet ActualParams;
-	ActualParams.Initialize(temp_names, temp_values);
+	vector<double> ActualParams;
 	
 	ss << "cosmosurvey";
 	for(int i = 0; i < temp_names.size(); i++){

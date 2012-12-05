@@ -77,7 +77,7 @@ void EmulatorHandler::QueryEmulator(vector<double> Theta,vector<double> &Means, 
 	string currentline;
 	char * token;
 	int NumDataRows = 1;
-	EmulatedParams = mcmc->ParamNames;
+	EmulatedParams = mcmc->EmulatorParams;
 	outputfile.open(EmInputFile.c_str());
 
 	if(outputfile){

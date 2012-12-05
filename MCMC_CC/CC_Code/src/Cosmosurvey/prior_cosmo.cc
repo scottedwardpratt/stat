@@ -19,7 +19,7 @@ PriorDistribution_Cosmo::PriorDistribution_Cosmo(MCMC * mcmc_in){
 	}
 }
 
-double PriorDistribution_Cosmo::Evaluate(ParameterSet Theta){
+double PriorDistribution_Cosmo::Evaluate(vector<double> Theta){
 	return 1.0;
 }
 #endif

@@ -64,7 +64,7 @@ int ProposalDistribution::FindParam(string name){
 }
 
 vector<double> ProposalDistribution::Iterate(vector<double> current, float scale){
-	ParameterSet proposed = current;
+	vector<double> proposed = current;
 	if(SymmetricProposal){
 		//We use the scale set in the parameter file
 		
