@@ -8,7 +8,7 @@ using namespace std;
 
 VizHandler::VizHandler(MCMC *mcmc_in){
 	mcmc = mcmc_in;
-	ThetaListSize = mcmc->WRITEOUT;
+	ThetaListSize = mcmc->VIZOUT;
 	
 	if(!mcmc){
 		cout << "MCMC not loaded!" << endl;
@@ -148,10 +148,10 @@ void VizHandler::UpdateTraceFig(){
 			for(int i = 0; i < ThetaListSize; i++){
 				for(int j = 0; j< mcmc->ParamNames.size(); j++){
 					if(mcmc->RESCALED_TRACE){
-						ss << mcmc->WRITEOUT*mcmc->WriteOutCounter + i + 1 << " " << mcmc->Scaled_ThetaList[i][j]<< "\n";
+						ss << mcmc->VIZOUT*mcmc->VizWriteOutCounter + i + 1 << " " << mcmc->VizScaled_ThetaList[i][j]<< "\n";
 					}
 					else{
-						ss << mcmc->WRITEOUT*mcmc->WriteOutCounter + i + 1 << " " << mcmc->ThetaList[i][j] << "\n";
+						ss << mcmc->VIZOUT*mcmc->VizWriteOutCounter + i + 1 << " " << mcmc->VizThetaList[i][j] << "\n";
 					}
 					if(DequeParameterValues[j].size() > DequeSize){
 						DequeParameterValues[j].pop_front();
@@ -180,10 +180,10 @@ void VizHandler::UpdateTraceFig(){
 						paramvalues[j] = "";
 					}
 					if(mcmc->RESCALED_TRACE){
-						ss << mcmc->WRITEOUT*mcmc->WriteOutCounter + i + 1 << " " << mcmc->Scaled_ThetaList[i][j] << "\n";
+						ss << mcmc->VIZOUT*mcmc->VizWriteOutCounter + i + 1 << " " << mcmc->VizScaled_ThetaList[i][j] << "\n";
 					}
 					else{
-						ss << mcmc->WRITEOUT*mcmc->WriteOutCounter + i + 1 << " " << mcmc->ThetaList[i][j] << "\n";
+						ss << mcmc->VIZOUT*mcmc->VizWriteOutCounter + i + 1 << " " << mcmc->VizThetaList[i][j] << "\n";
 					}
 					paramvalues[j] = ss.str();
 					ss.str(string()); //clears the stringstream.
@@ -223,7 +223,7 @@ void VizHandler::UpdateTraceFig(){
 			}
 		}
 	}
-	mcmc->WriteOutCounter++;
+	mcmc->VizWriteOutCounter++;
 }
 
 void VizHandler::FinalTrace(){

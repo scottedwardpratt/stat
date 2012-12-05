@@ -48,6 +48,7 @@ public:
 	bool RESCALED_TRACE;
 	bool PRESCALED_PARAMS;
 	int  WRITEOUT;
+	int  VIZOUT;
 	int  BURN_IN;
 	int  MAXITERATIONS;
 	bool RANDOM_THETA0;
@@ -85,9 +86,12 @@ public:
 	string tracedir;
 	VizHandler *Visualizer;
 	int WriteOutCounter;
+	int VizWriteOutCounter;
 	//ParameterSetList *ThetaList;
 	vector<vector<double> > ThetaList;
+	vector<vector<double> > VizThetaList;
 	vector<vector<double> > Scaled_ThetaList;
+	vector<vector<double> > VizScaled_ThetaList;
 	int Accept_Count;
 	int Viz_Count;
 };

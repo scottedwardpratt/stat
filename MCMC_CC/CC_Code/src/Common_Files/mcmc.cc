@@ -108,11 +108,15 @@ void MCMC::FirstPass(){
 	tracedir = dir_name + "/trace/" + configname;
 	
 	MAXITERATIONS = parameter::getI(parmap, "MAX_ITERATIONS", 500);
+	VIZOUT = parameter::getI(parmap, "VIZOUT", 100);
 	WRITEOUT = parameter::getI(parmap, "WRITEOUT", 100);
 	BURN_IN = parameter::getI(parmap, "BURN_IN", 0);
 	RANDOM_THETA0 = parameter::getB(parmap, "RANDOM_THETA0", false);
 	VIZTRACE = parameter::getB(parmap, "VISUALIZE_TRACE", true);
 	QUIET = parameter::getB(parmap, "QUIET", false);
+
+	WriteOutCounter = 0;
+	VizWriteOutCounter = 0;
 	
 	if(RANDOM_THETA0){
 		cout << "We are using random theta0 values. They are:" << endl;
@@ -328,26 +332,23 @@ void MCMC::Run(){
 		if(i > BURN_IN){ // We are just tossing everything in the burn in period.
 			ThetaList.push_back(Theta);
 			Scaled_ThetaList.push_back(Scaled_Theta);
-		}
-
-		/*if((i > BURN_IN) && (CREATE_TRACE)){
-			if((i+1) % Viz_Count == 0){
+			if(CREATE_TRACE && ((i+1) % VIZOUT == 0)){
 				Visualizer->UpdateTraceFig();
+				VizThetaList.clear();
+				VizScaled_ThetaList.clear();
 			}
-		}*/
-
-		if((i > BURN_IN) && ((i+1) % WRITEOUT == 0)){
-			cout << "Writing out." << endl;
-			if(CREATE_TRACE &&(i!=1)){
-				Visualizer->UpdateTraceFig();
+			if((i+1) % VIZOUT == 0){
+				cout << "Writing out." << endl;
+				PrintDataToFile();
 				ThetaList.clear();
+				Scaled_ThetaList.clear();
 			}
-			//ThetaList->WriteOut();
 		}
 	}
 	
-	//ThetaList->WriteOut();
-	//ThetaList->MakeTrace();
+	PrintDataToFile();
+	MakeTrace();
+
 	if(CREATE_TRACE){
 		Visualizer->FinalTrace();
 	}
