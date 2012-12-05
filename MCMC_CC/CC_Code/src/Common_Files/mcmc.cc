@@ -329,16 +329,17 @@ void MCMC::Run(){
 			Scaled_Theta[k] = (Theta[k] - Min_Ranges[k])/(Max_Ranges[k]-Min_Ranges[k]);
 		}
 
-		if(i > BURN_IN){ // We are just tossing everything in the burn in period.
+		if(i >= BURN_IN){ // We are just tossing everything in the burn in period.
 			ThetaList.push_back(Theta);
 			Scaled_ThetaList.push_back(Scaled_Theta);
+			VizThetaList.push_back(Theta);
+			VizScaled_ThetaList.push_back(Scaled_Theta);
 			if(CREATE_TRACE && ((i+1) % VIZOUT == 0)){
 				Visualizer->UpdateTraceFig();
 				VizThetaList.clear();
 				VizScaled_ThetaList.clear();
 			}
-			if((i+1) % VIZOUT == 0){
-				cout << "Writing out." << endl;
+			if((i+1) % WRITEOUT == 0){
 				PrintDataToFile();
 				ThetaList.clear();
 				Scaled_ThetaList.clear();
@@ -347,7 +348,7 @@ void MCMC::Run(){
 	}
 	
 	PrintDataToFile();
-	MakeTrace();
+	MakeFinalTrace();
 
 	if(CREATE_TRACE){
 		Visualizer->FinalTrace();
@@ -446,7 +447,6 @@ void MCMC::LoadObservables(){
 }
 
 void MCMC::PrintDataToFile(){
-	cout << "Printing data to file." << endl;
 	stringstream ss;
 	ss << WriteOutCounter+1;
 	string filename = tracedir + "/output"+ ss.str() +".dat";
@@ -455,6 +455,7 @@ void MCMC::PrintDataToFile(){
 	outputfile.open(filename.c_str());
 
 	if(!QUIET){
+		cout << "Printing data to file." << endl;
 		cout << "Writing out to: " << filename << endl;
 	}
 
@@ -466,30 +467,16 @@ void MCMC::PrintDataToFile(){
 		// outputfile << "LIKELIHOOD" << endl;
 
 		for(int i =0; i < WRITEOUT; i++){
-			if(Theta[i]->Used){
-				outputfile << i+WriteOutCounter*WRITEOUT << ",";
-				for(int j=0; j< Theta[i]->Values.size(); j++){
-					if(Theta[i]){
-						if(RESCALED_TRACE){
-							outputfile << (Theta[i][j]-Min_Ranges[j])/(Max_Ranges[j]-Min_Ranges[j]);
-							if(j!=Theta[i].size()-1){
-								outputfile << ",";
-							}
-						}else{
-							outputfile << Theta[i][j];
-							if(j!=Theta[i].size()-1){
-								outputfile << ",";
-							}
-						}
-					}
-					else{
-						cout << "Error: Accessing empty element." << endl;
-						exit(1);
-					}
+			outputfile << i+WriteOutCounter*WRITEOUT << ",";
+			for(int j=0; j < ParamNames.size(); j++){
+				if(RESCALED_TRACE){
+					outputfile << (Scaled_ThetaList[i][j]) << ",";
+				}else{
+					outputfile << ThetaList[i][j] << ",";
 				}
-				outputfile << endl;
-				// outputfile << "," << LikelihoodArray[i] << endl;
 			}
+			outputfile << endl;
+			// outputfile << "," << LikelihoodArray[i] << endl;
 		}
 		outputfile.close();
 	}else{
