@@ -6,6 +6,7 @@
 using namespace std;
 
 MCMC::MCMC(string info_dir, string configuration){
+	srand(time(NULL));
 	configname = configuration;
 	dir_name = info_dir;
 	parameterfile = dir_name+"/defaultpars/";
