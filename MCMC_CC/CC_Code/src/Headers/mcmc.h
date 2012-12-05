@@ -38,6 +38,8 @@ public:
 	void FirstPass(); //This prepares the objects necessary for the MCMC Run
 	void LoadObservables(); //This loads the names of the emulator observables
 	void Run(); //This performs the MAXITERATIONS sampling
+	void PrintDataToFile(); //This creates the output files
+	void MakeFinalTrace();
 
 	bool LOGLIKE;
 	bool LOGPRIOR;

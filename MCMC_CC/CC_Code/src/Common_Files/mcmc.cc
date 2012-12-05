@@ -445,4 +445,78 @@ void MCMC::LoadObservables(){
 	}
 }
 
+void MCMC::PrintDataToFile(){
+	cout << "Printing data to file." << endl;
+	stringstream ss;
+	ss << WriteOutCounter+1;
+	string filename = tracedir + "/output"+ ss.str() +".dat";
+	
+	ofstream outputfile;
+	outputfile.open(filename.c_str());
+
+	if(!QUIET){
+		cout << "Writing out to: " << filename << endl;
+	}
+
+	if(outputfile){
+		outputfile << "#ITERATION,";
+		for(int i = 0; i<ParamNames.size(); i++){
+			outputfile << ParamNames[i] << ",";
+		}
+		// outputfile << "LIKELIHOOD" << endl;
+
+		for(int i =0; i < WRITEOUT; i++){
+			if(Theta[i]->Used){
+				outputfile << i+WriteOutCounter*WRITEOUT << ",";
+				for(int j=0; j< Theta[i]->Values.size(); j++){
+					if(Theta[i]){
+						if(RESCALED_TRACE){
+							outputfile << (Theta[i][j]-Min_Ranges[j])/(Max_Ranges[j]-Min_Ranges[j]);
+							if(j!=Theta[i].size()-1){
+								outputfile << ",";
+							}
+						}else{
+							outputfile << Theta[i][j];
+							if(j!=Theta[i].size()-1){
+								outputfile << ",";
+							}
+						}
+					}
+					else{
+						cout << "Error: Accessing empty element." << endl;
+						exit(1);
+					}
+				}
+				outputfile << endl;
+				// outputfile << "," << LikelihoodArray[i] << endl;
+			}
+		}
+		outputfile.close();
+	}else{
+		cout << "Error in writing output file." << endl;
+		exit(1);
+	}
+	WriteOutCounter++;
+
+	if(!QUIET){
+		cout << "Done printing to file." << endl;
+	}
+}
+
+void MCMC::MakeFinalTrace(){
+	stringstream ss;
+	ss << "cat ";
+	
+	for(int i = 1; i <=ceil((double)(MAXITERATIONS)/(double)(WRITEOUT)); i++){
+		cout << "Parsing output" << i << ".dat" << endl;
+		ss << tracedir << "/output" << i << ".dat ";
+	}
+	ss << "> " << tracedir << "/trace.dat" << endl;
+	
+	string command = ss.str();
+	system(command.c_str());
+	
+	ss.str(string());
+}
+
 #endif
