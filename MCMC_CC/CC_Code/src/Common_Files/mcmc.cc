@@ -111,10 +111,37 @@ void MCMC::FirstPass(){
 	QUIET = parameter::getB(parmap, "QUIET", false);
 	
 	if(RANDOM_THETA0){
-		ThetaList = new ParameterSetList(this, time(NULL));
+		cout << "We are using random theta0 values. They are:" << endl;
+		for(int i=0;i<mcmc->ParamNames.size();i++){
+			Theta.push_back((double(rand())/double(RAND_MAX))*(Max_Ranges[i]-Min_Ranges[i])+Min_Ranges[i]);
+			cout << mcmc->ParamNames[i] << " " << Theta[i] << endl;
+		}
+		ThetaList.push_back(Theta);
 	}
 	else{
-		ThetaList = new ParameterSetList(this);
+		parameterMap theta_parmap;
+		string theta0_filename = parameterfile + "/theta0.param";
+		cout << "We are reading theta0 from " << theta0_filename << " The values are: " << endl;
+		parameter::ReadParsFromFile(theta_parmap, theta0_filename);
+		vector<string> temp_names = parameter::getVS(parmap, "NAMES", "");
+		vector<double> temp_values = parameter::getV(parmap, "VALUES", "");
+		for(int i=0;i<temp_names.size();i++){
+			if(strcmp(temp_names[i].c_str(),ParamNames[i].c_str())==0){
+				if((temp_values[i]>Max_Ranges[i])||(temp_values[i]<Min_Ranges[i])){
+					cout << "The theta0 value given for " << ParamNames[i] << " in " << theta0_filename << " is not within the ranges specified for this parameter. " << endl;
+					cout << "The range specifed was: [" << Min_Ranges[i] << "," << Max_Ranges[i] << "] but the theta0 value given was: " << temp_values[i] << endl;
+					exit(-1);
+				}
+				Theta.push_back(temp_values[i]);
+				cout << ParamNames[i] << " " << temp_values[i] << endl;
+			}
+		}
+		if(Theta.size()!=ParamNames.size()){
+			cout << "The theta0 vector specifed in " << theta0_filename << " is not the right length, or the names are incorrect." << endl;
+			cout << "Only " << Theta.size() << " values were read in, but there are " << ParamNames.size() << " parameters." << endl;
+			exit(-1);
+		}
+		ThetaList.push_back(Theta);
 	}
 	//Likelihood_Current=0;
 

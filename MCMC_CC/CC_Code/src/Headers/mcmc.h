@@ -68,17 +68,19 @@ public:
 	LikelihoodDistribution *Likelihood;
 	ProposalDistribution *Proposal;
 	PriorDistribution *Prior;
-	ParameterSetList *DummyList;
 	double Max_Ranges[30],Min_Ranges[30];
 	
-	ParameterSet *BestParameterSetPtr;
+	//ParameterSet *BestParameterSetPtr;
+	vector<double> BestParameterSetPtr;
 	vector<double> ParamValues;
+	vector<double> Theta;
 	double bestlikelihood;
 	double Likelihood_Current;
 	
 	string tracedir;
 	VizHandler *Visualizer;
-	ParameterSetList *ThetaList;
+	//ParameterSetList *ThetaList;
+	vector<vector<double>> ThetaList;
 	int Accept_Count;
 	int Viz_Count;
 };
