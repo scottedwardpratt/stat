@@ -84,21 +84,8 @@ MCMC::MCMC(string info_dir, string configuration){
 	}
 	printf("\n");
 
-	cout << "Parameter Ranges:" << endl;
-	for( int i =0; i< ParamNames.size(); i++){
-		cout << Min_Ranges[i] << " " << Max_Ranges[i] << endl;
-	}
-
 	if(PRESCALED_PARAMS){
-                cout << "WARNING: PRESCALED_PARAMS = True. This means all parameter ranges are forced to be [0,1]" << endl;
-		for(int i=0; i < ParamNames.size(); i++){
-			//They go from zero to 1
-			Min_Ranges[i]=0;
-			Max_Ranges[i]=1;
-		}
-	}
-
-	if(PRESCALED_PARAMS){
+        cout << "WARNING: PRESCALED_PARAMS = True. This means all parameter ranges are forced to be [0,1]" << endl;
 		for(int i=0; i < ParamNames.size(); i++){
 			//They go from zero to 1
 			Min_Ranges[i]=0;
@@ -200,6 +187,11 @@ MCMC::MCMC(string info_dir, string configuration){
 	
 	Proposal = new ProposalDistribution(this);
 	//cout << "Proposal done." << endl;
+
+	cout << "Parameter Ranges:" << endl;
+	for( int i =0; i< ParamNames.size(); i++){
+		cout << Min_Ranges[i] << " " << Max_Ranges[i] << endl;
+	}
 	
 }
 
