@@ -6,13 +6,12 @@
 using namespace std;
 
 class MCMC;
-class ParameterSet;
 
 class EmulatorHandler{
 public:
 	EmulatorHandler(parameterMap *parmap, MCMC * mcmc_in);
 	~EmulatorHandler();
-	void QueryEmulator(ParameterSet Theta,vector<double> &Means, vector<double> &Errors);
+	void QueryEmulator(vector<double> Theta,vector<double> &Means, vector<double> &Errors);
 private:
 	string EmulatedParams;
 	MCMC *mcmc;

@@ -12,7 +12,7 @@ EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMC * mcmc_in){
 	
 	EmulatorScriptHome = parameter::getS(*parmap, "EMULATORFILEPATH", "./");
 	//Observables = parameter::getS(mcmc->parmap, "OBSERVABLES", "Observables not specified");
-	//Observables = mcmc->Observables;
+	//Observables = mcmc->ObservablesNames;
 
 	// cout << "The emulator is located at " << EmulatorScriptHome << endl;
 	EmInputFile = EmulatorScriptHome + "/src/InputPts.txt";
@@ -35,7 +35,7 @@ EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMC * mcmc_in){
 	f.close();
 	
 	//check if emulator has been run yet.
-	string checkfilename = mcmc->dir_name + "/" + mcmc->Observables + "-thetas.txt";
+	string checkfilename = mcmc->dir_name + "/" + mcmc->ObservablesNames + "-thetas.txt";
 	//cout << checkfilename << endl;
 	
 	f.open(checkfilename.c_str());
@@ -44,7 +44,7 @@ EmulatorHandler::EmulatorHandler(parameterMap *parmap, MCMC * mcmc_in){
 		// cout << "Emulator exists." << endl;
 	}else{ //If the code can't find the emulator:
 		f.close();
-		string checkfilename = "./" + mcmc->Observables + "-thetas.txt"; //Check the base directory
+		string checkfilename = "./" + mcmc->ObservablesNames + "-thetas.txt"; //Check the base directory
 		//cout << checkfilename << endl;
 		f.open(checkfilename.c_str());
 		if(f){
@@ -69,7 +69,7 @@ EmulatorHandler::~EmulatorHandler(){
 	int temp = system(command.c_str());
 }
 
-void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, vector<double> &Errors){
+void EmulatorHandler::QueryEmulator(vector<double> Theta,vector<double> &Means, vector<double> &Errors){
 	// cout << "Querying emulator." << endl;
 	ofstream outputfile;
 	ifstream inputfile;
@@ -77,26 +77,26 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 	string currentline;
 	char * token;
 	int NumDataRows = 1;
-	EmulatedParams = mcmc->EmulatorParams;
+	EmulatedParams = mcmc->ParamNames;
 	outputfile.open(EmInputFile.c_str());
 
 	if(outputfile){
-		if(EmulatedParams.find(Theta.Names[0]) != string::npos){
-			outputfile << Theta.Values[0];
-			// cout << Theta.Values[0];
-			// cout << Theta.Names[0] << endl;
+		if(EmulatedParams.find(mcmc->ParamNames[0]) != string::npos){
+			outputfile << Theta[0];
+			// cout << Theta[0];
+			// cout << mcmc->ParamNames[0] << endl;
 		}
 		else{
-			cout << "Warning: Observable " << Theta.Names[0] << " is not an emulated observable." << endl;
+			cout << "Warning: Observable " << mcmc->ParamNames[0] << " is not an emulated observable." << endl;
 		}
-		for(int i = 1; i < Theta.Values.size(); i++){
-			if(EmulatedParams.find(Theta.Names[i]) != string::npos){
-				outputfile << " " << Theta.Values[i];
-				// cout << " " << Theta.Values[i];
-				// cout << Theta.Names[i] << endl;
+		for(int i = 1; i < Theta.size(); i++){
+			if(EmulatedParams.find(mcmc->ParamNames[i]) != string::npos){
+				outputfile << " " << Theta[i];
+				// cout << " " << Theta[i];
+				// cout << mcmc->ParamNames[i] << endl;
 			}
 			else{
-				cout << "Warning: Observable " << Theta.Names[i] << " is not an emulated observable." << endl;
+				cout << "Warning: Observable " << mcmc->ParamNames[i] << " is not an emulated observable." << endl;
 			}
 		}
 		outputfile << endl;
@@ -109,7 +109,7 @@ void EmulatorHandler::QueryEmulator(ParameterSet Theta,vector<double> &Means, ve
 	}
 	
 	command = EmulatorScriptHome + "/src/computePoints.sh " + mcmc->dir_name + " "\
-	+ mcmc->dir_name + "/fn-data-" + mcmc->Observables + ".dat < " + EmInputFile + " > "+ EmOutputFile + " 2> " + EmErrorFile;
+	+ mcmc->dir_name + "/fn-data-" + mcmc->ObservablesNames + ".dat < " + EmInputFile + " > "+ EmOutputFile + " 2> " + EmErrorFile;
 
 	//cout << command.c_str() << endl;
 

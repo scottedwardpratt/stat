@@ -150,7 +150,7 @@ vector<double> LikelihoodDistribution_RHIC::GetFakeData(){
 	vector<double> temp_values = parameter::getV(actualparmap, "VALUES", "");
 	
 	vector<double> ActualParams;
-	ActualParams.Initialize(temp_names, temp_values);
+	ActualParams = temp_names;
 	
 	My_emu->QueryEmulator(ActualParams, datameans, dataerror);
 
