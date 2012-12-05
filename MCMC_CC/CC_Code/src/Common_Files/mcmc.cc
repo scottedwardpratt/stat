@@ -192,7 +192,6 @@ void MCMC::FirstPass(){
 
 /** This runs MAXITERATIONS samplings */
 void MCMC::Run(){
-	srand(time(NULL));
 	double Likelihood_Current, Likelihood_New;
 	double Prior_Current, Prior_New;
 	double Proposal_Current, Proposal_New;
@@ -338,6 +337,7 @@ void MCMC::Run(){
 			cout << "Writing out." << endl;
 			if(CREATE_TRACE &&(i!=1)){
 				Visualizer->UpdateTraceFig();
+				ThetaList.clear();
 			}
 			//ThetaList->WriteOut();
 		}
