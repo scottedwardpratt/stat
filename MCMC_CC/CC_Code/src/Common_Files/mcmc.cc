@@ -115,9 +115,9 @@ void MCMC::FirstPass(){
 	
 	if(RANDOM_THETA0){
 		cout << "We are using random theta0 values. They are:" << endl;
-		for(int i=0;i<mcmc->ParamNames.size();i++){
+		for(int i=0;i<ParamNames.size();i++){
 			Theta.push_back((double(rand())/double(RAND_MAX))*(Max_Ranges[i]-Min_Ranges[i])+Min_Ranges[i]);
-			cout << mcmc->ParamNames[i] << " " << Theta[i] << endl;
+			cout << ParamNames[i] << " " << Theta[i] << endl;
 		}
 		ThetaList.push_back(Theta);
 	}
@@ -338,12 +338,12 @@ void MCMC::Run(){
 			if(CREATE_TRACE &&(i!=1)){
 				Visualizer->UpdateTraceFig();
 			}
-			ThetaList->WriteOut();
+			//ThetaList->WriteOut();
 		}
 	}
 	
-	ThetaList->WriteOut();
-	ThetaList->MakeTrace();
+	//ThetaList->WriteOut();
+	//ThetaList->MakeTrace();
 	if(CREATE_TRACE){
 		Visualizer->FinalTrace();
 	}
@@ -353,7 +353,7 @@ void MCMC::Run(){
 	cout << "Acceptance ratio: " << ratio << endl;
 	printf("-------- Best Parameter Set, likelihood=%g -------------\n",bestlikelihood);
 	for(int i=0;i<ParamNames.size();i++){
-		cout << ParamNames[i] << " " << BestParameterSet[k] << endl;
+		cout << ParamNames[i] << " " << BestParameterSet[i] << endl;
 	}
 }
 
