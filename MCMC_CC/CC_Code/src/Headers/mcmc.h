@@ -34,8 +34,7 @@ class MCMC{
 public:
 	MCMC(string run_file, string configuration);
 	~MCMC();
-	void LoadParams(); //This loads the names of the emulator parameters
-	void GetRanges(); //This loads the ranges of the emulator parameters
+	void GetRanges(); //This loads the names and ranges of the emulator parameters
 	void FirstPass(); //This prepares the objects necessary for the MCMC Run
 	void LoadObservables(); //This loads the names of the emulator observables
 	void Run(); //This performs the MAXITERATIONS sampling

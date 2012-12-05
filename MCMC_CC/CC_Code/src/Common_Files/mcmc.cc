@@ -25,8 +25,6 @@ MCMC::MCMC(string info_dir, string configuration){
 	MODEL = parameter::getS(parmap,"MODEL","NOMODEL");
 	PRESCALED_PARAMS = parameter::getB(parmap, "PRESCALED_PARAMS", false);
 	
-	LoadParams();
-
 	GetRanges();
 
 	if(PRESCALED_PARAMS){
@@ -329,46 +327,22 @@ void MCMC::Run(){
 	BestParameterSetPtr->Print();
 }
 
-void MCMC::LoadParams(){
-	if(EmulatorParams!=""){
-		string line;
-		stringstream Emparams;
-		Emparams << EmulatorParams;
-		getline(Emparams,line,' ');
-		ParamNames.push_back(line);
-		while(!Emparams.eof()){
-			getline(Emparams,line,' ');
-			if(line.compare(ParamNames.back())!=0) {ParamNames.push_back(line);}
-		} 
-		if(ParamNames.back().compare(0,1," ")==0 || ParamNames.back().empty()){ // if for some reason the last element is empty, drop it
-			ParamNames.pop_back();
-		}
-	}
-	for(int i=0;i<ParamNames.size();i++) {
-		printf("%s ",ParamNames[i].c_str());
-	}
-	printf("\n");
-}
-
 void MCMC::GetRanges(){
 	string filename = dir_name + "/ranges.dat";
 	fstream ranges;
 	ranges.open(filename.c_str(),fstream::in);
 	if(ranges){
 		string temps,name,line,type;
+		int index = 0;
 		while(ranges >> type){
 			if(strcmp(type.c_str(), "double") == 0){
 				ranges >> name;
-				for(int i=0;i<ParamNames.size();i++){
-					if(strcmp(ParamNames[i].c_str(),name.c_str())==0){
-						ranges >> Min_Ranges[i]; //minimum
-						ranges >> Max_Ranges[i]; //maximum
-						if(Min_Ranges[i] > Max_Ranges[i]){ //Flip them
-							double temp2 = Min_Ranges[i];
-							Min_Ranges[i] = Max_Ranges[i];
-							Max_Ranges[i] = temp2;
-						}
-					}
+				ranges >> Min_Ranges[index]; //minimum
+				ranges >> Max_Ranges[index]; //maximum
+				if(Min_Ranges[index] > Max_Ranges[index]){ //Flip them
+					double temp2 = Min_Ranges[index];
+					Min_Ranges[index] = Max_Ranges[index];
+					Max_Ranges[index] = temp2;
 				}
 			}else{
 				if(strncmp(type.c_str(), "#", 1) == 0){
@@ -376,8 +350,8 @@ void MCMC::GetRanges(){
 					getline(ranges, temp, '\n');
 				}
 			}
+			ParamNames.push_back(name);
 			EmulatorParams = EmulatorParams + name + " ";
-			index++;
 		}
 
 		ranges.close();
@@ -387,7 +361,12 @@ void MCMC::GetRanges(){
 		exit(1);
 	}
 
-	cout << "Ranges loaded" << endl;
+	cout << "Ranges and parameters loaded" << endl;
+
+	for(int i=0;i<ParamNames.size();i++) {
+		printf("%s ",ParamNames[i].c_str());
+	}
+	printf("\n");
 }
 
 void MCMC::LoadObservables(){
