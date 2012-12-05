@@ -23,46 +23,9 @@ MCMC::MCMC(string info_dir, string configuration){
 	RESCALED_TRACE = parameter::getB(parmap, "RESCALED_TRACE", false);
 	SUPPRESS_ERRORS = parameter::getB(parmap, "SUPPRESS_ERRORS", false);
 	MODEL = parameter::getS(parmap,"MODEL","NOMODEL");
-	
-	//============================================
-	// Reading the parameters out of ranges.dat
 	PRESCALED_PARAMS = parameter::getB(parmap, "PRESCALED_PARAMS", false);
-	string filename = info_dir + "/ranges.dat";
-	fstream ranges;
-	ranges.open(filename.c_str(),fstream::in);
-	if(ranges){
-		string temps,name,line,type;
-		int index = 0;
-		while(ranges >> type){
-			if(strcmp(type.c_str(), "double") == 0){
-				ranges >> name;
-				if(index != -1){ //returns -1 if not found
-					ranges >> Min_Ranges[index]; //minimum
-					ranges >> Max_Ranges[index]; //maximum
-					if(Min_Ranges[index] > Max_Ranges[index]){ //Flip them
-						double temp2 = Min_Ranges[index];
-						Min_Ranges[index] = Max_Ranges[index];
-						Max_Ranges[index] = temp2;
-					}
-				}
-			}else{
-				if(strncmp(type.c_str(), "#", 1) == 0){
-					string temp;
-					getline(ranges, temp, '\n');
-				}
-			}
-			EmulatorParams = EmulatorParams + name + " ";
-			index++;
-		}
-
-		ranges.close();
-	}
-	else{
-		cout << "Ranges.dat wont open" << endl;
-		exit(1);
-	}
-
-	cout << "Ranges loaded" << endl;
+	
+	GetRanges();
 
 	if(EmulatorParams!=""){
 		string line;
@@ -420,6 +383,45 @@ MCMC::Run(){
 	cout << "Acceptance ratio: " << ratio << endl;
 	printf("-------- Best Parameter Set, likelihood=%g -------------\n",bestlikelihood);
 	BestParameterSetPtr->Print();
+}
+
+MCMC::GetRanges(){
+	string filename = info_dir + "/ranges.dat";
+	fstream ranges;
+	ranges.open(filename.c_str(),fstream::in);
+	if(ranges){
+		string temps,name,line,type;
+		int index = 0;
+		while(ranges >> type){
+			if(strcmp(type.c_str(), "double") == 0){
+				ranges >> name;
+				if(index != -1){ //returns -1 if not found
+					ranges >> Min_Ranges[index]; //minimum
+					ranges >> Max_Ranges[index]; //maximum
+					if(Min_Ranges[index] > Max_Ranges[index]){ //Flip them
+						double temp2 = Min_Ranges[index];
+						Min_Ranges[index] = Max_Ranges[index];
+						Max_Ranges[index] = temp2;
+					}
+				}
+			}else{
+				if(strncmp(type.c_str(), "#", 1) == 0){
+					string temp;
+					getline(ranges, temp, '\n');
+				}
+			}
+			EmulatorParams = EmulatorParams + name + " ";
+			index++;
+		}
+
+		ranges.close();
+	}
+	else{
+		cout << "Ranges.dat wont open" << endl;
+		exit(1);
+	}
+
+	cout << "Ranges loaded" << endl;
 }
 
 #endif
