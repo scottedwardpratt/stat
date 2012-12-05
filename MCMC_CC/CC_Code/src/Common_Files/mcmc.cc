@@ -235,7 +235,7 @@ void MCMC::Run(){
 		}*/
 
 		// Proposal		
-		if(LOGLIKE){
+		/*if(LOGLIKE){
 			LOGBF += (log(Proposal_Current)-log(Proposal_New));
 		} else {
 			LOGBF *= Proposal_Current/Proposal_New;
@@ -243,7 +243,7 @@ void MCMC::Run(){
 
 		if(!QUIET){
 			printf(" Proposal_New=%g, Proposal_Current=%g\n",Proposal_New,Proposal_Current);
-		}
+		}*/
 		
 		if(LOGLIKE){
 			alpha = min(1.0,exp(LOGBF));
