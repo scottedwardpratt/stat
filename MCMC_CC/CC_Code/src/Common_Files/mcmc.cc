@@ -206,7 +206,6 @@ void MCMC::Run(){
 	
 	Likelihood_Current = Likelihood->Evaluate(Theta);
 	Scale_Current = (rand() / double(RAND_MAX));
-	//Proposal_Current = Proposal->Evaluate(Theta);
 	Prior_Current = Prior->Evaluate(Theta);
 
 	/*for(int i = 0; i < ThetaList->ParamNames.size(); i++){
@@ -239,8 +238,8 @@ void MCMC::Run(){
 			Scaled_Theta = Theta;
 		}
 		Prior_New = Prior->Evaluate(Proposed_Theta);
-		//Proposal_New = Proposal->Evaluate(Theta,Proposed_Theta,Scale_Current);
-		//Proposal_Current = Proposal->Evaluate(Proposed_Theta,Theta,Scale_New);
+		Proposal_New = Proposal->Evaluate(Theta,Proposed_Theta,Scale_Current);
+		Proposal_Current = Proposal->Evaluate(Proposed_Theta,Theta,Scale_New);
 		
 		// cout << "Likelihood of proposed set: " << Likelihood_New << endl;
 		// cout << "Likelihood of current set: " << Likelihood_Current << endl;
@@ -275,7 +274,7 @@ void MCMC::Run(){
 		}
 
 		// Proposal		
-		/*if(LOGLIKE){
+		if(LOGLIKE){
 			LOGBF += (log(Proposal_Current)-log(Proposal_New));
 		} else {
 			LOGBF *= Proposal_Current/Proposal_New;
@@ -283,7 +282,7 @@ void MCMC::Run(){
 
 		if(!QUIET){
 			printf(" Proposal_New=%g, Proposal_Current=%g\n",Proposal_New,Proposal_Current);
-		}*/
+		}
 		
 		if(LOGLIKE){
 			alpha = min(1.0,exp(LOGBF));
