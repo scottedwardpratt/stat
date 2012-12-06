@@ -401,7 +401,7 @@ void MCMC::LoadObservables(){
 			} 
 	
 			stringstream Observableslist;
-			line.erase(line.end()-1,line.end());
+			//line.erase(line.end()-1,line.end());
 			Observableslist << line;
 			
 			while(!Observableslist.eof()){
