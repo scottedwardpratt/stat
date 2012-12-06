@@ -187,9 +187,6 @@ void MCMC::FirstPass(){
 	string command = "mkdir -p "+ tracedir;
 	
 	system(command.c_str());
-	/*if(!QUIET){
-		printf("Iteration\tAlpha\tResult\n");
-	}*/
 }
 
 /** This runs MAXITERATIONS samplings */
@@ -200,17 +197,11 @@ void MCMC::Run(){
 	float Scale_Current, Scale_New;
 
 	double LOGBF,alpha;
-	//ParameterSet * ThetaZeroPtr = ThetaList->Theta[0];
-	//ParameterSet CurrentParameters = *ThetaZeroPtr;
 	Proposed_Theta = Theta;
 	
 	Likelihood_Current = Likelihood->Evaluate(Theta);
 	Scale_Current = (rand() / double(RAND_MAX));
 	Prior_Current = Prior->Evaluate(Theta);
-
-	/*for(int i = 0; i < ThetaList->ParamNames.size(); i++){
-		ParamValues.push_back(0);
-	}*/
 
 	Accept_Count = 0;
 	for(int i =1; i<=MAXITERATIONS; i++){
@@ -251,14 +242,10 @@ void MCMC::Run(){
 
 		// Likelihood
 		if(LOGLIKE){
-			if(!QUIET){
-				printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
-			}
+			if(!QUIET) printf(" ll_new=%g, ll_current=%g\n",Likelihood_New,Likelihood_Current);
 			LOGBF += Likelihood_New-Likelihood_Current;
 		} else {
-			if(!QUIET){
-				printf(" l_new=%g, l_current=%g\n",exp(Likelihood_New),exp(Likelihood_Current));
-			}
+			if(!QUIET) printf(" l_new=%g, l_current=%g\n",exp(Likelihood_New),exp(Likelihood_Current));
 			LOGBF *= exp(Likelihood_New)/exp(Likelihood_Current);
 		}
 
@@ -269,9 +256,7 @@ void MCMC::Run(){
 			LOGBF *= (Prior_New/Prior_Current);
 		}
 
-		if(!QUIET){
-			printf(" Prior_New=%g, Prior_Current=%g\n",Prior_New,Prior_Current);
-		}
+		if(!QUIET) printf(" Prior_New=%g, Prior_Current=%g\n",Prior_New,Prior_Current);
 
 		// Proposal		
 		if(LOGLIKE){
@@ -280,9 +265,7 @@ void MCMC::Run(){
 			LOGBF *= Proposal_Current/Proposal_New;
 		}
 
-		if(!QUIET){
-			printf(" Proposal_New=%g, Proposal_Current=%g\n",Proposal_New,Proposal_Current);
-		}
+		if(!QUIET) printf(" Proposal_New=%g, Proposal_Current=%g\n",Proposal_New,Proposal_Current);
 		
 		if(LOGLIKE){
 			alpha = min(1.0,exp(LOGBF));
@@ -292,18 +275,13 @@ void MCMC::Run(){
 
 		//cout << LOGBF << endl;
 
-		if(!QUIET){
-			printf("%5d\talpha=%6.5f\t",i,alpha);
-			//printf("LOGBF=%6.5f\t",alpha);
-		}
+		if(!QUIET) printf("%5d\talpha=%6.5f\t",i,alpha);
 		if(alpha > (randnum->ran())) { //Accept the proposed set.
 		//double ll = Likelihood_New;
 		//double oldll = Likelihood_Current;
 		//if((ll>oldll || randnum->ran()<exp(ll-oldll)) && (ll-oldll>-40)){
 		//if(ll>oldll || randnum->ran()<exp(ll-oldll)){
-			if(!QUIET){
-				printf("Accept\n");
-			}
+			if(!QUIET) printf("Accept\n");
 			if(i > BURN_IN){
 				Accept_Count++;
 			}
@@ -325,16 +303,11 @@ void MCMC::Run(){
 				}
 			}
 		}else{
-			if(!QUIET){
-				printf("Reject\n");
-			}
+			if(!QUIET) printf("Reject\n");
 		}
 
 		for(int k = 0; k < ParamNames.size(); k++){ //These ParamValus are used for the density plots
 			Scaled_Theta[k] = (Theta[k] - Min_Ranges[k])/(Max_Ranges[k]-Min_Ranges[k]);
-			if(!QUIET){
-				//cout << "Scale" << ParamNames[k] << ": " << Scaled_Theta[k] << endl;
-			}
 		}
 
 		if(i >= BURN_IN){ // We are just tossing everything in the burn in period.
@@ -348,9 +321,7 @@ void MCMC::Run(){
 				VizScaled_ThetaList.clear();
 			}
 			if((i+1) % WRITEOUT == 0){
-				if(QUIET){
-					cout << "."; cout.flush();
-				}
+				if(QUIET) cout << "."; cout.flush();
 				PrintDataToFile();
 				ThetaList.clear();
 				Scaled_ThetaList.clear();
@@ -496,9 +467,7 @@ void MCMC::PrintDataToFile(){
 	}
 	WriteOutCounter++;
 
-	if(!QUIET){
-		cout << "Done printing to file." << endl;
-	}
+	if(!QUIET) cout << "Done printing to file." << endl;
 }
 
 void MCMC::MakeFinalTrace(){
