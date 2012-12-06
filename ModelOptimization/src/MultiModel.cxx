@@ -118,17 +118,6 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
     this->stateFlag = ERROR;
     return OTHER_ERROR;
   }
-    
-  if(m_UseEmulator && !m_ProcessPipe){
-    std::cerr << "Emulator is being loaded from: " << m_DirectoryName << + "/Emulator.statfile" << "using the EmuPlusPlus.h emulator handler" << std::endl;
-    m_Emulator= new ::emulator(m_DirectoryName + "/Emulator.statefile");
-    std::cerr << "Emulator loaded. Test (number of params): _" << m_Emulator->number_params << "_" << std::endl;
-  } else if (m_ProcessPipe){
-    this->LoadProcess();
-  } else {
-    std::cerr << "Neither the process pipe nor use emulator flag is set to true. We can't do anything without an emulator" << std::endl;
-    exit(1);
-  }  
   
   std::string observables_filename = info_dir + "/pcanames.dat";
   this->LoadConfigurationFile(observables_filename);
@@ -144,7 +133,18 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
     this->stateFlag=ERROR;
     return OTHER_ERROR;
   }
-    
+  
+  if(m_UseEmulator && !m_ProcessPipe){
+    std::cerr << "Emulator is being loaded from: " << m_DirectoryName << + "/Emulator.statfile" << "using the EmuPlusPlus.h emulator handler" << std::endl;
+    m_Emulator= new ::emulator(m_DirectoryName + "/Emulator.statefile");
+    std::cerr << "Emulator loaded. Test (number of params): _" << m_Emulator->number_params << "_" << std::endl;
+  } else if (m_ProcessPipe){
+    this->LoadProcess();
+  } else {
+    std::cerr << "Neither the process pipe nor use emulator flag is set to true. We can't do anything without an emulator" << std::endl;
+    exit(1);
+  }  
+  
   std::vector<std::string> temp_logparam = parameter::getVS(m_ParameterMap, "LOG_PARAMETERS", "");
 	for(int i = 0; i < temp_logparam.size(); i++){
 		if( std::strcmp(temp_logparam[i].c_str(), "true") == 0 || std::strcmp(temp_logparam[i].c_str(), "True") == 0){
@@ -433,8 +433,8 @@ madai::MultiModel::LoadProcess()
     this->stateFlag = ERROR;
     return OTHER_ERROR;
 	}
-	if (n != 2*number_of_outputs) {
-		std::cerr << "number_of_outputs mismatch";
+	if (n != (2*number_of_outputs)) {
+		std::cerr << "number_of_outputs mismatch\n";
     this->stateFlag = ERROR;
     return OTHER_ERROR;
 	}
