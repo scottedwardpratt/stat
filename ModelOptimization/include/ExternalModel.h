@@ -72,7 +72,13 @@ namespace madai {
 			const std::vector< double > & parameters,
 			const std::vector< bool > & activeParameters,
 			std::vector< double > & scalars,
-			unsigned int outputIndex, std::vector< double > & gradient) const;
+      unsigned int outputIndex, std::vector< double > & gradient) const;
+    
+    // Not implemented yet.
+    // Proposed function for interaction with the MCMC
+    virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,
+                                       double & Like,
+                                       double & Prior ) const;
 	}; // end Model
 } // end namespace madai
 

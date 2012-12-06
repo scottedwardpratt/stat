@@ -19,7 +19,8 @@ madai::PriorDistribution::~PriorDistribution(){
 }
 madai::LikelihoodDistribution::~LikelihoodDistribution(){
 }
-double madai::LikelihoodDistribution::Evaluate(std::vector<double> Theta){
+double madai::LikelihoodDistribution::Evaluate(std::vector<double> ModelMeans,
+                                               std::vector<double> ModelErrors){
 }
 std::vector<double> madai::LikelihoodDistribution::GetData(){
 }

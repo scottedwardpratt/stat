@@ -11,7 +11,7 @@ madai::ProposalDistribution::ProposalDistribution(madai::Model * in_Model){
   m_SepMap = parameter::getB(m_Model->m_ParameterMap, "PROPOSAL_PARAMETER_MAP", false);
 
   if(m_SepMap){
-    std::string parmapfile = m_Model->m_ParameterFile + "/proposal.param";
+    std::string parmapfile = m_Model->m_DirectoryName + "/defaultpars/proposal.param";
     m_ParameterMap = new parameterMap;
     parameter::ReadParsFromFile(*m_ParameterMap, parmapfile);
   }else{
@@ -21,8 +21,11 @@ madai::ProposalDistribution::ProposalDistribution(madai::Model * in_Model){
   m_RescaledMethod = parameter::getB(*m_ParameterMap, "RESCALED_PROPOSAL", true);
   m_MixingStdDev = parameter::getV(*m_ParameterMap, "MIXING_STD_DEV", "0");
   m_SymmetricProposal = parameter::getB(*m_ParameterMap, "SYMMETRIC_PROPOSAL", true);
+  m_Prefactor = parameter::getD(*m_ParameterMap, "PREFACTOR", 1.0);
+  m_MinScale = parameter::getD(*m_ParameterMap, "MIN", 0.0);
+  m_MaxScale = parameter::getD(*m_ParameterMap, "Max", 1.0);
   m_Scale = parameter::getD(*m_ParameterMap, "SCALE", 1.0);
-  m_Offset = parameter::getD(*m_ParameterMap, "OFFSET", 0.0);
+  //m_Offset = parameter::getD(*m_ParameterMap, "OFFSET", 0.0);
 
   const gsl_rng_type * rngtype;
   rngtype = gsl_rng_default;
@@ -61,43 +64,35 @@ void madai::ProposalDistribution::SetActiveParameters(std::set<std::string> acti
 }
 
 std::vector<double> madai::ProposalDistribution::Iterate(std::vector<double>& current, double& scale/*, std::set<std::string>& activeParameters*/){
+  std::vector<double> proposed = current;
   if(m_SymmetricProposal){
     //We use the scale set in the parameter file
-    std::vector<double> proposed = current;
     double range[2];
-
     for(int i=0; i<proposed.size(); i++){
-      //std::vector<std::string>::const_iterator itr = activeParameters.begin();
       if(m_ActiveParameters.find( m_Model->GetParameters()[i].m_Name ) != m_ActiveParameters.end() ){
         m_Model->GetRange(i, range);
         proposed[i] = (current[i] - range[0])/(range[1]-range[0]); //scale to between 0 and 1
-        //proposed[i] = proposed[i] + gsl_ran_gaussian(randy, SCALE*MixingStdDev[i]/sqrt((double)proposed.size()));
-        proposed[i] = proposed[i] + gsl_ran_gaussian(m_RandNumGen, m_Scale*m_MixingStdDev[i]);
+        proposed[i] = proposed[i] + m_Prefactor*gsl_ran_gaussian(m_RandNumGen, m_Scale*m_MixingStdDev[i]);
         proposed[i] = proposed[i] - floor(proposed[i]);
         proposed[i] = (proposed[i]*(range[1]-range[0]))+range[0];
       }
-    }	
-
-    return proposed;
+    }
   } else {
     // We use whatever scale we just got passed from the rest of the code
-    std::vector<double> proposed = current;
+    scale = (scale*(m_MaxScale-m_MinScale))+m_MinScale;
     double range[2];
-
     for(int i=0; i<proposed.size(); i++){
       if(m_ActiveParameters.find(m_Model->GetParameters()[i].m_Name)!=
          m_ActiveParameters.end() ){
         m_Model->GetRange(i,range);
         proposed[i] = (current[i] - range[0])/(range[1]-range[0]); //scale to between 0 and 1
-        //proposed[i] = proposed[i] + gsl_ran_gaussian(randy, scale*MixingStdDev[i]/sqrt((double)proposed.size()));
-        proposed[i] = proposed[i] + gsl_ran_gaussian(m_RandNumGen, m_Scale*(scale+m_Offset)*m_MixingStdDev[i]);
+        proposed[i] = proposed[i] + m_Prefactor*gsl_ran_gaussian(m_RandNumGen, scale*m_MixingStdDev[i]);
         proposed[i] = proposed[i] - floor(proposed[i]);
         proposed[i] = (proposed[i]*(range[1]-range[0]))+range[0];
       }
-    }	
-
-    return proposed;
+    }
   }
+  return proposed;
 }
 
 double madai::ProposalDistribution::Evaluate(std::vector<double> Theta1, std::vector<double> Theta2, double scale){
@@ -109,12 +104,13 @@ double madai::ProposalDistribution::Evaluate(std::vector<double> Theta1, std::ve
 		// If it's symmetric this doesn't matter
 		probability = 1.0;
 	} else {
+    scale = (scale*(m_MaxScale-m_MinScale))+m_MinScale;
 		for(int i=0; i<Theta1.size(); i++){
-			exponent += -(Theta1[i]-Theta2[i])*(Theta1[i]-Theta2[i])/(2*m_Scale*m_Scale*(scale+m_Offset)*(scale+m_Offset)*m_MixingStdDev[i]*m_MixingStdDev[i]);
-			prefactor = prefactor/(m_Scale*(scale+m_Offset)*sqrt(2*M_PI));
+			exponent += -(Theta1[i]-Theta2[i])*(Theta1[i]-Theta2[i])/(2*scale*scale*m_MixingStdDev[i]*m_MixingStdDev[i]);
+			prefactor = prefactor/(scale*sqrt(2*M_PI));
 		}
 		probability = prefactor*exp(exponent);
 	}
-	
 	return probability;
+
 }

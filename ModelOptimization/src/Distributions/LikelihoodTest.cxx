@@ -6,7 +6,7 @@ madai::LikelihoodDistribution_Test::LikelihoodDistribution_Test(madai::Model *in
 	m_SepMap = parameter::getB(m_Model->m_ParameterMap, "LIKELIHOOD_PARAMETER_MAP", false);
 	
 	if(m_SepMap){
-		std::string parmapfile = m_Model->m_ParameterFile + "/likelihood.param";
+		std::string parmapfile = m_Model->m_DirectoryName + "/defaultpars/likelihood.param";
 		m_ParameterMap = new parameterMap;
 		parameter::ReadParsFromFile(*m_ParameterMap, parmapfile);
 	}else{

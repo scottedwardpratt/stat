@@ -29,7 +29,11 @@ public:
                                          const std::vector< bool > & activeParameters,
                                          std::vector< double > & scalars,
                                          unsigned int outputIndex, std::vector< double > & gradient) const;
-
+  // Not implemented yet.
+  // Proposed function for interaction with the MCMC
+  virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,
+                                     double & Like,
+                                     double & Prior ) const;
 protected:
   double m_MeanX;
   double m_MeanY;

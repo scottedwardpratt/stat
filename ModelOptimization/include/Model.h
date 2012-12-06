@@ -83,16 +83,20 @@ namespace madai {
 		
 		/** Get both scalar values and the gradient of the parameters. */
 		virtual ErrorType GetScalarAndGradientOutputs( const std::vector< double > & parameters,
-                                                      const std::vector< bool > & activeParameters,
-                                                      std::vector< double > & scalars,
-                                                      unsigned int outputIndex, 
-                                                      std::vector< double > & gradient) const = 0;
+                                                   const std::vector< bool > & activeParameters,
+                                                   std::vector< double > & scalars,
+                                                   unsigned int outputIndex, 
+                                                   std::vector< double > & gradient) const = 0;
+  
+    // Proposed function for interaction with the MCMC:
+    virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,
+                                       double & LikeNew,
+                                       double & PriorNew) const = 0;
+                                          
   
     std::string   m_DirectoryName;
-    std::string   m_ParameterFile;
     std::string   m_ParameterFileName;
     bool          m_LogLike;
-    bool          m_PrescaledParams;
     parameterMap  m_ParameterMap;
 		
 	protected:

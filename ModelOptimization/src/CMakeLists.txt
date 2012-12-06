@@ -6,14 +6,6 @@ set( SRC_FILES
   Distributions/Distribution.cxx
   Distributions/LikelihoodRHIC.cxx
   Distributions/PriorRHIC.cxx
-  Distributions/LikelihoodCosmo.cxx
-  Distributions/PriorCosmo.cxx
-  Distributions/LikelihoodRHIC_PCA.cxx
-  Distributions/PriorRHIC_PCA.cxx
-  Distributions/LikelihoodTest.cxx
-  Distributions/PriorTest.cxx
-  Distributions/Proposal.cxx
-  Quad.cxx
 
   MultiModel.cxx
 

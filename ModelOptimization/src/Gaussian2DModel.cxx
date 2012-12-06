@@ -126,4 +126,16 @@ Gaussian2DModel
   return (value * dy) / (sy * sy);
 }
 
+
+// Not implemented yet
+Model::ErrorType
+Gaussian2DModel
+::GetLikeAndPrior( const std::vector< double > & parameters,
+                   double & Like,
+                   double & Prior) const
+{
+  return OTHER_ERROR;
+}
+
+
 } // end namespace madai

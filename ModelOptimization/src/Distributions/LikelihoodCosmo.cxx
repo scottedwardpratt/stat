@@ -6,7 +6,7 @@ madai::LikelihoodDistribution_Cosmo::LikelihoodDistribution_Cosmo(madai::Model *
 	m_SepMap = parameter::getB(m_Model->m_ParameterMap, "LIKELIHOOD_PARAMETER_MAP", false);
 	
 	if(m_SepMap){
-		std::string parmapfile = m_Model->m_ParameterFile + "/likelihood.param";
+		std::string parmapfile = m_Model->m_DirectoryName + "defaultpars/likelihood.param";
 		m_ParameterMap = new parameterMap;
 		parameter::ReadParsFromFile(*m_ParameterMap, parmapfile);
 	}else{
@@ -104,7 +104,7 @@ std::vector<double> madai::LikelihoodDistribution_Cosmo::GetData(){
 	parameterMap actualparmap;
 	std::ifstream inputfile;
 	
-	std::string actual_filename = m_Model->m_ParameterFile + "/actual.param";
+	std::string actual_filename = m_Model->m_DirectoryName + "/defaultpars/actual.param";
 	parameter::ReadParsFromFile(actualparmap, actual_filename);
 	
 	std::vector<std::string> temp_names = parameter::getVS(actualparmap, "NAMES", "");

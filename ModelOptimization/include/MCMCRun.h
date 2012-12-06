@@ -24,7 +24,7 @@ class TraceElement;
     
 class MCMCRun : public Optimizer {
 public:
-  MCMCRun(const Model *in_model);
+  MCMCRun(const Model *in_model, const std::string info_dir);
   ~MCMCRun();
 
   void NextIteration(Trace *trace);
@@ -32,6 +32,7 @@ public:
   std::vector<double> GetRandomTheta0(int seed);
   std::vector<double> GetTheta0FromFile();
 
+  std::string         m_DirectoryName;
   parameterMap        m_LocalParameterMap;
   std::vector<double> m_BestParameterSet;
   std::vector<double> m_ParameterValues;
@@ -42,6 +43,7 @@ public:
   bool                m_Quiet;
   bool                m_RescaledTrace;
   bool                m_AppendTrace;
+  bool                m_LogLike;
   bool                m_LogPrior;
   bool                m_LogProposal;
   bool                m_CreateTrace;
@@ -62,6 +64,27 @@ public:
   int                 m_AcceptCount;
   int                 m_VizCount;
   int                 m_IterationNumber;
+  
+  // Taking a step and calculating the probability of the step
+  void LoadStepParameters();
+  std::vector<double> TakeStep(std::vector<double>& current,
+                               double& scale);
+  double EvaluateProposal(std::vector<double> Theta1,
+                          std::vector<double> Theta2,
+                          double scale);
+  
+  gsl_rng*            m_RandNumGen;
+  bool                m_SepMap;
+  bool                m_Timing;
+  bool                m_SymmetricProposal;
+  bool                m_RescaledMethod;
+  double              m_Prefactor;
+  double              m_MinScale;
+  double              m_MaxScale;
+  double              m_Scale;
+  double              m_Offset;
+  std::vector<double> m_MixingStdDev;
+  parameterMap*       m_StepParameterMap;
 protected:
 };
 

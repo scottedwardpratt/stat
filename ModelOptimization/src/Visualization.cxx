@@ -144,77 +144,74 @@ void madai::VizHandler::UpdateTraceFig(madai::Trace* ThetaOutsList){
   for( int i = 0; i < parameters.size(); i++){
     m_ParamNames.push_back(parameters[i].m_Name);
   }
-	
-  std::cerr << "Updating trace figure\n";
-    
-	if(m_MovingWindow){
-		int DequeSize = 500;
-		for(int i = 0; i < ThetaOutsList->m_Writeout; i++){
-			if((*ThetaOutsList)[i].m_Used && !((*ThetaOutsList)[i].m_InTrace)){
-				for(int j = 0; j< (*ThetaOutsList)[i].m_ParameterValues.size(); j++){
-					if(m_MCMC->m_RescaledTrace){
-            double * range = new double[2]();
-            m_MCMC->GetModel()->GetRange(j, range);
-						ss << ThetaOutsList->m_Writeout*ThetaOutsList->m_WriteOutCounter + i + 1 << " " << ((*ThetaOutsList)[i].m_ParameterValues[j]-range[0])/(range[1]-range[0])<< "\n";
-					}
-					else{
-						ss << ThetaOutsList->m_Writeout*ThetaOutsList->m_WriteOutCounter + i + 1 << " " << (*ThetaOutsList)[i].m_ParameterValues[j] << "\n";
-					}
-					if(m_DequeParameterValues[j].size() > DequeSize){
-						m_DequeParameterValues[j].pop_front();
-						m_DequeParameterValues[j].push_back(ss.str());
-					}
-					else{
-						m_DequeParameterValues[j].push_back(ss.str());
-					}
-					ss.str(string()); //clears the stringstream.
-				}
-				(*ThetaOutsList)[i].VizTrace();
-			}
-		}
-		for(int i = 0; i < m_ParamNames.size(); i++){
-			for(int j =0; j < m_DequeParameterValues[i].size(); j++){
-				plotcommand = plotcommand + (m_DequeParameterValues[i])[j];
-			}
-			plotcommand = plotcommand + "e\n";
-      //std::cerr << plotcommand << std::endl;
-		}
-	}else{
-		if(!m_MCMC){
-			std::cout << "MCMC pointer not found." << std::endl;
-		}
-		for(int i = 0; i < ThetaOutsList->m_Writeout; i++){
-			if((*ThetaOutsList)[i].m_Used && !((*ThetaOutsList)[i].m_InTrace)){
-				// count++;
-				for(int j =0; j< (*ThetaOutsList)[i].m_ParameterValues.size(); j++){
-					if(m_ParamValues[j].empty()){
-						m_ParamValues[j] = "";
-					}
-					if(m_MCMC->m_RescaledTrace){
-            double * range = new double[2]();
-            m_MCMC->GetModel()->GetRange(j,range);
-						ss << ThetaOutsList->m_Writeout*ThetaOutsList->m_WriteOutCounter + i + 1 << " " << ((*ThetaOutsList)[i].m_ParameterValues[j]-range[0])/(range[1]-range[0])<< "\n";
-					}
-					else{
-						ss << ThetaOutsList->m_Writeout*ThetaOutsList->m_WriteOutCounter + i + 1 << " " << (*ThetaOutsList)[i].m_ParameterValues[j] << "\n";
-					}
-					m_ParamValues[j] = ss.str();
-					ss.str(string()); //clears the stringstream.
-				}
-				(*ThetaOutsList)[i].VizTrace();
-			}
-		}
-		for(int i = 0; i < m_ParamNames.size(); i++){
-			plotcommand = plotcommand + m_ParamValues[i]+ "e\n";
-			//cout << paramvalues[i] << endl;
-		}
-	}
-	
-	if(m_MCMC->m_VizTrace){
+  
+  if(m_MCMC->m_VizTrace){
+    if(m_MovingWindow){
+      int DequeSize = 500;
+      for(int i = 0; i < ThetaOutsList->m_Writeout; i++){
+        if((*ThetaOutsList)[i].m_Used && !((*ThetaOutsList)[i].m_InTrace)){
+          for(int j = 0; j< (*ThetaOutsList)[i].m_ParameterValues.size(); j++){
+            if(m_MCMC->m_RescaledTrace){
+              double * range = new double[2]();
+              m_MCMC->GetModel()->GetRange(j, range);
+              ss << ThetaOutsList->m_Writeout*ThetaOutsList->m_WriteOutCounter + i + 1 << " " << ((*ThetaOutsList)[i].m_ParameterValues[j]-range[0])/(range[1]-range[0])<< "\n";
+            }
+            else{
+              ss << ThetaOutsList->m_Writeout*ThetaOutsList->m_WriteOutCounter + i + 1 << " " << (*ThetaOutsList)[i].m_ParameterValues[j] << "\n";
+            }
+            if(m_DequeParameterValues[j].size() > DequeSize){
+              m_DequeParameterValues[j].pop_front();
+              m_DequeParameterValues[j].push_back(ss.str());
+            }
+            else{
+              m_DequeParameterValues[j].push_back(ss.str());
+            }
+            ss.str(string()); //clears the stringstream.
+          }
+          (*ThetaOutsList)[i].VizTrace();
+        }
+      }
+      for(int i = 0; i < m_ParamNames.size(); i++){
+        for(int j =0; j < m_DequeParameterValues[i].size(); j++){
+          plotcommand = plotcommand + (m_DequeParameterValues[i])[j];
+        }
+        plotcommand = plotcommand + "e\n";
+        //std::cerr << plotcommand << std::endl;
+      }
+    }else{
+      if(!m_MCMC){
+        std::cout << "MCMC pointer not found." << std::endl;
+      }
+      for(int i = 0; i < ThetaOutsList->m_Writeout; i++){
+        if((*ThetaOutsList)[i].m_Used && !((*ThetaOutsList)[i].m_InTrace)){
+          // count++;
+          for(int j =0; j< (*ThetaOutsList)[i].m_ParameterValues.size(); j++){
+            if(m_ParamValues[j].empty()){
+              m_ParamValues[j] = "";
+            }
+            if(m_MCMC->m_RescaledTrace){
+              double * range = new double[2]();
+              m_MCMC->GetModel()->GetRange(j,range);
+              ss << ThetaOutsList->m_Writeout*ThetaOutsList->m_WriteOutCounter + i + 1 << " " << ((*ThetaOutsList)[i].m_ParameterValues[j]-range[0])/(range[1]-range[0])<< "\n";
+            }
+            else{
+              ss << ThetaOutsList->m_Writeout*ThetaOutsList->m_WriteOutCounter + i + 1 << " " << (*ThetaOutsList)[i].m_ParameterValues[j] << "\n";
+            }
+            m_ParamValues[j] = ss.str();
+            ss.str(string()); //clears the stringstream.
+          }
+          (*ThetaOutsList)[i].VizTrace();
+        }
+      }
+      for(int i = 0; i < m_ParamNames.size(); i++){
+        plotcommand = plotcommand + m_ParamValues[i]+ "e\n";
+        //cout << paramvalues[i] << endl;
+      }
+    }
     //std::cerr << "The plot command is: \n" << plotcommand << std::endl;
 		fprintf(m_GNUPlotPipe, "%s", plotcommand.c_str());
 		fflush(m_GNUPlotPipe);
-	}
+  }
 
 	if(m_DensityPlot){
 		int index = 0;

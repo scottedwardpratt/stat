@@ -23,23 +23,17 @@ int main(int argc, char ** argv){
     std::cerr << "Something is wrong with the model\n\n";
     return 0;
   }
-    
-  madai::MCMCRun run(&m_model);
+  
+  madai::MCMCRun run(&m_model, info_dir);
     
   std::vector<madai::Parameter> const * parameters = &(m_model.GetParameters());
   for(int i=0; i<parameters->size();i++)
     run.ActivateParameter((*parameters)[i].m_Name);
-    
-  m_model.m_Proposal->SetActiveParameters(run.GetActiveParameters());
    
   madai::Trace trace(info_dir,"default");
   if(run.m_BurnIn == 0){
     trace.add(run.m_InitialTheta);
   }
-	
-	run.m_LikelihoodCurrent = m_model.m_Likelihood->Evaluate(run.m_CurrentParameters);
-	run.m_ScaleCurrent = (rand() / double(RAND_MAX));
-	run.m_PriorCurrent = m_model.m_Prior->Evaluate(run.m_CurrentParameters);
     
   for(int j=0; j<m_model.GetNumberOfParameters(); j++)
     run.m_ParameterValues.push_back(0);
