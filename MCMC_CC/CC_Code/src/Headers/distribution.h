@@ -14,9 +14,7 @@
 using namespace std;
 
 class EmulatorHandler;
-class QuadHandler;
 class MCMC;
-//class ParameterSet;
 class emulator;
 class CRHICStat;
 
@@ -111,21 +109,9 @@ public:
     vector<string> STEP_SIDE;
 };
 
-class PriorDistribution_RHIC_PCA:public PriorDistribution{
-public:
-	PriorDistribution_RHIC_PCA(MCMC *mcmc_in);
-	double Evaluate(vector<double> Theta);
-};
-
 class PriorDistribution_Cosmo:public PriorDistribution {
 public:
 	PriorDistribution_Cosmo(MCMC *mcmc_in);
-	double Evaluate(vector<double> Theta);
-};
-
-class PriorDistribution_Test:public PriorDistribution {
-public:
-	PriorDistribution_Test(MCMC *mcmc_in);
 	double Evaluate(vector<double> Theta);
 };
 
@@ -145,7 +131,6 @@ public:
         bool UseEmulator;
         bool FAKE_DATA;
         emulator * My_emu;
-        //parameterMap * parmap;
         ofstream emulator_test;
         int FindParam(string param_name, vector<string> PNames);
         parameterMap observablesparmap;
@@ -160,23 +145,6 @@ public:
 	CRHICStat *My_emu;
 };
 
-class LikelihoodDistribution_RHIC_PCA:public LikelihoodDistribution{
-public:
-	LikelihoodDistribution_RHIC_PCA(MCMC *mcmc_in);
-	~LikelihoodDistribution_RHIC_PCA();
-	double Evaluate(vector<double> Theta);
-	double *Datamean;
-	double *Dataerror;
-	//private:
-	vector<double> GetRealData(); 
-	vector<double> DATA;
-	vector<double> ERROR;
-	bool UseEmulator;
-	ofstream emulator_test;
-	QuadHandler * quad;
-	parameterMap observablesparmap;
-};
-
 class LikelihoodDistribution_Cosmo:public LikelihoodDistribution {
 public:
 	LikelihoodDistribution_Cosmo(MCMC *mcmc_in);
@@ -189,18 +157,6 @@ public:
 	bool UseEmulator;
 	ofstream emulator_test;
 	//emulator * My_emu;
-};
-
-class LikelihoodDistribution_Test:public LikelihoodDistribution {
-public:
-	LikelihoodDistribution_Test(MCMC *mcmc_in);
-	~LikelihoodDistribution_Test();
-	double Evaluate(vector<double> Theta);
-	//private:
-	vector<double> GetData();
-	vector<double> DATA;
-	bool UseEmulator;
-	ofstream emulator_test;
 };
 
 #endif

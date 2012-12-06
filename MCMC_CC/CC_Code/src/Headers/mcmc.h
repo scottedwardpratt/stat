@@ -15,7 +15,6 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 //#include "emulator.h"
-#include "quad.h"
 #include <time.h>
 #include <sys/stat.h>
 #include "EmuPlusPlus.h"
@@ -76,7 +75,6 @@ public:
 	PriorDistribution *Prior;
 	double Max_Ranges[30],Min_Ranges[30];
 	
-	//ParameterSet *BestParameterSetPtr;
 	vector<double> BestParameterSet;
 	vector<double> ParamValues;
 	vector<double> Theta;
@@ -89,7 +87,6 @@ public:
 	VizHandler *Visualizer;
 	int WriteOutCounter;
 	int VizWriteOutCounter;
-	//ParameterSetList *ThetaList;
 	vector<vector<double> > ThetaList;
 	vector<vector<double> > VizThetaList;
 	vector<vector<double> > Scaled_ThetaList;
