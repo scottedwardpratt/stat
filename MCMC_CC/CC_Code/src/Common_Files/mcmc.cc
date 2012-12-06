@@ -250,13 +250,13 @@ void MCMC::Run(){
 		}
 
 		// Prior
-		if(LOGPRIOR){
+		/*if(LOGPRIOR){
 			LOGBF += (log(Prior_New)-log(Prior_Current));
 		} else {
 			LOGBF *= (Prior_New/Prior_Current);
 		}
 
-		if(!QUIET) printf(" Prior_New=%g, Prior_Current=%g\n",Prior_New,Prior_Current);
+		if(!QUIET) printf(" Prior_New=%g, Prior_Current=%g\n",Prior_New,Prior_Current);*/
 
 		// Proposal		
 		if(LOGLIKE){
