@@ -207,7 +207,7 @@ void MCMC::Run(){
 	Likelihood_Current = Likelihood->Evaluate(Theta);
 	Scale_Current = (rand() / double(RAND_MAX));
 	//Proposal_Current = Proposal->Evaluate(Theta);
-	//Prior_Current = Prior->Evaluate(Theta);
+	Prior_Current = Prior->Evaluate(Theta);
 
 	/*for(int i = 0; i < ThetaList->ParamNames.size(); i++){
 		ParamValues.push_back(0);
@@ -238,7 +238,7 @@ void MCMC::Run(){
 			BestParameterSet = Theta;
 			Scaled_Theta = Theta;
 		}
-		//Prior_New = Prior->Evaluate(Proposed_Theta);
+		Prior_New = Prior->Evaluate(Proposed_Theta);
 		//Proposal_New = Proposal->Evaluate(Theta,Proposed_Theta,Scale_Current);
 		//Proposal_Current = Proposal->Evaluate(Proposed_Theta,Theta,Scale_New);
 		
@@ -264,7 +264,7 @@ void MCMC::Run(){
 		}
 
 		// Prior
-		/*if(LOGPRIOR){
+		if(LOGPRIOR){
 			LOGBF += (log(Prior_New)-log(Prior_Current));
 		} else {
 			LOGBF *= (Prior_New/Prior_Current);
@@ -272,7 +272,7 @@ void MCMC::Run(){
 
 		if(!QUIET){
 			printf(" Prior_New=%g, Prior_Current=%g\n",Prior_New,Prior_Current);
-		}*/
+		}
 
 		// Proposal		
 		/*if(LOGLIKE){
@@ -309,7 +309,7 @@ void MCMC::Run(){
 				Accept_Count++;
 			}
 			Likelihood_Current = Likelihood_New;
-			//Prior_Current = Prior_New;
+			Prior_Current = Prior_New;
 			//Proposal_Current = Proposal_New;
 			Theta = Proposed_Theta;
 			Scale_Current = Scale_New;
