@@ -12,8 +12,6 @@
 #include "Model.h"
 #include <set>
 
-class emulator;
-
 namespace madai {
     
 class Model;
@@ -77,7 +75,7 @@ public:
 	virtual double Evaluate(std::vector<double> ModelMeans,
                           std::vector<double> ModelErrors);
   
-  protected:
+protected:
 
 	virtual std::vector<double> GetData();
 
@@ -101,7 +99,7 @@ public:
   PriorDistribution_RHIC(Model *in_Model);
   double Evaluate(std::vector<double> Theta); //ParameterSet Theta
 
-  private:
+private:
 
   std::string              m_Prior;
   bool                     m_Scaled;
@@ -111,6 +109,39 @@ public:
   std::vector<std::string> m_StepSide;
 };
 
+class PriorDistribution_Interpolator: public PriorDistribution{
+public:
+  PriorDistribution_Interpolator(Model * in_Model);
+  double Evaluate(vector<double> Theta);
+  
+private:
+
+  std::string              m_Prior;
+  bool                     m_Scaled;
+  std::vector<double>      m_GaussianMeans;
+  std::vector<double>      m_GaussianSTDVS;
+  std::vector<double>      m_StepMeans;
+  std::vector<std::string> m_StepSide;
+};
+  
+class PriorDistribution_RHIC_PCA:public PriorDistribution{
+public:
+  PriorDistribution_RHIC_PCA(Model *in_Model);
+  double Evaluate(std::vector<double> Theta);
+};
+
+class PriorDistribution_Cosmo:public PriorDistribution {
+public:
+  PriorDistribution_Cosmo(Model *in_Model);
+  double Evaluate(std::vector<double> Theta);
+};
+
+class PriorDistribution_Test:public PriorDistribution {
+public:
+  PriorDistribution_Test(Model *in_Model);
+  double Evaluate(std::vector<double> Theta);
+};
+
 class LikelihoodDistribution_RHIC:public LikelihoodDistribution{
 public:
   LikelihoodDistribution_RHIC(Model *in_Model);
@@ -118,7 +149,7 @@ public:
   double Evaluate(std::vector<double> ModelMeans,
                   std::vector<double> ModelErrors);
 
-  private:
+private:
 
   std::vector<double>  GetFakeData();
   std::vector<double>  GetRealData();
@@ -134,7 +165,54 @@ public:
 
   int FindParam(std::string param_name, std::vector<std::string> PNames);
 };
+
+class LikelihoodDistribution_RHIC_PCA:public LikelihoodDistribution{
+public:
+  LikelihoodDistribution_RHIC_PCA(Model *in_Model);
+  ~LikelihoodDistribution_RHIC_PCA();
+  double Evaluate(std::vector<double> ModelMeans,
+                  std::vector<double> ModelErrors);
     
+private:
+
+  vector<double> GetRealData(); 
+  
+  double*             m_DataMean;
+  double*             m_DataError;
+  std::vector<double> m_Data;
+  std::vector<double> m_Error;
+  parameterMap        m_ObservablesParamMap;
+};
+
+class LikelihoodDistribution_Cosmo:public LikelihoodDistribution {
+public:
+  LikelihoodDistribution_Cosmo(Model *in_Model);
+  ~LikelihoodDistribution_Cosmo();
+  double Evaluate(std::vector<double> ModelMeans,
+                  std::vector<double> ModelErrors);
+
+private:
+
+  std::vector<double> GetData();
+  
+  std::vector<double> m_Data;
+  std::vector<int>    m_intData;
+};
+
+class LikelihoodDistribution_Test:public LikelihoodDistribution {
+public:
+  LikelihoodDistribution_Test(Model *in_Model);
+  ~LikelihoodDistribution_Test();
+  double Evaluate(std::vector<double> ModelMeans,
+                  std::vector<double> ModelErrors);
+  
+private:
+  
+  std::vector<double> GetData();
+  
+  std::vector<double> m_Data;
+};
+
 }
 
 #endif

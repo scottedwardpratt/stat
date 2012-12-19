@@ -4,7 +4,8 @@
 #include <string>
 
 #include "MCMCRun.h"
-#include "MultiModel.h"
+//#include "MultiModel.h"
+#include "RHICModel.h"
 
 int main(int argc, char ** argv){
   srand(time(NULL));
@@ -17,7 +18,7 @@ int main(int argc, char ** argv){
     return 0;
   }
   std::string info_dir(argv[1]);
-  madai::MultiModel m_model;
+  madai::RHICModel m_model;
   m_model.LoadConfiguration(info_dir);
   if(!(m_model.good())){
     std::cerr << "Something is wrong with the model\n\n";

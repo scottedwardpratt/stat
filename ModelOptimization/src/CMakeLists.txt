@@ -6,8 +6,18 @@ set( SRC_FILES
   Distributions/Distribution.cxx
   Distributions/LikelihoodRHIC.cxx
   Distributions/PriorRHIC.cxx
+  Distributions/LikelihoodCosmo.cxx
+  Distributions/PriorCosmo.cxx
+  Distributions/LikelihoodRHIC_PCA.cxx
+  Distributions/PriorRHIC_PCA.cxx
+  Distributions/LikelihoodTest.cxx
+  Distributions/PriorTest.cxx
 
   MultiModel.cxx
+  RHICModel.cxx
+  CosmoModel.cxx
+  RHIC_PCA_Model.cxx
+  TestModel.cxx
 
   Visualization.cxx
 

@@ -13,39 +13,23 @@ madai::LikelihoodDistribution_RHIC_PCA::LikelihoodDistribution_RHIC_PCA(madai::M
 		m_ParameterMap = &(m_Model->m_ParameterMap);
 	}
 	
-	m_UseEmulator = parameter::getB(*m_ParameterMap, "USE_EMULATOR", false);
 	m_Timing = parameter::getB(*m_ParameterMap, "TIMING", false) || parameter::getB(*m_ParameterMap, "TIME_LIKELIHOOD", false);
 	m_Verbose = parameter::getB(*m_ParameterMap, "VERBOSE", false) || parameter::getB(*m_ParameterMap, "VERBOSE_LIKELIHOOD", false);
-	
-	if(m_UseEmulator){
-		m_Quad = new QuadHandler(m_ParameterMap, m_Model);
-	}
-	else{
-		exit(1);
-	}
 
 	m_Data = GetRealData();	
 }
 
 madai::LikelihoodDistribution_RHIC_PCA::~LikelihoodDistribution_RHIC_PCA(){
-	delete m_Quad;
+	//delete m_Quad;
 }
 
-double madai::LikelihoodDistribution_RHIC_PCA::Evaluate(std::vector<double> Theta){
+double madai::LikelihoodDistribution_RHIC_PCA::Evaluate(std::vector<double> ModelMeans,
+                                                        std::vector<double> ModelErrors){
 	clock_t begintime;
-	std::vector<double> ModelMeans;
-	std::vector<double> ModelErrors;
 	double likelihood;
 	
 	if(m_Timing){
 		begintime = clock();
-	}
-	
-	if(m_UseEmulator){
-		m_Quad->QueryQuad(Theta, ModelMeans, ModelErrors); //fills vectors with quad output
-	}
-	else{
-		//determine another way to fill the vectors
 	}
 	
 	//Initialize GSL containers
@@ -92,7 +76,7 @@ double madai::LikelihoodDistribution_RHIC_PCA::Evaluate(std::vector<double> Thet
 	return likelihood;
 }
 
-vector<double> madai::LikelihoodDistribution_RHIC_PCA::GetRealData(){
+std::vector<double> madai::LikelihoodDistribution_RHIC_PCA::GetRealData(){
 	std::vector<double> datameans;
 	float myints[] = {403.723,467.153,743.79,1042.58,5.28,4.81,5.47,180.682,460.801,739.43,1025.55,0.0891618,0.0271948,0.0498033,4.27,3.99,4.53};
 	datameans.assign (myints,myints+17);

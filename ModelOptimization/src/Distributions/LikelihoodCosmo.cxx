@@ -15,16 +15,8 @@ madai::LikelihoodDistribution_Cosmo::LikelihoodDistribution_Cosmo(madai::Model *
 	
 	// cout << "Like param map made." << endl;
 	
-	m_UseEmulator = parameter::getB(*m_ParameterMap, "USE_EMULATOR", false);
 	m_Timing = parameter::getB(*m_ParameterMap, "TIMING", false) || parameter::getB(*m_ParameterMap, "TIME_LIKELIHOOD", false);
 	m_Verbose = parameter::getB(*m_ParameterMap, "VERBOSE", false) || parameter::getB(*m_ParameterMap, "VERBOSE_LIKELIHOOD", false);
-	
-	// cout << "params declared." << endl;
-	if(m_UseEmulator){
-		std::cout << "Turn off USE_EMULATOR" << std::endl;
-		exit(-1);
-		//emulator = new EmulatorHandler(m_ParameterMap, mcmc_in);
-	}
 
 	m_Data = GetData();
 	m_intData.resize(m_Data.size());
@@ -37,39 +29,14 @@ madai::LikelihoodDistribution_Cosmo::~LikelihoodDistribution_Cosmo(){
 	//delete emulator;
 }
 
-double madai::LikelihoodDistribution_Cosmo::Evaluate(std::vector<double> Theta){
+double madai::LikelihoodDistribution_Cosmo::Evaluate(std::vector<double> ModelMeans,
+                                                     std::vector<double> ModelErrors){
 	clock_t begintime;
-	vector<double> ModelMeans;
-	vector<double> ModelErrors;
 	double likelihood = 0.0,dll;
-	std::stringstream ss;
-	std::ifstream inputfile;
 	
 	if(m_Timing){
 		begintime = clock();
 	}
-	
-  ss << "cosmosurvey";
-  std::vector<madai::Parameter> const * parameters = &(m_Model->GetParameters());
-  for(int i=0; i<parameters->size();i++)
-    ss << " -" << (*parameters)[i].m_Name << " " << Theta[i];
-
-	ss << " -nz 10 -nf 10 -ob .0406 > output.dat" << std::endl;
-	
-	std::cout << ss.str() << std::endl;
-	std::cout << "Waiting on cosmosurvey...";
-	std::cout.flush();
-	int result = system((ss.str()).c_str());
-	std::cout << "Done." << std::endl;
-	
-	inputfile.open("output.dat");
-	
-	while(!inputfile.eof()){
-		double temp;
-		inputfile >> temp;
-		ModelMeans.push_back(temp);
-	}
-	
 	
 	for(int i = 1; i < ModelMeans.size(); i++){
 		dll=log(gsl_ran_poisson_pdf(m_intData[i],ModelMeans[i]));
