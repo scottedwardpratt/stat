@@ -64,8 +64,6 @@ public:
         const std::string configuration);
   virtual ~Trace() {}
 
-	CParameterList *parlist;
-
 	unsigned int length() const;
   void add(const std::vector< double > & parameterValues,
            const std::vector< double > & OutputValues );

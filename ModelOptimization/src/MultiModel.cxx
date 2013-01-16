@@ -222,10 +222,22 @@ madai::MultiModel::LoadConfigurationFile( const std::string fileName )
     }
     if(fs){
       if(this->m_Parameters.back().m_Name.compare(0,1," ")==0 || this->m_Parameters.back().m_Name.empty())
-      this->m_Parameters.pop_back();
+        this->m_Parameters.pop_back();
+      /*this->number_of_parameters = this->m_Parameters.size();   // Use this for getting rid of needing to supply the number of parameters
+      if(this->number_of_parameters < 1){
+        std::cerr << "Number of parameters < 1" << std::endl;
+        this->stateFlag = ERROR;
+        return OTHER_ERROR;
+      }*/
     }else{
       if(this->m_ScalarOutputNames.back().compare(0,1," ")==0 || this->m_ScalarOutputNames.back().empty())
         this->m_ScalarOutputNames.pop_back();
+      /*this->number_of_outputs = this->m_ScalarOutputNames.size();   // Use this for getting rid of the need to supply the number of outputs
+      if(this->number_of_outputs < 1){
+        std::cerr << "Number of scalar outputs < 1" << std::endl;
+        this->stateFlag = ERROR;
+        return OTHER_ERROR;
+      }*/
     }
   }else{
     std::cout << "Could not open " << fileName.c_str() << std::endl;

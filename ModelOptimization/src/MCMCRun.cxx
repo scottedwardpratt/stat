@@ -5,6 +5,13 @@ madai::MCMCRun
           const std::string info_dir) :
   Optimizer( in_model ) 
 {
+  // First check to see if the model supplies a method for 
+  // calculating the Likelihood and Prior.
+  if(!IsLikeAndPrior()){
+    std::cerr << "GetLikeAndPrior() needs to be defined in order to use the MCMC" << std::endl;
+    exit(1);
+  }
+
   m_DirectoryName = info_dir;
   std::string ParFileName = info_dir + "/defaultpars/mcmc.param";
   parameter::ReadParsFromFile(m_LocalParameterMap, ParFileName.c_str());

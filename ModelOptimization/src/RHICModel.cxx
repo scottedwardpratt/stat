@@ -114,7 +114,8 @@ madai::RHICModel::GetLikeAndPrior( const std::vector< double > & parameters,
     }
   } else {
     std::cerr << "No emulator is being used. Can't do anything without an emulator" << std::endl;
-    exit(1);
+    return OTHER_ERROR;
+    // exit(1);
   }
   
   Like = m_Likelihood->Evaluate( ModelMeans, ModelErrors );
@@ -208,11 +209,22 @@ madai::RHICModel::LoadDistributions()
     std::cerr << "Emulator is being loaded from: " << m_DirectoryName << + "/Emulator.statfile" << "using the EmuPlusPlus.h emulator handler" << std::endl;
     m_Emulator= new ::emulator(m_DirectoryName + "/Emulator.statefile");
     std::cerr << "Emulator loaded. Test (number of params): _" << m_Emulator->number_params << "_" << std::endl;
+    if(m_Emulator->number_params != this->number_of_parameters){
+      std::cerr << "Emulator uses different number of parameters than read in. LoadDistributions Error" << std::endl;
+      this->stateFlag = ERROR;
+      return OTHER_ERROR;
+    }
   } else if (m_ProcessPipe){
-    this->LoadProcess();
+    if( this->LoadProcess() != NO_ERROR ){
+      std::cerr << "Error loading process pipe while setting up distributions in RHICModel" << std::endl;
+      this->stateFlag = ERROR;
+      return OTHER_ERROR;
+    }
   } else {
     std::cerr << "Neither the process pipe nor use emulator flag is set to true. We can't do anything without an emulator" << std::endl;
-    exit(1);
+    this->stateFlag = ERROR;
+    return OTHER_ERROR;
+    //exit(1);
   }  
   m_Likelihood = new LikelihoodDistribution_RHIC(this);
   m_Prior = new PriorDistribution_RHIC(this);

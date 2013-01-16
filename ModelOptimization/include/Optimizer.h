@@ -109,6 +109,8 @@ protected:
 
   unsigned int GetOutputScalarIndex( const std::string & scalarName ) const;
   unsigned int GetParameterIndex( const std::string & parameterName ) const;
+  
+  bool IsLikeAndPrior() const;
 
 }; // end Optimizer
 

@@ -21,6 +21,12 @@ class Model;
 class VizHandler;
 class Trace;
 class TraceElement;
+
+/* \class MCMCRun
+ *
+ * MCMCRun loads in parameters for running a monte carlo analysis and provides a method for
+ * taking steps in parameter space, defined by said parameters.
+ */
     
 class MCMCRun : public Optimizer {
 public:

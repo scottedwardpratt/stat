@@ -111,8 +111,6 @@ unsigned int Optimizer::GetOutputScalarToOptimizeIndex() const
 }
 
 
-
-
 const std::vector< double > &
 Optimizer
 ::GetCurrentParameters() const
@@ -148,6 +146,33 @@ Optimizer
   }
 
   return static_cast< unsigned int >(-1); // Intentional underflow
+}
+
+
+// To check if the model supplis a method for calculating the Likelihood and Prior
+bool
+Optimizer
+::IsLikeAndPrior() const
+{
+  std::cerr << "Using point at center of each parameter range" << std::endl;
+  double * range = new double[2]();
+  std::vector< double > temp_vals(this->m_Model->GetNumberOfParameters(), 0.0);
+  
+  for(unsigned int i = 0; i < this->m_Model->GetNumberOfParameters(); i++){
+    this->m_Model->GetRange(i, range);
+    temp_vals[i] = (range[0] + range[1]) / 2;
+    std::cerr << temp_vals[i] << "  ";
+  }
+  std::cerr << std::endl;
+  
+  double Likelihood, Prior;
+  if(this->m_Model->GetLikeAndPrior( temp_vals, Likelihood, Prior) != Model::NO_ERROR){
+    std::cerr << "GetLikeAndPrior not defined in model" << std::endl;
+    return false;
+  } else {
+    std::cerr << "GetLikeAndPrior is defined" << std::endl;
+    return true;
+  }
 }
 
 } // end namespace madai

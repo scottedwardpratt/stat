@@ -125,15 +125,6 @@ namespace madai {
 		
 	}; // end Model
 	
-	class CRHICQuadModel : public Model{
-	public:
-		
-	protected:
-		
-		
-		
-	};
-	
 } // end namespace madai
 
 #endif // __Model_h_

@@ -17,6 +17,12 @@
 
 namespace madai {
     
+/* \class MultiModel
+ *
+ * This class provides a method for reading in a model configuration.
+ * Other functions are specified in subclasses.
+ */    
+
 class MultiModel : public Model {
 private:
 protected:
