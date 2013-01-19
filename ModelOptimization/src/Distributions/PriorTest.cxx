@@ -1,5 +1,5 @@
 #include "Model.h"
-#include "distribution.h"
+#include "Distribution.h"
 
 madai::PriorDistribution_Test::PriorDistribution_Test(madai::Model * in_Model){
   m_Model = in_Model;
