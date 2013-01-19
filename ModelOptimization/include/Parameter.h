@@ -19,8 +19,6 @@ See copyright.txt for more information.
 #include <vector>
 
 namespace madai {
-	using namespace std;
-	
 	class Parameter {
 	public:
 		Parameter(std::string nm, 
