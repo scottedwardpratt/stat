@@ -108,9 +108,8 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
     return OTHER_ERROR;
   }
   
-  if(std::strcmp(m_Optimizer.c_str(), "MCMC" )==0 || std::strcmp(m_ModelType.c_str(), "Interpolator" ) == 0){
-    this->LoadDistributions();
-  }
+  //if(std::strcmp(m_Optimizer.c_str(), "MCMC" )==0 || std::strcmp(m_ModelType.c_str(), "Interpolator" ) == 0){
+  this->LoadDistributions();
   
   std::vector<std::string> temp_logparam = parameter::getVS(m_ParameterMap, "LOG_PARAMETERS", "");
 	for(int i = 0; i < temp_logparam.size(); i++){
