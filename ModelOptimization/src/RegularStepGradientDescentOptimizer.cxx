@@ -15,7 +15,6 @@ RegularStepGradientDescentOptimizer
 {
 }
 
-
 void
 RegularStepGradientDescentOptimizer
 ::NextIteration(Trace *trace)
@@ -37,7 +36,7 @@ RegularStepGradientDescentOptimizer
     m_Model->GetScalarAndGradientOutputs( m_CurrentParameters, activeParameters,
                                           scalars, 0, gradient );
 
-  // TODO - save output to a trace
+  trace->add( m_CurrentParameters, scalars );
 
   // Update the current parameters to the new position
   unsigned int activeParameter = 0;
