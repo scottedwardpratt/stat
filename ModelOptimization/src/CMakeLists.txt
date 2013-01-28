@@ -28,12 +28,6 @@ set( SRC_FILES
   process_pipe.c
 )
 
-include_directories(
-  ../include
-  /opt/local/include
-  ~/local/include
-)
-
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${ModelOptimization_BINARY_DIR}/lib )
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY} )
-add_library( IHU ${SRC_FILES} )
+add_library( ModelOptimization ${SRC_FILES} )
