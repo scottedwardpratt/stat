@@ -1,5 +1,5 @@
-#ifndef __DISTRIBUTION_H__
-#define __DISTRIBUTION_H__
+#ifndef __Distribution_h
+#define __Distribution_h
 
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
@@ -8,27 +8,29 @@
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_linalg.h>
+
 #include "parametermap.h"
 #include "Model.h"
+
 #include <set>
 
 namespace madai {
     
 class Model;
 
-class Distribution{
+class Distribution {
 public:
-	Distribution();
-	virtual ~Distribution();
+  Distribution();
+  virtual ~Distribution();
 	
-	double Normal(double x, double mu, double sigma);
-	double IntegratedNormal(double x, double mu, double sigma, double data_sigma);
-	double Gaussian(double x, double mu, double sigma);
-	double Gaussian(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
-	double Gaussian(gsl_vector x, gsl_vector mu, gsl_matrix sigma, gsl_matrix data_sigma);
-	double Log_MVNormal(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
-	double MVNormal(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
-	double LogNormal(double x, double mu, double sigma);
+  double Normal(double x, double mu, double sigma);
+  double IntegratedNormal(double x, double mu, double sigma, double data_sigma);
+  double Gaussian(double x, double mu, double sigma);
+  double Gaussian(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
+  double Gaussian(gsl_vector x, gsl_vector mu, gsl_matrix sigma, gsl_matrix data_sigma);
+  double Log_MVNormal(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
+  double MVNormal(gsl_vector x, gsl_vector mu, gsl_matrix sigma);
+  double LogNormal(double x, double mu, double sigma);
 
 protected:
 
@@ -44,7 +46,7 @@ protected:
 /** ---------------------------------------- */
 
 // Proposal isn't currently being used (transfered functions to MCMCRun)
-class ProposalDistribution:public Distribution {
+class ProposalDistribution : public Distribution {
 public:
   ProposalDistribution(Model *m_Model);
   std::vector<double> Iterate(std::vector<double>& current,
@@ -67,40 +69,41 @@ protected:
   int FindParam(std::string param_name);
 };
 
+/** ---------------------------------------- */
 
-class LikelihoodDistribution:public Distribution{
+class LikelihoodDistribution : public Distribution {
 public:
-	LikelihoodDistribution();
-	virtual ~LikelihoodDistribution();
-	virtual double Evaluate(std::vector<double> ModelMeans,
+  LikelihoodDistribution();
+  virtual ~LikelihoodDistribution();
+  virtual double Evaluate(std::vector<double> ModelMeans,
                           std::vector<double> ModelErrors);
   
 protected:
-
-	virtual std::vector<double> GetData();
+  virtual std::vector<double> GetData();
 
   std::vector<double> m_Data;
-	bool                m_UseEmulator;
+  bool                m_UseEmulator;
   bool                m_ProcessPipe;
   std::ofstream       m_EmulatorTest;
 };
 
-class PriorDistribution:public Distribution {
+/** ---------------------------------------- */
+
+class PriorDistribution : public Distribution {
 public:
-	PriorDistribution();
-	virtual ~PriorDistribution();
-	virtual double Evaluate(std::vector<double> Theta);
+  PriorDistribution();
+  virtual ~PriorDistribution();
+  virtual double Evaluate(std::vector<double> Theta);
 };
 
 /** ---------------------------------------- */
 
-class PriorDistribution_RHIC:public PriorDistribution{
+class PriorDistribution_RHIC : public PriorDistribution {
 public:
   PriorDistribution_RHIC(Model *in_Model);
   double Evaluate(std::vector<double> Theta); //ParameterSet Theta
 
 private:
-
   std::string              m_Prior;
   bool                     m_Scaled;
   std::vector<double>      m_GaussianMeans;
@@ -109,7 +112,9 @@ private:
   std::vector<std::string> m_StepSide;
 };
 
-class PriorDistribution_Interpolator: public PriorDistribution{
+/** ---------------------------------------- */
+
+class PriorDistribution_Interpolator : public PriorDistribution{
 public:
   PriorDistribution_Interpolator(Model * in_Model);
   double Evaluate(vector<double> Theta);
@@ -124,25 +129,25 @@ private:
   std::vector<std::string> m_StepSide;
 };
   
-class PriorDistribution_RHIC_PCA:public PriorDistribution{
+class PriorDistribution_RHIC_PCA : public PriorDistribution {
 public:
   PriorDistribution_RHIC_PCA(Model *in_Model);
   double Evaluate(std::vector<double> Theta);
 };
 
-class PriorDistribution_Cosmo:public PriorDistribution {
+class PriorDistribution_Cosmo : public PriorDistribution {
 public:
   PriorDistribution_Cosmo(Model *in_Model);
   double Evaluate(std::vector<double> Theta);
 };
 
-class PriorDistribution_Test:public PriorDistribution {
+class PriorDistribution_Test : public PriorDistribution {
 public:
   PriorDistribution_Test(Model *in_Model);
   double Evaluate(std::vector<double> Theta);
 };
 
-class LikelihoodDistribution_RHIC:public LikelihoodDistribution{
+class LikelihoodDistribution_RHIC : public LikelihoodDistribution{
 public:
   LikelihoodDistribution_RHIC(Model *in_Model);
   ~LikelihoodDistribution_RHIC();
@@ -166,7 +171,7 @@ private:
   int FindParam(std::string param_name, std::vector<std::string> PNames);
 };
 
-class LikelihoodDistribution_RHIC_PCA:public LikelihoodDistribution{
+class LikelihoodDistribution_RHIC_PCA : public LikelihoodDistribution{
 public:
   LikelihoodDistribution_RHIC_PCA(Model *in_Model);
   ~LikelihoodDistribution_RHIC_PCA();
@@ -174,7 +179,6 @@ public:
                   std::vector<double> ModelErrors);
     
 private:
-
   vector<double> GetRealData(); 
   
   double*             m_DataMean;
@@ -184,7 +188,7 @@ private:
   parameterMap        m_ObservablesParamMap;
 };
 
-class LikelihoodDistribution_Cosmo:public LikelihoodDistribution {
+class LikelihoodDistribution_Cosmo : public LikelihoodDistribution {
 public:
   LikelihoodDistribution_Cosmo(Model *in_Model);
   ~LikelihoodDistribution_Cosmo();
@@ -192,14 +196,13 @@ public:
                   std::vector<double> ModelErrors);
 
 private:
-
   std::vector<double> GetData();
   
   std::vector<double> m_Data;
   std::vector<int>    m_intData;
 };
 
-class LikelihoodDistribution_Test:public LikelihoodDistribution {
+class LikelihoodDistribution_Test : public LikelihoodDistribution {
 public:
   LikelihoodDistribution_Test(Model *in_Model);
   ~LikelihoodDistribution_Test();
@@ -207,12 +210,11 @@ public:
                   std::vector<double> ModelErrors);
   
 private:
-  
   std::vector<double> GetData();
   
   std::vector<double> m_Data;
 };
 
-}
+} // namespace madai
 
 #endif

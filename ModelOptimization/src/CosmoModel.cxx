@@ -31,21 +31,21 @@ madai::CosmoModel::GetScalarOutputs( const std::vector< double > & parameters,
   for(int i = 0; i< m_Parameters.size(); i++)
     ss << " -" << m_Parameters[i].m_Name << " " << parameters[i];
   
-	ss << " -nz 10 -nf 10 -ob .0406 > output.dat" << std::endl;
+  ss << " -nz 10 -nf 10 -ob .0406 > output.dat" << std::endl;
 	
-	std::cout << ss.str() << std::endl;
-	std::cout << "Waiting on cosmosurvey...";
-	std::cout.flush();
-	int result = system((ss.str()).c_str());
-	std::cout << "Done." << std::endl;
+  std::cout << ss.str() << std::endl;
+  std::cout << "Waiting on cosmosurvey...";
+  std::cout.flush();
+  int result = system((ss.str()).c_str());
+  std::cout << "Done." << std::endl;
 	
-	inputfile.open("output.dat");
+  inputfile.open("output.dat");
 	
-	while(!inputfile.eof()){
-		double temp;
-		inputfile >> temp;
-		scalars.push_back(temp);
-	}
+  while(!inputfile.eof()){
+    double temp;
+    inputfile >> temp;
+    scalars.push_back(temp);
+  }
   return NO_ERROR;
 }
 
@@ -53,11 +53,11 @@ madai::CosmoModel::GetScalarOutputs( const std::vector< double > & parameters,
 /** Get both scalar values and the gradient of the parameters. */
 madai::CosmoModel::ErrorType 
 madai::CosmoModel::GetScalarAndGradientOutputs(const std::vector< double > & parameters,
-                                              const std::vector< bool > & activeParameters,
-                                              std::vector< double > & scalars,
-                                              unsigned int outputIndex, std::vector< double > & gradient) const 
+                                               const std::vector< bool > & activeParameters,
+                                               std::vector< double > & scalars,
+                                               unsigned int outputIndex, std::vector< double > & gradient) const 
 {
-	return OTHER_ERROR;
+  return OTHER_ERROR;
 }
 
 // For interaction with the mcmc

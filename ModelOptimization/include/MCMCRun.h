@@ -1,5 +1,5 @@
-#ifndef __MCMCRun_h__
-#define __MCMCRun_h__
+#ifndef __MCMCRun_h
+#define __MCMCRun_h
 
 #include <vector>
 #include <string>
@@ -27,14 +27,13 @@ class TraceElement;
  * MCMCRun loads in parameters for running a monte carlo analysis and provides a method for
  * taking steps in parameter space, defined by said parameters.
  */
-    
 class MCMCRun : public Optimizer {
 public:
   MCMCRun(const Model *in_model, const std::string info_dir);
   ~MCMCRun();
 
-  void NextIteration(Trace *trace);
-        
+  void NextIteration( Trace *trace );
+
   std::vector<double> GetRandomTheta0(int seed);
   std::vector<double> GetTheta0FromFile();
 
@@ -54,10 +53,10 @@ public:
   bool                m_LogProposal;
   bool                m_CreateTrace;
   bool                m_Debug;
-  
+
   VizHandler*         m_Visualizer;
   CRandom*            m_RandomNumber;
-  
+
   std::vector<double> m_CurrentParameters;
   double              m_LikelihoodCurrent;
   double              m_LikelihoodNew;
@@ -71,15 +70,15 @@ public:
   int                 m_AcceptCount;
   int                 m_VizCount;
   int                 m_IterationNumber;
-  
+
   // Taking a step and calculating the probability of the step
   void LoadStepParameters();
-  std::vector<double> TakeStep(std::vector<double>& current,
-                               double& scale);
-  double EvaluateProposal(std::vector<double> Theta1,
-                          std::vector<double> Theta2,
-                          double scale);
-  
+  std::vector<double> TakeStep( std::vector<double>& current,
+                                double& scale);
+  double EvaluateProposal( std::vector<double> Theta1,
+                           std::vector<double> Theta2,
+                           double scale );
+
   gsl_rng*            m_RandNumGen;
   bool                m_SepMap;
   bool                m_Timing;
@@ -92,9 +91,8 @@ public:
   double              m_Offset;
   std::vector<double> m_MixingStdDev;
   parameterMap*       m_StepParameterMap;
-protected:
 };
 
 } // end namespace madai
 
-#endif // end __MCMCRun_h__
+#endif // end __MCMCRun_h

@@ -15,9 +15,9 @@ Optimizer
   const std::vector< Parameter > parameterDescriptions =
     m_Model->GetParameters();
   for ( unsigned int i = 0; i < parameterDescriptions.size(); ++i )
-  {
+    {
     this->ActivateParameter( parameterDescriptions[i].m_Name );
-  }
+    }
 }
 
 
@@ -114,7 +114,7 @@ Optimizer
 std::string Optimizer::GetOutputScalarToOptimize()
 {
   return this->m_OutputScalarToOptimize;
-} 
+}
 unsigned int Optimizer::GetOutputScalarToOptimizeIndex() const
 {
   return this->m_OutputScalarToOptimizeIndex;
@@ -135,10 +135,10 @@ Optimizer
 {
   std::vector< std::string > const & outputs = this->m_Model->GetScalarOutputNames();
   for ( unsigned int i = 0; i < outputs.size(); i++ )
-  {
+    {
     if ( outputs[i] == scalarName )
       return i;
-  }
+    }
 
   return static_cast< unsigned int >(-1); // Intentional underflow
 }
@@ -150,10 +150,10 @@ Optimizer
 {
   const std::vector< Parameter > & parameters = this->m_Model->GetParameters();
   for ( unsigned int i = 0; i < m_Model->GetNumberOfParameters(); i++ )
-  {
+    {
     if ( parameters[i].m_Name == parameterName )
       return i;
-  }
+    }
 
   return static_cast< unsigned int >(-1); // Intentional underflow
 }
@@ -167,21 +167,21 @@ Optimizer
   std::cerr << "Using point at center of each parameter range" << std::endl;
   double * range = new double[2]();
   std::vector< double > temp_vals(this->m_Model->GetNumberOfParameters(), 0.0);
-  
+
   for(unsigned int i = 0; i < this->m_Model->GetNumberOfParameters(); i++){
-    this->m_Model->GetRange(i, range);
-    temp_vals[i] = (range[0] + range[1]) / 2;
-    std::cerr << temp_vals[i] << "  ";
+  this->m_Model->GetRange(i, range);
+  temp_vals[i] = (range[0] + range[1]) / 2;
+  std::cerr << temp_vals[i] << "  ";
   }
   std::cerr << std::endl;
-  
+
   double Likelihood, Prior;
   if(this->m_Model->GetLikeAndPrior( temp_vals, Likelihood, Prior) != Model::NO_ERROR){
-    std::cerr << "GetLikeAndPrior not defined in model" << std::endl;
-    return false;
+  std::cerr << "GetLikeAndPrior not defined in model" << std::endl;
+  return false;
   } else {
-    std::cerr << "GetLikeAndPrior is defined" << std::endl;
-    return true;
+  std::cerr << "GetLikeAndPrior is defined" << std::endl;
+  return true;
   }
 }
 

@@ -31,31 +31,31 @@ madai::InterModel::GetScalarOutputs( const std::vector< double > & parameters,
   double likelihood;
   double *x = new double[parameters.size()]();
   for(unsigned int j = 0 ; j < parameters.size(); j++){
-    x[j] = parameters[j];
+  x[j] = parameters[j];
   }
-  
+
   if(m_Verbose){
-    std::cerr << "Theta: ";
-    for(int i = 0; i < parameters.size(); i++){
-      std::cerr << parameters[i] << " ";
-    }
-    std::cerr << std::endl;
+  std::cerr << "Theta: ";
+  for(int i = 0; i < parameters.size(); i++){
+  std::cerr << parameters[i] << " ";
   }
-  
+  std::cerr << std::endl;
+  }
+
   if(m_Timing){
-    begintime = clock();
+  begintime = clock();
   }
-  
+
   if(m_UseEmulator){
-    //likelihood = m_Emulator->GetLL(x)
-    //std::cerr << "Using 'x': " << likelihood << std::endl;
-    likelihood = m_Emulator->GetLL(&parameters[0]);
-    //std::cerr << "Using '&parameters[0]': " << likelihood << std::endl;
+  //likelihood = m_Emulator->GetLL(x)
+  //std::cerr << "Using 'x': " << likelihood << std::endl;
+  likelihood = m_Emulator->GetLL(&parameters[0]);
+  //std::cerr << "Using '&parameters[0]': " << likelihood << std::endl;
   }
   scalars.push_back(likelihood);
-  
+
   if(m_Timing){
-    std::cerr << "Likelihood evaluation took " << (clock() - begintime)*1000/CLOCKS_PER_SEC << " ms." << std::endl;
+  std::cerr << "Likelihood evaluation took " << (clock() - begintime)*1000/CLOCKS_PER_SEC << " ms." << std::endl;
   }
   return NO_ERROR;
 }
@@ -79,14 +79,14 @@ madai::InterModel::GetLikeAndPrior( const std::vector< double > & parameters,
   std::vector< double > tempv;
   this->GetScalarOutputs(parameters, tempv);
   if(tempv.size() != 1){
-    std::cerr << "Size mismatch for getting likelihood from model" << std::endl;
-    return OTHER_ERROR;
+  std::cerr << "Size mismatch for getting likelihood from model" << std::endl;
+  return OTHER_ERROR;
   } else {
-    Like = tempv[0];
+  Like = tempv[0];
   }
-  
+
   Prior = m_Prior->Evaluate(parameters);
-  
+
   return NO_ERROR;
 }
 
@@ -96,23 +96,23 @@ madai::InterModel::LoadDistributions()
   parameterMap * parmap;
   bool smap = parameter::getB(m_ParameterMap, "LIKELIHOOD_PARAMETER_MAP", false);
   if(smap){
-    std::string parmapfile = m_DirectoryName + "/defaultpars/likelihood.param";
-    parmap = new parameterMap;
-    parameter::ReadParsFromFile(*parmap, parmapfile);
+  std::string parmapfile = m_DirectoryName + "/defaultpars/likelihood.param";
+  parmap = new parameterMap;
+  parameter::ReadParsFromFile(*parmap, parmapfile);
   } else {
-    parmap = &m_ParameterMap;
+  parmap = &m_ParameterMap;
   }
-  
+
   if(m_UseEmulator){
-    std::cerr << "Emulator is being loaded from: " << m_DirectoryName << std::endl;
-    m_Emulator = new CRHICStat(m_DirectoryName);
+  std::cerr << "Emulator is being loaded from: " << m_DirectoryName << std::endl;
+  m_Emulator = new CRHICStat(m_DirectoryName);
   } else {
-    std::cerr << "The UseEmulator flag is set to false ( or not set). We can't do anything without an emulator" << std::endl;
-    this->stateFlag = ERROR;
-    return OTHER_ERROR;
+  std::cerr << "The UseEmulator flag is set to false ( or not set). We can't do anything without an emulator" << std::endl;
+  this->stateFlag = ERROR;
+  return OTHER_ERROR;
   }
-  
+
   m_Prior = new PriorDistribution_Interpolator(this);
-  
+
   return NO_ERROR;
 }

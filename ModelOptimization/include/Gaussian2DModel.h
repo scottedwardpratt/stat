@@ -1,5 +1,5 @@
-#ifndef __Gaussian2DModel_h_
-#define __Gaussian2DModel_h_
+#ifndef __Gaussian2DModel_h
+#define __Gaussian2DModel_h
 
 #include "Model.h"
 
@@ -28,12 +28,14 @@ public:
   ErrorType GetScalarAndGradientOutputs( const std::vector< double > & parameters,
                                          const std::vector< bool > & activeParameters,
                                          std::vector< double > & scalars,
-                                         unsigned int outputIndex, std::vector< double > & gradient) const;
+                                         unsigned int outputIndex,
+                                         std::vector< double > & gradient) const;
   // Not implemented yet.
   // Proposed function for interaction with the MCMC
   virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,
                                      double & Like,
                                      double & Prior ) const;
+
 protected:
   double m_MeanX;
   double m_MeanY;
@@ -47,4 +49,4 @@ protected:
 
 } // end namespace madai
 
-#endif // __Gaussian2DModel_h_
+#endif // __Gaussian2DModel_h

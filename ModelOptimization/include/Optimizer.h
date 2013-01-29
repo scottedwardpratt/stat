@@ -2,7 +2,7 @@
 MADAI Model Statistical Tools
 Copyright 2011-2012, The University of North Carolina at Chapel Hill.
 
-This software was written in 2011-2012 by 
+This software was written in 2011-2012 by
 	Cory Quammen <cquammen AT cs.unc.edu>
 	Russell Taylor <taylorr AT cs.unc.edu>
 	Scott Pratt <pratt AT nscl.msu.edu>
@@ -12,8 +12,8 @@ while working for the MADAI project <http://madai.us/>.
 
 See copyright.txt for more information.
 *********************************************************************/
-#ifndef __Optimizer_h_
-#define __Optimizer_h_
+#ifndef __Optimizer_h
+#define __Optimizer_h
 
 #include <set>
 
@@ -51,12 +51,12 @@ public:
   ErrorType SetOutputScalarToOptimize( const std::string & scalarName );
   std::string GetOutputScalarToOptimize();
 
-	ErrorType SetOutputScalarToOptimizeIndex(unsigned int idx);
-	unsigned int GetOutputScalarToOptimizeIndex() const;
+  ErrorType SetOutputScalarToOptimizeIndex(unsigned int idx);
+  unsigned int GetOutputScalarToOptimizeIndex() const;
 
   /** Compute the next set of parameters and the output scalar values,
    * and save them in the trace file. */
-  
+
   virtual void NextIteration(Trace *trace) = 0;
   //{  /* suggested structure for this function */
   //std::vector< double > scalarOutputs;
@@ -91,17 +91,14 @@ public:
 
   /** Get the current parameter values. */
   const std::vector< double > & GetCurrentParameters() const;
-    
+
 protected:
 
-  const Model *m_Model;
-
+  const Model *           m_Model;
   std::set< std::string > m_ActiveParameters;
-
-  std::vector< double > m_CurrentParameters;
-
-  std::string m_OutputScalarToOptimize;
-	unsigned int m_OutputScalarToOptimizeIndex;
+  std::vector< double >   m_CurrentParameters;
+  std::string             m_OutputScalarToOptimize;
+  unsigned int            m_OutputScalarToOptimizeIndex;
 
   Optimizer() {}; // intentionally hidden
 
@@ -112,11 +109,11 @@ protected:
 
   unsigned int GetOutputScalarIndex( const std::string & scalarName ) const;
   unsigned int GetParameterIndex( const std::string & parameterName ) const;
-  
+
   bool IsLikeAndPrior() const;
 
 }; // end Optimizer
 
 } // end namespace madai
 
-#endif // __Optimizer_h_
+#endif // __Optimizer_h

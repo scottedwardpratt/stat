@@ -23,9 +23,9 @@ RegularStepGradientDescentOptimizer
 
   // TODO - set these from the set of active parameters
   for (unsigned int i = 0; i < activeParameters.size(); i++)
-  {
+    {
     activeParameters[i] = true;
-  }
+    }
 
   std::vector< double > scalars;
   std::vector< double > gradient;
