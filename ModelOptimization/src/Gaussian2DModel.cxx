@@ -12,8 +12,10 @@ Gaussian2DModel
   m_StandardDeviationX = 4.0;
   m_StandardDeviationY = 12.3;
 
-  this->AddParameter( "X" );
-  this->AddParameter( "Y" );
+  // Temporarily changed this so that the mcmc would work with this model
+  // Using +-DBL_MAX for the range introduces errors in taking steps in the mcmc.
+  this->AddParameter( "X", m_MeanX-10.0*m_StandardDeviationX, m_MeanX+10.0*m_StandardDeviationX );
+  this->AddParameter( "Y", m_MeanY-10.0*m_StandardDeviationY, m_MeanY+10.0*m_StandardDeviationY );
 
   this->AddScalarOutputName( "Value" );
 }
@@ -27,7 +29,6 @@ Gaussian2DModel
 
   return Model::NO_ERROR;
 }
-
 
 void
 Gaussian2DModel
@@ -55,7 +56,7 @@ Gaussian2DModel
   double sy = m_StandardDeviationY;
 
   double value = exp( -( ((dx*dx) / (2.0 * sx * sx)) +
-                         ((dy*dy) / (2.0 * sx * sx)) ) );
+                         ((dy*dy) / (2.0 * sy * sy)) ) );
 
   scalars.push_back( value );
 
@@ -126,5 +127,28 @@ Gaussian2DModel
   // TODO - verify that this is correct
   return (value * dy) / (sy * sy);
 }
+
+
+
+Model::ErrorType
+Gaussian2DModel
+::GetLikeAndPrior( const std::vector< double > & parameters,
+                   double & Like,
+                   double & Prior) const
+{
+  std::vector< double > output;
+  ErrorType error = this->GetScalarOutputs( parameters, output );
+  if ( error != NO_ERROR )
+  {
+    return error;
+  }
+  Like = log(output[0]);
+  
+  // We'll use a uniform prior for now;
+  Prior = 1;
+  
+  return NO_ERROR;
+}
+
 
 } // end namespace madai
