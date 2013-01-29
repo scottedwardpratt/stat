@@ -49,18 +49,20 @@ def dice_model(x,N=96):
 		else:
 			count[5] += 1
 	assert sum(count) == N
-	return count
+	return count[:5]
 
 def dice_model2(x,N=96):
 	"""
 	reimplementation of dice_model().
 	"""
 	(x1,x2,x3,x4,x5,x6) = x
-	P = [x1, x2, x3, x4, 0, 0]
-	P[4] = x5 + x6
+	P = [x1 * 0.3, x2 * 0.3, x3 * 0.3, x4 * 0.3, 0, 0]
+	P[4] = (x5 + x6) * 0.3
 	P[5] = 1.0 - x1 - x2 - x3 - x4 - x5 - x6
-	count = [int(math.floor(P[i]*N)) for i in xrange(6)]
-	for i in xrange(N - sum(count)):
+	count = [0 for i in xrange(6)]
+	#count = [int(math.floor(P[i]*N)) for i in xrange(6)]
+	#for i in xrange(N - sum(count)):
+	for i in xrange(N):
 		r = random.random()
 		if r < sum(P[:1]):
 			count[0] += 1
@@ -74,21 +76,29 @@ def dice_model2(x,N=96):
 			count[4] += 1
 		else:
 			count[5] += 1
+	assert sum(count) == N
 	return count[:5]
+
+def liklihood(y, expected, covariance):
+	return numpy.exp(-0.5 * numpy.dot(
+		(y - expected),
+		numpy.dot( 
+			numpy.linalg.inv(covariance),
+			(y - expected)).flatten()))
 
 def get_likelihood(model, x, expected, covariance):
 	"""
 	Given a model function and a point x, calculate the liklihood of
 	that point.
 	"""
-	y = numpy.array(model(x),dtype=float)
-	invcov = numpy.linalg.inv(covariance),
-	#expected = numpy.array(expected, dtype=float)
-	#variance = numpy.array(variance, dtype=float)
-	J2 = numpy.dot(
-		(y - expected),
-		numpy.dot( invcov, (y - expected)).flatten())
-	return numpy.exp(-J2/2.0)
+	return liklihood(numpy.array(model(x),dtype=float), expected, covariance)
+	# invcov = numpy.linalg.inv(covariance),
+	# #expected = numpy.array(expected, dtype=float)
+	# #variance = numpy.array(variance, dtype=float)
+	# J2 = numpy.dot(
+	# 	(y - expected),
+	# 	numpy.dot( invcov, (y - expected)).flatten())
+	# return numpy.exp(-J2/2.0)
 
 def MCMC(func, N, skip=0, length_scale=0.1, init_x=None):
 	"""
@@ -125,49 +135,51 @@ def print_matrix(matrix, transpose=False, file_object=sys.stdout):
 	for i in xrange(view.shape[0]):
 		print >>sys.stdout, ','.join(map(str,view[i,:]))
 
-#x = [0.16,0.20,0.16,0.16,0.16,0.0]
-#Yf = [dice_model(x, 96) for i in xrange(8)]
-#print '\n'.join(map(repr, Yf))
 
-"""
-Yf is the matrix of field data (real-world observations) The
-experiment was repeated eight times.  To remove linear dependance, the
-final column was deleted.  Otherwise the covariace calulation will
-give wierd answers.
-[[Here's a pit to fall into.]]
-"""
-Yf = numpy.array(          # Yf=numpy.array(			  
-	[[16, 15, 16, 19, 16], # 	[[16, 15, 16, 19, 16, 14],
-	 [12, 21, 21, 15, 18], # 	 [12, 21, 21, 15, 18,  9],
-	 [11, 17, 15, 21, 12], # 	 [11, 17, 15, 21, 12, 20],
-	 [12, 20, 21, 13, 16], # 	 [12, 20, 21, 13, 16, 14],
-	 [14, 19, 18, 14, 19], # 	 [14, 19, 18, 14, 19, 12],
-	 [18, 19, 15, 14, 17], # 	 [18, 19, 15, 14, 17, 13],
-	 [19, 18, 14, 16, 15], # 	 [19, 18, 14, 16, 15, 14],
-	 [17, 15, 19, 18, 13]] # 	 [17, 15, 19, 18, 13, 14]]
-	).transpose()		   # 	).transpose()
+if __name__ == '__main__':
+	# x = [0.16,0.20,0.16,0.16,0.16,0.0]
+	# Yf = [dice_model(x, 96) for i in xrange(8)]
+	# print '\n'.join(map(repr, Yf))
+	"""
+	Yf is the matrix of field data (real-world observations) The
+	experiment was repeated eight times.  To remove linear dependance, the
+	final column was deleted.  Otherwise the covariace calulation will
+	give wierd answers.
+	[[Here's a pit to fall into.]]
+	"""
+	Yf = numpy.array(          # Yf=numpy.array(
+		[[16, 15, 16, 19, 16], # 	[[16, 15, 16, 19, 16, 14],
+		 [12, 21, 21, 15, 18], # 	 [12, 21, 21, 15, 18,  9],
+		 [11, 17, 15, 21, 12], # 	 [11, 17, 15, 21, 12, 20],
+		 [12, 20, 21, 13, 16], # 	 [12, 20, 21, 13, 16, 14],
+		 [14, 19, 18, 14, 19], # 	 [14, 19, 18, 14, 19, 12],
+		 [18, 19, 15, 14, 17], # 	 [18, 19, 15, 14, 17, 13],
+		 [19, 18, 14, 16, 15], # 	 [19, 18, 14, 16, 15, 14],
+		 [17, 15, 19, 18, 13]] # 	 [17, 15, 19, 18, 13, 14]]
+		).transpose()		   # 	).transpose()
 
-"""
-EYf = E[Y_f] = expectation value of the observations.
-"""
-EYf = numpy.mean(Yf, 1)
-"""
-CovYf = covariace of the observations.  If only one set of
-observations, is just variance.
-"""
-CovYf = numpy.cov(Yf, bias=1)
+	"""
+	EYf = E[Y_f] = expectation value of the observations.
+	"""
+	EYf = numpy.mean(Yf, 1)
+	"""
+	CovYf = covariace of the observations.  If only one set of
+	observations, is just variance.
+	"""
+	CovYf = numpy.cov(Yf, bias=1)
 
-"""
-To calulate likeyhood ratio, compare the output of the dice_model at a
-point x to the expected value EYf, using the Covariance of the output
-to scale.
-"""
-dice_likelihood = lambda *x : get_likelihood(dice_model2, x, EYf, CovYf)
+	"""
+	To calulate likeyhood ratio, compare the output of the dice_model at a
+	point x to the expected value EYf, using the Covariance of the output
+	to scale.
+	"""
+	# dice_likelihood = lambda *x : get_likelihood(dice_model2, x, EYf, CovYf)
+	dice_likelihood = lambda *x : liklihood(
+		numpy.array(dice_model2(x),dtype=float), EYf, CovYf)
 
-trace =  MCMC((6, dice_likelihood), 5000)
+	trace =  MCMC((6, dice_likelihood), 5000)
 
-print_matrix(trace, True)
-
+	print_matrix(trace, True)
 
 
 
