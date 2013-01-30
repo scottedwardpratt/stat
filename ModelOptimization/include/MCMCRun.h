@@ -53,6 +53,7 @@ public:
   bool                m_LogPrior;
   bool                m_LogProposal;
   bool                m_CreateTrace;
+  bool                m_Debug;
   
   VizHandler*         m_Visualizer;
   CRandom*            m_RandomNumber;

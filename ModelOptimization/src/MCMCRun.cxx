@@ -26,19 +26,28 @@ madai::MCMCRun
   m_LogProposal = parameter::getB(m_LocalParameterMap, "LOGPROPOSAL", true);
   m_LogPrior = parameter::getB(m_LocalParameterMap, "LOGPRIOR", true);
   m_LogLike = parameter::getB(m_LocalParameterMap, "LOGLIKE", true);
+  m_Debug = parameter::getB(m_LocalParameterMap, "DEBUG", false);
+  //m_Debug = true; // For creating a regression test
+  std::cerr << "1" << std::endl;
   
   // Define how to take and evaluate steps
   this->LoadStepParameters();
-      
+  
   m_RandomNumber = new CRandom(1234);
+  std::cerr << "2" << std::endl;
   
   // Get initial theta
   if(m_RandomTheta0){
+    if(m_Debug){
+      std::cerr << "Debug mode is for MCMC Core testing. Random initial theta and debug mode are incompatible" << std::endl;
+      exit(1);
+    }
     m_InitialTheta = this->GetRandomTheta0(time(NULL));
   }
   else{
     m_InitialTheta = this->GetTheta0FromFile();
   }
+  std::cerr << "3" << std::endl;
   m_CurrentParameters = m_InitialTheta;
   // Get Likelihood, Prior and Scale for the initial theta
   m_Model->GetLikeAndPrior(m_CurrentParameters, m_LikelihoodCurrent, m_PriorCurrent);
@@ -73,6 +82,11 @@ madai::MCMCRun
   }
   
   Temp_Theta = this->TakeStep(m_CurrentParameters, m_ScaleNew);
+  /*std::cerr << "Proposed parameter set:" << std::endl;
+  for (unsigned int l = 0; l < Temp_Theta.size(); l++){
+    std::cerr << Temp_Theta[l] << "  ";
+  }
+  std::cerr << std::endl;*/
   m_Model->GetLikeAndPrior(Temp_Theta, m_LikelihoodNew, m_PriorNew);
   m_ProposalNew = this->EvaluateProposal(m_CurrentParameters, Temp_Theta, m_ScaleCurrent); // m_ProposalNew
   m_ProposalCurrent = this->EvaluateProposal(Temp_Theta, m_CurrentParameters, m_ScaleNew); // m_ProposalCurrent
@@ -115,7 +129,14 @@ madai::MCMCRun
     printf("%5d\talpha=%6.5f\t",m_IterationNumber,alpha);
   }
   
-  if(alpha > (this->m_RandomNumber->ran())) { //Accept the proposed set.
+  double r;
+  if(m_Debug){
+    r = rand()/double(RAND_MAX);
+  } else {
+    r = this->m_RandomNumber->ran();
+  }
+  
+  if(alpha > r) { //Accept the proposed set.
     if(!m_Quiet){
       printf("Accept\n");
     }
@@ -140,19 +161,26 @@ madai::MCMCRun
   }
   std::cerr << std::endl;
   
+  std::vector< double > TElement;
   if(m_IterationNumber > m_BurnIn){ // We are just tossing everything in the burn in period.
     if(m_RescaledTrace){
-      std::vector<double> RescaledParameters;
       double* range = new double[2]();
       for( int k = 0; k < m_CurrentParameters.size(); k++){
         m_Model->GetRange(k, range);
-        RescaledParameters.push_back((m_CurrentParameters[k]-range[0])/(range[1]-range[0]));
+        TElement.push_back((m_CurrentParameters[k]-range[0])/(range[1]-range[0]));
       }
-      ThetaOutsList->add(RescaledParameters);
     }else{
-      ThetaOutsList->add(m_CurrentParameters);
+      TElement = m_CurrentParameters;
     }
   }
+  if(m_Debug){
+    TElement.push_back(m_LikelihoodCurrent);
+    TElement.push_back(m_PriorCurrent);
+    TElement.push_back(m_ProposalCurrent);
+    TElement.push_back(m_ProposalNew);
+    TElement.push_back(alpha);
+  }
+  ThetaOutsList->add(TElement);
   
   double range[2];
   for(int k = 0; k < m_Model->GetNumberOfParameters(); k++){ //These ParamValus are used for the density plots
@@ -173,7 +201,7 @@ std::vector<double>
 madai::MCMCRun
 ::GetRandomTheta0(int seed)
 { //This creates random theta 0s
-	srand(seed);
+	//srand(seed);
   std::cout << "We are using random theta0 values. They are:" << std::endl;
 	double *range = new double[2];
   std::vector<double> temp_values(this->m_Model->GetNumberOfParameters(), 0.0);
@@ -254,7 +282,11 @@ madai::MCMCRun
   rngtype = gsl_rng_default;
   gsl_rng_env_setup();
   m_RandNumGen = gsl_rng_alloc(rngtype);
-  gsl_rng_set(m_RandNumGen, time(NULL));
+  if(m_Debug){
+    gsl_rng_set(m_RandNumGen, 1);
+  } else {
+    gsl_rng_set(m_RandNumGen, time(NULL));
+  }
 
 }
 

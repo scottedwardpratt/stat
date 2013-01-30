@@ -33,8 +33,12 @@ double madai::PriorDistribution_Test::Evaluate(std::vector<double> Theta){
       }
     }
   }
-  std::cerr << "SIGMA parameter not found!" << std::endl;
-  std::cerr << "Will return the prior as 1.0" << std::endl;
-  return 1.0;
+  if(Found){
+    return temp;
+  } else {
+    std::cerr << "SIGMA parameter not found!" << std::endl;
+    std::cerr << "Will return the prior as 1.0" << std::endl;
+    return 1.0;
+  }
   //return Normal(log(Theta.GetValue("SIGMA")), mean, sigma);
 }

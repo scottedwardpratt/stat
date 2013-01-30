@@ -92,8 +92,6 @@ madai::Trace::Trace(const std::string info_dir, const std::string configuration)
   m_Writeout = parameter::getI(m_TraceParameterMap, "WRITEOUT",100);
   m_MaxIterations = parameter::getI(m_TraceParameterMap, "MAX_ITERATIONS", 200);
   m_AppendTrace = parameter::getB(m_TraceParameterMap, "APPEND_TRACE", false);
-  
-  m_TraceDirectory = info_dir + "/trace/" + configuration;
 
   if(m_AppendTrace){
     std::string addon = "";

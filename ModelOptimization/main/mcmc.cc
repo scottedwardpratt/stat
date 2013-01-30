@@ -4,7 +4,6 @@
 #include <string>
 
 #include "MCMCRun.h"
-//#include "MultiModel.h"
 #include "RHICModel.h"
 
 int main(int argc, char ** argv){
@@ -28,8 +27,8 @@ int main(int argc, char ** argv){
   madai::MCMCRun run(&m_model, info_dir);
     
   std::vector<madai::Parameter> const * parameters = &(m_model.GetParameters());
-  for(int i=0; i<parameters->size();i++)
-    run.ActivateParameter((*parameters)[i].m_Name);
+  for(int i = 0; i < parameters->size(); i++)
+    run.ActivateParameter( (*parameters)[i].m_Name );
    
   madai::Trace trace(info_dir,"default");
   if(run.m_BurnIn == 0){
