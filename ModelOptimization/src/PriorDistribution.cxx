@@ -1,6 +1,8 @@
 #include "PriorDistribution.h"
 
+
 namespace madai {
+
 
 PriorDistribution
 ::PriorDistribution()

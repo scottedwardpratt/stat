@@ -21,6 +21,7 @@ set( SRC_FILES
   CosmoModel.cxx
   RHIC_PCA_Model.cxx
   TestModel.cxx
+  Quad.cxx
 
   Visualization.cxx
 

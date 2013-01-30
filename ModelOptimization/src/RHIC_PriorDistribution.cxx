@@ -1,10 +1,10 @@
 #include "RHIC_PriorDistribution.h"
 
-
 #include "Model.h"
 
 
 namespace madai {
+
 
 RHIC_PriorDistribution
 ::RHIC_PriorDistribution( Model * in_Model )

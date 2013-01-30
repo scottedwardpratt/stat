@@ -1,11 +1,14 @@
 #ifndef __Visualization_h__
 #define __Visualization_h__
 
-#include "MCMCRun.h"
+
 #include "Trace.h"
+
 #include <deque>
 
+
 namespace madai {
+
 
 class MCMCRun;
 

@@ -1,8 +1,12 @@
 #include "Visualization.h"
 
+#include "MCMCRun.h"
+
 #include <deque>
 
+
 namespace madai {
+
 
 Visualization
 ::Visualization( MCMCRun *mcmc_in )

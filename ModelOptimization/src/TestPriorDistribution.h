@@ -3,7 +3,9 @@
 
 #include "PriorDistribution.h"
 
+
 namespace madai {
+
 
 class TestPriorDistribution : public PriorDistribution {
 public:

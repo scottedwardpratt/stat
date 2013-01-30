@@ -11,7 +11,9 @@ See copyright.txt for more information.
 #ifndef __SimpleMetropolisHastings_h__
 #define __SimpleMetropolisHastings_h__
 
+
 #include "Optimizer.h"
+
 
 namespace madai {
 

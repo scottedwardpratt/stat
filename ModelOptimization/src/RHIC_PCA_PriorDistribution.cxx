@@ -2,7 +2,9 @@
 
 #include "Model.h"
 
+
 namespace madai {
+
 
 RHIC_PCA_PriorDistribution
 ::RHIC_PCA_PriorDistribution( Model * in_Model )

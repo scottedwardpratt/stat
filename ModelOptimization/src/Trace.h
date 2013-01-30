@@ -15,13 +15,14 @@ See copyright.txt for more information.
 #ifndef __Trace_h__
 #define __Trace_h__
 
-#include <vector>
-#include <string>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <sstream>
+#include <string>
 #include <sys/stat.h>
-#include "math.h"
+#include <vector>
+
+#include <cmath>
 #include <map>
 
 #include "Parameter.h"
@@ -33,7 +34,7 @@ namespace madai {
 
 /** \class Trace
  *
- * Traces contain all the state of the optimization required to
+ * Traces contain all the state of the distribution sampling required to
  * replay it. */
 class Trace {
 public:

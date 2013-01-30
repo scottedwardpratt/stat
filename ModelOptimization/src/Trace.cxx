@@ -18,7 +18,7 @@ See copyright.txt for more information.
 namespace madai {
 
 std::vector< std::string >
- Trace
+Trace
 ::GetParNames(){
   return this->m_ParameterNames;
 }

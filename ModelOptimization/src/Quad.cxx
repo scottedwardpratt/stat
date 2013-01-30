@@ -2,6 +2,10 @@
 
 #include "Model.h"
 
+
+namespace madai {
+
+
 QuadHandler
 ::QuadHandler(parameterMap *parmap, Model * in_Model)
 {

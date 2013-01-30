@@ -1,6 +1,8 @@
 #include "MCMCRun.h"
 
+
 namespace madai {
+
 
 MCMCRun
 ::MCMCRun( const Model *in_model,

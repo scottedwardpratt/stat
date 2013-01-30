@@ -1,4 +1,5 @@
-#include "Distribution.h"
+#include "InterpolatorPriorDistribution.h"
+
 
 namespace madai {
 

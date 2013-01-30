@@ -18,12 +18,12 @@ See copyright.txt for more information.
 #include <string>
 #include <vector>
 
+
 namespace madai {
+
 class Parameter {
 public:
-  Parameter( std::string nm,
-             double mn=0.0,
-             double mx=1.0 ) :
+  Parameter( std::string nm, double mn = 0.0, double mx = 1.0 ) :
     m_Name(nm),
     m_MinimumPossibleValue(mn),
     m_MaximumPossibleValue(mx) { }

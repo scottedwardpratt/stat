@@ -1,7 +1,9 @@
 #ifndef __RegularStepGradientDescentOptimizer_h__
 #define __RegularStepGradientDescentOptimizer_h__
 
+
 #include "Optimizer.h"
+
 
 namespace madai {
 

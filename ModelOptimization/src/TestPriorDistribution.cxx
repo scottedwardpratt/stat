@@ -2,7 +2,9 @@
 
 #include "Model.h"
 
+
 namespace madai {
+
 
 TestPriorDistribution
 ::TestPriorDistribution( Model * in_Model )

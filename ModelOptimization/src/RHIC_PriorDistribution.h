@@ -3,7 +3,9 @@
 
 #include "PriorDistribution.h"
 
+
 namespace madai {
+
 
 class RHIC_PriorDistribution : public PriorDistribution {
 public:

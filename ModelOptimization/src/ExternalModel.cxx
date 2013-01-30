@@ -17,8 +17,8 @@ See copyright.txt for more information.
 
 #include "ExternalModel.h"
 
-namespace madai {
 
+namespace madai {
 
 ExternalModel
 ::ExternalModel()

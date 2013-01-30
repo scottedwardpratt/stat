@@ -1,7 +1,9 @@
 #include "Optimizer.h"
 #include "Parameter.h"
 
+
 namespace madai {
+
 
 Optimizer
 ::Optimizer( const Model *model )

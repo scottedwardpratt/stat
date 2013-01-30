@@ -3,6 +3,7 @@
 
 #include "Model.h"
 
+
 namespace madai {
 
 /** \class Gaussian2DModel

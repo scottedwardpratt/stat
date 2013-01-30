@@ -16,9 +16,10 @@ See copyright.txt for more information.
 #define __Model_h__
 
 #include "Parameter.h"
-#include "random.h"
-#include <gsl/gsl_randist.h>
 #include "parametermap.h"
+#include "random.h"
+
+#include <gsl/gsl_randist.h>
 
 #include <cfloat>
 #include <vector>

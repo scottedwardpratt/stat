@@ -12,7 +12,9 @@ See copyright.txt for more information.
 
 #include <cstdlib>
 
+
 namespace madai {
+
 
 SimpleMetropolisHastings
 ::SimpleMetropolisHastings( const Model * model ) :

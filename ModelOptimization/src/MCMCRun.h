@@ -1,26 +1,29 @@
 #ifndef __MCMCRun_h__
 #define __MCMCRun_h__
 
-#include <vector>
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
+
+#include <gsl/gsl_randist.h>
 
 #include "parametermap.h"
 #include "random.h"
-#include <gsl/gsl_randist.h>
 
 #include "Model.h"
 #include "MultiModel.h"
+#include "Optimizer.h"
 #include "Trace.h"
 #include "Visualization.h"
-#include "Optimizer.h"
+
 
 namespace madai {
 
 class Model;
-class Visualization;
 class Trace;
 class TraceElement;
+class Visualization;
+
 
 /* \class MCMCRun
  *

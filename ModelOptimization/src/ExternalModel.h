@@ -11,7 +11,6 @@ See copyright.txt for more information.
 #ifndef __ExternalModel_h__
 #define __ExternalModel_h__
 
-#include "Parameter.h" // Parameter class 
 #include "Model.h"
 
 #include "process_pipe.h"

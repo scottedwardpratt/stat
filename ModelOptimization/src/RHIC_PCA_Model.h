@@ -1,8 +1,11 @@
 #ifndef __RHIC_PCA_Model_h__
 #define __RHIC_PCA_Model_h__
 
+
 #include "MultiModel.h"
+
 #include "Quad.h"
+
 
 namespace madai {
 
@@ -11,8 +14,6 @@ namespace madai {
  * \todo Document the difference between this class and RHICModel
  */  
 class RHIC_PCA_Model : public MultiModel {
-private:
-  QuadHandler* m_Quad;
 public:
   RHIC_PCA_Model();
   RHIC_PCA_Model(std::string info_dir);
@@ -36,6 +37,9 @@ public:
                                     double & Prior ) const;
   
   virtual ErrorType LoadDistributions();
+
+private:
+  QuadHandler* m_Quad;
   
 }; // end class RHIC_PCA_Model
   

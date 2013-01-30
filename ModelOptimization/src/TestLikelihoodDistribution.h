@@ -3,7 +3,9 @@
 
 #include "LikelihoodDistribution.h"
 
+
 namespace madai {
+
 
 class TestLikelihoodDistribution : public LikelihoodDistribution {
 public:

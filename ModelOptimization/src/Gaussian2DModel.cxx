@@ -1,6 +1,7 @@
+#include "Gaussian2DModel.h"
+
 #include <cmath>
 
-#include "Gaussian2DModel.h"
 
 namespace madai {
 

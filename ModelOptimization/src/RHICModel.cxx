@@ -3,7 +3,9 @@
 #include "RHIC_LikelihoodDistribution.h"
 #include "RHIC_PriorDistribution.h"
 
+
 namespace madai {
+
 
 RHICModel
 ::RHICModel()

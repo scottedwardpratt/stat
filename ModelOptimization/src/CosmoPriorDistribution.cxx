@@ -1,5 +1,6 @@
-#include "Model.h"
 #include "CosmoPriorDistribution.h"
+
+#include "Model.h"
 
 
 namespace madai {

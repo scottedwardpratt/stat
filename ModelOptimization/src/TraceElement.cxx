@@ -1,6 +1,8 @@
 #include "TraceElement.h"
 
+
 namespace madai {
+
 
 TraceElement
 ::TraceElement( const std::vector< double > & parameter_values,
