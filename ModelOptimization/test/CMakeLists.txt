@@ -1,11 +1,5 @@
-include_directories( 
-  ../include 
-  /opt/local/include
-  ~/local/include
-)
-
 set( LIBRARIES 
-  IHU
+  ModelOptimization
   ${CORELIBS} 
 )
 
