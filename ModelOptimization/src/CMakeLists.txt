@@ -2,6 +2,7 @@ set( SRC_FILES
   Optimizer.cxx
   MCMCRun.cxx
   Trace.cxx
+  TraceElement.cxx
 
   Distribution.cxx
   LikelihoodDistribution.cxx

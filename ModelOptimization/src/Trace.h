@@ -27,37 +27,9 @@ See copyright.txt for more information.
 #include "Parameter.h"
 #include "parametermap.h"
 
+#include "TraceElement.h"
+
 namespace madai {
-    
-class Trace;
-class TraceElement;
-
-/** \class TraceElement
- *
- * Individual entry in a Trace.
- */
-class TraceElement {
-public:
-  TraceElement(const std::vector< double > & parameterValues,
-               const std::vector< double > & OutputValues );
-  TraceElement(const std::vector< double > & parameterValues);
-  TraceElement();
-  void Reset();
-  void Print();
-  void VizTrace();
-    
-  std::vector< double > m_ParameterValues;
-  std::vector< double > m_OutputValues;
-  bool                  m_InTrace;
-  bool                  m_Used;
-    
-  /** Comments may be used to store human-readable comments *or*
-  record changes to state, such as changing an optimizer type,
-  which parameters are activated, etc.. */
-  std::vector< std::string > m_Comments;
-
-}; // class TraceElement
-
 
 /** \class Trace
  *
@@ -66,18 +38,18 @@ public:
 class Trace {
 public:
   Trace() {};
-  Trace(const std::string info_dir, 
-        const std::string configuration);
+  Trace( const std::string info_dir, 
+         const std::string configuration );
   virtual ~Trace() {}
 
   unsigned int length() const;
-  void add(const std::vector< double > & parameterValues,
-           const std::vector< double > & OutputValues );
-  void add(const std::vector< double > & parameterValues);
-  TraceElement & operator[](unsigned int idx);
-  const TraceElement & operator[](unsigned int idx) const;
+  void add( const std::vector< double > & parameterValues,
+            const std::vector< double > & OutputValues );
+  void add( const std::vector< double > & parameterValues );
+  TraceElement & operator[]( unsigned int idx );
+  const TraceElement & operator[]( unsigned int idx ) const;
 
-  void write(std::ostream & o) const;  
+  void write( std::ostream & o ) const;  
 
   /*
     Assert:
@@ -85,13 +57,13 @@ public:
         this->m_TraceElements[i].m_ParameterValues.size() == params.size()
         this->m_TraceElements[i].m_OutputValues.size() == outputs.size()
   */
-  void writeHead(std::ostream & o, 
-                 const std::vector< Parameter > & params) const;
-  void writeHead(std::ostream & o,
-                 const std::vector< Parameter > & params,
-                 const std::vector< std::string > & outputs) const;
-  void PrintDataToFile(const std::vector< Parameter > & params);
-  void WriteOut(const std::vector< Parameter > & params);
+  void writeHead( std::ostream & o, 
+                  const std::vector< Parameter > & params ) const;
+  void writeHead( std::ostream & o,
+                  const std::vector< Parameter > & params,
+                  const std::vector< std::string > & outputs) const;
+  void PrintDataToFile( const std::vector< Parameter > & params );
+  void WriteOut( const std::vector< Parameter > & params );
   void MakeTrace();
   std::vector< std::string > GetParNames();
     
@@ -104,7 +76,6 @@ public:
   parameterMap m_TraceParameterMap;
 
 protected:
-
   std::vector< TraceElement > m_TraceElements;
   std::vector< std::string >  m_ParameterNames;
 

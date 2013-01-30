@@ -17,52 +17,6 @@ See copyright.txt for more information.
 
 namespace madai {
 
-TraceElement
-::TraceElement( const std::vector< double > & parameter_values,
-                const std::vector< double > & output_values ) :
-  m_ParameterValues( parameter_values ),
-  m_OutputValues( output_values )
-{
-}
-
-
-TraceElement
-::TraceElement( const std::vector< double > & parameter_values) :
-  m_ParameterValues( parameter_values ),
-  m_Used( true )
-{
-}
-
-
-void
-TraceElement
-::Reset()
-{
-  m_ParameterValues.clear();
-  m_OutputValues.clear();
-  m_Comments.clear();
-  m_Used = false;
-  m_InTrace = false;
-}
-
-
-TraceElement
-::TraceElement()
-{
-  m_Used=false;
-}
-
-
-void
-TraceElement
-::VizTrace()
-{
-  if ( !m_InTrace ) {
-    m_InTrace=true;
-  }
-}
-
-
 std::vector< std::string >
  Trace
 ::GetParNames(){
@@ -107,7 +61,7 @@ Trace
 
 TraceElement &
 Trace
-::operator[](unsigned int idx)
+::operator[]( unsigned int idx )
 {
   return this->m_TraceElements[idx];
 }
@@ -115,7 +69,7 @@ Trace
 
 const TraceElement &
 Trace
-::operator[](unsigned int idx) const
+::operator[]( unsigned int idx ) const
 {
   return this->m_TraceElements[idx];
 }
