@@ -25,16 +25,6 @@ namespace madai {
  * Other functions are specified in subclasses.
  */
 class MultiModel : public Model {
-protected:
-  unsigned int number_of_parameters;
-  unsigned int number_of_outputs;
-  typedef enum {
-    UNINITIALIZED,
-    READY,
-    ERROR
-  } internal_state;
-  internal_state stateFlag;
-
 public:
   std::vector<bool>       m_LogParam;
   std::string             m_ModelType;
@@ -46,7 +36,7 @@ public:
   bool                    m_UseEmulator;
   bool                    m_ProcessPipe;
 
-  bool good() { return (this->stateFlag == READY);}
+  bool good() { return (this->m_StateFlag == READY);}
 
   MultiModel() {};
   virtual ~MultiModel() {};
@@ -86,6 +76,19 @@ public:
   void eat_whitespace(std::istream& i);
   void eat_whitespace(std::FILE* fp);
   bool discard_comments(std::istream& i, char comment_character);
+
+protected:
+
+  unsigned int m_NumberOfParameters;
+  unsigned int m_NumberOfOutputs;
+
+  typedef enum {
+    UNINITIALIZED,
+    READY,
+    ERROR
+  } InternalState;
+
+  InternalState m_StateFlag;
 
 }; // end class MultiModel
 

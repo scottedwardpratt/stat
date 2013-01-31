@@ -14,9 +14,9 @@ See copyright.txt for more information.
 madai::SimpleMetropolisHastings::SimpleMetropolisHastings(
   const madai::Model * model ) :
   madai::Optimizer( model ), m_StepSize(1.0e-2),
-  activeParameters(model->GetNumberOfParameters(), true),
-  number_parameters(model->GetNumberOfParameters()),
-  number_outputs(model->GetNumberOfScalarOutputs())
+  m_ActiveParameters(model->GetNumberOfParameters(), true),
+  m_NumberOfParameters(model->GetNumberOfParameters()),
+  m_NumberOfOutputs(model->GetNumberOfScalarOutputs())
 {
 }
 
@@ -36,12 +36,12 @@ double uniform_rand() {
 void madai::SimpleMetropolisHastings::NextIteration(madai::Trace *trace)
 {
   // xc is x_candidate
-  std::vector< double > xc(this->number_parameters, 0.0);
-  std::vector< double > yc(this->number_outputs, 0.0);
+  std::vector< double > xc(this->m_NumberOfParameters, 0.0);
+  std::vector< double > yc(this->m_NumberOfOutputs, 0.0);
   unsigned int trace_length = trace->length();
   if (trace_length < 1)
     {
-    for (unsigned int i = 0; i < this->number_parameters; i++)
+    for (unsigned int i = 0; i < this->m_NumberOfParameters; i++)
       {
       double range[2];
       this->m_Model->GetRange(i, range);
@@ -62,8 +62,8 @@ void madai::SimpleMetropolisHastings::NextIteration(madai::Trace *trace)
 
   for(unsigned int giveup = 1048576; giveup != 0; --giveup)
     {
-    for (unsigned int i = 0; i < this->number_parameters; i++)
-      if (this->activeParameters[i])
+    for (unsigned int i = 0; i < this->m_NumberOfParameters; i++)
+      if (this->m_ActiveParameters[i])
         xc[i] = (*x)[i]
           + (uniform_rand() - 0.5) * 2 * this->m_StepSize;
       else

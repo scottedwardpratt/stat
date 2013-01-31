@@ -29,8 +29,12 @@ protected:
   double m_StepSize;
 
   SimpleMetropolisHastings() {}; // intentionally hidden
-  std::vector< bool > activeParameters;
-  unsigned int number_parameters, number_outputs;
+
+  std::vector< bool > m_ActiveParameters;
+
+  unsigned int m_NumberOfParameters;
+  
+  unsigned int m_NumberOfOutputs;
 
 }; // end class SimpleMetropolisHastings
 

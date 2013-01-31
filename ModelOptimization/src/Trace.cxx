@@ -15,16 +15,20 @@ See copyright.txt for more information.
 
 #include "Trace.h"
 
-madai::TraceElement::TraceElement(const std::vector< double > & parameter_values,
-                                  const std::vector< double > & output_values ) :
+namespace madai {
+
+TraceElement::TraceElement(const std::vector< double > & parameter_values,
+                           const std::vector< double > & output_values ) :
   m_ParameterValues(parameter_values),
   m_OutputValues(output_values) { }
 
-madai::TraceElement::TraceElement(const std::vector< double > & parameter_values) :
+TraceElement::TraceElement(const std::vector< double > & parameter_values) :
   m_ParameterValues(parameter_values),
-  m_Used(true) { }
+  m_Used(true)
+{
+}
 
-void madai::TraceElement::Reset()
+void TraceElement::Reset()
 {
   m_ParameterValues.clear();
   m_OutputValues.clear();
@@ -33,35 +37,35 @@ void madai::TraceElement::Reset()
   m_InTrace = false;
 }
 
-madai::TraceElement::TraceElement()
+TraceElement::TraceElement()
 {
   m_Used=false;
 }
 
-void madai::TraceElement::VizTrace()
+void TraceElement::VizTrace()
 {
   if(!m_InTrace){
   m_InTrace=true;
   }
 }
 
-std::vector<std::string> madai::Trace::GetParNames(){
+std::vector<std::string> Trace::GetParNames(){
   return (this->m_ParameterNames);
 }
 
-unsigned int madai::Trace::length() const
+unsigned int Trace::length() const
 {
   return this->m_TraceElements.size();
 }
 
-void madai::Trace::add(const std::vector< double > & parameterValues,
+void Trace::add(const std::vector< double > & parameterValues,
                        const std::vector< double > & OutputValues )
 {
   this->m_TraceElements.push_back(
     TraceElement(parameterValues,OutputValues));
 }
 
-void madai::Trace::add(const std::vector< double > & parameterValues)
+void Trace::add(const std::vector< double > & parameterValues)
 {
   if(m_CurrentIteration >= m_Writeout){
   std::cerr << "Error: Trace class out of bounds (Greater than WRITEOUT).\n\n";
@@ -74,17 +78,17 @@ void madai::Trace::add(const std::vector< double > & parameterValues)
   }
 }
 
-madai::TraceElement & madai::Trace::operator[](unsigned int idx)
+TraceElement & Trace::operator[](unsigned int idx)
 {
   return this->m_TraceElements[idx];
 }
 
-const madai::TraceElement & madai::Trace::operator[](unsigned int idx) const
+const TraceElement & Trace::operator[](unsigned int idx) const
 {
   return this->m_TraceElements[idx];
 }
 
-madai::Trace::Trace(const std::string info_dir, const std::string configuration){
+Trace::Trace(const std::string info_dir, const std::string configuration){
   m_TraceDirectory = info_dir + "/trace/" + configuration;
   std::string filename = info_dir + "/defaultpars/mcmc.param";
 
@@ -142,7 +146,7 @@ void write_vector(std::ostream& o, std::vector< T > const & v, char delim) {
   }
 }
 
-void madai::Trace::write(std::ostream & out) const {
+void Trace::write(std::ostream & out) const {
   unsigned int N = this->length();
   for (unsigned int i = 0; i < N; i ++) {
   write_vector(out, (*this)[i].m_ParameterValues, ',');
@@ -165,9 +169,9 @@ void madai::Trace::write(std::ostream & out) const {
         this->m_TraceElements[i].m_OutputValues.size() == outputs.size()
   */
 
-void madai::Trace::writeHead(std::ostream & o,
-                             const std::vector<madai::Parameter> & params,
-                             const std::vector<std::string> & outputs) const
+void Trace::writeHead(std::ostream & o,
+                      const std::vector<madai::Parameter> & params,
+                      const std::vector<std::string> & outputs) const
 {
   if (! params.empty()) {
   std::vector< madai::Parameter >::const_iterator itr = params.begin();
@@ -186,8 +190,8 @@ void madai::Trace::writeHead(std::ostream & o,
   }
 }
 
-void madai::Trace::writeHead(std::ostream & o,
-                             const std::vector<madai::Parameter> & params) const
+void Trace::writeHead(std::ostream & o,
+                      const std::vector<madai::Parameter> & params) const
 {
   if (! params.empty()) {
   std::vector< madai::Parameter >::const_iterator itr = params.begin();
@@ -197,7 +201,7 @@ void madai::Trace::writeHead(std::ostream & o,
   }
 }
 
-void madai::Trace::PrintDataToFile(const std::vector<madai::Parameter> & params)
+void Trace::PrintDataToFile(const std::vector<madai::Parameter> & params)
 {
   std::cout << "Printing data to file." << std::endl;
   std::ofstream outputfile;
@@ -245,7 +249,7 @@ void madai::Trace::PrintDataToFile(const std::vector<madai::Parameter> & params)
   }
 }
 
-void madai::Trace::WriteOut(const std::vector<madai::Parameter> & parameters)
+void Trace::WriteOut(const std::vector<madai::Parameter> & parameters)
 {
   this->PrintDataToFile(parameters);
   for(int i=0;i<m_Writeout;i++){
@@ -255,7 +259,7 @@ void madai::Trace::WriteOut(const std::vector<madai::Parameter> & parameters)
   m_CurrentIteration=0;
 }
 
-void madai::Trace::MakeTrace()
+void Trace::MakeTrace()
 {
   std::stringstream ss;
   ss << "cat ";
@@ -271,3 +275,5 @@ void madai::Trace::MakeTrace()
 
   ss.str(string());
 }
+
+} // end namespace madai

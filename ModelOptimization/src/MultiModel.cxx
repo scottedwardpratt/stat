@@ -1,5 +1,7 @@
 #include "MultiModel.h"
 
+#include <cctype>
+
 void 
 madai::MultiModel::discard_line(std::FILE * fp) {
   static int buffersize = 1024;
@@ -26,8 +28,6 @@ madai::MultiModel::discard_comments(std::FILE * fp, char comment_character) {
   return true;  
 }
 
-#include <cctype>
-
 void 
 madai::MultiModel::eat_whitespace(std::istream & i) {
   while (true) {
@@ -37,6 +37,7 @@ madai::MultiModel::eat_whitespace(std::istream & i) {
     return;
   }
 }
+
 void 
 madai::MultiModel::eat_whitespace(std::FILE * fp) {
   while (true) {
@@ -89,7 +90,7 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
     std::cout << itr->m_Name << std::endl;
   }else{
   std::cout << "Parameters were not read in!" << std::endl;
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
   
@@ -104,7 +105,7 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
   std::cout << std::endl;
   }else{
   std::cout << "Observables were not read in!" << std::endl;
-  this->stateFlag=ERROR;
+  this->m_StateFlag=ERROR;
   return OTHER_ERROR;
   }
   
@@ -119,12 +120,12 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
   m_LogParam.push_back(false);
   }else{
   std::cout << "Unrecognized LogParam value " << temp_logparam[i] << std::endl;
-  this->stateFlag=ERROR;
+  this->m_StateFlag=ERROR;
   return OTHER_ERROR;
   }
   }
   
-  this->stateFlag=READY;
+  this->m_StateFlag=READY;
   return NO_ERROR;
 }
 
@@ -141,7 +142,7 @@ madai::MultiModel::LoadConfigurationFile( const std::string fileName )
   config_file >> num_inputs;
   if(num_inputs < 1){
   std::cerr << "Number of inputs is < 1" << std::endl;
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
   bool fs, ro;
@@ -152,15 +153,15 @@ madai::MultiModel::LoadConfigurationFile( const std::string fileName )
   if(fileName == (m_DirectoryName + "/pcanames.dat")){
   fs = false; //File switch to determine how the data is read in
   ro = true; //Tells the program whether to keep reading a line or not
-  this->number_of_outputs = num_inputs;
+  this->m_NumberOfOutputs = num_inputs;
   this->m_ScalarOutputNames.reserve(num_inputs);
   }else if(fileName == (m_DirectoryName+ "/ranges.dat")){
   fs = true; ro = false;
-  this->number_of_parameters = num_inputs;
+  this->m_NumberOfParameters = num_inputs;
   this->m_Parameters.reserve(num_inputs);
   }else{
   std::cerr << "That fileName doesn't correspond to an mcmc input file" << std::endl;
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
   eat_whitespace(config_file);
@@ -222,25 +223,25 @@ madai::MultiModel::LoadConfigurationFile( const std::string fileName )
   if(fs){
   if(this->m_Parameters.back().m_Name.compare(0,1," ") == 0 || this->m_Parameters.back().m_Name.empty())
     this->m_Parameters.pop_back();
-  /*this->number_of_parameters = this->m_Parameters.size();   // Use this for getting rid of needing to supply the number of parameters
-      if(this->number_of_parameters < 1){
+  /*this->m_NumberOfParameters = this->m_Parameters.size();   // Use this for getting rid of needing to supply the number of parameters
+      if(this->m_NumberOfParameters < 1){
         std::cerr << "Number of parameters < 1" << std::endl;
-        this->stateFlag = ERROR;
+        this->m_StateFlag = ERROR;
         return OTHER_ERROR;
       }*/
   }else{
   if(this->m_ScalarOutputNames.back().compare(0,1," ") == 0 || this->m_ScalarOutputNames.back().empty())
     this->m_ScalarOutputNames.pop_back();
-  /*this->number_of_outputs = this->m_ScalarOutputNames.size();   // Use this for getting rid of the need to supply the number of outputs
-      if(this->number_of_outputs < 1){
+  /*this->m_NumberOfOutputs = this->m_ScalarOutputNames.size();   // Use this for getting rid of the need to supply the number of outputs
+      if(this->m_NumberOfOutputs < 1){
         std::cerr << "Number of scalar outputs < 1" << std::endl;
-        this->stateFlag = ERROR;
+        this->m_StateFlag = ERROR;
         return OTHER_ERROR;
       }*/
   }
   }else{
   std::cout << "Could not open " << fileName.c_str() << std::endl;
-  this->stateFlag=ERROR;
+  this->m_StateFlag=ERROR;
   return OTHER_ERROR;
   }
   config_file.close();

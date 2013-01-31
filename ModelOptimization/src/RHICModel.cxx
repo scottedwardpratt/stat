@@ -5,7 +5,7 @@ madai::RHICModel::RHICModel()
   this->m_Process.question = NULL;
   this->m_Process.answer = NULL;
   this->m_Emulator = NULL;
-  this->stateFlag = UNINITIALIZED;
+  this->m_StateFlag = UNINITIALIZED;
 }
 
 madai::RHICModel::RHICModel(const std::string info_dir)
@@ -13,7 +13,7 @@ madai::RHICModel::RHICModel(const std::string info_dir)
   this->m_Process.question = NULL;
   this->m_Process.answer = NULL;
   this->m_Emulator = NULL;
-  this->stateFlag = UNINITIALIZED;
+  this->m_StateFlag = UNINITIALIZED;
   this->LoadConfiguration(info_dir);
 }
 
@@ -53,7 +53,7 @@ madai::RHICModel::GetScalarOutputs( const std::vector< double > & parameters,
   }
   std::fflush(this->m_Process.question);
   double dtemp;
-  for(unsigned int i = 0; i < 2*number_of_outputs; i++){
+  for(unsigned int i = 0; i < 2*m_NumberOfOutputs; i++){
   if(1 != fscanf(this->m_Process.answer, "%lf%*c", &dtemp) ){
   std::cerr << "Interprocess communication error [cj83A]\n";
   return OTHER_ERROR;
@@ -65,7 +65,7 @@ madai::RHICModel::GetScalarOutputs( const std::vector< double > & parameters,
   std::vector< double > Means;
   std::vector< double > Errors;
   m_Emulator->QueryEmulator( parameters, Means, Errors );
-  if(Means.size() != number_of_outputs){
+  if(Means.size() != m_NumberOfOutputs){
   std::cerr << "Number of observables from emulator not the number of observables read in\n";
   return OTHER_ERROR;
   }
@@ -163,7 +163,7 @@ madai::RHICModel::LoadProcess()
 
   if (this->m_Process.answer == NULL || this->m_Process.question == NULL) {
   std::cerr << "create_process_pipe returned NULL fileptrs.\n";
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
 
@@ -173,30 +173,30 @@ madai::RHICModel::LoadProcess()
   unsigned int n;
   if (1 != std::fscanf(this->m_Process.answer, "%u", &n)) {
   std::cerr << "fscanf failure reading from the external process [1]\n";
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
-  if (n != number_of_parameters) {
-  std::cerr << "number_of_parameters mismatch\n";
-  this->stateFlag = ERROR;
+  if (n != m_NumberOfParameters) {
+  std::cerr << "m_NumberOfParameters mismatch\n";
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
   eat_whitespace(this->m_Process.answer);
-  for (unsigned int i = 0; i < number_of_parameters; i++) {
+  for (unsigned int i = 0; i < m_NumberOfParameters; i++) {
   discard_line(this->m_Process.answer);
   }
   if (1 != std::fscanf(this->m_Process.answer,"%d", &n)) {
   std::cerr << "fscanf failure reading from the external process [2]\n";
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
-  if (n != (2*number_of_outputs)) {
-  std::cerr << "number_of_outputs mismatch\n";
-  this->stateFlag = ERROR;
+  if (n != (2*m_NumberOfOutputs)) {
+  std::cerr << "m_NumberOfOutputs mismatch\n";
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
   eat_whitespace(this->m_Process.answer);
-  for (unsigned int i = 0; i < 2*number_of_outputs; i++) {
+  for (unsigned int i = 0; i < 2*m_NumberOfOutputs; i++) {
   discard_line(this->m_Process.answer);
   }
   return NO_ERROR;
@@ -209,20 +209,20 @@ madai::RHICModel::LoadDistributions()
   std::cerr << "Emulator is being loaded from: " << m_DirectoryName << + "/Emulator.statfile" << "using the EmuPlusPlus.h emulator handler" << std::endl;
   m_Emulator= new ::emulator(m_DirectoryName + "/Emulator.statefile");
   std::cerr << "Emulator loaded. Test (number of params): _" << m_Emulator->number_params << "_" << std::endl;
-  if(m_Emulator->number_params != this->number_of_parameters){
+  if(m_Emulator->number_params != this->m_NumberOfParameters){
   std::cerr << "Emulator uses different number of parameters than read in. LoadDistributions Error" << std::endl;
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
   } else if (m_ProcessPipe){
   if( this->LoadProcess() != NO_ERROR ){
   std::cerr << "Error loading process pipe while setting up distributions in RHICModel" << std::endl;
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
   } else {
   std::cerr << "Neither the process pipe nor use emulator flag is set to true. We can't do anything without an emulator" << std::endl;
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   //exit(1);
   }

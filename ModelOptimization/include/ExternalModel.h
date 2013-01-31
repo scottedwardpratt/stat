@@ -32,21 +32,9 @@ namespace madai {
  * Specifies an interface to external executables that take
  * parameters and produce model outputs. */
 class ExternalModel : public Model {
-private:
-  unsigned int number_of_parameters, number_of_outputs;
-  std::vector< std::string > command_arguments;
-  process_pipe process;
-  std::string configFileName;
-  typedef enum {
-    UNINITIALIZED,
-    READY,
-    ERROR
-  } internal_state;
-  internal_state stateFlag;
-    
 public:
   
-  bool good() { return (this->stateFlag == READY); }
+  bool good() { return (this->m_StateFlag == READY); }
   ExternalModel();
   ExternalModel(const std::string & configFileName);
   virtual ~ExternalModel();
@@ -81,6 +69,26 @@ public:
   virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,
                                      double & Like,
                                      double & Prior ) const;
+
+private:
+  unsigned int m_NumberOfParameters;
+
+  unsigned int m_NumberOfOutputs;
+
+  std::vector< std::string > m_CommandArguments;
+
+  process_pipe m_Process;
+
+  std::string m_ConfigurationFileName;
+
+  typedef enum {
+    UNINITIALIZED,
+    READY,
+    ERROR
+  } InternalState;
+
+  InternalState m_StateFlag;
+
 }; // end Model
 
 } // end namespace madai

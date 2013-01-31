@@ -25,7 +25,7 @@ private:
   std::string m_EmInputFile;
   std::string m_EmOutputFile;
   std::string m_EmErrorFile;
-  char*       m_pPath;
+  char*       m_Path;
 };
 
 } // end namespace madai

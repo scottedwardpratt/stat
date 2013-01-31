@@ -2,12 +2,12 @@
 
 madai::TestModel::TestModel()
 {
-  this->stateFlag = UNINITIALIZED;
+  this->m_StateFlag = UNINITIALIZED;
 }
 
 madai::TestModel::TestModel( const std::string info_dir )
 {
-  this->stateFlag = UNINITIALIZED;
+  this->m_StateFlag = UNINITIALIZED;
   this->LoadConfiguration(info_dir);
 }
 
@@ -83,7 +83,7 @@ madai::TestModel::LoadDistributions()
 {
   if( m_UseEmulator || m_ProcessPipe ){
   std::cerr << "Emulator is not used for the test model. Turn off USE_EMULATOR and PROCESS_PIPE" << std::endl;
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
   m_Likelihood = new LikelihoodDistribution_Test(this);

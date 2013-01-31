@@ -34,7 +34,7 @@ madai::QuadHandler::~QuadHandler(){
   }
 
   //cd back to original directory.
-  std::string command = "cd " + std::string(m_pPath);
+  std::string command = "cd " + std::string(m_Path);
   int temp = system(command.c_str());
 }
 

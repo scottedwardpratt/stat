@@ -8,37 +8,39 @@ while working for the MADAI project <http://madai.us/>.
 
 See copyright.txt for more information.
 *********************************************************************/
-#include <string> // std::string
-#include <fstream>
+#include <cassert>
+#include <cctype>
 #include <cstdio> // std::fgets, std::fscanf, et cetera.
 #include <cstdlib> // EXIT_FAILURE
-#include <cassert>
+#include <fstream>
+#include <string> // std::string
 
 #include "ExternalModel.h"
 
+
 madai::ExternalModel::ExternalModel()
 {
-  this->process.question = NULL; // construcotr must do this
+  this->m_Process.question = NULL; // construcotr must do this
   // so that we know whether the destructor must act.
-  this->process.answer = NULL; // construcotr must do this.
-  this->stateFlag = UNINITIALIZED;
+  this->m_Process.answer = NULL; // construcotr must do this.
+  this->m_StateFlag = UNINITIALIZED;
 }
 
-madai::ExternalModel::ExternalModel(const std::string & configFileName)
+madai::ExternalModel::ExternalModel(const std::string & m_ConfigurationFileName)
 {
-  this->process.question = NULL; // construcotr must do this
+  this->m_Process.question = NULL; // construcotr must do this
   // so that we know whether the destructor must act.
-  this->process.answer = NULL; // construcotr must do this.
-  this->stateFlag = UNINITIALIZED;
-  this->LoadConfigurationFile(configFileName);
+  this->m_Process.answer = NULL; // construcotr must do this.
+  this->m_StateFlag = UNINITIALIZED;
+  this->LoadConfigurationFile(m_ConfigurationFileName);
 }
 
 madai::ExternalModel::~ExternalModel()
 {
-  if (this->process.question != NULL)
-    std::fclose(this->process.question);
-  if (this->process.answer != NULL)
-    std::fclose(this->process.answer);
+  if (this->m_Process.question != NULL)
+    std::fclose(this->m_Process.question);
+  if (this->m_Process.answer != NULL)
+    std::fclose(this->m_Process.answer);
   // Hopefully the external process will clean itself up after its
   // stdin is closed for reading.
 }
@@ -51,7 +53,7 @@ madai::ExternalModel::~ExternalModel()
 madai::ExternalModel::ErrorType
 madai::ExternalModel::LoadConfigurationFile( const std::string fileName )
 {
-  this->configFileName = fileName; // keep a copy of the file name
+  this->m_ConfigurationFileName = fileName; // keep a copy of the file name
   // just in case we need it.
   std::ifstream configFile(fileName.c_str());
   ErrorType r = this->LoadConfigurationFile(configFile);
@@ -83,7 +85,6 @@ bool discard_comments(std::FILE * fp, char comment_character) {
   }
   return true;
 }
-#include <cctype>
 
 void eat_whitespace(std::istream & i) {
   while (true) {
@@ -119,39 +120,39 @@ madai::ExternalModel::ErrorType
 madai::ExternalModel::LoadConfigurationFile( std::istream & configFile )
 {
   discard_comments(configFile, '#');
-  configFile >> this->number_of_parameters;
-  if (this->number_of_parameters < 1) {
+  configFile >> this->m_NumberOfParameters;
+  if (this->m_NumberOfParameters < 1) {
   std::cerr << "bad value [YRDR]\n"; // 1g6o8duPJOAzMJgo
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
   eat_whitespace(configFile);
-  //std::cerr << this->number_of_parameters << '\n';
-  this->m_Parameters.reserve(this->number_of_parameters);
-  for (unsigned int i = 0; i < this->number_of_parameters; i++) {
+  //std::cerr << this->m_NumberOfParameters << '\n';
+  this->m_Parameters.reserve(this->m_NumberOfParameters);
+  for (unsigned int i = 0; i < this->m_NumberOfParameters; i++) {
   std::string s;
   double minimum = 0.0, maximum = 0.0;
   std::getline(configFile, s);
   configFile >> minimum >> maximum;
   if (minimum >= maximum) {
   std::cerr << "bad range [Tw4X]: " << i << ' '<<minimum << ':' << maximum<<"\n";
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
   eat_whitespace(configFile);
   this->m_Parameters.push_back(Parameter(s, minimum, maximum));
   //std::cerr << s << '\n';
   }
-  configFile >> this->number_of_outputs;
-  if (this->number_of_outputs < 1) {
+  configFile >> this->m_NumberOfOutputs;
+  if (this->m_NumberOfOutputs < 1) {
   std::cerr << "bad value [YRDR]\n"; // 1g6o8duPJOAzMJgo
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
   eat_whitespace(configFile);
-  //std::cerr << this->number_of_outputs << '\n';
-  this->m_ScalarOutputNames.reserve(this->number_of_parameters);
-  for (unsigned int i = 0; i < this->number_of_outputs; i++) {
+  //std::cerr << this->m_NumberOfOutputs << '\n';
+  this->m_ScalarOutputNames.reserve(this->m_NumberOfParameters);
+  for (unsigned int i = 0; i < this->m_NumberOfOutputs; i++) {
   std::string s;
   std::getline(configFile, s);
   this->m_ScalarOutputNames.push_back(s);
@@ -179,9 +180,9 @@ madai::ExternalModel::LoadConfigurationFile( std::istream & configFile )
   */
 
   /** function returns EXIT_FAILURE on error, EXIT_SUCCESS otherwise */
-  if (EXIT_FAILURE == create_process_pipe(&(this->process), argv)) {
+  if (EXIT_FAILURE == create_process_pipe(&(this->m_Process), argv)) {
   std::cerr << "create_process_pipe returned failure.\n";
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
   for (unsigned int i = 0; i < command_line_length; i++) {
@@ -189,48 +190,48 @@ madai::ExternalModel::LoadConfigurationFile( std::istream & configFile )
   }
   delete[] argv;
 
-  if (this->process.answer == NULL || this->process.question == NULL) {
+  if (this->m_Process.answer == NULL || this->m_Process.question == NULL) {
   std::cerr << "create_process_pipe returned NULL fileptrs.\n";
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
 
-  discard_comments(this->process.answer, '#');
+  discard_comments(this->m_Process.answer, '#');
   // allow comment lines to BEGIN the interactive process
 
   unsigned int n;
-  if (1 != std::fscanf(this->process.answer,"%u",&n)) {
+  if (1 != std::fscanf(this->m_Process.answer,"%u",&n)) {
   std::cerr << "fscanf failure reading from the external process [1]\n";
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
-  if (n != this->number_of_parameters) {
-  std::cerr << "number_of_parameters mismatch\n";
-  this->stateFlag = ERROR;
+  if (n != this->m_NumberOfParameters) {
+  std::cerr << "m_NumberOfParameters mismatch\n";
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
-  eat_whitespace(this->process.answer);
-  for (unsigned int i = 0; i < this->number_of_parameters; i++) {
-  discard_line(this->process.answer);
+  eat_whitespace(this->m_Process.answer);
+  for (unsigned int i = 0; i < this->m_NumberOfParameters; i++) {
+  discard_line(this->m_Process.answer);
   // read but don't do anything with parameter names.
   // THINK ABOUT where is best to define these?
   }
-  if (1 != std::fscanf(this->process.answer,"%d", &n)) {
+  if (1 != std::fscanf(this->m_Process.answer,"%d", &n)) {
   std::cerr << "fscanf failure reading from the external process [2]\n";
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
-  if (n != this->number_of_outputs) {
-  std::cerr << "number_of_outputs mismatch";
-  this->stateFlag = ERROR;
+  if (n != this->m_NumberOfOutputs) {
+  std::cerr << "m_NumberOfOutputs mismatch";
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
-  eat_whitespace(this->process.answer);
-  for (unsigned int i = 0; i < this->number_of_outputs; i++) {
-  discard_line(this->process.answer);
+  eat_whitespace(this->m_Process.answer);
+  for (unsigned int i = 0; i < this->m_NumberOfOutputs; i++) {
+  discard_line(this->m_Process.answer);
   }
   /* We are now ready to go! */
-  this->stateFlag = READY;
+  this->m_StateFlag = READY;
   return NO_ERROR;
 }
 
@@ -253,12 +254,12 @@ madai::ExternalModel::GetScalarOutputs(
   for (std::vector<double>::const_iterator par_it = parameters.begin();
        par_it < parameters.end(); par_it++ ) {
   //FIXME to do: check against parameter range.
-  std::fprintf(this->process.question,"%.17lf\n", *par_it);
+  std::fprintf(this->m_Process.question,"%.17lf\n", *par_it);
   }
-  std::fflush(this->process.question);
+  std::fflush(this->m_Process.question);
   for (std::vector<double>::iterator ret_it = scalars.begin();
        ret_it < scalars.end(); ret_it++ )
-    if (1 != fscanf(this->process.answer, "%lf%*c", &(*ret_it))) {
+    if (1 != fscanf(this->m_Process.answer, "%lf%*c", &(*ret_it))) {
     std::cerr << "interprocess communication error [cJ83A]\n";
     return OTHER_ERROR;
     }

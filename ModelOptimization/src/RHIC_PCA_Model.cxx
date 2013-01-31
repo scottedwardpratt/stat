@@ -2,13 +2,13 @@
 
 madai::RHIC_PCA_Model::RHIC_PCA_Model()
 {
-  this->stateFlag = UNINITIALIZED;
+  this->m_StateFlag = UNINITIALIZED;
   this->m_Quad = NULL;
 }
 
 madai::RHIC_PCA_Model::RHIC_PCA_Model( const std::string info_dir )
 {
-  this->stateFlag = UNINITIALIZED;
+  this->m_StateFlag = UNINITIALIZED;
   this->m_Quad = NULL;
   this->LoadConfiguration(info_dir);
 }
@@ -96,7 +96,7 @@ madai::RHIC_PCA_Model::LoadDistributions()
   }
   } else {
   std::cerr << "RHIC_PCA requires the use of the Quad emulator" << std::endl;
-  this->stateFlag = ERROR;
+  this->m_StateFlag = ERROR;
   return OTHER_ERROR;
   }
 

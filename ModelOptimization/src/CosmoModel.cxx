@@ -2,12 +2,12 @@
 
 madai::CosmoModel::CosmoModel()
 {
-  this->stateFlag = UNINITIALIZED;
+  this->m_StateFlag = UNINITIALIZED;
 }
 
 madai::CosmoModel::CosmoModel( const std::string info_dir )
 {
-  this->stateFlag = UNINITIALIZED;
+  this->m_StateFlag = UNINITIALIZED;
   this->LoadConfiguration(info_dir);
 }
 
@@ -81,7 +81,7 @@ madai::CosmoModel::LoadDistributions()
 {
   if(m_UseEmulator || m_ProcessPipe){
     std::cerr << "Emulator is not needed for this model. Turn off USE_EMULATOR and PROCESS_PIPE" << std::endl;
-    this->stateFlag = ERROR;
+    this->m_StateFlag = ERROR;
     return OTHER_ERROR;
   }
   m_Likelihood = new LikelihoodDistribution_Cosmo(this);
