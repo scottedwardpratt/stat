@@ -1,5 +1,5 @@
-#ifndef __MCMCRun_h
-#define __MCMCRun_h
+#ifndef __MCMCRun_h__
+#define __MCMCRun_h__
 
 #include <vector>
 #include <string>
@@ -95,4 +95,4 @@ public:
 
 } // end namespace madai
 
-#endif // end __MCMCRun_h
+#endif // __MCMCRun_h__

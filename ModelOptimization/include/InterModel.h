@@ -1,11 +1,14 @@
-#ifndef __InterModel_h
-#define __InterModel_h
+#ifndef __InterModel_h__
+#define __InterModel_h__
 
 #include "MultiModel.h"
 #include "rhicstat.h"
 
 namespace madai {
 
+/** \class InterModel
+ *
+ */
 class InterModel : public MultiModel {
 private:
   bool       m_Verbose;
@@ -38,4 +41,4 @@ public:
 
 } // end namespace madai
 
-#endif
+#endif // __InterModel_h__

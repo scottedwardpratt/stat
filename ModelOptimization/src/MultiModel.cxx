@@ -23,7 +23,7 @@ madai::MultiModel::discard_comments(std::FILE * fp, char comment_character) {
   std::cerr << "ungetc error :(\n";
   return false;
   }
-  return true;	
+  return true;  
 }
 
 #include <cctype>
@@ -178,7 +178,7 @@ madai::MultiModel::LoadConfigurationFile( const std::string fileName )
   if(ro){//check to see if keep reading
   config_file >> name;
   if(index!=-1 && fs){//check for reading ranges
-  if(std::strcmp(m_ModelType.c_str(), "Interpolator")==0){
+  if(std::strcmp(m_ModelType.c_str(), "Interpolator") == 0){
   std::string line;
   std::getline( config_file, line);
   double r3 = sqrt(3);
@@ -204,14 +204,14 @@ madai::MultiModel::LoadConfigurationFile( const std::string fileName )
   if(index==0){
   this->m_Parameters.push_back(Parameter(name,MinR,MaxR));
   }else{
-  if(name.compare(this->m_Parameters.back().m_Name)!=0)
+  if(name.compare(this->m_Parameters.back().m_Name) != 0)
     this->m_Parameters.push_back(Parameter(name,MinR,MaxR));
   }
   }else{
-  if(index==0){
+  if(index == 0){
   this->m_ScalarOutputNames.push_back(name);
   }else{
-  if(name.compare(this->m_ScalarOutputNames.back())!=0)
+  if(name.compare(this->m_ScalarOutputNames.back()) != 0)
     this->m_ScalarOutputNames.push_back(name);
   }
   }
@@ -220,7 +220,7 @@ madai::MultiModel::LoadConfigurationFile( const std::string fileName )
   index++;
   }
   if(fs){
-  if(this->m_Parameters.back().m_Name.compare(0,1," ")==0 || this->m_Parameters.back().m_Name.empty())
+  if(this->m_Parameters.back().m_Name.compare(0,1," ") == 0 || this->m_Parameters.back().m_Name.empty())
     this->m_Parameters.pop_back();
   /*this->number_of_parameters = this->m_Parameters.size();   // Use this for getting rid of needing to supply the number of parameters
       if(this->number_of_parameters < 1){
@@ -229,7 +229,7 @@ madai::MultiModel::LoadConfigurationFile( const std::string fileName )
         return OTHER_ERROR;
       }*/
   }else{
-  if(this->m_ScalarOutputNames.back().compare(0,1," ")==0 || this->m_ScalarOutputNames.back().empty())
+  if(this->m_ScalarOutputNames.back().compare(0,1," ") == 0 || this->m_ScalarOutputNames.back().empty())
     this->m_ScalarOutputNames.pop_back();
   /*this->number_of_outputs = this->m_ScalarOutputNames.size();   // Use this for getting rid of the need to supply the number of outputs
       if(this->number_of_outputs < 1){

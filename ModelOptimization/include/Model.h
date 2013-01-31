@@ -3,17 +3,17 @@ MADAI Model Statistical Tools
 Copyright 2011-2012, The University of North Carolina at Chapel Hill.
 
 This software was written in 2011-2012 by
-	Cory Quammen <cquammen AT cs.unc.edu>
-	Russell Taylor <taylorr AT cs.unc.edu>
-	Scott Pratt <pratt AT nscl.msu.edu>
-	Kevin Novak <novakkev AT msu.edu>
-	Hal Canary <hal AT cs.unc.edu>
+  Cory Quammen <cquammen AT cs.unc.edu>
+  Russell Taylor <taylorr AT cs.unc.edu>
+  Scott Pratt <pratt AT nscl.msu.edu>
+  Kevin Novak <novakkev AT msu.edu>
+  Hal Canary <hal AT cs.unc.edu>
 while working for the MADAI project <http://madai.us/>.
 
 See copyright.txt for more information.
 *********************************************************************/
-#ifndef __Model_h
-#define __Model_h
+#ifndef __Model_h__
+#define __Model_h__
 
 #include "Parameter.h"
 #include "random.h"
@@ -62,13 +62,13 @@ public:
   virtual unsigned int GetNumberOfScalarOutputs() const
   {
     return static_cast<unsigned int>(m_ScalarOutputNames.size());
-  };
+  }
 
   /** Get the names of the scalar outputs of the model. */
   virtual const std::vector< std::string > & GetScalarOutputNames() const
   {
     return m_ScalarOutputNames;
-  };
+  }
 
   /** Get the valid range for the parameter at parameterIndex. */
   virtual void GetRange( unsigned int parameterIndex, double range[2] ) const

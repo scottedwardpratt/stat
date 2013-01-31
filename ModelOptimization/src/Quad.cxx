@@ -70,7 +70,7 @@ void madai::QuadHandler::QueryQuad(std::vector<double> Theta, std::vector<double
   std::getline(inputfile, currentline, '\n');
   // std::cout << currentline << std::endl;
   if(currentline.compare(0,1,"#") != 0 && !currentline.empty() ){ //Comments have a # character
-  if(currentline.compare(0,5,"Error") ==0){ //pass Quad errors to cerr stream
+  if(currentline.compare(0,5,"Error") == 0){ //pass Quad errors to cerr stream
   std::cerr << "Error during emulation: Check " << m_EmOutputFile << std::endl;
   std::cerr << currentline << std::endl;
   exit(1);
@@ -88,11 +88,11 @@ void madai::QuadHandler::QueryQuad(std::vector<double> Theta, std::vector<double
   NumDataRows++;
   }
   }
-  if(Means.size()==17){
+  if(Means.size() == 17){
   float myints[] = {23.2096,28.6014,45.2516,62.9723,0.390475,0.36656,0.383316,10.566,28.7311,45.3162,62.7765,0.00482302,0.00455732,0.00534056,0.326125,0.31816,0.326674};
   Errors.assign (myints,myints+17);
   }
-  if(Means.size()==6){
+  if(Means.size() == 6){
   float myints[] = {1,1,1,1,1,1};
   Errors.assign (myints,myints+6);
   }

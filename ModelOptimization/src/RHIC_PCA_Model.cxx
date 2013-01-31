@@ -67,7 +67,7 @@ madai::RHIC_PCA_Model::GetLikeAndPrior( const std::vector< double > & parameters
   std::vector< double > ModelMeans;
   std::vector< double > ModelErrors;
   this->GetScalarOutputs(parameters, outputs);
-  for(unsigned int i = 0 ; i < outputs.size(); i++ ){
+  for(unsigned int i = 0; i < outputs.size(); i++ ){
   if( i%2 == 0 ){
   ModelMeans.push_back(outputs[i]);
   } else {

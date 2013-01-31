@@ -5,6 +5,9 @@
 
 namespace madai {
 
+/** \class CosmoModel
+ *
+ * Encapsulates the Cosmo simulation. */
 class CosmoModel : public MultiModel {
 public:
   CosmoModel();
@@ -17,10 +20,10 @@ public:
 
   // Not implemented yet.  Should we do this numerically?
   /** Get both scalar values and the gradient of the parameters. */
-  virtual ErrorType GetScalarAndGradientOutputs(const std::vector< double > & parameters,
-                                                const std::vector< bool > & activeParameters,
-                                                std::vector< double > & scalars,
-                                                unsigned int outputIndex, std::vector< double > & gradient) const;
+  virtual ErrorType GetScalarAndGradientOutputs( const std::vector< double > & parameters,
+                                                 const std::vector< bool > & activeParameters,
+                                                 std::vector< double > & scalars,
+                                                 unsigned int outputIndex, std::vector< double > & gradient ) const;
 
   // Proposed function for interaction with the MCMC
   /** Get the likelihood and prior at the point parameters in parameter space. */

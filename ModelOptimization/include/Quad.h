@@ -1,5 +1,5 @@
-#ifndef __Quad_h
-#define __Quad_h
+#ifndef __Quad_h__
+#define __Quad_h__
 
 #include "Model.h"
 
@@ -7,7 +7,10 @@ namespace madai {
 
 class Model;
 
-class QuadHandler{
+/** \class QuadHandler
+ *
+ * \todo Add documentation for this class. */
+class QuadHandler {
 public:
   QuadHandler(parameterMap *parmap, Model * m_Model);
   ~QuadHandler();
@@ -27,4 +30,4 @@ private:
 
 } // end namespace madai
 
-#endif // end __Quad_h
+#endif // end __Quad_h__

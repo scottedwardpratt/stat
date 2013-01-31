@@ -3,13 +3,13 @@ MADAI Model Statistical Tools
 Copyright 2011-2012, The University of North Carolina at Chapel Hill.
 
 This software was written in 2011-2012 by 
-	Hal Canary <hal AT cs.unc.edu>
+  Hal Canary <hal AT cs.unc.edu>
 while working for the MADAI project <http://madai.us/>.
 
 See copyright.txt for more information.
 *********************************************************************/
-#ifndef __SimpleMetropolisHastings_h_
-#define __SimpleMetropolisHastings_h_
+#ifndef __SimpleMetropolisHastings_h__
+#define __SimpleMetropolisHastings_h__
 
 #include "Optimizer.h"
 
@@ -30,10 +30,10 @@ protected:
 
   SimpleMetropolisHastings() {}; // intentionally hidden
   std::vector< bool > activeParameters;
-	unsigned int number_parameters, number_outputs;
+  unsigned int number_parameters, number_outputs;
 
 }; // end class SimpleMetropolisHastings
 
 } // end namespace madai
 
-#endif // __SimpleMetropolisHastings_h_
+#endif // __SimpleMetropolisHastings_h__

@@ -1,10 +1,14 @@
-#ifndef __RegularStepGradientDescentOptimizer_h_
-#define __RegularStepGradientDescentOptimizer_h_
+#ifndef __RegularStepGradientDescentOptimizer_h__
+#define __RegularStepGradientDescentOptimizer_h__
 
 #include "Optimizer.h"
 
 namespace madai {
 
+/** \class RegularStepGradientDescentOptimizer
+ *
+ * Straightforward implementation of a gradient descent optimizer.
+ */
 class RegularStepGradientDescentOptimizer : public Optimizer {
 public:
   RegularStepGradientDescentOptimizer( const Model *model );
@@ -23,4 +27,4 @@ protected:
 
 } // end namespace madai
 
-#endif // __RegularStepGradientDescentOptimizer_h_
+#endif // __RegularStepGradientDescentOptimizer_h__

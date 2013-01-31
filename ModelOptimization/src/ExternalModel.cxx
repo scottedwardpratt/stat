@@ -3,7 +3,7 @@ MADAI Model Statistical Tools
 Copyright 2011-2012, The University of North Carolina at Chapel Hill.
 
 This software was written in 2011-2012 by
-	Hal Canary <hal AT cs.unc.edu>
+  Hal Canary <hal AT cs.unc.edu>
 while working for the MADAI project <http://madai.us/>.
 
 See copyright.txt for more information.
@@ -160,7 +160,7 @@ madai::ExternalModel::LoadConfigurationFile( std::istream & configFile )
   unsigned int command_line_length;
   configFile >> command_line_length;
   eat_whitespace(configFile);
-  //	std::cerr << command_line_length << '\n';
+  //  std::cerr << command_line_length << '\n';
   assert(command_line_length > 0);
   char ** argv = new char* [command_line_length + 1];
   argv[command_line_length] = NULL; // termination signal for exec*();
@@ -174,9 +174,9 @@ madai::ExternalModel::LoadConfigurationFile( std::istream & configFile )
   }
 
   /*
-				We are now done reading configuration settings.  We will now
-				open a pipe to the emulator and leave it going
-	*/
+        We are now done reading configuration settings.  We will now
+        open a pipe to the emulator and leave it going
+  */
 
   /** function returns EXIT_FAILURE on error, EXIT_SUCCESS otherwise */
   if (EXIT_FAILURE == create_process_pipe(&(this->process), argv)) {

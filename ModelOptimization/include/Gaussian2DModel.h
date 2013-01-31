@@ -1,10 +1,13 @@
-#ifndef __Gaussian2DModel_h
-#define __Gaussian2DModel_h
+#ifndef __Gaussian2DModel_h__
+#define __Gaussian2DModel_h__
 
 #include "Model.h"
 
 namespace madai {
 
+/** \class Gaussian2DModel
+ *
+ * A simple example of a model. */
 class Gaussian2DModel : public Model {
 public:
   Gaussian2DModel();
@@ -49,4 +52,4 @@ protected:
 
 } // end namespace madai
 
-#endif // __Gaussian2DModel_h
+#endif // __Gaussian2DModel_h__

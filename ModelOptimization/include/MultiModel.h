@@ -1,5 +1,5 @@
-#ifndef __MultiModel_h
-#define __MultiModel_h
+#ifndef __MultiModel_h__
+#define __MultiModel_h__
 
 #include <vector>
 #include <string>
@@ -17,12 +17,13 @@
 
 namespace madai {
 
-/* \class MultiModel
+/** \class MultiModel
  *
- * This class provides a method for reading in a model configuration.
+ * This class provides a method for reading in a model configuration
+ * defined with more than one file.
+ *
  * Other functions are specified in subclasses.
  */
-
 class MultiModel : public Model {
 protected:
   unsigned int number_of_parameters;
@@ -90,4 +91,4 @@ public:
 
 } // end namespace madai
 
-#endif // end __MultiModel_h
+#endif // __MultiModel_h

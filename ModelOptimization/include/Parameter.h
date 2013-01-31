@@ -3,17 +3,17 @@ MADAI Model Statistical Tools
 Copyright 2011-2012, The University of North Carolina at Chapel Hill.
 
 This software was written in 2011-2012 by
-	Cory Quammen <cquammen AT cs.unc.edu>
-	Russell Taylor <taylorr AT cs.unc.edu>
-	Scott Pratt <pratt AT nscl.msu.edu>
-	Kevin Novak <novakkev AT msu.edu>
-	Hal Canary <hal AT cs.unc.edu>
+  Cory Quammen <cquammen AT cs.unc.edu>
+  Russell Taylor <taylorr AT cs.unc.edu>
+  Scott Pratt <pratt AT nscl.msu.edu>
+  Kevin Novak <novakkev AT msu.edu>
+  Hal Canary <hal AT cs.unc.edu>
 while working for the MADAI project <http://madai.us/>.
 
 See copyright.txt for more information.
 *********************************************************************/
-#ifndef __Parameter_h
-#define __Parameter_h
+#ifndef __Parameter_h__
+#define __Parameter_h__
 
 #include <string>
 #include <vector>
@@ -36,4 +36,4 @@ public:
 
 } // end namespace madai
 
-#endif // __Parameter_h
+#endif // __Parameter_h__

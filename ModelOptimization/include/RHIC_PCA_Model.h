@@ -5,7 +5,11 @@
 #include "Quad.h"
 
 namespace madai {
-  
+
+/** \class RHIC_PCA_Model
+ *
+ * \todo Document the difference between this class and RHICModel
+ */  
 class RHIC_PCA_Model : public MultiModel {
 private:
   QuadHandler* m_Quad;

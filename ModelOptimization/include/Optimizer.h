@@ -3,17 +3,17 @@ MADAI Model Statistical Tools
 Copyright 2011-2012, The University of North Carolina at Chapel Hill.
 
 This software was written in 2011-2012 by
-	Cory Quammen <cquammen AT cs.unc.edu>
-	Russell Taylor <taylorr AT cs.unc.edu>
-	Scott Pratt <pratt AT nscl.msu.edu>
-	Kevin Novak <novakkev AT msu.edu>
-	Hal Canary <hal AT cs.unc.edu>
+  Cory Quammen <cquammen AT cs.unc.edu>
+  Russell Taylor <taylorr AT cs.unc.edu>
+  Scott Pratt <pratt AT nscl.msu.edu>
+  Kevin Novak <novakkev AT msu.edu>
+  Hal Canary <hal AT cs.unc.edu>
 while working for the MADAI project <http://madai.us/>.
 
 See copyright.txt for more information.
 *********************************************************************/
-#ifndef __Optimizer_h
-#define __Optimizer_h
+#ifndef __Optimizer_h__
+#define __Optimizer_h__
 
 #include <set>
 
@@ -24,6 +24,9 @@ namespace madai {
 
 class Model;
 
+/** \class Optimizer
+ *
+ * Base class for algorithms that sample from a distribution. */
 class Optimizer {
 public:
   typedef enum {
@@ -116,4 +119,4 @@ protected:
 
 } // end namespace madai
 
-#endif // __Optimizer_h
+#endif // __Optimizer_h__x

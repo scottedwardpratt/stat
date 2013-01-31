@@ -5,6 +5,9 @@
 
 namespace madai {
 
+/** \class TestModel
+ *
+ * Test model. */
 class TestModel : public MultiModel {
 public:
   TestModel();

@@ -3,11 +3,11 @@ MADAI Model Statistical Tools
 Copyright 2011-2012, The University of North Carolina at Chapel Hill.
 
 This software was written in 2011-2012 by
-	Cory Quammen <cquammen AT cs.unc.edu>
-	Russell Taylor <taylorr AT cs.unc.edu>
-	Scott Pratt <pratt AT nscl.msu.edu>
-	Kevin Novak <novakkev AT msu.edu>
-	Hal Canary <hal AT cs.unc.edu>
+  Cory Quammen <cquammen AT cs.unc.edu>
+  Russell Taylor <taylorr AT cs.unc.edu>
+  Scott Pratt <pratt AT nscl.msu.edu>
+  Kevin Novak <novakkev AT msu.edu>
+  Hal Canary <hal AT cs.unc.edu>
 while working for the MADAI project <http://madai.us/>.
 
 See copyright.txt for more information.
@@ -101,7 +101,7 @@ madai::Trace::Trace(const std::string info_dir, const std::string configuration)
   struct stat st;
   std::stringstream ss;
   std::string tempfile = m_TraceDirectory + addon;
-  if(stat(tempfile.c_str(), &st)==0){
+  if(stat(tempfile.c_str(), &st) == 0){
   //directory exists.
   std::cout << tempfile << " exists, trying next option..." << std::endl;
   filecount++;
@@ -159,11 +159,11 @@ void madai::Trace::write(std::ostream & out) const {
 }
 
 /*
-	  Assert:
-	    FOR ALL i < this->m_TraceElements.size():
-	      this->m_TraceElements[i].m_ParameterValues.size() == params.size()
-	      this->m_TraceElements[i].m_OutputValues.size() == outputs.size()
-	*/
+    Assert:
+      FOR ALL i < this->m_TraceElements.size():
+        this->m_TraceElements[i].m_ParameterValues.size() == params.size()
+        this->m_TraceElements[i].m_OutputValues.size() == outputs.size()
+  */
 
 void madai::Trace::writeHead(std::ostream & o,
                              const std::vector<madai::Parameter> & params,

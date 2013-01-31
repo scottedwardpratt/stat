@@ -32,15 +32,15 @@ madai::CosmoModel::GetScalarOutputs( const std::vector< double > & parameters,
     ss << " -" << m_Parameters[i].m_Name << " " << parameters[i];
   
   ss << " -nz 10 -nf 10 -ob .0406 > output.dat" << std::endl;
-	
+  
   std::cout << ss.str() << std::endl;
   std::cout << "Waiting on cosmosurvey...";
   std::cout.flush();
   int result = system((ss.str()).c_str());
   std::cout << "Done." << std::endl;
-	
+  
   inputfile.open("output.dat");
-	
+  
   while(!inputfile.eof()){
     double temp;
     inputfile >> temp;

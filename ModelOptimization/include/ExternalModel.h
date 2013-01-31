@@ -3,13 +3,13 @@ MADAI Model Statistical Tools
 Copyright 2011-2012, The University of North Carolina at Chapel Hill.
 
 This software was written in 2011-2012 by 
-	Hal Canary <hal AT cs.unc.edu>
+  Hal Canary <hal AT cs.unc.edu>
 while working for the MADAI project <http://madai.us/>.
 
 See copyright.txt for more information.
 *********************************************************************/
-#ifndef __ExternalModel_h
-#define __ExternalModel_h
+#ifndef __ExternalModel_h__
+#define __ExternalModel_h__
 
 #include "Parameter.h" // Parameter class 
 #include "Model.h"
@@ -27,6 +27,10 @@ See copyright.txt for more information.
 
 namespace madai {
 
+/** \class ExternalModel
+ *
+ * Specifies an interface to external executables that take
+ * parameters and produce model outputs. */
 class ExternalModel : public Model {
 private:
   unsigned int number_of_parameters, number_of_outputs;
@@ -39,7 +43,7 @@ private:
     ERROR
   } internal_state;
   internal_state stateFlag;
-		
+    
 public:
   
   bool good() { return (this->stateFlag == READY); }
@@ -81,4 +85,4 @@ public:
 
 } // end namespace madai
 
-#endif // __ExternalModel_h
+#endif // __ExternalModel_h__

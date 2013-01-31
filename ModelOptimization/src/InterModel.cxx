@@ -30,7 +30,7 @@ madai::InterModel::GetScalarOutputs( const std::vector< double > & parameters,
   clock_t begintime;
   double likelihood;
   double *x = new double[parameters.size()]();
-  for(unsigned int j = 0 ; j < parameters.size(); j++){
+  for(unsigned int j = 0; j < parameters.size(); j++) {
   x[j] = parameters[j];
   }
 

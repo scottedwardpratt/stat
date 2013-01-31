@@ -129,7 +129,6 @@ namespace madai {
   }
 
 
-
   Model::ErrorType
   Gaussian2DModel
   ::GetLikeAndPrior( const std::vector< double > & parameters,

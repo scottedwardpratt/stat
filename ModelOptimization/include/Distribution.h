@@ -1,5 +1,5 @@
-#ifndef __Distribution_h
-#define __Distribution_h
+#ifndef __Distribution_h__
+#define __Distribution_h__
 
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_vector.h>
@@ -18,11 +18,14 @@ namespace madai {
     
 class Model;
 
+/** \class Distribution
+ *
+ * Base class for distributions. */
 class Distribution {
 public:
   Distribution();
   virtual ~Distribution();
-	
+  
   double Normal(double x, double mu, double sigma);
   double IntegratedNormal(double x, double mu, double sigma, double data_sigma);
   double Gaussian(double x, double mu, double sigma);

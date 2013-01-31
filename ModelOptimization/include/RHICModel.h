@@ -6,7 +6,10 @@
 #include "EmuPlusPlus/EmuPlusPlus.h"
 
 namespace madai {
-  
+
+/** \class RHICModel
+ *
+ * Adapter to the RHIC model. */  
 class RHICModel : public MultiModel {
 private:
   process_pipe m_Process;

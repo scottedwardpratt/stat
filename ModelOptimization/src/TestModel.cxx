@@ -37,7 +37,7 @@ madai::TestModel::GetScalarOutputs( const std::vector< double > & parameters,
   }
   Means.assign(means,means+4);
   }
-  for( int j = 0 ; j < 4 ; j++ ) {
+  for( int j = 0; j < 4; j++ ) {
   scalars.push_back(Means[j]);
   scalars.push_back(Errors[j]);
   }

@@ -31,17 +31,17 @@ madai::VizHandler::VizHandler(madai::MCMCRun *mcmc_in){
 
   // Setting up the pipe for the density plots
   /*gnuplotmultipipe = popen("gnuplot -persist", "w");
-		if(!gnuplotmultipipe){
-			cout << "Gnuplot not found!" << endl;
-			exit(1);
-		}
+    if(!gnuplotmultipipe){
+      cout << "Gnuplot not found!" << endl;
+      exit(1);
+    }
 
-		stringstream ss;
-		ss << "set term " << gnuplotterm << "\n set multiplot\n";
+    stringstream ss;
+    ss << "set term " << gnuplotterm << "\n set multiplot\n";
 
-		fprintf(gnuplotmultipipe, "%s\n", ss.str().c_str());
-		fflush(gnuplotmultipipe);
-		*/
+    fprintf(gnuplotmultipipe, "%s\n", ss.str().c_str());
+    fflush(gnuplotmultipipe);
+    */
   }
 
   // The header for the trace plot
@@ -59,7 +59,7 @@ madai::VizHandler::VizHandler(madai::MCMCRun *mcmc_in){
   std::string tempfile;
   struct stat st;
   tempfile = m_MCMC->GetModel()->m_DirectoryName + "/DensityPlots";
-  if(stat(tempfile.c_str(), &st)!=0){
+  if(stat(tempfile.c_str(), &st) != 0){
   std::string command = "mkdir -p " + tempfile;
   std::system(command.c_str());
   }
@@ -76,7 +76,10 @@ madai::VizHandler::VizHandler(madai::MCMCRun *mcmc_in){
   m_DensityPlotFileNames.push_back(filename);
   command << "set bmargin 0.001\n set tmargin 0.001\n set lmargin 0.001\n set rmargin 0.001\nunset key\nunset xtics\nunset ytics\n";
   command << "\nset origin " << (float(i)*(1./float(N))) << "," << (float(j-1)*(1./float(N))) << "\n";
-  command << "set xlabel \'" << m_MCMC->GetModel()->GetParameters()[i].m_Name << "\'\nset ylabel \'" << m_MCMC->GetModel()->GetParameters()[i].m_Name << "\'\nset view map\nsplot \'" << m_DensityPlotFileNames.back() << ".txt\' matrix with image\n";
+  command << "set xlabel \'" << m_MCMC->GetModel()->GetParameters()[i].m_Name
+          << "\'\nset ylabel \'" << m_MCMC->GetModel()->GetParameters()[i].m_Name
+          << "\'\nset view map\nsplot \'" << m_DensityPlotFileNames.back()
+          << ".txt\' matrix with image\n";
   m_DensityPlotCommands.push_back(command.str());
   //cout << command.str();
   command.str("");
@@ -262,9 +265,10 @@ void madai::VizHandler::FinalTrace(madai::Trace* ThetaOutsList){
 
   ss.str(string()); //clears the stringstream
 
-  ss << "set term postscipt\n" << "set ouput " << ThetaOutsList->m_TraceDirectory << "/trace.ps\n" << "replot\n" << "set term x11\n"; //This last may need to be changed to "set term win" on windows machines
+  ss << "set term postscipt\n" << "set ouput " << ThetaOutsList->m_TraceDirectory << "/trace.ps\n"
+     << "replot\n"
+     << "set term x11\n"; // This last may need to be changed to "set term win" on windows machines
   fprintf(m_GNUPlotPipe, "%s", gnuplotcmd.c_str());
   fflush(m_GNUPlotPipe);
   }
 }
-
