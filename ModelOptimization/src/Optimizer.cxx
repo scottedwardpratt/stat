@@ -37,9 +37,11 @@ Optimizer
 
 std::set< std::string >
 Optimizer
-::GetActiveParameters(){
+::GetActiveParameters()
+{
   return m_ActiveParameters;
 }
+
 
 void
 Optimizer
@@ -91,8 +93,8 @@ Optimizer::ErrorType
 Optimizer
 ::SetOutputScalarToOptimize( const std::string & scalarName )
 {
-  unsigned int idx = this->GetOutputScalarIndex(scalarName);
-  if (idx == static_cast< unsigned int >(-1))
+  unsigned int idx = this->GetOutputScalarIndex( scalarName );
+  if ( idx == static_cast< unsigned int >( -1 ) )
     return INVALID_PARAMETER_INDEX_ERROR;
   this->m_OutputScalarToOptimize = scalarName;
   this->m_OutputScalarToOptimizeIndex = idx;
@@ -102,7 +104,7 @@ Optimizer
 
 Optimizer::ErrorType
 Optimizer
-::SetOutputScalarToOptimizeIndex(unsigned int idx)
+::SetOutputScalarToOptimizeIndex( unsigned int idx )
 {
   if (idx >= m_Model->GetNumberOfScalarOutputs())
     return INVALID_PARAMETER_INDEX_ERROR;
@@ -111,11 +113,18 @@ Optimizer
   return NO_ERROR;
 }
 
-std::string Optimizer::GetOutputScalarToOptimize()
+
+std::string
+Optimizer
+::GetOutputScalarToOptimize()
 {
   return this->m_OutputScalarToOptimize;
 }
-unsigned int Optimizer::GetOutputScalarToOptimizeIndex() const
+
+
+unsigned int
+Optimizer
+::GetOutputScalarToOptimizeIndex() const
 {
   return this->m_OutputScalarToOptimizeIndex;
 }
@@ -166,22 +175,22 @@ Optimizer
 {
   std::cerr << "Using point at center of each parameter range" << std::endl;
   double * range = new double[2]();
-  std::vector< double > temp_vals(this->m_Model->GetNumberOfParameters(), 0.0);
+  std::vector< double > temp_vals( this->m_Model->GetNumberOfParameters(), 0.0 );
 
-  for(unsigned int i = 0; i < this->m_Model->GetNumberOfParameters(); i++){
-  this->m_Model->GetRange(i, range);
-  temp_vals[i] = (range[0] + range[1]) / 2;
-  std::cerr << temp_vals[i] << "  ";
+  for ( unsigned int i = 0; i < this->m_Model->GetNumberOfParameters(); i++ ) {
+    this->m_Model->GetRange( i, range );
+    temp_vals[i] = (range[0] + range[1]) / 2;
+    std::cerr << temp_vals[i] << "  ";
   }
   std::cerr << std::endl;
 
   double Likelihood, Prior;
-  if(this->m_Model->GetLikeAndPrior( temp_vals, Likelihood, Prior) != Model::NO_ERROR){
-  std::cerr << "GetLikeAndPrior not defined in model" << std::endl;
-  return false;
+  if ( this->m_Model->GetLikeAndPrior( temp_vals, Likelihood, Prior ) != Model::NO_ERROR ) {
+    std::cerr << "GetLikeAndPrior not defined in model" << std::endl;
+    return false;
   } else {
-  std::cerr << "GetLikeAndPrior is defined" << std::endl;
-  return true;
+    std::cerr << "GetLikeAndPrior is defined" << std::endl;
+    return true;
   }
 }
 

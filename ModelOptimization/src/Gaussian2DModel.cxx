@@ -73,33 +73,28 @@ Gaussian2DModel
                                std::vector< double > & gradient) const
 {
   ErrorType error = this->GetScalarOutputs( parameters, scalars );
-  if ( error != NO_ERROR )
-    {
+  if ( error != NO_ERROR ) {
     return error;
-    }
+  }
 
   // Compute the gradient for the desired output variable, but only
   // for the active parameters.
-  if ( outputIndex >= this->GetNumberOfScalarOutputs() )
-    {
+  if ( outputIndex >= this->GetNumberOfScalarOutputs() ) {
     return INVALID_OUTPUT_INDEX;
-    }
+  }
 
-  if ( activeParameters.size() != this->GetNumberOfParameters() )
-    {
+  if ( activeParameters.size() != this->GetNumberOfParameters() ) {
     return INVALID_ACTIVE_PARAMETERS;
-    }
+  }
 
   double functionValue = scalars[0];
   unsigned int activeParameter = 0;
-  if ( activeParameters[0] )
-    {
+  if ( activeParameters[0] ) {
     gradient.push_back( this->PartialX( parameters[0], functionValue ) );
-    }
-  if ( activeParameters[1] )
-    {
+  }
+  if ( activeParameters[1] ) {
     gradient.push_back( this->PartialY( parameters[1], functionValue ) );
-    }
+  }
 
   return NO_ERROR;
 }
@@ -141,7 +136,7 @@ Gaussian2DModel
     {
     return error;
     }
-  Like = log(output[0]);
+  Like = log( output[0] );
 
   // We'll use a uniform prior for now;
   Prior = 1;
