@@ -54,7 +54,7 @@ public:
   bool                m_CreateTrace;
   bool                m_Debug;
 
-  Visualization*         m_Visualizer;
+  Visualization*      m_Visualizer;
   CRandom*            m_RandomNumber;
 
   std::vector<double> m_CurrentParameters;
