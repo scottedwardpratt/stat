@@ -101,9 +101,9 @@ public:
 
 /** ---------------------------------------- */
 
-class PriorDistribution_RHIC : public PriorDistribution {
+class RHIC_PriorDistribution : public PriorDistribution {
 public:
-  PriorDistribution_RHIC(Model *in_Model);
+  RHIC_PriorDistribution(Model *in_Model);
   double Evaluate(std::vector<double> Theta); //ParameterSet Theta
 
 private:
@@ -117,9 +117,9 @@ private:
 
 /** ---------------------------------------- */
 
-class PriorDistribution_Interpolator : public PriorDistribution{
+class InterpolatorPriorDistribution : public PriorDistribution{
 public:
-  PriorDistribution_Interpolator(Model * in_Model);
+  InterpolatorPriorDistribution(Model * in_Model);
   double Evaluate(std::vector<double> Theta);
   
 private:
@@ -132,28 +132,28 @@ private:
   std::vector<std::string> m_StepSide;
 };
   
-class PriorDistribution_RHIC_PCA : public PriorDistribution {
+class RHIC_PCA_PriorDistribution : public PriorDistribution {
 public:
-  PriorDistribution_RHIC_PCA(Model *in_Model);
+  RHIC_PCA_PriorDistribution(Model *in_Model);
   double Evaluate(std::vector<double> Theta);
 };
 
-class PriorDistribution_Cosmo : public PriorDistribution {
+class CosmoPriorDistribution : public PriorDistribution {
 public:
-  PriorDistribution_Cosmo(Model *in_Model);
+  CosmoPriorDistribution(Model *in_Model);
   double Evaluate(std::vector<double> Theta);
 };
 
-class PriorDistribution_Test : public PriorDistribution {
+class TestPriorDistribution : public PriorDistribution {
 public:
-  PriorDistribution_Test(Model *in_Model);
+  TestPriorDistribution(Model *in_Model);
   double Evaluate(std::vector<double> Theta);
 };
 
-class LikelihoodDistribution_RHIC : public LikelihoodDistribution{
+class RHIC_LikelihoodDistribution : public LikelihoodDistribution{
 public:
-  LikelihoodDistribution_RHIC(Model *in_Model);
-  ~LikelihoodDistribution_RHIC();
+  RHIC_LikelihoodDistribution(Model *in_Model);
+  ~RHIC_LikelihoodDistribution();
   double Evaluate(std::vector<double> ModelMeans,
                   std::vector<double> ModelErrors);
 
@@ -174,10 +174,10 @@ private:
   int FindParam(std::string param_name, std::vector<std::string> PNames);
 };
 
-class LikelihoodDistribution_RHIC_PCA : public LikelihoodDistribution{
+class RHIC_PCA_LikelihoodDistribution : public LikelihoodDistribution{
 public:
-  LikelihoodDistribution_RHIC_PCA(Model *in_Model);
-  ~LikelihoodDistribution_RHIC_PCA();
+  RHIC_PCA_LikelihoodDistribution(Model *in_Model);
+  ~RHIC_PCA_LikelihoodDistribution();
   double Evaluate(std::vector<double> ModelMeans,
                   std::vector<double> ModelErrors);
     
@@ -191,10 +191,10 @@ private:
   parameterMap        m_ObservablesParamMap;
 };
 
-class LikelihoodDistribution_Cosmo : public LikelihoodDistribution {
+class CosmoLikelihoodDistribution : public LikelihoodDistribution {
 public:
-  LikelihoodDistribution_Cosmo(Model *in_Model);
-  ~LikelihoodDistribution_Cosmo();
+  CosmoLikelihoodDistribution(Model *in_Model);
+  ~CosmoLikelihoodDistribution();
   double Evaluate(std::vector<double> ModelMeans,
                   std::vector<double> ModelErrors);
 
@@ -205,10 +205,10 @@ private:
   std::vector<int>    m_intData;
 };
 
-class LikelihoodDistribution_Test : public LikelihoodDistribution {
+class TestLikelihoodDistribution : public LikelihoodDistribution {
 public:
-  LikelihoodDistribution_Test(Model *in_Model);
-  ~LikelihoodDistribution_Test();
+  TestLikelihoodDistribution(Model *in_Model);
+  ~TestLikelihoodDistribution();
   double Evaluate(std::vector<double> ModelMeans,
                   std::vector<double> ModelErrors);
   

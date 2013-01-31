@@ -105,8 +105,8 @@ TestModel
     this->m_StateFlag = ERROR;
     return OTHER_ERROR;
   }
-  m_Likelihood = new LikelihoodDistribution_Test( this );
-  m_Prior = new PriorDistribution_Test( this );
+  m_Likelihood = new TestLikelihoodDistribution( this );
+  m_Prior = new TestPriorDistribution( this );
 }
 
 } // end namespace madai

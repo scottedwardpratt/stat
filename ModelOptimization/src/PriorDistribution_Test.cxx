@@ -3,8 +3,8 @@
 
 namespace madai {
 
-PriorDistribution_Test
-::PriorDistribution_Test( Model * in_Model )
+TestPriorDistribution
+::TestPriorDistribution( Model * in_Model )
 {
   m_Model = in_Model;
   m_SepMap = parameter::getB( m_Model->m_ParameterMap, "PRIOR_PARAMETER_MAP", false );
@@ -21,7 +21,7 @@ PriorDistribution_Test
 
 
 double
-PriorDistribution_Test
+TestPriorDistribution
 ::Evaluate( std::vector< double > Theta ) {
   double mean  = parameter::getD( *m_ParameterMap, "PRIOR_MEAN", -3.7372 );
   double sigma = parameter::getD( *m_ParameterMap, "PRIOR_SIGMA", 1.6845 );

@@ -3,8 +3,8 @@
 
 namespace madai {
 
-LikelihoodDistribution_Cosmo
-::LikelihoodDistribution_Cosmo( Model *in_Model )
+CosmoLikelihoodDistribution
+::CosmoLikelihoodDistribution( Model *in_Model )
 {
   m_Model = in_Model;
   m_SepMap = parameter::getB( m_Model->m_ParameterMap, "LIKELIHOOD_PARAMETER_MAP", false );
@@ -30,15 +30,15 @@ LikelihoodDistribution_Cosmo
 }
 
 
-LikelihoodDistribution_Cosmo
-::~LikelihoodDistribution_Cosmo()
+CosmoLikelihoodDistribution
+::~CosmoLikelihoodDistribution()
 {
   //delete emulator;
 }
 
 
 double
-LikelihoodDistribution_Cosmo
+CosmoLikelihoodDistribution
 ::Evaluate( std::vector<double> ModelMeans,
             std::vector<double> ModelErrors )
 {
@@ -78,7 +78,7 @@ LikelihoodDistribution_Cosmo
 
 
 std::vector< double >
-LikelihoodDistribution_Cosmo
+CosmoLikelihoodDistribution
 ::GetData()
 {
   std::vector< double > datameans;

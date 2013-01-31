@@ -95,8 +95,8 @@ CosmoModel::LoadDistributions()
     this->m_StateFlag = ERROR;
     return OTHER_ERROR;
   }
-  m_Likelihood = new LikelihoodDistribution_Cosmo( this );
-  m_Prior = new PriorDistribution_Cosmo( this );
+  m_Likelihood = new CosmoLikelihoodDistribution( this );
+  m_Prior = new CosmoPriorDistribution( this );
 }
 
 } // end namespace madai

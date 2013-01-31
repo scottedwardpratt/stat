@@ -3,8 +3,8 @@
 
 namespace madai {
 
-PriorDistribution_Cosmo
-::PriorDistribution_Cosmo( Model * in_Model )
+CosmoPriorDistribution
+::CosmoPriorDistribution( Model * in_Model )
 {
   m_Model = in_Model;
   m_SepMap = parameter::getB( m_Model->m_ParameterMap, "PRIOR_PARAMETER_MAP", false );
@@ -21,7 +21,7 @@ PriorDistribution_Cosmo
 
 
 double
-PriorDistribution_Cosmo
+CosmoPriorDistribution
 ::Evaluate( std::vector< double > Theta )
 {
   return 1.0;

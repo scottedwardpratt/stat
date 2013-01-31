@@ -4,8 +4,8 @@
 
 namespace madai {
 
-PriorDistribution_RHIC_PCA
-::PriorDistribution_RHIC_PCA( Model * in_Model )
+RHIC_PCA_PriorDistribution
+::RHIC_PCA_PriorDistribution( Model * in_Model )
 {
   m_Model = in_Model;
   m_SepMap = parameter::getB( m_Model->m_ParameterMap, "PRIOR_PARAMETER_MAP", false );
@@ -21,7 +21,7 @@ PriorDistribution_RHIC_PCA
 }
 
 
-double PriorDistribution_RHIC_PCA
+double RHIC_PCA_PriorDistribution
 ::Evaluate( std::vector< double > Theta )
 {
   double mean = parameter::getD( *m_ParameterMap, "PRIOR_MEAN", -3.7372 );

@@ -3,8 +3,8 @@
 
 namespace madai {
 
-LikelihoodDistribution_RHIC
-::LikelihoodDistribution_RHIC( Model *in_Model )
+RHIC_LikelihoodDistribution
+::RHIC_LikelihoodDistribution( Model *in_Model )
 {
   m_Model = in_Model;
   m_SuppressErrors = parameter::getB( m_Model->m_ParameterMap, "SUPPRESS_ERRORS", false );
@@ -36,14 +36,14 @@ LikelihoodDistribution_RHIC
 }
 
 
-LikelihoodDistribution_RHIC
-::~LikelihoodDistribution_RHIC()
+RHIC_LikelihoodDistribution
+::~RHIC_LikelihoodDistribution()
 {
 }
 
 
 double
-LikelihoodDistribution_RHIC
+RHIC_LikelihoodDistribution
 ::Evaluate( std::vector<double> ModelMeans,
             std::vector<double> ModelErrors )
 {
@@ -114,7 +114,7 @@ LikelihoodDistribution_RHIC
 
 
 std::vector< double >
-LikelihoodDistribution_RHIC
+RHIC_LikelihoodDistribution
 ::GetFakeData()
 {
   //This makes some fake results by querying the emulator with the parameters from actual.param
@@ -154,7 +154,7 @@ LikelihoodDistribution_RHIC
 
 
 std::vector< double >
-LikelihoodDistribution_RHIC
+RHIC_LikelihoodDistribution
 ::GetRealData()
 {
   std::vector< double > datameans;
@@ -224,7 +224,7 @@ LikelihoodDistribution_RHIC
 
 
 std::vector< double >
-LikelihoodDistribution_RHIC
+RHIC_LikelihoodDistribution
 ::GetRealError()
 {
   std::vector< double > dataerrors;
@@ -292,7 +292,7 @@ LikelihoodDistribution_RHIC
 
 
 int
-LikelihoodDistribution_RHIC
+RHIC_LikelihoodDistribution
 ::FindParam( std::string name, std::vector< std::string > PNames )
 {
   int out = -1;

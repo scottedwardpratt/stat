@@ -4,8 +4,8 @@
 
 namespace madai {
 
-LikelihoodDistribution_Test
-::LikelihoodDistribution_Test( Model *in_Model )
+TestLikelihoodDistribution
+::TestLikelihoodDistribution( Model *in_Model )
 {
   m_Model = in_Model;
   m_SepMap = parameter::getB( m_Model->m_ParameterMap, "LIKELIHOOD_PARAMETER_MAP", false );
@@ -33,14 +33,14 @@ LikelihoodDistribution_Test
 }
 
 
-LikelihoodDistribution_Test
-::~LikelihoodDistribution_Test()
+TestLikelihoodDistribution
+::~TestLikelihoodDistribution()
 {
 }
 
 
 double
-LikelihoodDistribution_Test
+TestLikelihoodDistribution
 ::Evaluate( std::vector< double > ModelMeans, std::vector< double > ModelErrors )
 {
   clock_t begintime;
@@ -106,7 +106,7 @@ LikelihoodDistribution_Test
 
 
 std::vector< double >
-LikelihoodDistribution_Test
+TestLikelihoodDistribution
 ::GetData()
 {
   //Four separate gaussians with means of 1, 2, 3, and 4 and standard deviations of 2. The means will be the input,

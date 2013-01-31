@@ -4,8 +4,8 @@
 
 namespace madai {
 
-LikelihoodDistribution_RHIC_PCA
-::LikelihoodDistribution_RHIC_PCA( Model *in_Model )
+RHIC_PCA_LikelihoodDistribution
+::RHIC_PCA_LikelihoodDistribution( Model *in_Model )
 {
   m_Model = in_Model;
   m_SepMap = parameter::getB( m_Model->m_ParameterMap, "LIKELIHOOD_PARAMETER_MAP", false );
@@ -25,15 +25,15 @@ LikelihoodDistribution_RHIC_PCA
 }
 
 
-LikelihoodDistribution_RHIC_PCA
-::~LikelihoodDistribution_RHIC_PCA()
+RHIC_PCA_LikelihoodDistribution
+::~RHIC_PCA_LikelihoodDistribution()
 {
   //delete m_Quad;
 }
 
 
 double
-LikelihoodDistribution_RHIC_PCA
+RHIC_PCA_LikelihoodDistribution
 ::Evaluate( std::vector< double > ModelMeans,
             std::vector< double > ModelErrors){
   clock_t begintime;
@@ -89,7 +89,7 @@ LikelihoodDistribution_RHIC_PCA
 
 
 std::vector< double >
-LikelihoodDistribution_RHIC_PCA
+RHIC_PCA_LikelihoodDistribution
 ::GetRealData() {
   std::vector< double > datameans;
   float myints[] = {403.723,467.153,743.79,1042.58,5.28,4.81,5.47,180.682,460.801,739.43,1025.55,0.0891618,0.0271948,0.0498033,4.27,3.99,4.53};

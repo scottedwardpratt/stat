@@ -4,8 +4,8 @@
 
 namespace madai {
 
-PriorDistribution_RHIC
-::PriorDistribution_RHIC( Model * in_Model )
+RHIC_PriorDistribution
+::RHIC_PriorDistribution( Model * in_Model )
 {
   m_Model = in_Model;
   m_SepMap = parameter::getB( m_Model->m_ParameterMap, "PRIOR_PARAMETER_MAP", false );
@@ -27,12 +27,12 @@ PriorDistribution_RHIC
     m_GaussianMeans = parameter::getV( *m_ParameterMap, "GAUSSIAN_MEANS", "" );
     m_GaussianSTDVS = parameter::getV( *m_ParameterMap, "GAUSSIAN_STDVS", "" );
     if ( m_GaussianMeans.size() == 0 || m_GaussianSTDVS.size() == 0 ) {
-      std::cout << "Error in prior_rhic.cc: PriorDistribution_RHIC::PriorDistribution_RHIC(MCMCConfiguration)" << std::endl;
+      std::cout << "Error in prior_rhic.cc: RHIC_PriorDistribution::RHIC_PriorDistribution(MCMCConfiguration)" << std::endl;
       std::cout << "GAUSSIAN_MEANS or GAUSSIAN_STDVS not specified. Exiting" << std::endl;
       exit( 1 );
     }
     if ( m_GaussianMeans.size() != m_GaussianSTDVS.size() ) {
-      std::cout << "Error in prior_rhic.cc: PriorDistribution_RHIC::PriorDistribution_RHIC(MCMCConfiguration)" << std::endl;
+      std::cout << "Error in prior_rhic.cc: RHIC_PriorDistribution::RHIC_PriorDistribution(MCMCConfiguration)" << std::endl;
       std::cout << "Length of GAUSSIAN_MEANS and GAUSSIAN_STDVS are not the same." << std::endl;
       std::cout << "Lenght of GAUSSIAN_MEANS = " << m_GaussianMeans.size() << std::endl;
       std::cout << "Lenght of GAUSSIAN_STDVS = " << m_GaussianSTDVS.size() << std::endl;
@@ -48,12 +48,12 @@ PriorDistribution_RHIC
     m_StepMeans = parameter::getV( *m_ParameterMap, "STEP_MEANS", "" );
     m_StepSide  = parameter::getVS( *m_ParameterMap, "STEP_SIDE", "" );
     if ( m_StepMeans.size() == 0 || m_StepSide.size() == 0 ) {
-      std::cout << "Error in prior_rhic.cc: PriorDistribution_RHIC::PriorDistribution_RHIC(MCMCConfiguration)" << std::endl;
+      std::cout << "Error in prior_rhic.cc: RHIC_PriorDistribution::RHIC_PriorDistribution(MCMCConfiguration)" << std::endl;
       std::cout << "STEP_MEANS or STEP_SIDE not specified. Exiting" << std::endl;
       exit( 1 );
     }
     if ( m_StepMeans.size() != m_StepSide.size() ) {
-      std::cout << "Error in prior_rhic.cc: PriorDistribution_RHIC::PriorDistribution_RHIC(MCMCConfiguration)" << std::endl;
+      std::cout << "Error in prior_rhic.cc: RHIC_PriorDistribution::RHIC_PriorDistribution(MCMCConfiguration)" << std::endl;
       std::cout << "Length of STEP_MEANS and STEP_SIDE are not the same." << std::endl;
       std::cout << "Lenght of STEP_MEANS = " << m_StepMeans.size() << std::endl;
       std::cout << "Lenght of STEP_SIDE = " << m_StepSide.size() << std::endl;
@@ -65,7 +65,7 @@ PriorDistribution_RHIC
 
 
 double
-PriorDistribution_RHIC
+RHIC_PriorDistribution
 ::Evaluate( std::vector< double > Theta ) {
   /*double mean = parameter::getD( *parmap, "PRIOR_MEAN", -3.7372 );
   double sigma = parameter::getD( *parmap, "PRIOR_SIGMA", 1.6845 );

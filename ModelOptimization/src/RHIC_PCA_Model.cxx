@@ -119,8 +119,8 @@ RHIC_PCA_Model
     return OTHER_ERROR;
   }
 
-  m_Likelihood = new LikelihoodDistribution_RHIC_PCA( this );
-  m_Prior = new PriorDistribution_RHIC_PCA( this );
+  m_Likelihood = new RHIC_PCA_LikelihoodDistribution( this );
+  m_Prior = new RHIC_PCA_PriorDistribution( this );
 }
 
 } // end namespace madai

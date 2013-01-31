@@ -251,8 +251,8 @@ RHICModel
     return OTHER_ERROR;
     //exit( 1 );
   }
-  m_Likelihood = new LikelihoodDistribution_RHIC( this );
-  m_Prior = new PriorDistribution_RHIC( this );
+  m_Likelihood = new RHIC_LikelihoodDistribution( this );
+  m_Prior = new RHIC_PriorDistribution( this );
 }
 
 } // end namespace madai
