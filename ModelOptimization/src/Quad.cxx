@@ -1,7 +1,8 @@
 #include "Quad.h"
+
 #include "Model.h"
 
-madai::QuadHandler::QuadHandler(parameterMap *parmap, Model * in_Model){
+QuadHandler::QuadHandler(parameterMap *parmap, Model * in_Model){
   m_Model = in_Model;
   // cout << "QuadHandler: Constructor Start" << endl;
 
@@ -20,7 +21,7 @@ madai::QuadHandler::QuadHandler(parameterMap *parmap, Model * in_Model){
   f.close();
 
   std::stringstream ss;
-  std::vector<madai::Parameter> const * parameters = &(m_Model->GetParameters());
+  std::vector<Parameter> const * parameters = &(m_Model->GetParameters());
   for(int i=0; i<parameters->size();i++)
     ss << (*parameters)[i].m_Name << " ";
   ss >> m_EmulatedParams;
@@ -28,7 +29,7 @@ madai::QuadHandler::QuadHandler(parameterMap *parmap, Model * in_Model){
   // cout << "QuadHandler: Constructor Done." << endl;
 }
 
-madai::QuadHandler::~QuadHandler(){
+QuadHandler::~QuadHandler(){
   if(remove(m_EmOutputFile.c_str()) != 0){
   std::cerr << "Warning: ~QuadHandler: Unable to erase input/output/error files." << std::endl;
   }
@@ -38,7 +39,7 @@ madai::QuadHandler::~QuadHandler(){
   int temp = system(command.c_str());
 }
 
-void madai::QuadHandler::QueryQuad(std::vector<double> Theta, std::vector<double> &Means, std::vector<double> &Errors){
+void QuadHandler::QueryQuad(std::vector<double> Theta, std::vector<double> &Means, std::vector<double> &Errors){
   // cout << "Querying Quad." << endl;
   std::ofstream outputfile;
   std::ifstream inputfile;
@@ -110,3 +111,5 @@ void madai::QuadHandler::QueryQuad(std::vector<double> Theta, std::vector<double
   }
 
 }
+
+} // end namespace madai

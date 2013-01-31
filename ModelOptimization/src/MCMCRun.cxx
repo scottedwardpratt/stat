@@ -1,6 +1,8 @@
 #include "MCMCRun.h"
 
-madai::MCMCRun
+namespace madai {
+
+MCMCRun
 ::MCMCRun(const madai::Model *in_model,
           const std::string info_dir) :
   Optimizer( in_model )
@@ -54,13 +56,13 @@ madai::MCMCRun
   m_ScaleCurrent = (rand()/double(RAND_MAX));
 }
 
-madai::MCMCRun
+MCMCRun
 ::~MCMCRun()
 {
 }
 
 void
-madai::MCMCRun
+MCMCRun
 ::NextIteration(madai::Trace *ThetaOutsList)
 {
   double alpha, LOGBF;
@@ -198,7 +200,7 @@ madai::MCMCRun
 }
 
 std::vector<double>
-madai::MCMCRun
+MCMCRun
 ::GetRandomTheta0(int seed)
 { //This creates random theta 0s
   //srand(seed);
@@ -217,7 +219,7 @@ madai::MCMCRun
 }
 
 std::vector<double>
-madai::MCMCRun
+MCMCRun
 ::GetTheta0FromFile()
 {
   parameterMap parmap;
@@ -258,7 +260,7 @@ madai::MCMCRun
 
 // Load parameters for taking and evaluating steps
 void
-madai::MCMCRun
+MCMCRun
 ::LoadStepParameters()
 {
   m_SepMap = parameter::getB(m_LocalParameterMap, "PROPOSAL_PARAMETER_MAP", false);
@@ -292,7 +294,7 @@ madai::MCMCRun
 
 // Take a step in parameter space
 std::vector<double>
-madai::MCMCRun
+MCMCRun
 ::TakeStep(std::vector<double>& current, double& scale)
 {
   std::vector<double> proposed = current;
@@ -328,7 +330,7 @@ madai::MCMCRun
 
 // Calculate the probability of taking the step
 double
-madai::MCMCRun
+MCMCRun
 ::EvaluateProposal(std::vector<double> Theta1,
                    std::vector<double> Theta2,
                    double scale)
@@ -349,3 +351,5 @@ madai::MCMCRun
   }
   return probability;
 }
+
+} // end namespace madai

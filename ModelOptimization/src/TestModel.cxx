@@ -1,17 +1,19 @@
 #include "TestModel.h"
 
-madai::TestModel::TestModel()
+namespace madai {
+
+TestModel::TestModel()
 {
   this->m_StateFlag = UNINITIALIZED;
 }
 
-madai::TestModel::TestModel( const std::string info_dir )
+TestModel::TestModel( const std::string info_dir )
 {
   this->m_StateFlag = UNINITIALIZED;
   this->LoadConfiguration(info_dir);
 }
 
-madai::TestModel::~TestModel()
+TestModel::~TestModel()
 {
   if( m_Likelihood != NULL )
     delete m_Likelihood;
@@ -19,9 +21,9 @@ madai::TestModel::~TestModel()
     delete m_Prior;
 }
 
-madai::TestModel::ErrorType
-madai::TestModel::GetScalarOutputs( const std::vector< double > & parameters,
-                                    std::vector< double > & scalars ) const
+TestModel::ErrorType
+TestModel::GetScalarOutputs( const std::vector< double > & parameters,
+                             std::vector< double > & scalars ) const
 {
   std::vector< double > Means;
   std::vector< double > Errors;
@@ -46,19 +48,19 @@ madai::TestModel::GetScalarOutputs( const std::vector< double > & parameters,
 
 // Not implemented yet.  Should we do this numerically?
 /** Get both scalar values and the gradient of the parameters. */
-madai::TestModel::ErrorType
-madai::TestModel::GetScalarAndGradientOutputs(const std::vector< double > & parameters,
-                                              const std::vector< bool > & activeParameters,
-                                              std::vector< double > & scalars,
-                                              unsigned int outputIndex, std::vector< double > & gradient) const
+TestModel::ErrorType
+TestModel::GetScalarAndGradientOutputs(const std::vector< double > & parameters,
+                                       const std::vector< bool > & activeParameters,
+                                       std::vector< double > & scalars,
+                                       unsigned int outputIndex, std::vector< double > & gradient) const
 {
   return OTHER_ERROR;
 }
 
-madai::TestModel::ErrorType
-madai::TestModel::GetLikeAndPrior( const std::vector< double > & parameters,
-                                   double & Like,
-                                   double & Prior) const
+TestModel::ErrorType
+TestModel::GetLikeAndPrior( const std::vector< double > & parameters,
+                            double & Like,
+                            double & Prior) const
 {
   std::vector< double > outputs;
   std::vector< double > ModelMeans;
@@ -78,8 +80,8 @@ madai::TestModel::GetLikeAndPrior( const std::vector< double > & parameters,
   return NO_ERROR;
 }
 
-madai::TestModel::ErrorType
-madai::TestModel::LoadDistributions()
+TestModel::ErrorType
+TestModel::LoadDistributions()
 {
   if( m_UseEmulator || m_ProcessPipe ){
   std::cerr << "Emulator is not used for the test model. Turn off USE_EMULATOR and PROCESS_PIPE" << std::endl;
@@ -89,3 +91,5 @@ madai::TestModel::LoadDistributions()
   m_Likelihood = new LikelihoodDistribution_Test(this);
   m_Prior = new PriorDistribution_Test(this);
 }
+
+} // end namespace madai

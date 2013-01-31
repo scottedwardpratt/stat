@@ -2,8 +2,10 @@
 
 #include <cctype>
 
+namespace madai {
+
 void 
-madai::MultiModel::discard_line(std::FILE * fp) {
+MultiModel::discard_line(std::FILE * fp) {
   static int buffersize = 1024;
   char buffer[buffersize];
   std::fgets(buffer, buffersize, fp);
@@ -11,7 +13,7 @@ madai::MultiModel::discard_line(std::FILE * fp) {
 
 
 bool 
-madai::MultiModel::discard_comments(std::FILE * fp, char comment_character) {
+MultiModel::discard_comments(std::FILE * fp, char comment_character) {
   int c = std::getc(fp);
   if ((c == EOF) || std::ferror(fp)) {
   std::cerr << "premature end of file:(\n";
@@ -29,7 +31,7 @@ madai::MultiModel::discard_comments(std::FILE * fp, char comment_character) {
 }
 
 void 
-madai::MultiModel::eat_whitespace(std::istream & i) {
+MultiModel::eat_whitespace(std::istream & i) {
   while (true) {
   if (! std::isspace(i.peek()))
     return;
@@ -39,7 +41,7 @@ madai::MultiModel::eat_whitespace(std::istream & i) {
 }
 
 void 
-madai::MultiModel::eat_whitespace(std::FILE * fp) {
+MultiModel::eat_whitespace(std::FILE * fp) {
   while (true) {
   int c = std::fgetc(fp);
   if (! std::isspace(c)) {
@@ -52,7 +54,7 @@ madai::MultiModel::eat_whitespace(std::FILE * fp) {
 }
 
 bool 
-madai::MultiModel::discard_comments(std::istream & i, char comment_character) {
+MultiModel::discard_comments(std::istream & i, char comment_character) {
   int c = i.peek();
   while (i.good() && ((c == comment_character) || (c == '\n'))) {
   std::string s;
@@ -61,8 +63,8 @@ madai::MultiModel::discard_comments(std::istream & i, char comment_character) {
   }
 }
 
-madai::MultiModel::ErrorType
-madai::MultiModel::LoadConfiguration(std::string info_dir){
+MultiModel::ErrorType
+MultiModel::LoadConfiguration(std::string info_dir){
   m_DirectoryName = info_dir;
   m_ParameterFile = info_dir+"/defaultpars/";
   std::cout << "There should be something here ->" << m_ParameterFile << "<-" << std::endl;
@@ -132,8 +134,8 @@ madai::MultiModel::LoadConfiguration(std::string info_dir){
 /** 
  * Loads a configuration from a file. Reads pcanames.dat or ranges.dat based on fileName
  */
-madai::MultiModel::ErrorType
-madai::MultiModel::LoadConfigurationFile( const std::string fileName )
+MultiModel::ErrorType
+MultiModel::LoadConfigurationFile( const std::string fileName )
 {
   std::fstream config_file;
   config_file.open(fileName.c_str(),std::fstream::in);
@@ -248,3 +250,5 @@ madai::MultiModel::LoadConfigurationFile( const std::string fileName )
   
   return NO_ERROR;
 }
+
+} // end namespace madai

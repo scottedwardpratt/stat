@@ -1,17 +1,19 @@
 #include "CosmoModel.h"
 
-madai::CosmoModel::CosmoModel()
+namespace madai {
+
+CosmoModel::CosmoModel()
 {
   this->m_StateFlag = UNINITIALIZED;
 }
 
-madai::CosmoModel::CosmoModel( const std::string info_dir )
+CosmoModel::CosmoModel( const std::string info_dir )
 {
   this->m_StateFlag = UNINITIALIZED;
   this->LoadConfiguration(info_dir);
 }
 
-madai::CosmoModel::~CosmoModel()
+CosmoModel::~CosmoModel()
 {
   if( m_Likelihood != NULL )
     delete m_Likelihood;
@@ -19,9 +21,9 @@ madai::CosmoModel::~CosmoModel()
     delete m_Prior;
 }
 
-madai::CosmoModel::ErrorType
-madai::CosmoModel::GetScalarOutputs( const std::vector< double > & parameters,
-                                     std::vector< double > & scalars ) const
+CosmoModel::ErrorType
+CosmoModel::GetScalarOutputs( const std::vector< double > & parameters,
+                              std::vector< double > & scalars ) const
 {
   std::stringstream ss;
   std::ifstream inputfile;
@@ -51,20 +53,20 @@ madai::CosmoModel::GetScalarOutputs( const std::vector< double > & parameters,
 
 // Not implemented yet.  Should we do this numerically?
 /** Get both scalar values and the gradient of the parameters. */
-madai::CosmoModel::ErrorType 
-madai::CosmoModel::GetScalarAndGradientOutputs(const std::vector< double > & parameters,
-                                               const std::vector< bool > & activeParameters,
-                                               std::vector< double > & scalars,
-                                               unsigned int outputIndex, std::vector< double > & gradient) const 
+CosmoModel::ErrorType 
+CosmoModel::GetScalarAndGradientOutputs(const std::vector< double > & parameters,
+                                        const std::vector< bool > & activeParameters,
+                                        std::vector< double > & scalars,
+                                        unsigned int outputIndex, std::vector< double > & gradient) const 
 {
   return OTHER_ERROR;
 }
 
 // For interaction with the mcmc
-madai::CosmoModel::ErrorType
-madai::CosmoModel::GetLikeAndPrior( const std::vector< double > & parameters,
-                                    double & Like,
-                                    double & Prior) const
+CosmoModel::ErrorType
+CosmoModel::GetLikeAndPrior( const std::vector< double > & parameters,
+                             double & Like,
+                             double & Prior) const
 {
   std::vector< double > ModelMeans;
   std::vector< double > ModelErrors;
@@ -76,8 +78,8 @@ madai::CosmoModel::GetLikeAndPrior( const std::vector< double > & parameters,
   return NO_ERROR;
 }
 
-madai::CosmoModel::ErrorType
-madai::CosmoModel::LoadDistributions()
+CosmoModel::ErrorType
+CosmoModel::LoadDistributions()
 {
   if(m_UseEmulator || m_ProcessPipe){
     std::cerr << "Emulator is not needed for this model. Turn off USE_EMULATOR and PROCESS_PIPE" << std::endl;
@@ -87,3 +89,5 @@ madai::CosmoModel::LoadDistributions()
   m_Likelihood = new LikelihoodDistribution_Cosmo(this);
   m_Prior = new PriorDistribution_Cosmo(this);
 }
+
+} // end namespace madai

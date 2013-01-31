@@ -1,19 +1,21 @@
 #include "RHIC_PCA_Model.h"
 
-madai::RHIC_PCA_Model::RHIC_PCA_Model()
+namespace madai {
+
+RHIC_PCA_Model::RHIC_PCA_Model()
 {
   this->m_StateFlag = UNINITIALIZED;
   this->m_Quad = NULL;
 }
 
-madai::RHIC_PCA_Model::RHIC_PCA_Model( const std::string info_dir )
+RHIC_PCA_Model::RHIC_PCA_Model( const std::string info_dir )
 {
   this->m_StateFlag = UNINITIALIZED;
   this->m_Quad = NULL;
   this->LoadConfiguration(info_dir);
 }
 
-madai::RHIC_PCA_Model::~RHIC_PCA_Model()
+RHIC_PCA_Model::~RHIC_PCA_Model()
 {
   if( m_Likelihood != NULL )
     delete m_Likelihood;
@@ -23,9 +25,9 @@ madai::RHIC_PCA_Model::~RHIC_PCA_Model()
     delete m_Quad;
 }
 
-madai::RHIC_PCA_Model::ErrorType
-madai::RHIC_PCA_Model::GetScalarOutputs( const std::vector< double > & parameters,
-                                         std::vector< double > & scalars ) const
+RHIC_PCA_Model::ErrorType
+RHIC_PCA_Model::GetScalarOutputs( const std::vector< double > & parameters,
+                                  std::vector< double > & scalars ) const
 {
   std::vector< double > Means;
   std::vector< double > Errors;
@@ -48,20 +50,20 @@ madai::RHIC_PCA_Model::GetScalarOutputs( const std::vector< double > & parameter
 
 // Not implemented yet.  Should we do this numerically?
 /** Get both scalar values and the gradient of the parameters. */
-madai::RHIC_PCA_Model::ErrorType
-madai::RHIC_PCA_Model::GetScalarAndGradientOutputs(const std::vector< double > & parameters,
-                                                   const std::vector< bool > & activeParameters,
-                                                   std::vector< double > & scalars,
-                                                   unsigned int outputIndex, std::vector< double > & gradient) const
+RHIC_PCA_Model::ErrorType
+RHIC_PCA_Model::GetScalarAndGradientOutputs(const std::vector< double > & parameters,
+                                            const std::vector< bool > & activeParameters,
+                                            std::vector< double > & scalars,
+                                            unsigned int outputIndex, std::vector< double > & gradient) const
 {
   return OTHER_ERROR;
 }
 
 // For interaction with the mcmc
-madai::RHIC_PCA_Model::ErrorType
-madai::RHIC_PCA_Model::GetLikeAndPrior( const std::vector< double > & parameters,
-                                        double & Like,
-                                        double & Prior) const
+RHIC_PCA_Model::ErrorType
+RHIC_PCA_Model::GetLikeAndPrior( const std::vector< double > & parameters,
+                                 double & Like,
+                                 double & Prior) const
 {
   std::vector< double > outputs;
   std::vector< double > ModelMeans;
@@ -81,8 +83,8 @@ madai::RHIC_PCA_Model::GetLikeAndPrior( const std::vector< double > & parameters
   return NO_ERROR;
 }
 
-madai::RHIC_PCA_Model::ErrorType
-madai::RHIC_PCA_Model::LoadDistributions()
+RHIC_PCA_Model::ErrorType
+RHIC_PCA_Model::LoadDistributions()
 {
   if(m_UseEmulator){
   bool sep_map = parameter::getB(m_ParameterMap, "LIKELIHOOD_PARAMETER_MAP", false);
@@ -103,3 +105,5 @@ madai::RHIC_PCA_Model::LoadDistributions()
   m_Likelihood = new LikelihoodDistribution_RHIC_PCA(this);
   m_Prior = new PriorDistribution_RHIC_PCA(this);
 }
+
+} // end namespace madai

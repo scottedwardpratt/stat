@@ -2,20 +2,22 @@
 
 #include "InterModel.h"
 
-madai::InterModel::InterModel()
+namespace madai {
+
+InterModel::InterModel()
 {
   this->m_Emulator = NULL;
   this->stateFlag = UNINITIALIZED;
 }
 
-madai::InterModel::InterModel( const std::string info_dir )
+InterModel::InterModel( const std::string info_dir )
 {
   this->m_Emulator = NULL;
   this->stateFlag = UNINITIALIZED;
   this->LoadConfiguration(info_dir);
 }
 
-madai::InterModel::~InterModel()
+InterModel::~InterModel()
 {
   if( m_Prior != NULL )
     delete m_Prior;
@@ -23,9 +25,9 @@ madai::InterModel::~InterModel()
     delete m_Emulator;
 }
 
-madai::InterModel::ErrorType
-madai::InterModel::GetScalarOutputs( const std::vector< double > & parameters,
-                                     std::vector< double > & scalars ) const
+InterModel::ErrorType
+InterModel::GetScalarOutputs( const std::vector< double > & parameters,
+                              std::vector< double > & scalars ) const
 {
   clock_t begintime;
   double likelihood;
@@ -61,8 +63,8 @@ madai::InterModel::GetScalarOutputs( const std::vector< double > & parameters,
 }
 
 // Not implemented yet
-madai::InterModel::ErrorType
-madai::InterModel::GetScalarAndGradientOutputs( const std::vector< double > & parameters,
+InterModel::ErrorType
+InterModel::GetScalarAndGradientOutputs( const std::vector< double > & parameters,
                                                 const std::vector< bool > & activeParameters,
                                                 std::vector< double > & scalars,
                                                 unsigned int outputIndex, std::vector< double > & gradient) const
@@ -71,8 +73,8 @@ madai::InterModel::GetScalarAndGradientOutputs( const std::vector< double > & pa
 }
 
 // For interaction with the mcmc
-madai::InterModel::ErrorType
-madai::InterModel::GetLikeAndPrior( const std::vector< double > & parameters,
+InterModel::ErrorType
+InterModel::GetLikeAndPrior( const std::vector< double > & parameters,
                                     double & Like,
                                     double & Prior) const
 {
@@ -90,8 +92,8 @@ madai::InterModel::GetLikeAndPrior( const std::vector< double > & parameters,
   return NO_ERROR;
 }
 
-madai::InterModel::ErrorType
-madai::InterModel::LoadDistributions()
+InterModel::ErrorType
+InterModel::LoadDistributions()
 {
   parameterMap * parmap;
   bool smap = parameter::getB(m_ParameterMap, "LIKELIHOOD_PARAMETER_MAP", false);
@@ -116,3 +118,5 @@ madai::InterModel::LoadDistributions()
 
   return NO_ERROR;
 }
+
+} // end namespace madai

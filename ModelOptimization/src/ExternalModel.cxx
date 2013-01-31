@@ -17,8 +17,9 @@ See copyright.txt for more information.
 
 #include "ExternalModel.h"
 
+namespace madai {
 
-madai::ExternalModel::ExternalModel()
+ExternalModel::ExternalModel()
 {
   this->m_Process.question = NULL; // construcotr must do this
   // so that we know whether the destructor must act.
@@ -26,7 +27,7 @@ madai::ExternalModel::ExternalModel()
   this->m_StateFlag = UNINITIALIZED;
 }
 
-madai::ExternalModel::ExternalModel(const std::string & m_ConfigurationFileName)
+ExternalModel::ExternalModel(const std::string & m_ConfigurationFileName)
 {
   this->m_Process.question = NULL; // construcotr must do this
   // so that we know whether the destructor must act.
@@ -35,7 +36,7 @@ madai::ExternalModel::ExternalModel(const std::string & m_ConfigurationFileName)
   this->LoadConfigurationFile(m_ConfigurationFileName);
 }
 
-madai::ExternalModel::~ExternalModel()
+ExternalModel::~ExternalModel()
 {
   if (this->m_Process.question != NULL)
     std::fclose(this->m_Process.question);
@@ -50,8 +51,8 @@ madai::ExternalModel::~ExternalModel()
  * Loads a configuration from a file.  The format of the file is
  * defined by this function.  We'll lock it down later.
  */
-madai::ExternalModel::ErrorType
-madai::ExternalModel::LoadConfigurationFile( const std::string fileName )
+ExternalModel::ErrorType
+ExternalModel::LoadConfigurationFile( const std::string fileName )
 {
   this->m_ConfigurationFileName = fileName; // keep a copy of the file name
   // just in case we need it.
@@ -116,8 +117,8 @@ bool discard_comments(std::istream & i, char comment_character) {
 }
 
 
-madai::ExternalModel::ErrorType
-madai::ExternalModel::LoadConfigurationFile( std::istream & configFile )
+ExternalModel::ErrorType
+ExternalModel::LoadConfigurationFile( std::istream & configFile )
 {
   discard_comments(configFile, '#');
   configFile >> this->m_NumberOfParameters;
@@ -236,7 +237,7 @@ madai::ExternalModel::LoadConfigurationFile( std::istream & configFile )
 }
 
 /** Get the valid range for the parameter at parameterIndex. */
-void madai::ExternalModel::GetRange(unsigned int parameterIndex, double range[2]) const
+void ExternalModel::GetRange(unsigned int parameterIndex, double range[2]) const
 {
   range[0] = this->m_Parameters.at(parameterIndex).m_MinimumPossibleValue;
   range[1] = this->m_Parameters.at(parameterIndex).m_MaximumPossibleValue;
@@ -246,8 +247,8 @@ void madai::ExternalModel::GetRange(unsigned int parameterIndex, double range[2]
  * Get the scalar outputs from the model evaluated at x.  If an
  * error happens, the scalar output array will be left incomplete.
  */
-madai::ExternalModel::ErrorType
-madai::ExternalModel::GetScalarOutputs(
+ExternalModel::ErrorType
+ExternalModel::GetScalarOutputs(
   const std::vector< double > & parameters,
   std::vector< double > & scalars ) const
 {
@@ -268,8 +269,8 @@ madai::ExternalModel::GetScalarOutputs(
 
 // Not implemented yet.  Should we do this numerically?
 /** Get both scalar values and the gradient of the parameters. */
-madai::ExternalModel::ErrorType
-madai::ExternalModel::GetScalarAndGradientOutputs(
+ExternalModel::ErrorType
+ExternalModel::GetScalarAndGradientOutputs(
   const std::vector< double > & parameters,
   const std::vector< bool > & activeParameters,
   std::vector< double > & scalars,
@@ -287,3 +288,5 @@ madai::ExternalModel::GetLikeAndPrior( const std::vector< double > & parameters,
 {
   return OTHER_ERROR;
 }
+
+} // end namespace madai

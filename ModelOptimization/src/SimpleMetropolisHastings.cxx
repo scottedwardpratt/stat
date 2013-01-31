@@ -9,9 +9,12 @@ while working for the MADAI project <http://madai.us/>.
 See copyright.txt for more information.
 *********************************************************************/
 #include "SimpleMetropolisHastings.h"
+
 #include <cstdlib>
 
-madai::SimpleMetropolisHastings::SimpleMetropolisHastings(
+namespace madai {
+
+SimpleMetropolisHastings::SimpleMetropolisHastings(
   const madai::Model * model ) :
   madai::Optimizer( model ), m_StepSize(1.0e-2),
   m_ActiveParameters(model->GetNumberOfParameters(), true),
@@ -20,10 +23,10 @@ madai::SimpleMetropolisHastings::SimpleMetropolisHastings(
 {
 }
 
-madai::SimpleMetropolisHastings::~SimpleMetropolisHastings() {
+SimpleMetropolisHastings::~SimpleMetropolisHastings() {
 }
 
-void madai::SimpleMetropolisHastings::SetStepSize( double stepSize ) {
+void SimpleMetropolisHastings::SetStepSize( double stepSize ) {
   this->m_StepSize = stepSize;
 }
 
@@ -33,7 +36,7 @@ double uniform_rand() {
   return R * static_cast<double>(rand());
 }
 
-void madai::SimpleMetropolisHastings::NextIteration(madai::Trace *trace)
+void SimpleMetropolisHastings::NextIteration(madai::Trace *trace)
 {
   // xc is x_candidate
   std::vector< double > xc(this->m_NumberOfParameters, 0.0);
@@ -78,3 +81,5 @@ void madai::SimpleMetropolisHastings::NextIteration(madai::Trace *trace)
     }
     }
 }
+
+} // end namespace madai

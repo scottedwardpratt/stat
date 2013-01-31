@@ -1,6 +1,8 @@
 #include "RHICModel.h"
 
-madai::RHICModel::RHICModel()
+namespace madai {
+
+RHICModel::RHICModel()
 {
   this->m_Process.question = NULL;
   this->m_Process.answer = NULL;
@@ -8,7 +10,7 @@ madai::RHICModel::RHICModel()
   this->m_StateFlag = UNINITIALIZED;
 }
 
-madai::RHICModel::RHICModel(const std::string info_dir)
+RHICModel::RHICModel(const std::string info_dir)
 {
   this->m_Process.question = NULL;
   this->m_Process.answer = NULL;
@@ -17,7 +19,7 @@ madai::RHICModel::RHICModel(const std::string info_dir)
   this->LoadConfiguration(info_dir);
 }
 
-madai::RHICModel::~RHICModel()
+RHICModel::~RHICModel()
 {
   if( m_Likelihood != NULL )
     delete m_Likelihood;
@@ -34,9 +36,9 @@ madai::RHICModel::~RHICModel()
 /**
  * Get the scalar outputs for the model
  **/
-madai::RHICModel::ErrorType
-madai::RHICModel::GetScalarOutputs( const std::vector< double > & parameters,
-                                    std::vector< double > & scalars ) const
+RHICModel::ErrorType
+RHICModel::GetScalarOutputs( const std::vector< double > & parameters,
+                             std::vector< double > & scalars ) const
 {
   if(m_ProcessPipe){
   std::vector< double > temp_outs;
@@ -83,20 +85,20 @@ madai::RHICModel::GetScalarOutputs( const std::vector< double > & parameters,
 
 // Not implemented yet.  Should we do this numerically?
 /** Get both scalar values and the gradient of the parameters. */
-madai::RHICModel::ErrorType
-madai::RHICModel::GetScalarAndGradientOutputs(const std::vector< double > & parameters,
-                                              const std::vector< bool > & activeParameters,
-                                              std::vector< double > & scalars,
-                                              unsigned int outputIndex, std::vector< double > & gradient) const
+RHICModel::ErrorType
+RHICModel::GetScalarAndGradientOutputs(const std::vector< double > & parameters,
+                                       const std::vector< bool > & activeParameters,
+                                       std::vector< double > & scalars,
+                                       unsigned int outputIndex, std::vector< double > & gradient) const
 {
   return OTHER_ERROR;
 }
 
 // For interaction with the mcmc
-madai::RHICModel::ErrorType
-madai::RHICModel::GetLikeAndPrior( const std::vector< double > & parameters,
-                                   double & Like,
-                                   double & Prior) const
+RHICModel::ErrorType
+RHICModel::GetLikeAndPrior( const std::vector< double > & parameters,
+                            double & Like,
+                            double & Prior) const
 {
   std::vector< double > ModelMeans;
   std::vector< double > ModelErrors;
@@ -124,8 +126,8 @@ madai::RHICModel::GetLikeAndPrior( const std::vector< double > & parameters,
   return NO_ERROR;
 }
 
-madai::RHICModel::ErrorType
-madai::RHICModel::LoadProcess()
+RHICModel::ErrorType
+RHICModel::LoadProcess()
 {
   std::string EmuSnapFile_Name = m_DirectoryName + "/Emulator.statefile";
   std::cerr << "Loading emulator from " << EmuSnapFile_Name << " as a running process_pipe" << std::endl;
@@ -202,8 +204,8 @@ madai::RHICModel::LoadProcess()
   return NO_ERROR;
 }
 
-madai::RHICModel::ErrorType
-madai::RHICModel::LoadDistributions()
+RHICModel::ErrorType
+RHICModel::LoadDistributions()
 {
   if(m_UseEmulator && !m_ProcessPipe){
   std::cerr << "Emulator is being loaded from: " << m_DirectoryName << + "/Emulator.statfile" << "using the EmuPlusPlus.h emulator handler" << std::endl;
@@ -229,3 +231,5 @@ madai::RHICModel::LoadDistributions()
   m_Likelihood = new LikelihoodDistribution_RHIC(this);
   m_Prior = new PriorDistribution_RHIC(this);
 }
+
+} // end namespace madai
