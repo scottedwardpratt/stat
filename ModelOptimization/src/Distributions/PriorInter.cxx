@@ -43,7 +43,7 @@ PriorDistribution_Interpolator
 
 double
 PriorDistribution_Interpolator
-::Evaluate( vector< double > Theta )
+::Evaluate( std::vector< double > Theta )
 {
   /*double mean = parameter::getD( *parmap, "PRIOR_MEAN", -3.7372 );
   double sigma = parameter::getD( *parmap, "PRIOR_SIGMA", 1.6845 );

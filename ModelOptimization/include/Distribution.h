@@ -120,7 +120,7 @@ private:
 class PriorDistribution_Interpolator : public PriorDistribution{
 public:
   PriorDistribution_Interpolator(Model * in_Model);
-  double Evaluate(vector<double> Theta);
+  double Evaluate(std::vector<double> Theta);
   
 private:
 
@@ -182,7 +182,7 @@ public:
                   std::vector<double> ModelErrors);
     
 private:
-  vector<double> GetRealData(); 
+  std::vector<double> GetRealData(); 
   
   double*             m_DataMean;
   double*             m_DataError;

@@ -121,8 +121,8 @@ LikelihoodDistribution_Test
   string actual_filename = mcmc->parameterfile + "/actual.param";
   parameter::ReadParsFromFile( actualparmap, actual_filename );
 
-  vector<string> temp_names  = parameter::getVS( actualparmap, "NAMES", "");
-  vector<double> temp_values = parameter::getV( actualparmap, "VALUES", "");
+  std::vector<string> temp_names  = parameter::getVS( actualparmap, "NAMES", "");
+  std::vector<double> temp_values = parameter::getV( actualparmap, "VALUES", "");
 
   ParameterSet ActualParams;
   ActualParams.Initialize(temp_names, temp_values);
