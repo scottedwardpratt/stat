@@ -4,14 +4,14 @@ set( SRC_FILES
   Trace.cxx
 
   Distribution.cxx
-  LikelihoodRHIC.cxx
-  PriorRHIC.cxx
-  LikelihoodCosmo.cxx
-  PriorCosmo.cxx
-  LikelihoodRHIC_PCA.cxx
-  PriorRHIC_PCA.cxx
-  LikelihoodTest.cxx
-  PriorTest.cxx
+  LikelihoodDistribution_RHIC.cxx
+  PriorDistribution_RHIC.cxx
+  LikelihoodDistribution_Cosmo.cxx
+  PriorDistribution_Cosmo.cxx
+  LikelihoodDistribution_RHIC_PCA.cxx
+  PriorDistribution_RHIC_PCA.cxx
+  LikelihoodDistribution_Test.cxx
+  PriorDistribution_Test.cxx
 
   MultiModel.cxx
   RHICModel.cxx
