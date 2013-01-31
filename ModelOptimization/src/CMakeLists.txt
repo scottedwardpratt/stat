@@ -3,15 +3,15 @@ set( SRC_FILES
   MCMCRun.cxx
   Trace.cxx
 
-  Distributions/Distribution.cxx
-  Distributions/LikelihoodRHIC.cxx
-  Distributions/PriorRHIC.cxx
-  Distributions/LikelihoodCosmo.cxx
-  Distributions/PriorCosmo.cxx
-  Distributions/LikelihoodRHIC_PCA.cxx
-  Distributions/PriorRHIC_PCA.cxx
-  Distributions/LikelihoodTest.cxx
-  Distributions/PriorTest.cxx
+  Distribution.cxx
+  LikelihoodRHIC.cxx
+  PriorRHIC.cxx
+  LikelihoodCosmo.cxx
+  PriorCosmo.cxx
+  LikelihoodRHIC_PCA.cxx
+  PriorRHIC_PCA.cxx
+  LikelihoodTest.cxx
+  PriorTest.cxx
 
   MultiModel.cxx
   RHICModel.cxx
