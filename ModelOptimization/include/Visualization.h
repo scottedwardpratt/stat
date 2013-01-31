@@ -9,13 +9,13 @@ namespace madai {
 
 class MCMCRun;
 
-/** \class VizHandler
+/** \class Visualization
  *
  * Class for generating a visualization from an MCMC run. */
-class VizHandler {
+class Visualization {
 public:
-  VizHandler(MCMCRun * mcmc_in);
-  ~VizHandler();
+  Visualization(MCMCRun * mcmc_in);
+  ~Visualization();
 
   void operator() (const std::string& command);
   void UpdateTraceFig(Trace* ThetaOutsList);

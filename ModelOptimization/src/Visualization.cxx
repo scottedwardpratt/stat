@@ -4,7 +4,7 @@
 
 namespace madai {
 
-VizHandler::VizHandler(MCMCRun *mcmc_in){
+Visualization::Visualization(MCMCRun *mcmc_in){
   m_MCMC = mcmc_in;
 
   if(!m_MCMC){
@@ -123,7 +123,7 @@ VizHandler::VizHandler(MCMCRun *mcmc_in){
   m_Bins = 100;
 }
 
-VizHandler::~VizHandler(){
+Visualization::~Visualization(){
   if(m_MCMC->m_VizTrace){
   fprintf(m_GNUPlotPipe, "exit\n");
   pclose(m_GNUPlotPipe);
@@ -133,16 +133,16 @@ VizHandler::~VizHandler(){
 }
 
 // KMN not sure if I'm going to use this, it should allow for something like:
-//VizHandler plotter(this);
+//Visualization plotter(this);
 //plotter("plot cos(x)");
-void VizHandler::operator() (const std::string& command) {
+void Visualization::operator() (const std::string& command) {
   if(m_MCMC->m_VizTrace){
   fprintf(m_GNUPlotPipe, "%s\n", command.c_str());
   fflush(m_GNUPlotPipe);
   }
 }
 
-void VizHandler::UpdateTraceFig(madai::Trace* ThetaOutsList){
+void Visualization::UpdateTraceFig(madai::Trace* ThetaOutsList){
   std::stringstream ss;
   std::string plotcommand = m_Header;
   std::vector<std::string> m_ParamNames;
@@ -243,7 +243,7 @@ void VizHandler::UpdateTraceFig(madai::Trace* ThetaOutsList){
   }
 }
 
-void VizHandler::FinalTrace(madai::Trace* ThetaOutsList){
+void Visualization::FinalTrace(madai::Trace* ThetaOutsList){
   if(m_MCMC->m_VizTrace){
   std::vector<std::string> m_ParamNames;
   const std::vector<madai::Parameter> parameters = m_MCMC->GetModel()->GetParameters();

@@ -78,7 +78,7 @@ MCMCRun
   m_BestLikelihood=m_LikelihoodCurrent;
   m_BestParameterSet = m_InitialTheta;
   if(m_CreateTrace){
-  m_Visualizer = new VizHandler(this);
+  m_Visualizer = new Visualization(this);
   m_VizCount = parameter::getI(m_LocalParameterMap, "VIZ_COUNT", floor(ThetaOutsList->m_MaxIterations/200));
   }
   }

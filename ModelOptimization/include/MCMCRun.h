@@ -18,7 +18,7 @@
 namespace madai {
 
 class Model;
-class VizHandler;
+class Visualization;
 class Trace;
 class TraceElement;
 
@@ -54,7 +54,7 @@ public:
   bool                m_CreateTrace;
   bool                m_Debug;
 
-  VizHandler*         m_Visualizer;
+  Visualization*         m_Visualizer;
   CRandom*            m_RandomNumber;
 
   std::vector<double> m_CurrentParameters;
