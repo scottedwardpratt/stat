@@ -3,7 +3,7 @@
 namespace madai {
 
 MCMCRun
-::MCMCRun( const madai::Model *in_model,
+::MCMCRun( const Model *in_model,
            const std::string info_dir ) :
   Optimizer( in_model )
 {
@@ -62,7 +62,7 @@ MCMCRun
 
 void
 MCMCRun
-::NextIteration(madai::Trace *ThetaOutsList)
+::NextIteration( Trace *ThetaOutsList )
 {
   double alpha, LOGBF;
   if ( m_LogLike ) {

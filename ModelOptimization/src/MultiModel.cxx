@@ -104,7 +104,7 @@ MultiModel
   std::cout << "Ranges loaded" << std::endl;
 
   if ( !( this->m_Parameters.empty() ) ) {
-    std::vector<madai::Parameter>::const_iterator itr = this->m_Parameters.begin();
+    std::vector< Parameter >::const_iterator itr = this->m_Parameters.begin();
     for( itr; itr < this->m_Parameters.end(); itr++ ) {
       std::cout << itr->m_Name << std::endl;
     }

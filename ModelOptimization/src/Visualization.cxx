@@ -158,7 +158,7 @@ Visualization
   std::stringstream ss;
   std::string plotcommand = m_Header;
   std::vector<std::string> m_ParamNames;
-  const std::vector<madai::Parameter> parameters = m_MCMC->GetModel()->GetParameters();
+  const std::vector< Parameter > parameters = m_MCMC->GetModel()->GetParameters();
   for ( int i = 0; i < parameters.size(); i++ ) {
     m_ParamNames.push_back( parameters[i].m_Name );
   }

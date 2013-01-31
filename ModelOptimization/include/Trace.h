@@ -86,14 +86,14 @@ public:
         this->m_TraceElements[i].m_OutputValues.size() == outputs.size()
   */
   void writeHead(std::ostream & o, 
-                 const std::vector<madai::Parameter> & params) const;
+                 const std::vector< Parameter > & params) const;
   void writeHead(std::ostream & o,
-                 const std::vector<madai::Parameter> & params,
-                 const std::vector<std::string> & outputs) const;
-  void PrintDataToFile(const std::vector<madai::Parameter> & params);
-  void WriteOut(const std::vector<madai::Parameter> & params);
+                 const std::vector< Parameter > & params,
+                 const std::vector< std::string > & outputs) const;
+  void PrintDataToFile(const std::vector< Parameter > & params);
+  void WriteOut(const std::vector< Parameter > & params);
   void MakeTrace();
-  std::vector<std::string> GetParNames();
+  std::vector< std::string > GetParNames();
     
   std::string  m_TraceDirectory;
   int          m_Writeout;

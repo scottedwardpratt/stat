@@ -306,10 +306,9 @@ ExternalModel::GetScalarAndGradientOutputs(
 
 // Not implemented yet.
 // Get the likelihood and prior at the point theta
-madai::ExternalModel::ErrorType
-madai::ExternalModel::GetLikeAndPrior( const std::vector< double > & parameters,
-                                       double & Like,
-                                       double & Prior ) const
+ExternalModel::ErrorType
+ExternalModel::GetLikeAndPrior( const std::vector< double > & parameters,
+                                double & Like, double & Prior ) const
 {
   return OTHER_ERROR;
 }

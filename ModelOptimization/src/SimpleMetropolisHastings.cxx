@@ -16,7 +16,7 @@ namespace madai {
 
 SimpleMetropolisHastings
 ::SimpleMetropolisHastings( const Model * model ) :
-  madai::Optimizer( model ),
+  Optimizer( model ),
   m_StepSize(1.0e-2),
   m_ActiveParameters( model->GetNumberOfParameters(), true ),
   m_NumberOfParameters( model->GetNumberOfParameters() ),
