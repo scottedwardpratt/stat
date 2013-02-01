@@ -1,0 +1,43 @@
+#ifndef __RHICModel_h__
+#define __RHICModel_h__
+
+#include "MultiModel.h"
+#include "process_pipe.h"
+#include "EmuPlusPlus/EmuPlusPlus.h"
+
+namespace madai {
+  
+class RHICModel : public MultiModel {
+private:
+  process_pipe m_Process;
+  emulator*    m_Emulator;
+public:
+  RHICModel();
+  RHICModel(std::string info_dir);
+  virtual ~RHICModel();
+  
+  
+  virtual ErrorType GetScalarOutputs( const std::vector< double > & parameters,
+                                     std::vector< double > & scalars ) const;
+  
+  // Not implemented yet.  Should we do this numerically?
+  /** Get both scalar values and the gradient of the parameters. */
+  virtual ErrorType GetScalarAndGradientOutputs(const std::vector< double > & parameters,
+                                                const std::vector< bool > & activeParameters,
+                                                std::vector< double > & scalars,
+                                                unsigned int outputIndex, std::vector< double > & gradient) const;
+  
+  // For interaction with the MCMC
+  /** Get the likelihood and prior at the point parameters in parameter space. */
+  virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,
+                                    double & Like,
+                                    double & Prior ) const;
+  
+  virtual ErrorType LoadDistributions();
+  virtual ErrorType LoadProcess();
+    
+}; // end class RHICModel
+
+} // end namespace madai
+
+#endif // end __RHICModel_h__

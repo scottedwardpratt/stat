@@ -51,9 +51,10 @@ int main(int argc, char ** argv) {
 		external_model.GetScalarOutputNames().at(0) );
 
 	madai::Trace trace;
-	unsigned int numberIter = 10000;
-	for (unsigned int count = 0; count < numberIter; count ++)
+	unsigned int numberIter = 500;
+	for (unsigned int count = 0; count < numberIter; count ++){
 		simple_mcmc.NextIteration(&trace);
+    }
 
 	trace.writeHead(std::cout, external_model.GetParameters(), external_model.GetScalarOutputNames());
 	trace.write(std::cout);

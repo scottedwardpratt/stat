@@ -7,6 +7,9 @@ while working for the MADAI project <http://madai.us/>.
 
 See copyright.txt for more information.
 *********************************************************************/
+#ifndef __unix__
+#define __unix__
+#endif
 
 #ifndef __process_pipe_h_
 #define __process_pipe_h_

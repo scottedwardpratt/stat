@@ -16,7 +16,7 @@ public:
    * the mean in x, mean in y, standard deviation in x and standard
    * devaition in y of the 2D Gaussian function. */
   ErrorType LoadConfigurationFile( const std::string fileName );
-
+    
   /** Get the valid range for the parameter at parameterIndex. */
   void GetRange( unsigned int parameterIndex, double range[2] );
 
@@ -29,7 +29,11 @@ public:
                                          const std::vector< bool > & activeParameters,
                                          std::vector< double > & scalars,
                                          unsigned int outputIndex, std::vector< double > & gradient) const;
-
+  // Not implemented yet.
+  // Proposed function for interaction with the MCMC
+  virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,
+                                     double & Like,
+                                     double & Prior ) const;
 protected:
   double m_MeanX;
   double m_MeanY;

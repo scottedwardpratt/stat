@@ -256,7 +256,7 @@ madai::ExternalModel::GetScalarOutputs(
 		std::fprintf(this->process.question,"%.17lf\n", *par_it);
 	}
 	std::fflush(this->process.question);
-	for (vector<double>::iterator ret_it = scalars.begin();
+	for (std::vector<double>::iterator ret_it = scalars.begin();
 			ret_it < scalars.end(); ret_it++ )
 		if (1 != fscanf(this->process.answer, "%lf%*c", &(*ret_it))) {
 			std::cerr << "interprocess communication error [cJ83A]\n";
@@ -272,8 +272,17 @@ madai::ExternalModel::GetScalarAndGradientOutputs(
 			const std::vector< double > & parameters,
 			const std::vector< bool > & activeParameters,
 			std::vector< double > & scalars,
-			unsigned int outputIndex, std::vector< double > & gradient) const {
+			unsigned int outputIndex, std::vector< double > & gradient) const 
+{
 	return OTHER_ERROR;
 }
 
-
+// Not implemented yet.
+// Get the likelihood and prior at the point theta
+madai::ExternalModel::ErrorType
+madai::ExternalModel::GetLikeAndPrior( const std::vector< double > & parameters,
+                                       double & Like,
+                                       double & Prior ) const
+{
+  return OTHER_ERROR;
+}

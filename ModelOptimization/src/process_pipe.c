@@ -10,9 +10,7 @@ See copyright.txt for more information.
 TO DO:
 	Implement Win32.
 *********************************************************************/
-
-#include "../include/process_pipe.h"
-//#include "process_pipe.h"
+#include "process_pipe.h"
 
 #ifdef __unix__
 
@@ -60,9 +58,9 @@ int create_process_pipe(process_pipe * pp, char * const * argv) {
 		if (-1 == close(question_pipe[1]))
 			return perror_failure("close [Xj78]");
 		  if (-1 == close(answer_pipe[0]))
-				return perror_failure("close [ttKr]");
+              return perror_failure("close [ttKr]");
 		  if (-1 == close(answer_pipe[1]))
-				return perror_failure("close [IGpw]");
+              return perror_failure("close [IGpw]");
 		  execvp(argv[0], argv);
 		  /* if you reach this line, huge error. */
 		  fprintf(stderr, "Error while trying to execute \"%s\"\n", argv[0]);
