@@ -1,5 +1,9 @@
 #include "CosmoModel.h"
 
+#include "CosmoLikelihoodDistribution.h"
+#include "CosmoPriorDistribution.h"
+
+
 namespace madai {
 
 CosmoModel

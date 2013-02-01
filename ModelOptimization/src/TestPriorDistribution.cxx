@@ -1,5 +1,6 @@
+#include "TestPriorDistribution.h"
+
 #include "Model.h"
-#include "Distribution.h"
 
 namespace madai {
 

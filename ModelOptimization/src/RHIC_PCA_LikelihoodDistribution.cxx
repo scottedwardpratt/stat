@@ -1,4 +1,4 @@
-#include "Distribution.h"
+#include "RHIC_PCA_LikelihoodDistribution.h"
 
 #include <time.h>
 

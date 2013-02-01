@@ -1,5 +1,8 @@
 #include "RHIC_PCA_Model.h"
 
+#include "RHIC_PCA_LikelihoodDistribution.h"
+#include "RHIC_PCA_PriorDistribution.h"
+
 namespace madai {
 
 RHIC_PCA_Model

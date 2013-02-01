@@ -1,4 +1,5 @@
-#include "Distribution.h"
+#include "CosmoLikelihoodDistribution.h"
+
 #include <time.h>
 
 namespace madai {

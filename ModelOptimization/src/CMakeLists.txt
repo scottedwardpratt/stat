@@ -4,6 +4,8 @@ set( SRC_FILES
   Trace.cxx
 
   Distribution.cxx
+  LikelihoodDistribution.cxx
+  PriorDistribution.cxx
   RHIC_LikelihoodDistribution.cxx
   RHIC_PriorDistribution.cxx
   CosmoLikelihoodDistribution.cxx

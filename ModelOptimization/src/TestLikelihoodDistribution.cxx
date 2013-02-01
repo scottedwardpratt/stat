@@ -1,4 +1,4 @@
-#include "Distribution.h"
+#include "TestLikelihoodDistribution.h"
 
 #include <time.h>
 

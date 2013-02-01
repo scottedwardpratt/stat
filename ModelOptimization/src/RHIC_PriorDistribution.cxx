@@ -1,6 +1,8 @@
+#include "RHIC_PriorDistribution.h"
+
+
 #include "Model.h"
 
-#include "Distribution.h"
 
 namespace madai {
 

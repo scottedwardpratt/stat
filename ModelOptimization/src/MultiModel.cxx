@@ -1,5 +1,8 @@
 #include "MultiModel.h"
 
+#include "LikelihoodDistribution.h"
+#include "PriorDistribution.h"
+
 #include <cctype>
 
 namespace madai {
@@ -74,6 +77,24 @@ MultiModel
     std::string s;
     std::getline( i, s );
     c = i.peek();
+  }
+}
+
+
+MultiModel
+::MultiModel()
+{
+}
+
+
+MultiModel
+::~MultiModel()
+{
+  if ( m_Likelihood != NULL ) {
+    delete m_Likelihood;
+  }
+  if ( m_Prior != NULL ) {
+    delete m_Prior;
   }
 }
 

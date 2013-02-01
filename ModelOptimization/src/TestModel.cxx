@@ -1,5 +1,9 @@
 #include "TestModel.h"
 
+#include "TestLikelihoodDistribution.h"
+#include "TestPriorDistribution.h"
+
+
 namespace madai {
 
 TestModel

@@ -16,54 +16,8 @@ Distribution
 }
 
 
-PriorDistribution
-::PriorDistribution()
-{
-}
-
-
-LikelihoodDistribution
-::LikelihoodDistribution()
-{
-}
-
-
 Distribution
 ::~Distribution()
-{
-}
-
-
-PriorDistribution
-::~PriorDistribution()
-{
-}
-
-
-LikelihoodDistribution
-::~LikelihoodDistribution()
-{
-}
-
-
-double
-LikelihoodDistribution
-::Evaluate( std::vector<double> ModelMeans,
-            std::vector<double> ModelErrors )
-{
-}
-
-
-std::vector< double >
-LikelihoodDistribution
-::GetData()
-{
-}
-
-
-double
-PriorDistribution
-::Evaluate( std::vector< double > Theta )
 {
 }
 

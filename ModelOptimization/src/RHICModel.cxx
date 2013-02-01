@@ -1,5 +1,8 @@
 #include "RHICModel.h"
 
+#include "RHIC_LikelihoodDistribution.h"
+#include "RHIC_PriorDistribution.h"
+
 namespace madai {
 
 RHICModel
@@ -27,12 +30,6 @@ RHICModel
 RHICModel
 ::~RHICModel()
 {
-  if ( m_Likelihood != NULL ) {
-    delete m_Likelihood;
-  }
-  if ( m_Prior != NULL ) {
-    delete m_Prior;
-  }
   if ( this->m_Process.question != NULL ) {
     std::fclose( this->m_Process.question );
   }

@@ -12,10 +12,14 @@
 #include <gsl/gsl_randist.h>
 #include <time.h>
 #include <sys/stat.h>
+
 #include "Model.h"
 #include "Distribution.h"
 
 namespace madai {
+
+class LikelihoodDistribution;
+class PriorDistribution;
 
 /** \class MultiModel
  *
@@ -38,8 +42,8 @@ public:
 
   bool good() { return (this->m_StateFlag == READY);}
 
-  MultiModel() {};
-  virtual ~MultiModel() {};
+  MultiModel();
+  virtual ~MultiModel();
 
   /**
    * Load a configuration from multiple files. The format of these
