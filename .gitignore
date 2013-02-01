@@ -1,3 +1,9 @@
+# compiled python bytecode file
+*.pyc
+*.pyo
+
+# emacs backups
 *~
+
 msu-hydro-analysis/model-data/*
 msu-hydro-analysis/CrossCheckSummary*
