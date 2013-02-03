@@ -46,6 +46,11 @@ public:
   /** Loads a configuration from a file. **/
   virtual ErrorType LoadConfigurationFile( const std::string fileName ) = 0;
 
+  /** Has the model been initialized? */
+  bool IsReady() const {
+    return ( m_StateFlag == READY );
+  }
+
   /** Get the number of parameters. */
   virtual unsigned int GetNumberOfParameters() const
   {

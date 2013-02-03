@@ -63,7 +63,7 @@ int main(int argc, char ** argv){
   std::string info_dir(argv[1]);
   madai::TestModel t_model;
   t_model.LoadConfiguration(info_dir);
-  if(!(t_model.good())){
+  if(!(t_model.IsReady())){
     std::cerr << "Something is wrong with the model\n\n";
     return 0;
   }

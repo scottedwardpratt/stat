@@ -37,7 +37,7 @@ int main(int argc, char ** argv){
   std::string info_dir(argv[1]);
   madai::RHICModel m_model;
   m_model.LoadConfiguration(info_dir);
-  if(!(m_model.good())){
+  if(!(m_model.IsReady())){
     std::cerr << "Something is wrong with the model\n\n";
     return 0;
   }

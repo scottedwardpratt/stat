@@ -41,7 +41,6 @@ namespace madai {
 class ExternalModel : public Model {
 public:
   
-  bool good() { return (this->m_StateFlag == READY); }
   ExternalModel();
   ExternalModel(const std::string & configFileName);
   virtual ~ExternalModel();
@@ -87,8 +86,6 @@ private:
   process_pipe m_Process;
 
   std::string m_ConfigurationFileName;
-
-  InternalState m_StateFlag;
 
 }; // end Model
 

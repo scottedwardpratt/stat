@@ -45,7 +45,7 @@ int main(int argc, char ** argv) {
 	} else {
 		external_model.LoadConfigurationFile(filename);
 	}
-	if (! external_model.good()) {
+	if (! external_model.IsReady()) {
 	  std::cerr << "Something is wrong with the external model\n";
 	  return 1;
 	}

@@ -58,8 +58,6 @@ public:
   bool                    m_UseEmulator;
   bool                    m_ProcessPipe;
 
-  bool good() { return (this->m_StateFlag == READY);}
-
   MultiModel();
   virtual ~MultiModel();
 
