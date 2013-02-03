@@ -55,11 +55,6 @@ public:
   /** Get names of the parameters. */
   virtual const std::vector< Parameter > & GetParameters() const;
 
-  /** Set the parameters. */
-  virtual ErrorType SetParameters(const std::vector< Parameter > &){
-    return NO_ERROR;
-  }
-
   /** Get the number of scalar outputs. */
   virtual unsigned int GetNumberOfScalarOutputs() const;
 
