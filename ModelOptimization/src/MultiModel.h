@@ -104,14 +104,6 @@ protected:
   unsigned int m_NumberOfParameters;
   unsigned int m_NumberOfOutputs;
 
-  typedef enum {
-    UNINITIALIZED,
-    READY,
-    ERROR
-  } InternalState;
-
-  InternalState m_StateFlag;
-
 }; // end class MultiModel
 
 } // end namespace madai

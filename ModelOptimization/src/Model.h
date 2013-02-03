@@ -105,6 +105,13 @@ public:
   parameterMap  m_ParameterMap;
 
 protected:
+  /** Enumeration of internal state. */
+  typedef enum {
+    UNINITIALIZED,
+    READY,
+    ERROR
+  } InternalState;
+
   /** Subclasses must populate this vector with the names of the
    * model parameters. */
   std::vector< Parameter > m_Parameters;
@@ -112,6 +119,9 @@ protected:
   /** Subclasses must populate these vectors with the names of the
    * scalar outputs. */
   std::vector< std::string > m_ScalarOutputNames;
+
+  /** Current state of the model. */
+  InternalState m_StateFlag;
 
   /** Add a parameter. */
   void AddParameter( const std::string & name,

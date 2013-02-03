@@ -88,12 +88,6 @@ private:
 
   std::string m_ConfigurationFileName;
 
-  typedef enum {
-    UNINITIALIZED,
-    READY,
-    ERROR
-  } InternalState;
-
   InternalState m_StateFlag;
 
 }; // end Model
