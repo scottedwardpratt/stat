@@ -7,6 +7,7 @@ set( SRC_FILES
   Gaussian2DModel.cxx
   LikelihoodDistribution.cxx
   MCMCRun.cxx
+  Model.cxx
   MultiModel.cxx
   Optimizer.cxx
   PriorDistribution.cxx

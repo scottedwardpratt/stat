@@ -40,28 +40,20 @@ public:
     OTHER_ERROR
   } ErrorType;
 
-  Model() {};
-  virtual ~Model() {};
+  Model();
+  virtual ~Model();
 
   /** Loads a configuration from a file. **/
   virtual ErrorType LoadConfigurationFile( const std::string fileName ) = 0;
 
   /** Has the model been initialized? */
-  bool IsReady() const {
-    return ( m_StateFlag == READY );
-  }
+  bool IsReady() const;
 
   /** Get the number of parameters. */
-  virtual unsigned int GetNumberOfParameters() const
-  {
-    return static_cast<unsigned int>(m_Parameters.size());
-  };
+  virtual unsigned int GetNumberOfParameters() const;
 
   /** Get names of the parameters. */
-  virtual const std::vector< Parameter > & GetParameters() const
-  {
-    return m_Parameters;
-  };
+  virtual const std::vector< Parameter > & GetParameters() const;
 
   /** Set the parameters. */
   virtual ErrorType SetParameters(const std::vector< Parameter > &){
@@ -69,23 +61,13 @@ public:
   }
 
   /** Get the number of scalar outputs. */
-  virtual unsigned int GetNumberOfScalarOutputs() const
-  {
-    return static_cast<unsigned int>(m_ScalarOutputNames.size());
-  }
+  virtual unsigned int GetNumberOfScalarOutputs() const;
 
   /** Get the names of the scalar outputs of the model. */
-  virtual const std::vector< std::string > & GetScalarOutputNames() const
-  {
-    return m_ScalarOutputNames;
-  }
+  virtual const std::vector< std::string > & GetScalarOutputNames() const;
 
   /** Get the valid range for the parameter at parameterIndex. */
-  virtual void GetRange( unsigned int parameterIndex, double range[2] ) const
-  {
-    range[0] = this->m_Parameters.at(parameterIndex).m_MinimumPossibleValue;
-    range[1] = this->m_Parameters.at(parameterIndex).m_MaximumPossibleValue;
-  }
+  virtual void GetRange( unsigned int parameterIndex, double range[2] ) const;
 
   /** Get the scalar outputs from the model evaluated at x. */
   virtual ErrorType GetScalarOutputs( const std::vector< double > & parameters,
@@ -131,17 +113,10 @@ protected:
   /** Add a parameter. */
   void AddParameter( const std::string & name,
                      double minimumPossibleValue = -DBL_MAX,
-                     double maximumPossibleValue =  DBL_MAX )
-  {
-    m_Parameters.push_back(
-      Parameter(name, minimumPossibleValue, maximumPossibleValue) );
-  }
+                     double maximumPossibleValue =  DBL_MAX );
 
   /** Add a scalar output name. */
-  void AddScalarOutputName( const std::string & name )
-  {
-    m_ScalarOutputNames.push_back( name );
-  }
+  void AddScalarOutputName( const std::string & name );
 
 }; // end Model
 
