@@ -43,12 +43,6 @@ RHIC_PCA_Model
 RHIC_PCA_Model
 ::~RHIC_PCA_Model()
 {
-  if ( m_Likelihood != NULL ) {
-    delete m_Likelihood;
-  }
-  if ( m_Prior != NULL ) {
-    delete m_Prior;
-  }
   if ( m_Quad != NULL ) {
     delete m_Quad;
   }

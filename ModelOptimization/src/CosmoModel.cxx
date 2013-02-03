@@ -40,13 +40,6 @@ CosmoModel
 CosmoModel
 ::~CosmoModel()
 {
-  if( m_Likelihood != NULL ) {
-    delete m_Likelihood;
-  }
-
-  if( m_Prior != NULL ) {
-    delete m_Prior;
-  }
 }
 
 CosmoModel::ErrorType
