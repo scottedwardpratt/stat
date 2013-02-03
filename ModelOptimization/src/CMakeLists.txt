@@ -1,34 +1,30 @@
 set( SRC_FILES
-  Optimizer.cxx
-  MCMCRun.cxx
-  Trace.cxx
-  TraceElement.cxx
-
-  Distribution.cxx
-  LikelihoodDistribution.cxx
-  PriorDistribution.cxx
-  RHIC_LikelihoodDistribution.cxx
-  RHIC_PriorDistribution.cxx
   CosmoLikelihoodDistribution.cxx
-  CosmoPriorDistribution.cxx
-  RHIC_PCA_LikelihoodDistribution.cxx
-  RHIC_PCA_PriorDistribution.cxx
-  TestLikelihoodDistribution.cxx
-  TestPriorDistribution.cxx
-
-  MultiModel.cxx
-  RHICModel.cxx
   CosmoModel.cxx
-  RHIC_PCA_Model.cxx
-  TestModel.cxx
-  Quad.cxx
-
-  Visualization.cxx
-
+  CosmoPriorDistribution.cxx
+  Distribution.cxx
   ExternalModel.cxx
   Gaussian2DModel.cxx
+  LikelihoodDistribution.cxx
+  MCMCRun.cxx
+  MultiModel.cxx
+  Optimizer.cxx
+  PriorDistribution.cxx
+  Quad.cxx
+  RHICModel.cxx
+  RHIC_LikelihoodDistribution.cxx
+  RHIC_PCA_LikelihoodDistribution.cxx
+  RHIC_PCA_Model.cxx
+  RHIC_PCA_PriorDistribution.cxx
+  RHIC_PriorDistribution.cxx
   RegularStepGradientDescentOptimizer.cxx
   SimpleMetropolisHastings.cxx
+  TestLikelihoodDistribution.cxx
+  TestModel.cxx
+  TestPriorDistribution.cxx
+  Trace.cxx
+  TraceElement.cxx
+  Visualization.cxx
   process_pipe.c
 )
 
