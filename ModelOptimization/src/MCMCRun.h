@@ -105,6 +105,7 @@ public:
   bool                m_Timing;
   bool                m_SymmetricProposal;
   bool                m_RescaledMethod;
+  bool                m_FlatStep;
   double              m_Prefactor;
   double              m_MinScale;
   double              m_MaxScale;

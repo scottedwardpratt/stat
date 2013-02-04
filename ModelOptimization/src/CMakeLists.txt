@@ -23,6 +23,8 @@ set( SRC_FILES
   TestModel.cxx
   Quad.cxx
 
+  DiceModel.cxx
+
   Visualization.cxx
 
   ExternalModel.cxx

@@ -153,18 +153,34 @@ int main(int argc, char ** argv){
   ox.open("DensityPlotX.txt");
   std::ofstream oy;
   oy.open("DensityPlotY.txt");
-  double binx, biny;
+  double binx, biny, temp, sum=0, absdev=0, MeanX, MeanY;
+  std::vector< double > tempv;
   binx = (range[0][1] - range[0][0]) / 100;
   biny = (range[1][1] - range[1][0]) / 100;
   for(unsigned int k = 0; k < 100; k++){
     ox << range[0][0]+(double(k)+0.5)*binx << " " << double(rhox[k])/double(trace.m_MaxIterations) << std::endl;
     oy << range[1][0]+(double(k)+0.5)*biny << " " << double(rhoy[k])/double(trace.m_MaxIterations) << std::endl;
     for(unsigned int l = 0; l < 100; l++){
-      o1 << range[0][0]+(double(k)+0.5)*binx << " ";  // Print x value of center of bin
-      o1 << range[1][0]+(double(l)+0.5)*biny << " ";  // Print y value of center of bin
-      o1 << double(densities[k][l])/double(trace.m_MaxIterations) << std::endl;  // Print density
+      tempv.clear();
+      temp = range[0][0] + (double(k)+0.5)*binx;
+      o1 << temp << " ";  // Print x value of center of bin
+      tempv.push_back(temp);
+      temp = range[1][0]+(double(l)+0.5)*biny;
+      o1 << temp << " ";  // Print y value of center of bin
+      tempv.push_back(temp);
+      temp = double(densities[k][l])/double(trace.m_MaxIterations);
+      o1 << temp << std::endl;  // Print density
+      std::vector< double > Prob;
+      g2d_model.GetScalarOutputs(tempv, Prob);
+      g2d_model.GetMeans( MeanX, MeanY );
+      Prob[0]/=(2*MeanX*MeanY);
+      sum+=(Prob[0]-temp);
+      absdev+=abs(Prob[0]-temp);
     }
   }
+  sum/=10000;
+  std::cerr << "The average deviation from the model is: " << sum << std::endl;
+  std::cerr << "Average Absolute Deviation: " << (absdev/10000) << std::endl;
   o1.close();
   ox.close();
   oy.close();
@@ -176,31 +192,36 @@ int main(int argc, char ** argv){
   delete densities;
   // Open pipe to create plots of rho(x) and rho(y)
   FILE* XPlot = popen("gnuplot -persist", "w");
+  bool PlotDensities = true;
   if(!XPlot){
     std::cerr << "GNUPlot not found :(" << std::endl;
-    exit(1);
+    PlotDensities = false;
+    //exit(1);
   }
   FILE* YPlot = popen("gnuplot -persist", "w");
   if(!YPlot){
     std::cerr << "GNUPlot not found :(" << std::endl;
-    exit(1);
+    PlotDensities = false;
+    //exit(1);
   }
-  std::string command1;
-  std::string command2;
-  fprintf(XPlot, "%s\n", "set term x11");
-  fprintf(XPlot, "%s\n", "set xlabel \"X\"");
-  fprintf(XPlot, "%s\n", "set ylabel \"Density\"");
-  fprintf(XPlot, "%s\n", "set title \"Density Over X\"");
-  fprintf(XPlot, "%s\n", "set key out vert right top");
-  command1 = "plot \"DensityPlotX.txt\" t \"rho(x)\" w lines";
-  fprintf(XPlot, "%s\n", command1.c_str());
-  fprintf(YPlot, "%s\n", "set term x11");
-  fprintf(YPlot, "%s\n", "set ylabel \"Density\"");
-  fprintf(YPlot, "%s\n", "set xlabel \"Y\"");
-  fprintf(YPlot, "%s\n", "set title \"Density Over Y\"");
-  fprintf(YPlot, "%s\n", "set key out vert right top");
-  command2 = "plot \"DensityPlotY.txt\" t \"rho(y)\" w lines";
-  fprintf(YPlot, "%s\n", command2.c_str());
+  if(PlotDensities){
+    std::string command1;
+    std::string command2;
+    fprintf(XPlot, "%s\n", "set term x11");
+    fprintf(XPlot, "%s\n", "set xlabel \"X\"");
+    fprintf(XPlot, "%s\n", "set ylabel \"Density\"");
+    fprintf(XPlot, "%s\n", "set title \"Density Over X\"");
+    fprintf(XPlot, "%s\n", "set key out vert right top");
+    command1 = "plot \"DensityPlotX.txt\" t \"rho(x)\" w lines";
+    fprintf(XPlot, "%s\n", command1.c_str());
+    fprintf(YPlot, "%s\n", "set term x11");
+    fprintf(YPlot, "%s\n", "set ylabel \"Density\"");
+    fprintf(YPlot, "%s\n", "set xlabel \"Y\"");
+    fprintf(YPlot, "%s\n", "set title \"Density Over Y\"");
+    fprintf(YPlot, "%s\n", "set key out vert right top");
+    command2 = "plot \"DensityPlotY.txt\" t \"rho(y)\" w lines";
+    fprintf(YPlot, "%s\n", command2.c_str());
+  }
   
   return 0;
 }

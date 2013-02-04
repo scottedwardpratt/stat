@@ -36,6 +36,7 @@ MCMCRun
 
   m_DirectoryName = info_dir;
   std::string ParFileName = info_dir + "/defaultpars/mcmc.param";
+
   parameter::ReadParsFromFile( m_LocalParameterMap, ParFileName.c_str() );
 
   m_BurnIn        = parameter::getI( m_LocalParameterMap, "BURN_IN", 0 );
@@ -56,7 +57,6 @@ MCMCRun
   this->LoadStepParameters();
 
   m_RandomNumber = new CRandom( 1234 );
-  std::cerr << "2" << std::endl;
 
   // Get initial theta
   if ( m_RandomTheta0 ) {
@@ -68,7 +68,6 @@ MCMCRun
   } else {
     m_InitialTheta = this->GetTheta0FromFile();
   }
-  std::cerr << "3" << std::endl;
   m_CurrentParameters = m_InitialTheta;
   // Get Likelihood, Prior and Scale for the initial theta
   m_Model->GetLikeAndPrior( m_CurrentParameters, m_LikelihoodCurrent, m_PriorCurrent );
@@ -103,11 +102,6 @@ MCMCRun
   }
 
   Temp_Theta = this->TakeStep( m_CurrentParameters, m_ScaleNew );
-  /*std::cerr << "Proposed parameter set:" << std::endl;
-  for (unsigned int l = 0; l < Temp_Theta.size(); l++){
-    std::cerr << Temp_Theta[l] << "  ";
-  }
-  std::cerr << std::endl;*/
   m_Model->GetLikeAndPrior( Temp_Theta, m_LikelihoodNew, m_PriorNew );
   m_ProposalNew = this->EvaluateProposal( m_CurrentParameters, Temp_Theta, m_ScaleCurrent ); // m_ProposalNew
   m_ProposalCurrent = this->EvaluateProposal( Temp_Theta, m_CurrentParameters, m_ScaleNew ); // m_ProposalCurrent
@@ -327,6 +321,14 @@ MCMCRun
         proposed[i] = proposed[i] + m_Prefactor * gsl_ran_gaussian( m_RandNumGen, m_Scale * m_MixingStdDev[i] );
         proposed[i] = proposed[i] - floor(proposed[i]);
         proposed[i] = ( proposed[i] * ( range[1] - range[0] ) ) + range[0];
+      }
+    }
+  } else if (m_FlatStep) {
+    double range[2];
+    for(int i = 0; i < proposed.size(); i++){
+      if(m_ActiveParameters.find(m_Model->GetParameters()[i].m_Name)!=m_ActiveParameters.end() ) {
+        m_Model->GetRange(i, range);
+        proposed[i] = double(rand() % int((range[1] - range[0])*10000))/10000+range[0];
       }
     }
   } else {
