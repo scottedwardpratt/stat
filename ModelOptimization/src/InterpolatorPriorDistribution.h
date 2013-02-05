@@ -42,4 +42,3 @@ private:
 } // end namespace madai
 
 #endif // __InterpolatorPriorDistribution_h__
-

@@ -31,14 +31,13 @@ public:
                   std::vector<double> ModelErrors);
 
 private:
-  std::vector<double> GetData();
+  std::vector< double > GetData();
   
-  std::vector<double> m_Data;
-  std::vector<int>    m_intData;
+  std::vector< double > m_Data;
+  std::vector< int >    m_IntData;
 };
 
 
 } // end namespace madai
 
 #endif // __CosmoLikelihoodDistribution_h__
-

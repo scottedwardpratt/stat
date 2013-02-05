@@ -45,4 +45,3 @@ private:
 } // end namespace madai
 
 #endif // __RHIC_PCA_LikelihoodDistribution_h__
-

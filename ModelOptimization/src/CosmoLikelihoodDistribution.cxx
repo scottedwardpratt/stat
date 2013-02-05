@@ -42,9 +42,9 @@ CosmoLikelihoodDistribution
   m_Verbose = parameter::getB( *m_ParameterMap, "VERBOSE", false) || parameter::getB(*m_ParameterMap, "VERBOSE_LIKELIHOOD", false );
 
   m_Data = GetData();
-  m_intData.resize( m_Data.size() );
-  for ( int i = 1; i < m_intData.size(); i++ ) {
-    m_intData[i] = gsl_ran_poisson( m_RandNumGen, m_Data[i] );
+  m_IntData.resize( m_Data.size() );
+  for ( int i = 1; i < m_IntData.size(); i++ ) {
+    m_IntData[i] = gsl_ran_poisson( m_RandNumGen, m_Data[i] );
   }
 }
 
@@ -69,7 +69,7 @@ CosmoLikelihoodDistribution
   }
 
   for ( int i = 1; i < ModelMeans.size(); i++ ) {
-    dll = log( gsl_ran_poisson_pdf( m_intData[i],ModelMeans[i] ) );
+    dll = log( gsl_ran_poisson_pdf( m_IntData[i],ModelMeans[i] ) );
     //printf("ModelMeans[%d]=%g, intDATA[%d]=%d, Dloglikelihood=%g\n",i,ModelMeans[i],i,intDATA[i],dll);
     //likelihood += log(gsl_ran_poisson_pdf(static_cast<unsigned int>(ModelMeans[i] + 0.5), DATA[i]));
     likelihood += dll;
@@ -77,8 +77,8 @@ CosmoLikelihoodDistribution
   printf( "XXXXX LogLikelihood=%g XXXXXX\b", likelihood );
   if ( likelihood > -0.0001 ) {
     for ( int i = 1; i < ModelMeans.size(); i++ ) {
-      dll = log( gsl_ran_poisson_pdf( m_intData[i], ModelMeans[i] ) );
-      printf( "ModelMeans[%d]=%g, intDATA[%d]=%d, Dloglikelihood=%g\n", i, ModelMeans[i], i, m_intData[i], dll );
+      dll = log( gsl_ran_poisson_pdf( m_IntData[i], ModelMeans[i] ) );
+      printf( "ModelMeans[%d]=%g, intDATA[%d]=%d, Dloglikelihood=%g\n", i, ModelMeans[i], i, m_IntData[i], dll );
       //likelihood += log(gsl_ran_poisson_pdf(static_cast<unsigned int>(ModelMeans[i] + 0.5), DATA[i]));
     }
     exit( 1 );

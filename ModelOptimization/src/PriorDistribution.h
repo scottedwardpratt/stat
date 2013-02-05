@@ -36,4 +36,3 @@ public:
 
 
 #endif // __PriorDistribution_h__
-
