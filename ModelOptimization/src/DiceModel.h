@@ -42,7 +42,7 @@ public:
   int          m_Denom;
   std::string  m_ConfigFile;
   
-  bool good() { return (this->stateFlag == READY);}
+  bool good() { return (this->m_StateFlag == READY);}
   
   DiceModel();
   DiceModel(const std::string info_dir);
@@ -64,13 +64,14 @@ public:
                                      double & Prior) const;
 
 protected:
-  unsigned int number_of_parameters, number_of_outputs;
+  unsigned int m_NumberOfParameters, m_NumberOfOutputs;
+
   typedef enum {
     UNINITIALIZED,
     READY,
     ERROR
-  } internal_state;
-  internal_state stateFlag;
+  } InternalState;
+  InternalState m_StateFlag;
   
 }; // end class DiceModel
 

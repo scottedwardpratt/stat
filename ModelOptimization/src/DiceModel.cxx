@@ -25,14 +25,14 @@ namespace madai {
 DiceModel
 ::DiceModel()
 {
-  this->stateFlag = UNINITIALIZED;
+  this->m_StateFlag = UNINITIALIZED;
 }
 
 
 DiceModel
 ::DiceModel( const std::string info_dir )
 {
-  this->stateFlag = UNINITIALIZED;
+  this->m_StateFlag = UNINITIALIZED;
   this->LoadConfigurationFile(info_dir);
 }
 
@@ -47,12 +47,12 @@ DiceModel
   parameter::ReadParsFromFile( m_ParameterMap, m_ConfigFile.c_str() );
   m_Sum                = parameter::getB( m_ParameterMap, "SUM_DICE", true );
   m_Distinguishable    = parameter::getB( m_ParameterMap, "DISTINGUISHABLE", false );
-  number_of_parameters = parameter::getI( m_ParameterMap, "DICE", 5 );
+  m_NumberOfParameters = parameter::getI( m_ParameterMap, "DICE", 5 );
   
   // Factor for calculating the likelihood and add parameters
-  int m_Denom=1;
+  int m_Denom = 1;
   std::string par_name;
-  for ( unsigned int i = 0; i < number_of_parameters; i++ ) {
+  for ( unsigned int i = 0; i < m_NumberOfParameters; i++ ) {
     std::stringstream ss;
     ss << i;
     std::string addon = ss.str();
@@ -60,10 +60,11 @@ DiceModel
     this->AddParameter( par_name+addon, 0.5, 6.5 );
   }
   
-  this->stateFlag = READY;
+  this->m_StateFlag = READY;
   
   return Model::NO_ERROR;
 }
+
 
 Model
 ::ErrorType
