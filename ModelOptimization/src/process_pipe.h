@@ -1,12 +1,21 @@
-/*********************************************************************
-process_pipe.h
-Copyright 2012, The University of North Carolina at Chapel Hill.
+/*=========================================================================
+ *
+ *  Copyright The University of North Carolina at Chapel Hill
+ *  All rights reserved.
+ *
+ *  Licensed under the MADAI Software License. You may obtain a copy of
+ *  this license at
+ *
+ *         https://madai-public.cs.unc.edu/software/license/
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
-This software was written in 2012 by Hal Canary <cs.unc.edu/~hal>
-while working for the MADAI project <http://madai.us/>.
-
-See copyright.txt for more information.
-*********************************************************************/
 #ifndef __process_pipe_h__
 #define __process_pipe_h__
 
