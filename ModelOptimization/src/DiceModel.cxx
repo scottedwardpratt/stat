@@ -43,21 +43,21 @@ DiceModel
 ::LoadConfigurationFile( const std::string info_dir )
 {
   m_DirectoryName = info_dir;
-  m_ConfigFile = m_DirectoryName+"/DiceConfig.param";
-  parameter::ReadParsFromFile(m_ParameterMap, m_ConfigFile.c_str());
-  m_Sum = parameter::getB(m_ParameterMap, "SUM_DICE", true);
-  m_Distinguishable = parameter::getB(m_ParameterMap, "DISTINGUISHABLE", false);
-  number_of_parameters = parameter::getI(m_ParameterMap, "DICE", 5);
+  m_ConfigFile    = m_DirectoryName+"/DiceConfig.param";
+  parameter::ReadParsFromFile( m_ParameterMap, m_ConfigFile.c_str() );
+  m_Sum                = parameter::getB( m_ParameterMap, "SUM_DICE", true );
+  m_Distinguishable    = parameter::getB( m_ParameterMap, "DISTINGUISHABLE", false );
+  number_of_parameters = parameter::getI( m_ParameterMap, "DICE", 5 );
   
   // Factor for calculating the likelihood and add parameters
   int m_Denom=1;
   std::string par_name;
-  for(unsigned int i = 0; i < number_of_parameters; i++){
+  for ( unsigned int i = 0; i < number_of_parameters; i++ ) {
     std::stringstream ss;
     ss << i;
     std::string addon = ss.str();
-    m_Denom*=6;
-    this->AddParameter(par_name+addon, 0.5, 6.5);
+    m_Denom *= 6;
+    this->AddParameter( par_name+addon, 0.5, 6.5 );
   }
   
   this->stateFlag = READY;
