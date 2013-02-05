@@ -1,3 +1,21 @@
+/*=========================================================================
+ *
+ *  Copyright (c) 2010-2012 The University of North Carolina at Chapel Hill
+ *  All rights reserved.
+ *
+ *  Licensed under the MADAI Software License. You may obtain a copy of
+ *  this license at
+ *
+ *         https://madai-public.cs.unc.edu/software/license/
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
+
 #ifndef __DiceModel_h__
 #define __DiceModel_h__
 
@@ -7,22 +25,17 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+
 #include "parametermap.h"
 #include "Model.h"
 
 namespace madai {
   
+/** \class DiceModel
+ *
+ * Example model of a fair die.
+ */
 class DiceModel : public Model {
-private:
-protected:
-  unsigned int number_of_parameters, number_of_outputs;
-  typedef enum {
-    UNINITIALIZED,
-    READY,
-    ERROR
-  } internal_state;
-  internal_state stateFlag;
-  
 public:
   bool         m_Sum;
   bool         m_Distinguishable;
@@ -49,6 +62,15 @@ public:
   virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,
                                      double & Like,
                                      double & Prior) const;
+
+protected:
+  unsigned int number_of_parameters, number_of_outputs;
+  typedef enum {
+    UNINITIALIZED,
+    READY,
+    ERROR
+  } internal_state;
+  internal_state stateFlag;
   
 }; // end class DiceModel
 
