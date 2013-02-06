@@ -75,12 +75,12 @@ public:
                                                  unsigned int outputIndex,
                                                  std::vector< double > & gradient) const = 0;
 
-  // Proposed function for interaction with the MCMC:
+  /** Get the likelihood and prior for the parameters. */
   virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,
                                      double & LikeNew,
                                      double & PriorNew) const = 0;
 
-
+  /** \todo - These should be made protected. */
   std::string   m_DirectoryName;
   std::string   m_ParameterFileName;
   bool          m_LogLike;
