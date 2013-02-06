@@ -280,6 +280,15 @@ void CRHICStat::ScaleXY(){
 			testinfo[irun]->x[ix]=sqrt(12.0)*(testinfo[irun]->x[ix]-xbar[ix])/(xmax[ix]-xmin[ix]);
 		}
 	}
+	/*
+	for(irun=0;irun<NRUNS;irun++){
+		printf("%3d",irun);
+		for(ix=0;ix<NX;ix++){
+			printf(" %7.5f",runinfo[irun]->x[ix]);
+		}
+		printf("\n");
+	}
+	*/
 	for(iy=0;iy<NY;iy++){
 		ybar[iy]=0.0;
 		for(irun=0;irun<NRUNS;irun++){
@@ -321,6 +330,12 @@ void CRHICStat::PerformFits(){
 	for(irun=0;irun<NRUNS;irun++){
 		ri=runinfo[irun];
 		zgetter->GetZ(ri->x,ri->zfit);
+		//if(zgetter->GETERROR) zgetter->GetZError(ri->x,ri->zfiterror);
+		//printf("errors for irun=%d\n",irun);
+		//for(iz=0;iz<NZ;iz++){
+			//printf("%8.5f ",ri->zfiterror[iz]);
+		//}
+		//printf("\n");
 		GetYFromZ(ri);
 		GetYfitFromZfit(ri);
 		CalcNetDiffFit(ri);
@@ -334,6 +349,12 @@ void CRHICStat::PerformFits(){
 	for(irun=0;irun<NTESTRUNS;irun++){
 		ri=testinfo[irun];
 		zgetter->GetZ(ri->x,ri->zfit);
+		if(zgetter->GETERROR) zgetter->GetZError(ri->x,ri->zfiterror);
+		printf("errors for irun=%d\n",irun);
+		for(iz=0;iz<NZ;iz++){
+			printf("%8.5f ",ri->zfiterror[iz]);
+		}
+		printf("\n");
 		GetYFromZ(ri);
 		GetYfitFromZfit(ri);
 		CalcNetDiffFit(ri);

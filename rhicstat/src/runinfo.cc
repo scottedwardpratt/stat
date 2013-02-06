@@ -7,6 +7,7 @@ CRunInfo::CRunInfo(int NX,int NY){
 	w=new double[NX];
 	y=new double[NY];
 	z=new double[NY];
+	zfiterror=new double[NY];
 	sigmay=new double[NY];
 	xlinear=new double[NX];
 	ylinear=new double[NY];
@@ -22,10 +23,9 @@ void CRunInfo::Print(){
 	double yreal,yfitreal;
 	for(ix=1;ix<NX;ix++)
 	printf("%10.3e =%s\n",rhicstat->xbar[ix]+x[ix]*(rhicstat->xmax[ix]-rhicstat->xmin[ix])/sqrt(12.0),rhicstat->xname[ix].c_str());
-	printf(" i     z      zfit    zlinear\n");
+	printf(" i     z      zfit     zfiterror   zlinear\n");
 	for(iz=0;iz<NZ;iz++){
-		
-		printf("%2d %8.5f %8.5f %8.5f\n",iz,z[iz],zfit[iz],zlinear[iz]);
+		printf("%2d %8.5f %8.5f+/-%8.5f %8.5f\n",iz,z[iz],zfit[iz],zfiterror[ix],zlinear[iz]);
 	}
 	printf(" i     y         yfit     sigma_y  name\n");
 	for(iy=0;iy<NY;iy++){

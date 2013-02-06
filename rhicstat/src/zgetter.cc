@@ -5,11 +5,16 @@ using namespace std;
 
 
 CZGetter::CZGetter(){
+	GETERROR=false;
 	//dummy
 }
 
 void CZGetter::GetZ(double *x,double *z){
 	// dummy
+}
+
+void CZGetter::GetZError(double *x,double *zfiterror){
+	// dummy;
 }
 
 #endif

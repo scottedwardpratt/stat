@@ -12,6 +12,7 @@ CZGetter_GP::CZGetter_GP(CRHICStat *rsptr) : CZGetter(){
 	LINEAROFF=parameter::getB(rhicstat->parmap,"GP_LINEAROFF",false);
 	NORMALIZE=parameter::getB(rhicstat->parmap,"GP_NORMALIZE",true);
 	hyperPower=parameter::getD(rhicstat->parmap,"HYPER_POWER",1.8);
+	GETERROR=parameter::getB(rhicstat->parmap,"GP_GETERROR",false);
 	int irun1,irun2,iz;
 	NZ=rhicstat->NZ;
 	NX=rhicstat->NX;
@@ -24,6 +25,7 @@ CZGetter_GP::CZGetter_GP(CRHICStat *rsptr) : CZGetter(){
 	alphanorm=new double *[NZ];
 	hyperTheta0=new double[NZ];
 	hyperNugget=new double[NZ];
+	Dzsquared=new double[NZ];
 	for(iz=0;iz<NZ;iz++){
 		CovInvDotZ[iz]=new double[NRUNS];
 		alphanorm[iz]=new double[NRUNS];
@@ -45,6 +47,7 @@ CZGetter_GP::CZGetter_GP(CRHICStat *rsptr) : CZGetter(){
 	}
 	gslmatrix_NRUNS=new CGSLMatrix_Real(NRUNS);
 	InitInterpolator();
+	COVINVCALC=false;
 }
 
 void CZGetter_GP::LinearFit(){
@@ -68,6 +71,7 @@ void CZGetter_GP::LinearFit(){
 	for(iz=0;iz<NZ;iz++){
 		printf("iz=%d\n",iz);
 		zbar=0.0;
+		Dzsquared[iz]=0.0;
 		for(irun=0;irun<NRUNS;irun++){
 			zbar+=runinfo[irun]->z[iz];
 		}
@@ -131,8 +135,39 @@ void CZGetter_GP::LinearFit(){
 	delete [] xz;
 }
 
+void CZGetter_GP::CalcCovInv(){
+	int iz,irun1,irun2,irun3;
+	/*
+	double **unitytest;
+	unitytest=new double *[NRUNS];
+	for(irun1=0;irun1<NRUNS;irun1++){
+		unitytest[irun1]=new double[NRUNS];
+	}
+	*/
+	printf("BEGIN COV[][] INVERSION\n");
+		//gslmatrix_NRUNS->Cholesky_Invert(Cov[iz],CovInv[iz]);
+	for(iz=0;iz<NZ;iz++)
+		gslmatrix_NRUNS->Invert(Cov[iz],CovInv[iz]);
+	/*
+	for(irun1=0;irun1<NRUNS;irun1++){
+		for(irun2=0;irun2<NRUNS;irun2++){
+			unitytest[irun1][irun2]=0.0;
+			for(irun3=0;irun3<NRUNS;irun3++){
+				unitytest[irun1][irun2]+=Cov[0][irun1][irun3]*CovInv[iz][irun3][irun2];
+			}
+			printf("%7.5f ",unitytest[irun1][irun2]);
+		}
+		printf("\n");
+		delete [] unitytest[irun1];
+	}
+	delete [] unitytest;
+	*/
+	printf("INVERSION FINISHED\n");
+}
+
 void CZGetter_GP::InitInterpolator(){
 	int iz,ix,id,irun1,irun2;
+	double dz;
 	CRunInfo **runinfo=rhicstat->runinfo;
 
 	if(mlinear==NULL) LinearFit();
@@ -146,6 +181,18 @@ void CZGetter_GP::InitInterpolator(){
 			for(ix=0;ix<NX;ix++){
 				hyperR[iz][ix]=hyperR_default;
 			}
+		}
+		for(iz=0;iz<NZ;iz++){
+			for(irun1=0;irun1<NRUNS;irun1++){
+				if(LINEAROFF){
+					dz=runinfo[irun1]->z[iz];
+				}
+				else{
+					dz=runinfo[irun1]->z[iz]-runinfo[irun1]->zlinear[iz];
+				}
+				Dzsquared[iz]+=dz*dz;
+			}
+			hyperTheta0[iz]=Dzsquared[iz]/double(NRUNS);
 		}
 	}
 	for(iz=0;iz<NZ;iz++){
@@ -162,7 +209,6 @@ void CZGetter_GP::InitInterpolator(){
 				//printf("netcov[%d][%d]=%g\n",iz,irun1,netcov);
 		}
 		
-		
 		for(irun1=0;irun1<NRUNS;irun1++)
 			if(LINEAROFF) zz[irun1]=runinfo[irun1]->z[iz];
 		else zz[irun1]=runinfo[irun1]->z[iz]-runinfo[irun1]->zlinear[iz];
@@ -171,9 +217,6 @@ void CZGetter_GP::InitInterpolator(){
 			zz[irun1]=1.0;
 		gslmatrix_NRUNS->SolveLinearEqs(zz,Cov[iz],alphanorm[iz]);
 
-		
-		//		gslmatrix_NRUNS->Cholesky_Invert(Cov[iz],CovInv[iz]);
-		//gslmatrix_NRUNS->Invert(Cov[iz],CovInv[iz]);
 			/*
 		for(irun1=0;irun1<NRUNS;irun1++){
 			CovInvDotZ[iz][irun1]=0.0;
@@ -261,6 +304,24 @@ void CZGetter_GP::GetZ(double *x,double *z){
 	}
 }
 
+void CZGetter_GP::GetZError(double *x,double *error){
+	if(COVINVCALC==false){
+		CalcCovInv();
+		COVINVCALC=true;
+	}
+	int iz,irun1,irun2;
+	double *x1,*x2;
+	for(iz=0;iz<NZ;iz++){
+		error[iz]=GetCov(iz,x,x);
+		for(irun1=0;irun1<NRUNS;irun1++){
+			x1=rhicstat->runinfo[irun1]->x;
+			for(irun2=0;irun2<NRUNS;irun2++){
+				x2=rhicstat->runinfo[irun2]->x;
+				error[iz]-=GetCov(iz,x,x1)*CovInv[iz][irun1][irun2]*GetCov(iz,x2,x);
+			}
+		}
+	}
+}
 
 void CZGetter_GP::ReadHyperPars(){
 	const double root3=sqrt(3.0);
@@ -271,7 +332,7 @@ void CZGetter_GP::ReadHyperPars(){
 	FILE *hyperfile=fopen(filename.c_str(),"r");
 	fgets(dummy,150,hyperfile);		fgets(dummy,150,hyperfile);
 	for(iz=0;iz<NZ;iz++){
-		fscanf(hyperfile,"%d %lf %lf",&id,&hyperTheta0[iz],&scale,&hyperNugget[iz]);
+		fscanf(hyperfile,"%d %lf %lf %lf",&id,&hyperTheta0[iz],&scale,&hyperNugget[iz]);
 		//hyperTheta0[iz]*=30;
 		for(ix=0;ix<NX;ix++){
 			fscanf(hyperfile,"%lf",&hyperR[iz][ix]);
@@ -293,7 +354,7 @@ const double root3=sqrt(3.0);
 
 	//printf("##id             pca-var         Scale             Nugget                length_0        length_1      length_2        length_3        length_4        length_5 -- ##\n");
 	for(iz=0;iz<NZ;iz++){
-		fprintf(hyperfile,"%d %lf %lf",id,hyperTheta0[iz],scale,hyperNugget[iz]);
+		fprintf(hyperfile,"%d %lf %lf %lf",id,hyperTheta0[iz],scale,hyperNugget[iz]);
 		for(ix=0;ix<NX;ix++){
 			fprintf(hyperfile,"%lf",hyperR[iz][ix]);
 			hyperR[iz][ix]=hyperR[iz][ix]/(2*root3);

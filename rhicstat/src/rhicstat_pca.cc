@@ -27,7 +27,7 @@ void CRHICStat::PCA(){
 		GetZFromY(testinfo[irun]);
 	
 	printf("-------- PCA values -----------\n");
-	for(iy=0;iy<NY;iy++) printf("%2d: %g\n",iy,eigenvalyy[iy]);
+	for(iy=0;iy<NY;iy++) printf("%2d: %g\n",iy,sqrt(eigenvalyy[iy]));
 	for(iy=0;iy<NY;iy++){
 		printf("%2d %40s: %8.5f %8.5f %8.5f %8.5f %8.5f %8.5f\n", iy,yname[iy].c_str(),Uytoz[iy][0],Uytoz[iy][1],Uytoz[iy][2],Uytoz[iy][3],Uytoz[iy][4],Uytoz[iy][5]);
 	}

@@ -194,7 +194,7 @@ void CRHICStat::Metropolis(){
 	}
 
 	double CRHICStat::GetLL(double *x){
-		int ix,iz,NZ=NX;
+		int ix,iz;
 		double *z=new double[NZ];
 		zgetter->GetZ(x,z);
 		double ll=0.0;
@@ -205,5 +205,19 @@ void CRHICStat::Metropolis(){
 		ll=ll/(1.0+SIGMA2_EMULATOR);
 		return ll;
 	}
+	
+	/*
+	// This is just for testing purposes
+	double CRHICStat::GetLL(double *x){
+		double likelihood=1.0,da;
+		const double root3=sqrt(3.0);
+		int ix;
+		for(ix=0;ix<NX;ix++){
+			da=1.0-fabs(x[ix]/root3);
+			likelihood*=da;
+		}
+		return log(likelihood);
+	}
+	*/
 
 #endif

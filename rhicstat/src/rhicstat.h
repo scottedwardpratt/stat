@@ -10,7 +10,7 @@ class CRunInfo{  /** this is info that pertains to a specific run */
 public:
 	CRunInfo(int NX,int NY);
 	double *x,*w;
-	double *y,*z;
+	double *y,*z,*zfiterror;
 	double *sigmay;
 	double *ylinear,*zlinear,*xlinear,*zfit,*yfit,*xquad;
 	double netdiff_exp,netdiff_fit,netdiff_fitexp;
@@ -24,6 +24,8 @@ public:
 	CZGetter();
 	CRHICStat *rhicstat;
 	virtual void GetZ(double *x,double *z);
+	virtual void GetZError(double *x,double *zfiterror);
+	bool GETERROR;
 };
 
 class CZGetter_QuadFit : public CZGetter {
@@ -42,20 +44,24 @@ public:
 	void InitInterpolator();
 	void LinearFit();
 	void GetZ(double *x,double *z);
+	void GetZError(double *x,double *error);
 	double GetCov(int iz,CRunInfo *runinfo1,CRunInfo *runinfo2);
 	double GetCov(int iz,double *x1,double *x2);
 	void CalcHyperPars();
+	void CalcCovInv();
 	void PrintHyperPars();
 	void ReadHyperPars();
 	void GetCovDerivs(int iz,double *x1,double *x2,double &C,double *DC,double **DDC);
 	double ***Cov,***CovInv,**CovInvDotZ,**alphanorm;
 	double **hyperR,*hyperTheta0,*hyperNugget;
+	double *Dzsquared;
 	double **mlinear,*blinear;
 	bool LINEAROFF;
 	double hyperPower;
 	bool READ_HYPERPARS,NORMALIZE;
 	double hyperR_default;
 	CGSLMatrix_Real *gslmatrix_NRUNS;
+	bool COVINVCALC;
 	int NX,NZ,NRUNS,NTESTRUNS; //copied from rhicstat
 };
 
