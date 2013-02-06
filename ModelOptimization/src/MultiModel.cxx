@@ -102,7 +102,12 @@ MultiModel
 
 
 MultiModel
-::MultiModel()
+::MultiModel() :
+  m_Likelihood( NULL ),
+  m_Prior( NULL ),
+  m_PrescaledParams( false ),
+  m_UseEmulator( false ),
+  m_ProcessPipe( false )
 {
 }
 

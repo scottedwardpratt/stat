@@ -24,7 +24,9 @@ namespace madai {
 
 
 Optimizer
-::Optimizer( const Model *model )
+::Optimizer( const Model *model ) :
+  m_Model( model ),
+  m_OutputScalarToOptimizeIndex( 0 )
 {
   m_Model = model;
 

@@ -24,7 +24,14 @@
 namespace madai {
 
 Distribution
-::Distribution()
+::Distribution() :
+  m_Model( NULL ),
+  m_RandNumGen( NULL ),
+  m_SepMap( false ),
+  m_Timing( false ),
+  m_Verbose( false ),
+  m_Debug( false ),
+  m_ParameterMap( NULL )
 {
   const gsl_rng_type * rngtype;
   rngtype = gsl_rng_default;

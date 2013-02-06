@@ -24,13 +24,12 @@
 namespace madai {
 
 Gaussian2DModel
-::Gaussian2DModel()
+::Gaussian2DModel() :
+  m_MeanX( 23.2 ),
+  m_MeanY( -14.0 ),
+  m_StandardDeviationX( 4.0 ),
+  m_StandardDeviationY( 12.3 )
 {
-  m_MeanX = 23.2;
-  m_MeanY = -14.0;
-  m_StandardDeviationX = 4.0;
-  m_StandardDeviationY = 12.3;
-
   // Temporarily changed this so that the mcmc would work with this model
   // Using +-DBL_MAX for the range introduces errors in taking steps in the mcmc.
   this->AddParameter( "X", m_MeanX-10.0*m_StandardDeviationX, m_MeanX+10.0*m_StandardDeviationX );

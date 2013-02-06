@@ -25,9 +25,10 @@ namespace madai {
 
 
 QuadHandler
-::QuadHandler(parameterMap *parmap, Model * in_Model)
+::QuadHandler(parameterMap *parmap, Model * in_Model) :
+  m_Model( in_Model ),
+  m_Path( NULL )
 {
-  m_Model = in_Model;
   // cout << "QuadHandler: Constructor Start" << endl;
 
   m_QuadScriptHome = parameter::getS( *parmap, "QuadFILEPATH", "./" );
