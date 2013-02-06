@@ -23,11 +23,11 @@ PriorDistribution::~PriorDistribution(){
 }
 LikelihoodDistribution::~LikelihoodDistribution(){
 }
-double LikelihoodDistribution::Evaluate(ParameterSet Theta){
+double LikelihoodDistribution::Evaluate(vector<double> Theta){
 }
 vector<double> LikelihoodDistribution::GetData(){
 }
-double PriorDistribution::Evaluate(ParameterSet Theta){
+double PriorDistribution::Evaluate(vector<double> Theta){
 }
 
 double Distribution::Normal(double x, double mu, double sigma){

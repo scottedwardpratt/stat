@@ -9,12 +9,12 @@ int main(int argc, char *argv[]){
 	}
 	
 	string run_file = argv[1];
-	MCMCConfiguration *mcmcdefault = new MCMCConfiguration(run_file, "default");
+	MCMC *mcmcdefault = new MCMC(run_file, "default");
 	// cout << "Config done." << endl;
 	vector<string> Names = mcmcdefault->ParamNames;
-	// MCMCRun* runlow;
-	// MCMCRun* runbig;
-	MCMCRun *run;
+	// MCMC* runlow;
+	// MCMC* runbig;
+	MCMC *run;
 	ifstream input;
 	ParameterSet * Theta0 = new ParameterSet();
 	// vector<double> BigRatios;
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]){
 			}
 			Theta0->Initialize(Names, Tempvalues);
 			Theta0->Print();
-			run = new MCMCRun(mcmcdefault, *Theta0);
+			run = new MCMC(mcmcdefault, *Theta0);
 			ratio = run->Run();
 			Ratios.push_back(ratio);
 		}

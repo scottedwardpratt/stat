@@ -1,1 +1,16 @@
+# compiled python bytecode file
+*.pyc
+*.pyo
+
+# emacs backups
 *~
+
+msu-hydro-analysis/model-data/*
+msu-hydro-analysis/CrossCheckSummary*
+ModelOptimization/doc/cf.zip
+ModelOptimization/doc/cf/*
+ModelOptimization/doc/html.zip
+ModelOptimization/doc/html/*
+ModelOptimization/doc/latex/*
+ModelOptimization/test/Gaussian2DMCMC/*
+ModelOptimization/test/TestModel/*

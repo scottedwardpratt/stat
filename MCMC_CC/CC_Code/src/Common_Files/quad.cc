@@ -6,7 +6,7 @@
 
 using namespace std;
 
-QuadHandler::QuadHandler(parameterMap *parmap, MCMCConfiguration * mcmc_in){
+QuadHandler::QuadHandler(parameterMap *parmap, MCMC * mcmc_in){
 	mcmc = mcmc_in;
 	// cout << "QuadHandler: Constructor Start" << endl;
 	
@@ -37,7 +37,7 @@ QuadHandler::~QuadHandler(){
 	int temp = system(command.c_str());
 }
 
-void QuadHandler::QueryQuad(ParameterSet Theta,vector<double> &Means, vector<double> &Errors){
+void QuadHandler::QueryQuad(vector<double> Theta,vector<double> &Means, vector<double> &Errors){
 	// cout << "Querying Quad." << endl;
 	ofstream outputfile;
 	ifstream inputfile;
@@ -48,14 +48,14 @@ void QuadHandler::QueryQuad(ParameterSet Theta,vector<double> &Means, vector<dou
 	EmulatedParams = mcmc->EmulatorParams;
 	
 	command = QuadScriptHome + "/src/quad ";
-	for(int i = 0; i < Theta.Values.size(); i++){
-		if(EmulatedParams.find(Theta.Names[i]) != string::npos){
+	for(int i = 0; i < Theta.size(); i++){
+		if(EmulatedParams.find(mcmc->ParamNames[i]) != string::npos){
 			stringstream ss;
-			ss << Theta.Values[i];
+			ss << Theta[i];
 			command = command + ss.str() + " ";
 		}
 		else{
-			cout << "Warning: Observable " << Theta.Names[i] << " is not an emulated observable." << endl;
+			cout << "Warning: Observable " << mcmc->ParamNames[i] << " is not an emulated observable." << endl;
 		}
 	}
 	command = command + "> "+ EmOutputFile;

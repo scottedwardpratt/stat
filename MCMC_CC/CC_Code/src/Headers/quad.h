@@ -6,16 +6,15 @@
 using namespace std;
 
 class MCMC;
-class ParameterSet;
 
 class QuadHandler{
 public:
-	QuadHandler(parameterMap *parmap, MCMCConfiguration * mcmc_in);
+	QuadHandler(parameterMap *parmap, MCMC * mcmc_in);
 	~QuadHandler();
-	void QueryQuad(ParameterSet Theta,vector<double> &Means, vector<double> &Errors);
+	void QueryQuad(vector<double> Theta,vector<double> &Means, vector<double> &Errors);
 private:
 	string EmulatedParams;
-	MCMCConfiguration *mcmc;
+	MCMC *mcmc;
 	string QuadScriptHome;
 	string EmInputFile;
 	string EmOutputFile;

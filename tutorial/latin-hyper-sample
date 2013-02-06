@@ -1,0 +1,54 @@
+#!/usr/bin/Rscript
+
+## latin-hyper-sample
+## Copyright 2012, The University of North Carolina at Chapel Hill.
+##
+## This software was written in 2012 by Hal Canary <cs.unc.edu/~hal>
+## while working for the MADAI project <http://madai.us/>.
+##
+## See copyright.txt for more information.
+##
+## Run this program with either:
+##   $ R --slave < latin-hyper-sample.R
+## or:
+##   $ chmod +x latin-hyper-sample.R
+##   $ ./latin-hyper-sample.R 3 30
+
+argv <-  commandArgs('true')
+argc <- length(argv)
+
+default_number_params <- 3
+default_number_training_points <- 0
+
+number_params <- if (argc > 0) as.integer(argv[1]) else default_number_params
+number_training_points <- if (argc > 1) as.integer(argv[2]) else
+  if (default_number_training_points > 0)
+    default_number_training_points else
+	10 * number_params
+
+parameter_range_min <- rep(0.0, number_params)
+parameter_range_max <- rep(1.0, number_params)
+
+## if the range needs to be tweeked, do it here:
+#parameter_range_min <- c(0.0, 0.0, 0.0)
+#parameter_range_max <- c(1.0, 1.0, 1.0)
+
+if (! require("lhs", quietly=TRUE)) {
+  R_LIBS_USER <- Sys.getenv("R_LIBS_USER")
+  dir.create(R_LIBS_USER, FALSE, TRUE, "0777")
+  REPO='http://cran.us.r-project.org'
+  install.packages("lhs",lib=R_LIBS_USER,repos=REPO)
+  cat('...try again...')
+  q('no',1) # quit with return code 1
+}
+
+design <- maximinLHS(number_training_points, number_params)
+range <- parameter_range_max - parameter_range_min
+for (i in 1:number_params)
+  design[,i] <- (design[,i] * range[i]) + parameter_range_min[i]
+
+options(digits=17) ## good enought to represent any double.
+#cat( number_params, '\n' );
+#cat( number_training_points, '\n' );
+for (i in 1:number_training_points)
+   cat(design[i,], '\n')

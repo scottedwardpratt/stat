@@ -5,7 +5,7 @@
 
 using namespace std;
 
-ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
+ProposalDistribution::ProposalDistribution(MCMC * mcmc_in){
 	mcmc=mcmc_in;
 	string type, param_name;
 	int count = 0;
@@ -25,8 +25,10 @@ ProposalDistribution::ProposalDistribution(MCMCConfiguration * mcmc_in){
 	Rescaled_Method = parameter::getB(*parmap, "RESCALED_PROPOSAL", true);
 	MixingStdDev = parameter::getV(*parmap, "MIXING_STD_DEV", "0");
 	SymmetricProposal = parameter::getB(*parmap, "SYMMETRIC_PROPOSAL", true);
+	PREFACTOR = parameter::getD(*parmap, "PREFACTOR", 1.0);
 	SCALE = parameter::getD(*parmap, "SCALE", 1.0);
-	OFFSET = parameter::getD(*parmap, "OFFSET", 0.0);
+	MIN = parameter::getD(*parmap, "MIN", 0.0);
+	MAX = parameter::getD(*parmap, "MAX", 1.0);
 	
 	const gsl_rng_type * rngtype;
 	rngtype = gsl_rng_default;
@@ -61,37 +63,40 @@ int ProposalDistribution::FindParam(string name){
 	return out;
 }
 
-ParameterSet ProposalDistribution::Iterate(ParameterSet current, float scale){
+vector<double> ProposalDistribution::Iterate(vector<double> current, float scale){
+	vector<double> proposed = current;
 	if(SymmetricProposal){
 		//We use the scale set in the parameter file
-		ParameterSet proposed = current;
 		
-		for(int i=0; i<proposed.Values.size(); i++){
-			proposed.Values[i] = (current.Values[i] - mcmc->Min_Ranges[i])/(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]); //scale to between 0 and 1
-			//proposed.Values[i] = proposed.Values[i] + gsl_ran_gaussian(randy, SCALE*MixingStdDev[i]/sqrt((double)proposed.Names.size()));
-			proposed.Values[i] = proposed.Values[i] + gsl_ran_gaussian(randy, SCALE*MixingStdDev[i]);
-			proposed.Values[i] = proposed.Values[i] - floor(proposed.Values[i]);
-			proposed.Values[i] = (proposed.Values[i]*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]))+mcmc->Min_Ranges[i];
+		for(int i=0; i<proposed.size(); i++){
+			proposed[i] = (current[i] - mcmc->Min_Ranges[i])/(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]); //scale to between 0 and 1
+			proposed[i] = proposed[i] + PREFACTOR*gsl_ran_gaussian(randy, SCALE*MixingStdDev[i]);
+			proposed[i] = proposed[i] - floor(proposed[i]); //If it isn't in the range of [0,1], this will force it to be
+			proposed[i] = (proposed[i]*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]))+mcmc->Min_Ranges[i]; //Scale back to original range
 		}	
 
-		return proposed;
 	} else {
-		// We use whatever scale we just got passed from the rest of the code
-		ParameterSet proposed = current;
+		// We use whatever scale we just got passed from the rest of the code and the range set in the parameter file
+		scale = (scale*(MAX-MIN))+MIN;
 		
-		for(int i=0; i<proposed.Values.size(); i++){
-			proposed.Values[i] = (current.Values[i] - mcmc->Min_Ranges[i])/(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]); //scale to between 0 and 1
-			//proposed.Values[i] = proposed.Values[i] + gsl_ran_gaussian(randy, scale*MixingStdDev[i]/sqrt((double)proposed.Names.size()));
-			proposed.Values[i] = proposed.Values[i] + gsl_ran_gaussian(randy, SCALE*(scale+OFFSET)*MixingStdDev[i]);
-			proposed.Values[i] = proposed.Values[i] - floor(proposed.Values[i]);
-			proposed.Values[i] = (proposed.Values[i]*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]))+mcmc->Min_Ranges[i];
+		for(int i=0; i<proposed.size(); i++){
+			proposed[i] = (current[i] - mcmc->Min_Ranges[i])/(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]); //scale to between 0 and 1
+			proposed[i] = proposed[i] + PREFACTOR*gsl_ran_gaussian(randy, scale*MixingStdDev[i]);
+			proposed[i] = proposed[i] - floor(proposed[i]); //If it isn't in the range of [0,1], this will force it to be
+			proposed[i] = (proposed[i]*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]))+mcmc->Min_Ranges[i]; //Scale back to original range
 		}	
-
-		return proposed;
 	}
+
+	/*double diff = 0;
+	for(int i=0; i<proposed.size(); i++){
+		diff += (proposed[i]-current[i])*(proposed[i]-current[i])/((mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i])*(mcmc->Max_Ranges[i]-mcmc->Min_Ranges[i]));
+	}
+	cout << "Average difference between points was: " << sqrt(diff)/proposed.size() << endl;*/
+
+	return proposed;
 }
 
-double ProposalDistribution::Evaluate(ParameterSet Theta1, ParameterSet Theta2, float scale){
+double ProposalDistribution::Evaluate(vector<double> Theta1, vector<double> Theta2, float scale){
 	// At the moment we are using a gaussian proposal distribution, so the scale is the standard deviation
 	double probability;
 	double exponent = 0, prefactor = 1;
@@ -100,16 +105,12 @@ double ProposalDistribution::Evaluate(ParameterSet Theta1, ParameterSet Theta2, 
 		// If it's symmetric this doesn't matter
 		probability = 1.0;
 	} else {
-		// We need to actually calculate the proposal
-		/*cout << "ERROR: ProposalDistribution::Evaluate:" << endl;
-		cout << "Allowed for unsymmetric proposal without defining method to evaluate proposal." << endl;
-		exit(-1);*/
-		for(int i=0; i<Theta1.Values.size(); i++){
-			exponent += -(Theta1.Values[i]-Theta2.Values[i])*(Theta1.Values[i]-Theta2.Values[i])/(2*SCALE*SCALE*(scale+OFFSET)*(scale+OFFSET)*MixingStdDev[i]*MixingStdDev[i]);
-			prefactor = prefactor/(SCALE*(scale+OFFSET)*sqrt(2*M_PI));
+		scale = (scale*(MAX-MIN))+MIN;
+		for(int i=0; i<Theta1.size(); i++){
+			exponent += -(Theta1[i]-Theta2[i])*(Theta1[i]-Theta2[i])/(2*scale*scale*MixingStdDev[i]*MixingStdDev[i]);
+			prefactor = prefactor/(scale*sqrt(2*M_PI));
 		}
-		/*cout << (scale+OFFSET) << endl;
-		cout << exponent << " " << prefactor << endl;*/
+		/*cout << exponent << " " << prefactor << endl;*/
 		probability = prefactor*exp(exponent);
 	}
 	

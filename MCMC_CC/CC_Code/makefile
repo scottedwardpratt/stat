@@ -13,28 +13,25 @@ GSLPATH=${MADAI_GSLPATH}
 #################################################
 INC= -I${GSLPATH}/include -I include -I ${INSTALLDIR}/include -I ${INSTALLDIR}/include/EmuPlusPlus
 LIBS= -L${GSLPATH}/lib -L${INSTALLDIR}/lib
+HPM = -I${MADAI_HDF5_HOME}/include -L${MADAI_HDF5_HOME}/lib
 
 MCMC_HFILES = mcmc.h\
 parameterset.h\
 distribution.h\
-visualization.h\
-quad.h
+visualization.h
 #emulator.h\ #This is no longer used because we use the interactive emulator
 
 MCMC_OFILES = distribution.o\
-quad.o\
 likelihood_rhic.o\
 mcmc.o\
 parameterset.o\
 prior_rhic.o\
 proposal.o\
 visualization.o\
-likelihood_rhic_pca.o\
 likelihood_cosmo.o\
-likelihood_test.o\
-prior_rhic_pca.o\
+likelihood_inter.o\
 prior_cosmo.o\
-prior_test.o\
+prior_inter.o
 #emulator.o\ #This is no longer used because we use the interactive emulator
 
 
@@ -64,25 +61,20 @@ include/%.h: src/Headers/%.h
 build/likelihood_rhic.o: src/RHIC/likelihood_rhic.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 
-build/likelihood_rhic_pca.o: src/RHIC_PCA/likelihood_rhic_pca.cc
-	${CPP} -c ${OPT} ${INC} $< -o $@
-
 build/likelihood_cosmo.o: src/Cosmosurvey/likelihood_cosmo.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
-build/likelihood_test.o: src/TEST/likelihood_test.cc
-	${CPP} -c ${OPT} ${INC} $< -o $@
+build/likelihood_inter.o: src/Interpolator/likelihood_inter.cc
+	${CPP} -c ${OPT} ${HPM} ${INC} -lcoralutils -lgsl -lgslcblas -lrhicstat -o rhicstat $< -o $@
+	#${CPP} -c ${OPT} ${INC} $< -o $@
 	
 build/prior_rhic.o: src/RHIC/prior_rhic.cc
-	${CPP} -c ${OPT} ${INC} $< -o $@
-
-build/prior_rhic_pca.o: src/RHIC_PCA/prior_rhic_pca.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 
 build/prior_cosmo.o: src/Cosmosurvey/prior_cosmo.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
-build/prior_test.o: src/TEST/prior_test.cc
+build/prior_inter.o: src/Interpolator/prior_inter.cc
 	${CPP} -c ${OPT} ${INC} $< -o $@
 	
 build/%.o: src/Common_Files/%.cc
@@ -102,7 +94,7 @@ uninstall:
 	rm  -f ${addprefix ${INSTALLDIR}/include/, ${MCMC_HFILES}}
 
 run: mcmcrun.cc
-	${CPP} ${OPT} ${INC} -o mcmc $< -lcoralutils -lgsl -lmcmc -lgslcblas -lEmuPlusPlus ${LIBS} -g
+	${CPP} ${OPT} ${INC} ${HPM} -o mcmc $< -lcoralutils -lgsl -lmcmc -lgslcblas -lEmuPlusPlus ${LIBS} -lrhicstat -g
 	cp mcmc ~/local/include/;
 
 test: emulatortest.cc

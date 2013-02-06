@@ -1,16 +1,24 @@
-/*********************************************************************
-MADAI Model Statistical Tools
-Copyright 2011-2012, The University of North Carolina at Chapel Hill.
+/*=========================================================================
+ *
+ *  Copyright (c) 2010-2012 The University of North Carolina at Chapel Hill
+ *  All rights reserved.
+ *
+ *  Licensed under the MADAI Software License. You may obtain a copy of
+ *  this license at
+ *
+ *         https://madai-public.cs.unc.edu/software/license/
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
-This software was written in 2011-2012 by 
-	Hal Canary <hal AT cs.unc.edu>
-while working for the MADAI project <http://madai.us/>.
-
-See copyright.txt for more information.
-*********************************************************************/
+#include <cstdlib>
 #include <iostream>
 #include <string>
-#include <cstdlib>
 #include <vector>
 
 #include "ExternalModel.h"
@@ -51,9 +59,10 @@ int main(int argc, char ** argv) {
 		external_model.GetScalarOutputNames().at(0) );
 
 	madai::Trace trace;
-	unsigned int numberIter = 10000;
-	for (unsigned int count = 0; count < numberIter; count ++)
+	unsigned int numberIter = 500;
+	for (unsigned int count = 0; count < numberIter; count ++){
 		simple_mcmc.NextIteration(&trace);
+    }
 
 	trace.writeHead(std::cout, external_model.GetParameters(), external_model.GetScalarOutputNames());
 	trace.write(std::cout);

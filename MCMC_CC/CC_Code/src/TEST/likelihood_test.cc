@@ -6,7 +6,7 @@
 
 using namespace std;
 
-LikelihoodDistribution_Test::LikelihoodDistribution_Test(MCMCConfiguration *mcmc_in){
+LikelihoodDistribution_Test::LikelihoodDistribution_Test(MCMC *mcmc_in){
 	mcmc=mcmc_in;
 	SepMap = parameter::getB(mcmc->parmap, "LIKELIHOOD_PARAMETER_MAP", false);
 	
@@ -43,7 +43,7 @@ LikelihoodDistribution_Test::LikelihoodDistribution_Test(MCMCConfiguration *mcmc
 LikelihoodDistribution_Test::~LikelihoodDistribution_Test(){
 }
 
-double LikelihoodDistribution_Test::Evaluate(ParameterSet Theta){
+double LikelihoodDistribution_Test::Evaluate(vector<double> Theta){
 	clock_t begintime;
 	vector<double> ModelMeans;
 	vector<double> ModelErrors;
@@ -64,7 +64,7 @@ double LikelihoodDistribution_Test::Evaluate(ParameterSet Theta){
 		ModelErrors.assign (errors,errors+4);
 		int means[4];
 		for(int i=0;i<4;i++){
-			means[i]=Theta.Values[i];
+			means[i]=Theta[i];
 		}
 		ModelMeans.assign(means,means+4);
 	}
@@ -142,7 +142,7 @@ vector<double> LikelihoodDistribution_Test::GetData(){
 	vector<string> temp_names = parameter::getVS(actualparmap, "NAMES", "");
 	vector<double> temp_values = parameter::getV(actualparmap, "VALUES", "");
 	
-	ParameterSet ActualParams;
+	vector<double> ActualParams;
 	ActualParams.Initialize(temp_names, temp_values);
 	
 	emulator->QueryEmulator(ActualParams, datameans, dataerror);*/

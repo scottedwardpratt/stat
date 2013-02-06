@@ -1,0 +1,89 @@
+% Outline for statistics tutorial
+% Hal Canaray and Cory Quammen
+%
+% Note: this is in a rough format that may not compile in latex in its current form
+
+\section{Statistics background}
+
+\subsection{Basic concepts}
+
+We have a model and we're trying to find parameters for it that best explain some observed phenomena.
+
+\subsubsection{Probability and statistics review}
+
+Touch on terms.
+
+Probability, expectation, distribution, joint distribution, variance, covariance
+
+\subsubsection{Joint implausbility}
+
+\section{Gaussian process emulator}
+
+\subsection{Background}
+
+\begin{itemize}
+
+See Chris Coleman-Smith's presentation at the June 2012 MADAI meeting on this
+
+\item What it does?
+
+\item Why use it instead of interpolation?
+
+\item How to use it?
+
+\end{itemize}
+
+\subsection{Training an emulator}
+
+\subsubsection{What is a nugget?}
+
+\subsubsection{Inputs}
+
+\begin{itemize}
+
+\item Set regression order - this subtracts a broad trend in the data to make the training better behaved
+
+\item Pick a covariance function - this is a kernel that determines the weights of nearby training data on an output
+
+\item PCA variance (0.0 - 1.0) - how much of the variance do you want to explain?
+
+\end{itemize}
+
+\subsection{Verify emulator}
+
+Feed training points back into emulator. Results won't be identical, but should be close. Jittering parameter-space position should give you similar values.
+
+\section{Markov Chain Monte Carlo}
+
+\subsection{Background}
+
+\subsection{Algorithm we use}
+
+Metropolis-Hastings
+
+\subsection{Burn-in}
+
+\subsection{Post burn-in}
+
+
+
+\section{Software session}
+
+\subsection{Download code}
+
+\subsubsection{MADAI Workbench}
+
+\subsubsection{Emulator}
+
+Set up environment for running it
+
+\subsubsection{Data}
+
+\begin{itemize}
+
+\item One die example data in format useful for training. Question: How long is this going to take?
+
+\item Two die example
+
+\end{itemize}
+

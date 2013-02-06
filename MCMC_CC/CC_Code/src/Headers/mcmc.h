@@ -15,7 +15,6 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 //#include "emulator.h"
-#include "quad.h"
 #include <time.h>
 #include <sys/stat.h>
 #include "EmuPlusPlus.h"
@@ -30,13 +29,17 @@ class LikelihoodDistribution;
 class PriorDistribution;
 class VizHandler;
 
-class MCMCConfiguration{
+class MCMC{
 public:
-	MCMCConfiguration(string run_file);
-	MCMCConfiguration(string run_file, string configuration);
-	~MCMCConfiguration();
-	void Initialize();
-	
+	MCMC(string run_file, string configuration);
+	~MCMC();
+	void GetRanges(); //This loads the names and ranges of the emulator parameters
+	void FirstPass(); //This prepares the objects necessary for the MCMC Run
+	void LoadObservables(); //This loads the names of the emulator observables
+	void Run(); //This performs the MAXITERATIONS sampling
+	void PrintDataToFile(); //This creates the output files
+	void MakeFinalTrace();
+
 	bool LOGLIKE;
 	bool LOGPRIOR;
 	bool LOGPROPOSAL;
@@ -45,6 +48,16 @@ public:
 	bool SUPPRESS_ERRORS;
 	bool RESCALED_TRACE;
 	bool PRESCALED_PARAMS;
+	int  WRITEOUT;
+	int  VIZOUT;
+	int  BURN_IN;
+	int  MAXITERATIONS;
+	bool RANDOM_THETA0;
+	bool VIZTRACE;
+	bool QUIET;
+	bool WAIT_TO_PRINT_DENSITY_PLOTS;
+	bool MOVING_WINDOW;
+	bool DENSITY_PLOTS;
 	string MODEL;
 	parameterMap parmap;
 	string dir_name;
@@ -60,34 +73,24 @@ public:
 	LikelihoodDistribution *Likelihood;
 	ProposalDistribution *Proposal;
 	PriorDistribution *Prior;
-	ParameterSetList *DummyList;
-	double Max_Ranges[30],Min_Ranges[30]; // 
-};
-
-class MCMCRun{
-public:
-	parameterMap local_parmap;
-	MCMCRun(MCMCConfiguration *mcmc_config);
-	MCMCRun(MCMCConfiguration *mcmc_config, ParameterSet Theta0);
-	~MCMCRun();
-	double Run();
+	double Max_Ranges[30],Min_Ranges[30];
 	
-	ParameterSet *BestParameterSetPtr;
+	vector<double> BestParameterSet;
 	vector<double> ParamValues;
+	vector<double> Theta;
+	vector<double> Proposed_Theta;
+	vector<double> Scaled_Theta; //These are scaled to [0,1] for the trace density plots
 	double bestlikelihood;
 	double Likelihood_Current;
 	
-	int  WRITEOUT;
-	int BURN_IN;
-	int  MAXITERATIONS;
-	bool RANDOM_THETA0;
-	bool VIZTRACE;
-	bool QUIET;
-	
 	string tracedir;
-	MCMCConfiguration *mcmcconfig;
 	VizHandler *Visualizer;
-	ParameterSetList *ThetaList;
+	int WriteOutCounter;
+	int VizWriteOutCounter;
+	vector<vector<double> > ThetaList;
+	vector<vector<double> > VizThetaList;
+	vector<vector<double> > Scaled_ThetaList;
+	vector<vector<double> > VizScaled_ThetaList;
 	int Accept_Count;
 	int Viz_Count;
 };
