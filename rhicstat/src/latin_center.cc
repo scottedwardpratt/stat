@@ -1,3 +1,5 @@
+#ifndef __LATIN_CENTER_CC__
+#define 
 # include <cstdlib>
 # include <iostream>
 # include <iomanip>
@@ -613,3 +615,5 @@ void timestamp ( )
   return;
 # undef TIME_SIZE
 }
+
+#endif

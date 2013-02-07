@@ -1,5 +1,6 @@
 #ifndef __LATIN_CENTER_H__
 #define __LATIN_CENTER_H__
+#include <cstring>
 using namespace std;
 int get_seed ( );
 int i4_max ( int i1, int i2 );
@@ -12,4 +13,3 @@ int r4_nint ( float x );
 void r8mat_write ( string output_filename, int m, int n, double table[] );
 void timestamp ( );
 #endif
-
