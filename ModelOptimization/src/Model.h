@@ -69,7 +69,14 @@ public:
   virtual ErrorType GetScalarOutputs( const std::vector< double > & parameters,
                                             std::vector< double > & scalars ) const = 0;
 
-  /** Get both scalar values and the gradient of the parameters. */
+  /** Get both scalar outputs and the gradient of active parameters.
+   *
+   * The gradient output parameter will contain gradient components of
+   * the output scalar field requested by the outputIndex parameter
+   * for only the active parameters. That is, the first element in the
+   * vector will contain the gradient component for the first active
+   * parameter, the second element in the vector will contain the
+   * gradient component for the second active parameter, and so on. */
   virtual ErrorType GetScalarAndGradientOutputs(
     const std::vector< double > & parameters,
     const std::vector< bool > & activeParameters,

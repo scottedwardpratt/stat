@@ -82,7 +82,68 @@ Model
   unsigned int outputIndex,
   std::vector< double > & gradient) const
 {
-  return METHOD_NOT_IMPLEMENTED;
+  if ( outputIndex >= this->GetNumberOfScalarOutputs() ) {
+    return INVALID_OUTPUT_INDEX;
+  }
+
+  if ( static_cast< unsigned int >( activeParameters.size() ) !=
+       this->GetNumberOfParameters() ) {
+    return INVALID_ACTIVE_PARAMETERS;
+  }
+
+  // Make a copy of the parameters that we can work with
+  std::vector< double > parametersCopy( parameters );
+
+  // Clear the output vectors
+  scalars.clear();
+  gradient.clear();
+
+  ErrorType scalarOutputError;
+
+  double h = 1.0e-4;
+  for ( unsigned int i = 0; i < this->GetNumberOfParameters(); ++i ) {
+
+    if ( activeParameters[i] ) {
+      // Save the original parameter value
+      double originalParameterValue = parametersCopy[i];
+
+      // Compute the scalar outputs for a forward step
+      parametersCopy[i] = parameters[i] + h;
+      std::vector< double > forwardScalars;
+      scalarOutputError = this->GetScalarOutputs( parametersCopy, forwardScalars );
+      if ( scalarOutputError != NO_ERROR ) {
+        return scalarOutputError;
+      }
+
+      // Compute the scalar outputs for a backward step
+      parametersCopy[i] = parameters[i] - h;
+      std::vector< double > backwardScalars;
+      scalarOutputError = this->GetScalarOutputs( parametersCopy, backwardScalars );
+      if ( scalarOutputError != NO_ERROR ) {
+        return scalarOutputError;
+      }
+
+      // Compute the partial derivative with central differences
+      double f = forwardScalars[ outputIndex ];
+      double b = backwardScalars[ outputIndex ];
+      double partialDerivative = ( f - b ) / ( 2.0 * h );
+
+      // Store the partial derivative in the gradient output
+      gradient.push_back( partialDerivative );
+
+      // Restore the original parameter value
+      parametersCopy[i] = originalParameterValue;
+    }
+
+  }
+
+  // Now compute the scalars
+  scalarOutputError = this->GetScalarOutputs( parameters, scalars );
+  if ( scalarOutputError != NO_ERROR ) {
+    return scalarOutputError;
+  }
+
+  return NO_ERROR;
 }
 
 
