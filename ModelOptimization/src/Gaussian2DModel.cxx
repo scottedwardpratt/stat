@@ -73,8 +73,9 @@ Gaussian2DModel
   double sx = m_StandardDeviationX;
   double sy = m_StandardDeviationY;
 
-  double value = exp( -( ((dx*dx) / (2.0 * sx * sx)) +
-                         ((dy*dy) / (2.0 * sy * sy)) ) );
+  // Negate the Gaussian so there is a well-defined global minimum
+  double value = -exp( -( ((dx*dx) / (2.0 * sx * sx)) +
+                          ((dy*dy) / (2.0 * sy * sy)) ) );
 
   scalars.push_back( value );
 
@@ -90,6 +91,9 @@ Gaussian2DModel
                                unsigned int outputIndex,
                                std::vector< double > & gradient) const
 {
+  scalars.clear();
+  gradient.clear();
+
   ErrorType error = this->GetScalarOutputs( parameters, scalars );
   if ( error != NO_ERROR ) {
     return error;
@@ -125,8 +129,7 @@ Gaussian2DModel
   double dx = x - m_MeanX;
   double sx = m_StandardDeviationX;
 
-  // TODO - verify that this is correct
-  return (value * dx) / (sx * sx);
+  return -(value * dx) / (sx * sx);
 }
 
 
@@ -137,8 +140,7 @@ Gaussian2DModel
   double dy = y - m_MeanY;
   double sy = m_StandardDeviationY;
 
-  // TODO - verify that this is correct
-  return (value * dy) / (sy * sy);
+  return -(value * dy) / (sy * sy);
 }
 
 
