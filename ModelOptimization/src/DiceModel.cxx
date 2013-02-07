@@ -48,6 +48,7 @@ DiceModel
   m_Sum                = parameter::getB( m_ParameterMap, "SUM_DICE", true );
   m_Distinguishable    = parameter::getB( m_ParameterMap, "DISTINGUISHABLE", false );
   m_NumberOfParameters = parameter::getI( m_ParameterMap, "DICE", 5 );
+  m_Sides              = parameter::getI( m_ParameterMap, "SIDES", 6 );
   
   // Factor for calculating the likelihood and add parameters
   int m_Denom = 1;
@@ -57,7 +58,7 @@ DiceModel
     ss << i;
     std::string addon = ss.str();
     m_Denom *= 6;
-    this->AddParameter( par_name+addon, 0.5, 6.5 );
+    this->AddParameter( par_name+addon, 0.5, ( double( m_Sides ) + 0.5 ) );
   }
   
   this->m_StateFlag = READY;
@@ -75,10 +76,16 @@ DiceModel
   scalars.clear();
   for ( unsigned int i = 0; i < parameters.size(); i++ ) {
     double temp;
-    if ( parameters[i] < 0.5 || parameters[i] > 6.5 ) {
+    if ( parameters[i] < 0.5 || parameters[i] > ( double( m_Sides ) + 0.5 ) ) {
       std::cerr << i << "th parameter out of range" << std::endl;
       return OTHER_ERROR;
     }
+    for( unsigned int j = 0; j < m_Sides; j++ ) {
+      if( parameters[i] <= ( double( j ) + 1.5) ) {
+        temp = double( j ) + 1.0;
+      }
+    }
+    /*
     if ( parameters[i] <= 1.5 ) {
       temp = 1.0;
     } else if ( parameters[i] <= 2.5 ) {
@@ -92,6 +99,7 @@ DiceModel
     } else if ( parameters[i] <= 6.5 ) {
       temp = 6.0;
     }
+    */
     scalars.push_back( temp );
   }
   
@@ -125,19 +133,19 @@ DiceModel
       sum += parameters[l];
     }
     // Now calculate probability of getting that sum
-    for ( unsigned int iter = 0; iter < floor((sum-parameters.size())/6.0); iter++ ) {
+    for ( unsigned int iter = 0; iter < floor((sum-parameters.size())/double(m_Sides)); iter++ ) {
       double temp = 0;
       int iter2;
       temp += parameters.size();
       if ( iter % 2 == 1 ) {
         temp *= -1;
       }
-      // (k-6*iter-1)!
-      for ( iter2 = 0; iter2 < (sum-6*iter-1); iter2++ ) {
-        temp *= (iter2 + 1);
+      // (k-m_Sides*iter-1)!
+      for ( iter2 = 0; iter2 < (sum-m_Sides*iter-1); iter2++ ) {
+        temp *= ( iter2 + 1 );
       }
-      // 1/(k-6*iter-n)!
-      for ( iter2 = 0; iter2 < (sum-6*iter-parameters.size()); iter2++ ) {
+      // 1/(k-m_Sides*iter-n)!
+      for ( iter2 = 0; iter2 < (sum-m_Sides*iter-parameters.size()); iter2++ ) {
         temp /= double( iter2 + 1 );
       }
       // 1/(n-iter)!
@@ -159,7 +167,7 @@ DiceModel
     } else {
       // Get outputs
       std::vector< double > outputs;
-      int* bins = new int[6]();
+      int* bins = new int[m_Sides]();
       this->GetScalarOutputs( parameters, outputs );
       // Find total number of possible permutations of the dice
       int TotalPerms;
@@ -168,7 +176,7 @@ DiceModel
       }
       // Bin the dice values
       for ( unsigned int j = 0; j < outputs.size(); j++ ) {
-        for ( unsigned int k = 0; k < 6; k++ ) {
+        for ( unsigned int k = 0; k < m_Sides; k++ ) {
           if ( outputs[j] == double(k + 1) ) {
             bins[k]++;
             break;
@@ -177,7 +185,7 @@ DiceModel
       }
       // Eliminate repeated permutations
       int factor=1;
-      for ( unsigned int n = 0; n < 6; n++ ) {
+      for ( unsigned int n = 0; n < m_Sides; n++ ) {
         if ( bins[n] > 1 ) {
           for ( unsigned int index = 0; index < bins[n]; index++ ) {
             factor *= (index + 1);

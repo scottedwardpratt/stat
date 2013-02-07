@@ -40,6 +40,7 @@ public:
   bool         m_Sum;
   bool         m_Distinguishable;
   int          m_Denom;
+  int          m_Sides;
   std::string  m_ConfigFile;
   
   bool good() { return (this->m_StateFlag == READY);}

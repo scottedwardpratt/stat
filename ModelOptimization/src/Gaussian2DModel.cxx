@@ -165,6 +165,15 @@ Gaussian2DModel
 
 void
 Gaussian2DModel
+::GetDeviations( double & DevX, double & DevY ) const
+{
+  DevX = this->m_StandardDeviationX;
+  DevY = this->m_StandardDeviationY;
+}
+
+
+void
+Gaussian2DModel
 ::GetMeans( double & MeanX, double & MeanY ) const
 {
   MeanX = this->m_MeanX;

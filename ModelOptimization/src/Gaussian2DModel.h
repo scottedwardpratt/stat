@@ -59,6 +59,7 @@ public:
                                      double & Prior ) const;
 
   void GetMeans( double & MeanX, double & MeanY ) const;
+  void GetDeviations( double & DvX, double & DevY ) const;
 
 protected:
   double m_MeanX;
