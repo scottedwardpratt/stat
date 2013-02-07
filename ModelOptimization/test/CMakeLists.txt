@@ -11,6 +11,12 @@ target_link_libraries( Gaussian2DModelTest ${LIBRARIES} )
 add_test(              Gaussian2DModelTest
                        Gaussian2DModelTest )
 
+add_executable(        ModelTest
+                       ModelTest.cxx )
+target_link_libraries( ModelTest ${LIBRARIES} )
+add_test(              ModelTest
+                       ModelTest )
+
 add_executable(        NumericalGradientEstimationTest
                        NumericalGradientEstimationTest.cxx )
 target_link_libraries( NumericalGradientEstimationTest ${LIBRARIES} )

@@ -89,6 +89,10 @@ public:
                                      double & LikeNew,
                                      double & PriorNew) const = 0;
 
+  /** Set/get the gradient estimate step size. */
+  void SetGradientEstimateStepSize( double stepSize );
+  double GetGradientEstimateStepSize() const;
+
   /** \todo - These should be made protected. */
   std::string   m_DirectoryName;
   std::string   m_ParameterFileName;
@@ -110,6 +114,11 @@ protected:
   /** Subclasses must populate these vectors with the names of the
    * scalar outputs. */
   std::vector< std::string > m_ScalarOutputNames;
+
+  /** Step size used for numerical estimation of gradient.
+   *
+   * This is usually denoted 'h' in math texts about finite differences. */
+  double m_GradientEstimateStepSize;
 
   /** Current state of the model. */
   InternalState m_StateFlag;

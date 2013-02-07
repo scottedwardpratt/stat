@@ -21,9 +21,10 @@
 namespace madai {
 
 Model
-::Model()
+::Model() :
+  m_GradientEstimateStepSize( 1.0e-4 ),
+  m_StateFlag( UNINITIALIZED )
 {
-  
 }
 
 
@@ -65,6 +66,15 @@ Model
 }
 
 
+void
+Model
+::GetRange( unsigned int parameterIndex, double range[2] ) const
+{
+  range[0] = this->m_Parameters.at(parameterIndex).m_MinimumPossibleValue;
+  range[1] = this->m_Parameters.at(parameterIndex).m_MaximumPossibleValue;
+}
+
+
 const std::vector< std::string > &
 Model
 ::GetScalarOutputNames() const
@@ -100,7 +110,7 @@ Model
 
   ErrorType scalarOutputError;
 
-  double h = 1.0e-4;
+  double h = m_GradientEstimateStepSize;
   for ( unsigned int i = 0; i < this->GetNumberOfParameters(); ++i ) {
 
     if ( activeParameters[i] ) {
@@ -149,10 +159,17 @@ Model
 
 void
 Model
-::GetRange( unsigned int parameterIndex, double range[2] ) const
+::SetGradientEstimateStepSize( double stepSize )
 {
-  range[0] = this->m_Parameters.at(parameterIndex).m_MinimumPossibleValue;
-  range[1] = this->m_Parameters.at(parameterIndex).m_MaximumPossibleValue;
+  m_GradientEstimateStepSize = stepSize;
+}
+
+
+double
+Model
+::GetGradientEstimateStepSize() const
+{
+  return m_GradientEstimateStepSize;
 }
 
 
