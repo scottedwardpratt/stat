@@ -66,12 +66,18 @@ Model
 }
 
 
-void
+Model::ErrorType
 Model
 ::GetRange( unsigned int parameterIndex, double range[2] ) const
 {
+  if ( parameterIndex > this->GetNumberOfParameters() ) {
+    return INVALID_PARAMETER_INDEX;
+  }
+
   range[0] = this->m_Parameters.at(parameterIndex).m_MinimumPossibleValue;
   range[1] = this->m_Parameters.at(parameterIndex).m_MaximumPossibleValue;
+
+  return NO_ERROR;
 }
 
 
@@ -170,6 +176,47 @@ Model
 ::GetGradientEstimateStepSize() const
 {
   return m_GradientEstimateStepSize;
+}
+
+
+std::string
+Model
+::GetErrorTypeAsString( ErrorType error )
+{
+  std::string outputString( "NO_ERROR" );
+
+  switch ( error ) {
+
+  case INVALID_PARAMETER_INDEX:
+    outputString = std::string( "INVALID_PARAMETER_INDEX" );
+    break;
+
+  case INVALID_OUTPUT_INDEX:
+    outputString = std::string( "INVALID_OUTPUT_INDEX" );
+    break;
+
+  case INVALID_ACTIVE_PARAMETERS:
+    outputString = std::string( "INVALID_ACTIVE_PARAMETERS" );
+    break;
+
+  case FILE_NOT_FOUND_ERROR:
+    outputString = std::string( "FILE_NOT_FOUND_ERROR" );
+    break;
+
+  case METHOD_NOT_IMPLEMENTED:
+    outputString = std::string( "METHOD_NOT_IMPLEMENTED" );
+    break;
+
+  case OTHER_ERROR:
+    outputString = std::string( "OTHER_ERROR" );
+    break;
+
+  default:
+    break;
+
+  }
+
+  return outputString;
 }
 
 

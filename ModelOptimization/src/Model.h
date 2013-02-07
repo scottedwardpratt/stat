@@ -34,6 +34,7 @@ class Model {
 public:
   typedef enum {
     NO_ERROR = 0,
+    INVALID_PARAMETER_INDEX,
     INVALID_OUTPUT_INDEX,
     INVALID_ACTIVE_PARAMETERS,
     FILE_NOT_FOUND_ERROR,
@@ -63,11 +64,11 @@ public:
   virtual const std::vector< std::string > & GetScalarOutputNames() const;
 
   /** Get the valid range for the parameter at parameterIndex. */
-  virtual void GetRange( unsigned int parameterIndex, double range[2] ) const;
+  virtual ErrorType GetRange( unsigned int parameterIndex, double range[2] ) const;
 
   /** Get the scalar outputs from the model evaluated at x. */
   virtual ErrorType GetScalarOutputs( const std::vector< double > & parameters,
-                                            std::vector< double > & scalars ) const = 0;
+                                      std::vector< double > & scalars ) const = 0;
 
   /** Get both scalar outputs and the gradient of active parameters.
    *
@@ -92,6 +93,9 @@ public:
   /** Set/get the gradient estimate step size. */
   void SetGradientEstimateStepSize( double stepSize );
   double GetGradientEstimateStepSize() const;
+
+  /** Returns an error code as a string. */
+  static std::string GetErrorTypeAsString( ErrorType error );
 
   /** \todo - These should be made protected. */
   std::string   m_DirectoryName;
