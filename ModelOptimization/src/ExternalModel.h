@@ -52,9 +52,6 @@ public:
   virtual ErrorType LoadConfigurationFile( const std::string fileName );
   virtual ErrorType LoadConfigurationFile( std::istream & configFile );
 
-  /** Get the valid range for the parameter at parameterIndex. */
-  virtual void GetRange(unsigned int parameterIndex, double range[2]) const;
-
   /** 
    * Get the scalar outputs from the model evaluated at x.  If an
    * error happens, the scalar output array will be left incomplete.

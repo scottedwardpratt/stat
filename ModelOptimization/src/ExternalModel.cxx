@@ -267,15 +267,6 @@ ExternalModel::LoadConfigurationFile( std::istream & configFile )
 }
 
 
-/** Get the valid range for the parameter at parameterIndex. */
-void ExternalModel
-::GetRange( unsigned int parameterIndex, double range[2] ) const
-{
-  range[0] = this->m_Parameters.at( parameterIndex ).m_MinimumPossibleValue;
-  range[1] = this->m_Parameters.at( parameterIndex ).m_MaximumPossibleValue;
-}
-
-
 /**
  * Get the scalar outputs from the model evaluated at x.  If an
  * error happens, the scalar output array will be left incomplete.
