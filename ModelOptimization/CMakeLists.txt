@@ -46,7 +46,7 @@ set( ModelOptimization_LIBRARIES
 option( BUILD_TESTING "Build the tests for ModelOptimization." OFF )
 if ( BUILD_TESTING )
   enable_testing()
-add_subdirectory( test )
+  add_subdirectory( test )
 endif()
 
 # Configure package file
