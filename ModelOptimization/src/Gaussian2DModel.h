@@ -58,6 +58,8 @@ public:
                                      double & Like,
                                      double & Prior ) const;
 
+  void GetMeans( double & MeanX, double & MeanY ) const;
+
 protected:
   double m_MeanX;
   double m_MeanY;

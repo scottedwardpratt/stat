@@ -163,4 +163,13 @@ Gaussian2DModel
   return NO_ERROR;
 }
 
+
+void
+Gaussian2DModel
+::GetMeans( double & MeanX, double & MeanY ) const
+{
+  MeanX = this->m_MeanX;
+  MeanY = this->m_MeanY;
+}
+
 } // end namespace madai

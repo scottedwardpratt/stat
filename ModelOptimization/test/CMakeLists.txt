@@ -28,3 +28,7 @@ target_link_libraries( Gaussian2DMCMCTest ${LIBRARIES} )
 add_executable(        MCMC_core_test
                        MCMC_core_test.cxx )
 target_link_libraries( MCMC_core_test ${LIBRARIES} )
+
+add_executable(        DiceMCMC
+                       DiceMCMC.cxx )
+target_link_libraries( DiceMCMC ${LIBRARIES} )
