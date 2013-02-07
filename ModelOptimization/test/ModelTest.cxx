@@ -136,12 +136,105 @@ int main( int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
+  if ( model->GetNumberOfScalarOutputs() != 0 ) {
+    std::cerr << "Number of scalar outputs should be 0 by default, was "
+              << model->GetNumberOfScalarOutputs() << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if ( model->GetScalarOutputNames().size() != 0 ) {
+    std::cerr << "Size of vector containing scalar output names should be 0, was "
+             << model->GetScalarOutputNames().size() << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  double range[2];
+  madai::Model::ErrorType error = model->GetRange( 4, range );
+  if ( error != madai::Model::INVALID_PARAMETER_INDEX ) {
+    std::cerr << "Model::GetRange() should have returned INVALID_PARAMETER_INDEX,"
+              << " returned " << model->GetErrorTypeAsString( error ) << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  error = model->GetRange( 0, range );
+  if ( range[0] != -DBL_MAX || range[1] != DBL_MAX ) {
+    std::cerr << "ModelGetRange( 0, range ) returned range ("
+              << range[0] << "), " << range[1] << ", but (" << -DBL_MAX << ", "
+              << DBL_MAX << ") was expected." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  error = model->GetRange( 1, range );
+  if ( range[0] != 0.0 || range[1] != DBL_MAX ) {
+    std::cerr << "ModelGetRange( 1, range ) returned range ("
+              << range[0] << "), " << range[1] << ", but (" << 0.0 << ", "
+              << DBL_MAX << ") was expected." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  error = model->GetRange( 2, range );
+  if ( range[0] != 0.0 || range[1] != 1.0 ) {
+    std::cerr << "ModelGetRange( 2, range ) returned range ("
+              << range[0] << "), " << range[1] << ", but (" << 0.0 << ", "
+              << 1.0 << ") was expected." << std::endl;
+    return EXIT_FAILURE;
+  }
+
   double h = 1.13;
   model->SetGradientEstimateStepSize( h );
   double retrievedH = model->GetGradientEstimateStepSize();
   if ( retrievedH != h ) {
     std::cerr << "Unexpected value from Model::GetGradientEstimateStepSize()" << std::endl;
     std::cerr << "Got " << retrievedH << " but expected " << h << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if ( madai::Model::GetErrorTypeAsString( madai::Model::NO_ERROR ) != "NO_ERROR" ) {
+    std::cerr << "Expected string 'NO_ERROR', got '"
+              << madai::Model::GetErrorTypeAsString( madai::Model::NO_ERROR )
+              << "' instead." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if ( madai::Model::GetErrorTypeAsString( madai::Model::INVALID_PARAMETER_INDEX ) != "INVALID_PARAMETER_INDEX" ) {
+    std::cerr << "Expected string 'INVALID_PARAMETER_INDEX', got '"
+              << madai::Model::GetErrorTypeAsString( madai::Model::INVALID_PARAMETER_INDEX )
+              << "' instead." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if ( madai::Model::GetErrorTypeAsString( madai::Model::INVALID_OUTPUT_INDEX ) != "INVALID_OUTPUT_INDEX" ) {
+    std::cerr << "Expected string 'INVALID_OUTPUT_INDEX', got '"
+              << madai::Model::GetErrorTypeAsString( madai::Model::INVALID_OUTPUT_INDEX )
+              << "' instead." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if ( madai::Model::GetErrorTypeAsString( madai::Model::INVALID_ACTIVE_PARAMETERS ) != "INVALID_ACTIVE_PARAMETERS" ) {
+    std::cerr << "Expected string 'INVALID_ACTIVE_PARAMETERS', got '"
+              << madai::Model::GetErrorTypeAsString( madai::Model::INVALID_ACTIVE_PARAMETERS )
+              << "' instead." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if ( madai::Model::GetErrorTypeAsString( madai::Model::FILE_NOT_FOUND_ERROR ) != "FILE_NOT_FOUND_ERROR" ) {
+    std::cerr << "Expected string 'FILE_NOT_FOUND_ERROR', got '"
+              << madai::Model::GetErrorTypeAsString( madai::Model::FILE_NOT_FOUND_ERROR )
+              << "' instead." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if ( madai::Model::GetErrorTypeAsString( madai::Model::METHOD_NOT_IMPLEMENTED ) != "METHOD_NOT_IMPLEMENTED" ) {
+    std::cerr << "Expected string 'METHOD_NOT_IMPLEMENTED', got '"
+              << madai::Model::GetErrorTypeAsString( madai::Model::METHOD_NOT_IMPLEMENTED )
+              << "' instead." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if ( madai::Model::GetErrorTypeAsString( madai::Model::OTHER_ERROR ) != "OTHER_ERROR" ) {
+    std::cerr << "Expected string 'OTHER_ERROR', got '"
+              << madai::Model::GetErrorTypeAsString( madai::Model::OTHER_ERROR )
+              << "' instead." << std::endl;
     return EXIT_FAILURE;
   }
 
