@@ -48,18 +48,6 @@ class PriorDistribution;
  */
 class MultiModel : public Model {
 public:
-  std::vector<bool>       m_LogParam;
-  std::string             m_ModelType;
-  std::string             m_ParameterFile;
-  std::string             m_Optimizer;
-  LikelihoodDistribution* m_Likelihood;
-  PriorDistribution*      m_Prior;
-  bool                    m_PrescaledParams;
-  bool                    m_UseEmulator;
-  bool                    m_ProcessPipe;
-
-  bool good() { return (this->m_StateFlag == READY);}
-
   MultiModel();
   virtual ~MultiModel();
 
@@ -100,17 +88,18 @@ public:
   bool discard_comments(std::istream& i, char comment_character);
 
 protected:
-
   unsigned int m_NumberOfParameters;
   unsigned int m_NumberOfOutputs;
 
-  typedef enum {
-    UNINITIALIZED,
-    READY,
-    ERROR
-  } InternalState;
-
-  InternalState m_StateFlag;
+  std::vector< bool >     m_LogParam;
+  std::string             m_ModelType;
+  std::string             m_ParameterFile;
+  std::string             m_Optimizer;
+  LikelihoodDistribution* m_Likelihood;
+  PriorDistribution*      m_Prior;
+  bool                    m_PrescaledParams;
+  bool                    m_UseEmulator;
+  bool                    m_ProcessPipe;
 
 }; // end class MultiModel
 

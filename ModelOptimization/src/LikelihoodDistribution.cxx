@@ -22,7 +22,9 @@ namespace madai {
 
 
 LikelihoodDistribution
-::LikelihoodDistribution()
+::LikelihoodDistribution() :
+  m_UseEmulator( false ),
+  m_ProcessPipe( false )
 {
 }
 

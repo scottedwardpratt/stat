@@ -29,7 +29,9 @@
 namespace madai {
 
 ExternalModel
-::ExternalModel()
+::ExternalModel() :
+  m_NumberOfParameters( 0 ),
+  m_NumberOfOutputs( 0 )
 {
   this->m_Process.question = NULL; // constructor must do this
   // so that we know whether the destructor must act.

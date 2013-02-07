@@ -22,7 +22,9 @@
 namespace madai {
 
 InterpolatorPriorDistribution
-::InterpolatorPriorDistribution( Model * in_Model )
+::InterpolatorPriorDistribution( Model * in_Model ) :
+  m_Model( in_Model ),
+  m_Scaled( false )
 {
   m_Model = in_Model;
   m_SepMap = parameter::getB( m_Model->m_ParameterMap, "PRIOR_PARAMETER_MAP", false );

@@ -40,47 +40,29 @@ public:
     OTHER_ERROR
   } ErrorType;
 
-  Model() {};
-  virtual ~Model() {};
+  Model();
+  virtual ~Model();
 
   /** Loads a configuration from a file. **/
   virtual ErrorType LoadConfigurationFile( const std::string fileName ) = 0;
 
+  /** Has the model been initialized? */
+  bool IsReady() const;
+
   /** Get the number of parameters. */
-  virtual unsigned int GetNumberOfParameters() const
-  {
-    return static_cast<unsigned int>(m_Parameters.size());
-  };
+  virtual unsigned int GetNumberOfParameters() const;
 
   /** Get names of the parameters. */
-  virtual const std::vector< Parameter > & GetParameters() const
-  {
-    return m_Parameters;
-  };
-
-  /** Set the parameters. */
-  virtual ErrorType SetParameters(const std::vector< Parameter > &){
-    return NO_ERROR;
-  }
+  virtual const std::vector< Parameter > & GetParameters() const;
 
   /** Get the number of scalar outputs. */
-  virtual unsigned int GetNumberOfScalarOutputs() const
-  {
-    return static_cast<unsigned int>(m_ScalarOutputNames.size());
-  }
+  virtual unsigned int GetNumberOfScalarOutputs() const;
 
   /** Get the names of the scalar outputs of the model. */
-  virtual const std::vector< std::string > & GetScalarOutputNames() const
-  {
-    return m_ScalarOutputNames;
-  }
+  virtual const std::vector< std::string > & GetScalarOutputNames() const;
 
   /** Get the valid range for the parameter at parameterIndex. */
-  virtual void GetRange( unsigned int parameterIndex, double range[2] ) const
-  {
-    range[0] = this->m_Parameters.at(parameterIndex).m_MinimumPossibleValue;
-    range[1] = this->m_Parameters.at(parameterIndex).m_MaximumPossibleValue;
-  }
+  virtual void GetRange( unsigned int parameterIndex, double range[2] ) const;
 
   /** Get the scalar outputs from the model evaluated at x. */
   virtual ErrorType GetScalarOutputs( const std::vector< double > & parameters,
@@ -93,18 +75,25 @@ public:
                                                  unsigned int outputIndex,
                                                  std::vector< double > & gradient) const = 0;
 
-  // Proposed function for interaction with the MCMC:
+  /** Get the likelihood and prior for the parameters. */
   virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,
                                      double & LikeNew,
                                      double & PriorNew) const = 0;
 
-
+  /** \todo - These should be made protected. */
   std::string   m_DirectoryName;
   std::string   m_ParameterFileName;
   bool          m_LogLike;
   parameterMap  m_ParameterMap;
 
 protected:
+  /** Enumeration of internal state. */
+  typedef enum {
+    UNINITIALIZED,
+    READY,
+    ERROR
+  } InternalState;
+
   /** Subclasses must populate this vector with the names of the
    * model parameters. */
   std::vector< Parameter > m_Parameters;
@@ -113,20 +102,16 @@ protected:
    * scalar outputs. */
   std::vector< std::string > m_ScalarOutputNames;
 
+  /** Current state of the model. */
+  InternalState m_StateFlag;
+
   /** Add a parameter. */
   void AddParameter( const std::string & name,
                      double minimumPossibleValue = -DBL_MAX,
-                     double maximumPossibleValue =  DBL_MAX )
-  {
-    m_Parameters.push_back(
-      Parameter(name, minimumPossibleValue, maximumPossibleValue) );
-  }
+                     double maximumPossibleValue =  DBL_MAX );
 
   /** Add a scalar output name. */
-  void AddScalarOutputName( const std::string & name )
-  {
-    m_ScalarOutputNames.push_back( name );
-  }
+  void AddScalarOutputName( const std::string & name );
 
 }; // end Model
 

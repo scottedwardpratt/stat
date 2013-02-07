@@ -40,12 +40,6 @@ InterModel
 InterModel
 ::~InterModel()
 {
-  if ( m_Prior != NULL ) {
-    delete m_Prior;
-  }
-  if ( m_Emulator != NULL ) {
-    delete m_Emulator;
-  }
 }
 
 InterModel::ErrorType
