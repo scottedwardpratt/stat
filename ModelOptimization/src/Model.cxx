@@ -73,6 +73,19 @@ Model
 }
 
 
+Model::ErrorType
+Model
+::GetScalarAndGradientOutputs(
+  const std::vector< double > & parameters,
+  const std::vector< bool > & activeParameters,
+  std::vector< double > & scalars,
+  unsigned int outputIndex,
+  std::vector< double > & gradient) const
+{
+  return METHOD_NOT_IMPLEMENTED;
+}
+
+
 void
 Model
 ::GetRange( unsigned int parameterIndex, double range[2] ) const

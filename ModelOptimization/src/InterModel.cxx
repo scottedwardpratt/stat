@@ -79,16 +79,6 @@ InterModel::GetScalarOutputs( const std::vector< double > & parameters,
   return NO_ERROR;
 }
 
-// Not implemented yet
-InterModel::ErrorType
-InterModel::GetScalarAndGradientOutputs( const std::vector< double > & parameters,
-                                         const std::vector< bool > & activeParameters,
-                                         std::vector< double > & scalars,
-                                         unsigned int outputIndex, std::vector< double > & gradient) const
-{
-  return OTHER_ERROR;
-}
-
 // For interaction with the mcmc
 InterModel::ErrorType
 InterModel::GetLikeAndPrior( const std::vector< double > & parameters,

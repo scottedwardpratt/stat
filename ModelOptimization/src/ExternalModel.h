@@ -62,14 +62,6 @@ public:
   virtual ErrorType GetScalarOutputs( const std::vector< double > & parameters,
                                       std::vector< double > & scalars ) const;
 
-  // Not implemented yet.  Should we do this numerically?
-  /** Get both scalar values and the gradient of the parameters. */
-  virtual ErrorType GetScalarAndGradientOutputs( const std::vector< double > & parameters,
-                                                 const std::vector< bool > & activeParameters,
-                                                 std::vector< double > & scalars,
-                                                 unsigned int outputIndex,
-                                                 std::vector< double > & gradient) const;
-    
   // Not implemented yet.
   // Proposed function for interaction with the MCMC
   virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,

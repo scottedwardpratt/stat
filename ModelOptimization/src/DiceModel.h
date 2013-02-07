@@ -53,12 +53,6 @@ public:
   virtual ErrorType GetScalarOutputs( const std::vector< double > & parameters,
                                       std::vector< double > & scalars ) const;
                                       
-  virtual ErrorType GetScalarAndGradientOutputs( const std::vector< double > & parameters,
-                                                 const std::vector< bool > & activeParameters,
-                                                 std::vector< double > & scalars,
-                                                 unsigned int outputIndex,
-                                                 std::vector< double > & gradient) const;
-                                                 
   virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,
                                      double & Like,
                                      double & Prior) const;

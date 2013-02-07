@@ -114,19 +114,6 @@ RHICModel
 }
 
 
-// Not implemented yet.  Should we do this numerically?
-/** Get both scalar values and the gradient of the parameters. */
-RHICModel::ErrorType
-RHICModel
-::GetScalarAndGradientOutputs( const std::vector< double > & parameters,
-                               const std::vector< bool > & activeParameters,
-                               std::vector< double > & scalars,
-                               unsigned int outputIndex, std::vector< double > & gradient ) const
-{
-  return OTHER_ERROR;
-}
-
-
 // For interaction with the mcmc
 RHICModel::ErrorType
 RHICModel

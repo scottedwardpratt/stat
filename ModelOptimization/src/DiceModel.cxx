@@ -102,19 +102,6 @@ DiceModel
 Model
 ::ErrorType
 DiceModel
-::GetScalarAndGradientOutputs( const std::vector< double > & parameters,
-                               const std::vector< bool > & activeParameters,
-                               std::vector< double > & scalars,
-                               unsigned int outputIndex,
-                               std::vector< double > & gradient) const
-{
-  return Model::OTHER_ERROR;
-}
-
-
-Model
-::ErrorType
-DiceModel
 ::GetLikeAndPrior( const std::vector< double > & parameters,
                    double & Like,
                    double & Prior) const

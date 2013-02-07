@@ -302,17 +302,6 @@ ExternalModel::GetScalarOutputs(
   return NO_ERROR;
 }
 
-// Not implemented yet.  Should we do this numerically?
-/** Get both scalar values and the gradient of the parameters. */
-ExternalModel::ErrorType
-ExternalModel::GetScalarAndGradientOutputs(
-  const std::vector< double > & parameters,
-  const std::vector< bool > & activeParameters,
-  std::vector< double > & scalars,
-  unsigned int outputIndex, std::vector< double > & gradient ) const
-{
-  return OTHER_ERROR;
-}
 
 // Not implemented yet.
 // Get the likelihood and prior at the point theta

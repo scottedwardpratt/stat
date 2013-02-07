@@ -37,12 +37,6 @@ public:
   virtual ErrorType GetScalarOutputs( const std::vector< double > & parameters,
                                       std::vector< double > & scalars ) const;
   
-  // Not Implemented Yet
-  virtual ErrorType GetScalarAndGradientOutputs( const std::vector< double > & parameters,
-                                                 const std::vector< bool > & activeParameters,
-                                                 std::vector< double > & scalars,
-                                                 unsigned int outputIndex, std::vector< double > & gradient) const;
-  
   // Interface for MCMC
   virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,
                                      double & Like,

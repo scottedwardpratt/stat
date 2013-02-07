@@ -74,17 +74,6 @@ CosmoModel
   return NO_ERROR;
 }
 
-// Not implemented yet.  Should we do this numerically?
-CosmoModel::ErrorType 
-CosmoModel
-::GetScalarAndGradientOutputs(const std::vector< double > & parameters,
-                              const std::vector< bool > & activeParameters,
-                              std::vector< double > & scalars,
-                              unsigned int outputIndex, std::vector< double > & gradient) const 
-{
-  return OTHER_ERROR;
-}
-
 // For interaction with the mcmc
 CosmoModel::ErrorType
 CosmoModel

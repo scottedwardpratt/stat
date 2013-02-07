@@ -37,6 +37,7 @@ public:
     INVALID_OUTPUT_INDEX,
     INVALID_ACTIVE_PARAMETERS,
     FILE_NOT_FOUND_ERROR,
+    METHOD_NOT_IMPLEMENTED,
     OTHER_ERROR
   } ErrorType;
 
@@ -69,11 +70,12 @@ public:
                                             std::vector< double > & scalars ) const = 0;
 
   /** Get both scalar values and the gradient of the parameters. */
-  virtual ErrorType GetScalarAndGradientOutputs( const std::vector< double > & parameters,
-                                                 const std::vector< bool > & activeParameters,
-                                                 std::vector< double > & scalars,
-                                                 unsigned int outputIndex,
-                                                 std::vector< double > & gradient) const = 0;
+  virtual ErrorType GetScalarAndGradientOutputs(
+    const std::vector< double > & parameters,
+    const std::vector< bool > & activeParameters,
+    std::vector< double > & scalars,
+    unsigned int outputIndex,
+    std::vector< double > & gradient) const;
 
   /** Get the likelihood and prior for the parameters. */
   virtual ErrorType GetLikeAndPrior( const std::vector< double > & parameters,
