@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
   madai::RegularStepGradientDescentOptimizer *optimizer =
     new madai::RegularStepGradientDescentOptimizer( model );
 
-  madai::Trace *trace = NULL; // TODO - trace is not yet defined.
+  madai::Trace *trace = new madai::Trace();
 
   // Set the step size.
   double stepSize = 20.0;
@@ -46,22 +46,27 @@ int main(int argc, char *argv[])
   optimizer->SetParameterValue( "X", 21.0 );
   optimizer->SetParameterValue( "Y", -13.5 );
 
-  for (unsigned int i = 0; i < 50; i++)
-  {
+  std::vector< double > currentParameters;
+  for (unsigned int i = 0; i < 50; i++) {
+    currentParameters = optimizer->GetCurrentParameters();
     optimizer->NextIteration( trace );
-
-    std::vector< double > currentParameters =
-      optimizer->GetCurrentParameters();
-    std::cout << "[";
-    unsigned int j;
-    for ( j = 0; j < currentParameters.size()-1; ++j )
-    {
-      std::cout << currentParameters[j] << ", ";
-    }
-    std::cout << currentParameters[j] << "]" << std::endl;
   }
 
-  // TODO - test for convergence
+  double modelMeanX;
+  double modelMeanY;
+  model->GetMeans( modelMeanX, modelMeanY );
+
+  if ( fabs( modelMeanX - currentParameters[0] ) > 1.0e-3 ||
+       fabs( modelMeanY - currentParameters[1] ) > 1.0e-3 ) {
+    std::cerr << "RegularStepGradientDescentOptimizer failed to converge "
+              << "on the expected solution." << std::endl;
+    std::cerr << "Expected currentParameters to be (" << modelMeanX << ", "
+              << modelMeanY << "), got (" << currentParameters[0] << ", "
+              << currentParameters[1] << ") instead." << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  delete trace;
 
   return EXIT_SUCCESS;
 }
