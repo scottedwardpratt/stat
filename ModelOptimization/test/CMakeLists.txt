@@ -19,7 +19,7 @@ add_test( external_model_plus_mhmcmc_test external_model_plus_mhmcmc_test )
 
 add_executable( Gaussian2DMCMCTest Gaussian2DMCMCTest.cxx )
 target_link_libraries( Gaussian2DMCMCTest ${LIBRARIES} )
-add_test( Gaussian2DMCMCTest Gaussian2DMCMCTest )
+add_test( Gaussian2DMCMCTest Gaussian2DMCMCTest ${TEST_BASE_DIR}/Gaussian2DMCMC )
 
 add_executable( MCMC_core_test MCMC_core_test.cxx )
 target_link_libraries( MCMC_core_test ${LIBRARIES} )

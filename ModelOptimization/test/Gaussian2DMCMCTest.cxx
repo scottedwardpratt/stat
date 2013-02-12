@@ -54,10 +54,10 @@ int main( int argc, char ** argv ) {
   srand( time( NULL ) );
   if( argc != 2 ){
     std::cerr <<
-    "Useage:\n\t mcmc info_dir_path\n\n"
-    "where info_dir_path is the path to the "
-    "directory containing all of the configuration "
-    "files needed to run the mcmc.\n\n";
+      "Useage:\n\t " << argv[0] << " info_dir_path\n\n"
+      "where info_dir_path is the path to the "
+      "directory containing all of the configuration "
+      "files needed to run the mcmc.\n\n" << std::endl;
     return EXIT_FAILURE;
   }
   std::string info_dir( argv[1] );
