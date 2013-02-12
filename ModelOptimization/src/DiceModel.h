@@ -39,6 +39,7 @@ class DiceModel : public Model {
 public:
   bool         m_Sum;
   bool         m_Distinguishable;
+  bool         m_Weighted;
   int          m_Denom;
   int          m_Sides;
   std::string  m_ConfigFile;
@@ -66,6 +67,8 @@ public:
 
 protected:
   unsigned int m_NumberOfParameters, m_NumberOfOutputs;
+  std::vector< std::vector< double > > m_Weights;
+  std::vector< double >                m_TotalWeights;
 
   typedef enum {
     UNINITIALIZED,
@@ -73,6 +76,9 @@ protected:
     ERROR
   } InternalState;
   InternalState m_StateFlag;
+  
+  double GetWeightedDiceLikelihood( const std::vector< double > & outputs ) const;
+  double GetRegularDiceLikelihood( const std::vector< double > & outputs ) const;
   
 }; // end class DiceModel
 

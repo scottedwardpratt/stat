@@ -50,8 +50,6 @@ MCMCRun
   m_LogPrior      = parameter::getB( m_LocalParameterMap, "LOGPRIOR", true );
   m_LogLike       = parameter::getB( m_LocalParameterMap, "LOGLIKE", true );
   m_Debug         = parameter::getB( m_LocalParameterMap, "DEBUG", false );
-  //m_Debug = true; // For creating a regression test
-  std::cerr << "1" << std::endl;
 
   // Define how to take and evaluate steps
   this->LoadStepParameters();
@@ -174,7 +172,9 @@ MCMCRun
       printf("Reject\n");
     }
   }
-  std::cerr << std::endl;
+  if ( !m_Quiet ) {
+    std::cerr << std::endl;
+  }
 
   std::vector< double > TElement;
   if ( m_IterationNumber > m_BurnIn ) { // We are just tossing everything in the burn in period.
@@ -288,6 +288,7 @@ MCMCRun
   m_RescaledMethod    = parameter::getB( *m_StepParameterMap, "RESCALED_PROPOSAL", true );
   m_MixingStdDev      = parameter::getV( *m_StepParameterMap, "MIXING_STD_DEV", "0" );
   m_SymmetricProposal = parameter::getB( *m_StepParameterMap, "SYMMETRIC_PROPOSAL", true );
+  m_FlatStep          = parameter::getB( *m_StepParameterMap, "FLAT_STEP", false );
   m_Prefactor         = parameter::getD( *m_StepParameterMap, "PREFACTOR", 1.0 );
   m_MinScale          = parameter::getD( *m_StepParameterMap, "MIN", 0.0 );
   m_MaxScale          = parameter::getD( *m_StepParameterMap, "Max", 1.0 );
@@ -323,12 +324,12 @@ MCMCRun
         proposed[i] = ( proposed[i] * ( range[1] - range[0] ) ) + range[0];
       }
     }
-  } else if (m_FlatStep) {
+  } else if ( m_FlatStep ) {
     double range[2];
     for(int i = 0; i < proposed.size(); i++){
       if(m_ActiveParameters.find(m_Model->GetParameters()[i].m_Name)!=m_ActiveParameters.end() ) {
         m_Model->GetRange(i, range);
-        proposed[i] = double(rand() % int((range[1] - range[0])*10000))/10000+range[0];
+        proposed[i] = double(rand() % int((range[1] - range[0])*10000))/10000.0+range[0];
       }
     }
   } else {
@@ -359,7 +360,7 @@ MCMCRun
   double probability;
   double exponent = 0, prefactor = 1;
 
-  if ( m_SymmetricProposal ) {
+  if ( m_SymmetricProposal || m_FlatStep ) {
     // If it's symmetric this doesn't matter
     probability = 1.0;
   } else {
