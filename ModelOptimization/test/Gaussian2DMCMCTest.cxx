@@ -58,7 +58,7 @@ int main( int argc, char ** argv ) {
     "where info_dir_path is the path to the "
     "directory containing all of the configuration "
     "files needed to run the mcmc.\n\n";
-    return 0;
+    return EXIT_FAILURE;
   }
   std::string info_dir( argv[1] );
   madai::Gaussian2DModel g2d_model;
@@ -94,7 +94,7 @@ int main( int argc, char ** argv ) {
   FILE* fp = fopen( trace_file_name.c_str(), "r" );
   if( fp == NULL ){
     std::cerr << "Error opening trace.dat [1]" << std::endl;
-    return 0;
+    return EXIT_FAILURE;
   }
   
   // Find ranges of the trace data
@@ -128,7 +128,7 @@ int main( int argc, char ** argv ) {
   FILE* tfile = fopen( trace_file_name.c_str(), "r" );
   if( tfile == NULL ) {
     std::cerr << "Error opening trace.dat [2]" << std::endl;
-    return 0;
+    return EXIT_FAILURE;
   }
   int nbins = 300;
   int** densities = new int*[nbins]();
@@ -423,5 +423,5 @@ int main( int argc, char ** argv ) {
     std::cerr << "Plot these values for inspection of the distribution" << std::endl;
   }
   
-  return 0;
+  return EXIT_SUCCESS;
 }
