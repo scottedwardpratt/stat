@@ -3,6 +3,8 @@ set( LIBRARIES
   ${CORELIBS} 
 )
 
+set( TEST_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
+
 add_executable( Gaussian2DModelTest Gaussian2DModelTest.cxx )
 target_link_libraries( Gaussian2DModelTest ${LIBRARIES} )
 add_test( Gaussian2DModelTest Gaussian2DModelTest )
@@ -25,4 +27,4 @@ add_test( MCMC_core_test MCMC_core_test )
 
 add_executable( DiceMCMC DiceMCMC.cxx )
 target_link_libraries( DiceMCMC ${LIBRARIES} )
-add_test( DiceMCMC DiceMCMC )
+add_test( DiceMCMC DiceMCMC ${TEST_BASE_DIR}/DiceMCMC )
