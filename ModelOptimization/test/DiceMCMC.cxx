@@ -10,7 +10,7 @@
 int main(int argc, char ** argv){
   srand(time(NULL));
   if(argc != 2) {
-    "Useage:\n\t DiceMCMC info_dir\n\n"
+    std::cerr << "Useage:\n\t " << argv[0] << " info_dir_path\n\n"
     "where info_dir_path is the path to the "
     "directory containing all of the configuration "
     "files needed to run the mcmc.\n\n";
@@ -52,5 +52,5 @@ int main(int argc, char ** argv){
   
   std::cerr << "Done Successfully." << std::endl;
 
-  return EXIT_FAILURE;
+  return EXIT_SUCCESS;
 }
