@@ -58,14 +58,14 @@ int main(int argc, char ** argv){
     "where info_dir_path is the path to the "
     "directory containing all of the configuration "
     "files needed to run the mcmc.\n\n";
-    return 0;
+    return EXIT_FAILURE;
   }
   std::string info_dir(argv[1]);
   madai::TestModel t_model;
   t_model.LoadConfiguration(info_dir);
   if(!(t_model.IsReady())){
     std::cerr << "Something is wrong with the model\n\n";
-    return 0;
+    return EXIT_FAILURE;
   }
   
   madai::MCMCRun run(&t_model, info_dir);
@@ -101,11 +101,11 @@ int main(int argc, char ** argv){
   FILE* fp2 = fopen(trace_file_name.c_str(), "r");
   if(fp1 == NULL){
     std::cerr << "Error opening test_trace.dat" << std::endl;
-    return 0;
+    return EXIT_FAILURE;
   }
   if(fp2 == NULL){
     std::cerr << "Error opening " << trace.m_TraceDirectory+"/trace.dat" << std::endl;
-    return 0;
+    return EXIT_FAILURE;
   }
   double* set1 = new double[parameters->size()+5]();
   double* set2 = new double[parameters->size()+5]();
@@ -119,7 +119,7 @@ int main(int argc, char ** argv){
       std::cerr << "Iteration number error :(" << std::endl;
       std::cerr << "Iter1: " << iter_num1;
       std::cerr << "Iter2: " << iter_num2;
-      exit(1);
+      return EXIT_FAILURE;
     }
     for(k = 0; k < parameters->size(); k++){
       fscanf(fp1, "%lf,", &set1[k]);
@@ -128,10 +128,10 @@ int main(int argc, char ** argv){
         std::cerr << "Different values for parameter " << k << " on iteration " << iter_num1 << std::endl;
         if(iter_num1 == 0){
           std::cerr << "MCMC Core Test Failure: 0th iteration error. Initial theta needs to be the same" << std::endl;
-          exit(1);
+          return EXIT_FAILURE;
         } else {
           std::cerr << "MCMC Core Test Failure: Something must have gone wrong in taking a step in MCMCRun.cxx" << std::endl;
-          exit(1);
+          return EXIT_FAILURE;
         }
       }
     }
@@ -147,21 +147,21 @@ int main(int argc, char ** argv){
       std::cerr << "Different values for the Likelihood on iteration " << iter_num1 << "\n\n";
       std::cerr << "MCMC Core Test Failure: Model/Distribution Error." << std::endl;
       std::cerr << "Either TestModel.cxx's GetScalarOutputs or LikelihoodTest.cxx's Evaluate has changed" << std::endl;
-      exit(1);
+      return EXIT_FAILURE;
     }
     k++;
     if(set1[k]!=set2[k]){
       std::cerr << "Different values for the Prior on iteration " << iter_num1 << "\n\n";
       std::cerr << "MCMC Core Test Failure: Prior Distribution Error." << std::endl;
       std::cerr << "Check PriorTest.cxx's Evaluate" << std::endl;
-      exit(1);
+      return EXIT_FAILURE;
     }
     k++;
     if(set1[k]!=set2[k] || set1[k+1]!=set2[k+1]){
       std::cerr << "Different values for the Current Proposal on iteration " << iter_num1 << "\n\n";
       std::cerr << "MCMC Core Test Failure: MCMCRun Step Taking Error." << std::endl;
       std::cerr << "Check MCMCRun.cxx's EvaluateProposal and TakeStep" << std::endl;
-      exit(1);
+      return EXIT_FAILURE;
     }
     k+=2;
     if(set1[k]!=set2[k]){
@@ -171,6 +171,7 @@ int main(int argc, char ** argv){
       std::cerr << "1) MCMCRun::TakeStep" << std::endl;
       std::cerr << "2) MCMCRun::EvaluateProposal" << std::endl;
       std::cerr << "3) MCMCRun::NextIteration" << std::endl;
+      return EXIT_FAILURE;
     }
   }
   if(!feof(fp1)){
@@ -180,5 +181,5 @@ int main(int argc, char ** argv){
   std::cerr << "MCMC Core Test Passed:" << std::endl;
   std::cerr << "New run is identicle to test_trace.dat" << std::endl;
   
-  return 0;
+  return EXIT_SUCCESS;
 }

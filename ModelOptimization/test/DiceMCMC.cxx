@@ -10,18 +10,18 @@
 int main(int argc, char ** argv){
   srand(time(NULL));
   if(argc != 2) {
-    "Useage:\n\t DiceMCMC info_dir\n\n"
+    std::cerr << "Useage:\n\t " << argv[0] << " info_dir_path\n\n"
     "where info_dir_path is the path to the "
     "directory containing all of the configuration "
     "files needed to run the mcmc.\n\n";
-    return 0;
+    return EXIT_FAILURE;
   }
   std::string info_dir(argv[1]);
   madai::DiceModel d_model;
   d_model.LoadConfigurationFile(info_dir);
   if(!d_model.good()){
     std::cerr << "Something is wrong with the model\n\n";
-    return 0;
+    return EXIT_FAILURE;
   }
   
   madai::MCMCRun run(&d_model, info_dir);
@@ -51,5 +51,6 @@ int main(int argc, char ** argv){
   }
   
   std::cerr << "Done Successfully." << std::endl;
-  return 0;
+
+  return EXIT_SUCCESS;
 }
