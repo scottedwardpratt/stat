@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
 
   madai::RegularStepGradientDescentOptimizer *optimizer =
     new madai::RegularStepGradientDescentOptimizer( model );
+  optimizer->MinimizeOff(); // We want to maximize this function
 
   madai::Trace *trace = new madai::Trace();
 

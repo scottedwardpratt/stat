@@ -74,8 +74,8 @@ Gaussian2DModel
   double sy = m_StandardDeviationY;
 
   // Negate the Gaussian so there is a well-defined global minimum
-  double value = -exp( -( ((dx*dx) / (2.0 * sx * sx)) +
-                          ((dy*dy) / (2.0 * sy * sy)) ) );
+  double value = exp( -( ((dx*dx) / (2.0 * sx * sx)) +
+                         ((dy*dy) / (2.0 * sy * sy)) ) );
 
   scalars.push_back( value );
 
