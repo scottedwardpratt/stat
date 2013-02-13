@@ -39,8 +39,18 @@ public:
   /** Set the step size. */
   void SetStepSize( double stepSize );
 
+  /** Set search mode to minimize.
+   *
+   * Minimization is on by default. */
+  void MinimizeOn();
+
+  /** Set search mode to maximize. */
+  void MinimizeOff();
+
 protected:
   double m_StepSize;
+
+  bool m_Minimize;
 
   RegularStepGradientDescentOptimizer() {}; // intentionally hidden
 }; // end class RegularStepGradientDescentOptimizer

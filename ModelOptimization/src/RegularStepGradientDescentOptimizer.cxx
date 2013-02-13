@@ -24,9 +24,10 @@ namespace madai {
 
 RegularStepGradientDescentOptimizer
 ::RegularStepGradientDescentOptimizer( const Model *model ) :
-  Optimizer( model )
+  Optimizer( model ),
+  m_StepSize( 1.0e-3 ),
+  m_Minimize( true )
 {
-  m_StepSize = 1.0e-3;
 }
 
 
@@ -59,11 +60,16 @@ RegularStepGradientDescentOptimizer
   trace->add( m_CurrentParameters, scalars );
 
   // Update the current parameters to the new position
+  double direction = 1.0;
+  if ( m_Minimize ) {
+    direction = -1.0;
+  }
+
   unsigned int activeParameter = 0;
   for ( unsigned int i = 0; i < m_CurrentParameters.size(); ++i ) {
     if ( m_ActiveParameters.find( m_Model->GetParameters()[i].m_Name ) !=
          m_ActiveParameters.end() ) {
-      m_CurrentParameters[i] = -m_StepSize * gradient[activeParameter++] +
+      m_CurrentParameters[i] = direction * m_StepSize * gradient[activeParameter++] +
         m_CurrentParameters[i];
     }
   }
@@ -75,6 +81,22 @@ RegularStepGradientDescentOptimizer
 ::SetStepSize( double stepSize )
 {
   m_StepSize = stepSize;
+}
+
+
+void
+RegularStepGradientDescentOptimizer
+::MinimizeOn()
+{
+  m_Minimize = true;
+}
+
+
+void
+RegularStepGradientDescentOptimizer
+::MinimizeOff()
+{
+  m_Minimize = false;
 }
 
 } // end namespace madai
