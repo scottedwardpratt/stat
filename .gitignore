@@ -16,3 +16,7 @@ DistributionSampling/test/Gaussian2DMCMC/*
 DistributionSampling/test/TestModel/*
 DistributionSampling/test/DiceMCMC/DensityPlots/
 DistributionSampling/test/DiceMCMC/trace/
+
+tutorial/document/StatisticsTutorial.pdf
+tutorial/document/StatisticsTutorial.aux
+tutorial/document/StatisticsTutorial.log

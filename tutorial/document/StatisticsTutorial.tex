@@ -1,19 +1,63 @@
+%% -*- coding: utf-8 -*-
+\documentclass{article}
 % Outline for statistics tutorial
 % Hal Canaray and Cory Quammen
-%
-% Note: this is in a rough format that may not compile in latex in its current form
+\usepackage{graphicx}
+\usepackage{utfsymb}
+\begin{document}
+
+\begin{center}
+\includegraphics{figures/MADAI_2013_Stats_Workshop.pdf}
+\end{center}
 
 \section{Statistics background}
 
 \subsection{Basic concepts}
 
-We have a model and we're trying to find parameters for it that best explain some observed phenomena.
+We have a model and we're trying to find parameters for it that best
+explain some observed phenomena.
+
+\begin{itemize}
+
+\item Model — a conceptual model of a physical process.  It exists as
+  a procedure that takes in parameters and returns either a set of
+  outputs or a distribution of outputs.
+
+\item Observables — a set of field measurements that can be compared
+  against a model's outputs.
+
+\item Output Space — The set of all possible outputs of the model,
+  which are intended to be comared to observations.
+
+\item Model Outputs — a point in output space, or a distribution in
+  output space.
+
+\item Model Parameters — any of the modifiable inputs to the model
+
+\item Parameter Space — the set of all possible values for each of the
+  parameters
+
+\item Ground Truth — a point in parameter space that represents how
+  the universe actually works.  Will only exist if the model is any
+  good..
+
+\item Likelihood — Given a model and set of observables, what is the
+  probability of a given set of parameter values?  What we actually
+  calulate is the likelihood ratio.
+
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=3in]{figures/MADAI_Stats_and_Vis.pdf}
+\end{center}
+
 
 \subsubsection{Probability and statistics review}
 
 Touch on terms.
 
-Probability, expectation, distribution, joint distribution, variance, covariance
+Probability, expectation, distribution, joint distribution, variance,
+covariance
 
 \subsubsection{Joint implausbility}
 
@@ -21,9 +65,9 @@ Probability, expectation, distribution, joint distribution, variance, covariance
 
 \subsection{Background}
 
-\begin{itemize}
-
 See Chris Coleman-Smith's presentation at the June 2012 MADAI meeting on this
+
+\begin{itemize}
 
 \item What it does?
 
@@ -87,3 +131,4 @@ Set up environment for running it
 
 \end{itemize}
 
+\end{document}
