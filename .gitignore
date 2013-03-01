@@ -7,10 +7,16 @@
 
 msu-hydro-analysis/model-data/*
 msu-hydro-analysis/CrossCheckSummary*
-ModelOptimization/doc/cf.zip
-ModelOptimization/doc/cf/*
-ModelOptimization/doc/html.zip
-ModelOptimization/doc/html/*
-ModelOptimization/doc/latex/*
-ModelOptimization/test/Gaussian2DMCMC/*
-ModelOptimization/test/TestModel/*
+DistributionSampling/doc/cf.zip
+DistributionSampling/doc/cf/*
+DistributionSampling/doc/html.zip
+DistributionSampling/doc/html/*
+DistributionSampling/doc/latex/*
+DistributionSampling/test/Gaussian2DMCMC/*
+DistributionSampling/test/TestModel/*
+DistributionSampling/test/DiceMCMC/DensityPlots/
+DistributionSampling/test/DiceMCMC/trace/
+
+tutorial/document/StatisticsTutorial.pdf
+tutorial/document/StatisticsTutorial.aux
+tutorial/document/StatisticsTutorial.log
