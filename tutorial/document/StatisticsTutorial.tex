@@ -19,50 +19,84 @@ explain some observed phenomena.
 
 \begin{itemize}
 
-\item Model — a conceptual model of a physical process.  It exists as
+\item \textbf{Model} — a conceptual model of a physical process.  It exists as
   a procedure that takes in parameters and returns a set of
   outputs and potentially uncertainty about those outputs. FIXME Examples
  
-\item Observables — a set of field measurements that can be compared
+\item \textbf{Observables} — a set of field measurements that can be compared
   against a model's outputs. FIXME Examples
 
-\item Output Space — The set of all possible outputs of the model,
+\item \textbf{Output Space} — The set of all possible outputs of the model,
   which are intended to be compared to observables.
 
-\item Model Outputs — a point in output space, or a point in output
+\item \textbf{Model Outputs} — a point in output space, or a point in output
   space together wuith uncertainty.
 
-\item Model Parameters — any of the modifiable inputs to the
+\item \textbf{Model Parameters} — any of the modifiable inputs to the
   model. FIXME Examples
 
-\item Parameter Space — the set of all possible values for each of the
+\item \textbf{Parameter Space} — the set of all possible values for each of the
   parameters
 
-\item Ground Truth — a point in parameter space that represents how
+\item \textbf{Ground Truth} — a point in parameter space that represents how
   the physical process actually works.
 
-\item Likelihood — Given a model and set of observables, this is the
-  probability of a given set of parameter values.
+\item \textbf{Likelihood} — Given a model and set of observables, this is the
+  probability that a given set of parameter values is the ground truth.
 
 \item Prior Likelihood — FIXME
+\end{itemize}
 
 \newpage
 
-\[ P = \textrm{parameter space} ⊂ ℝ^p \]
-\[ T = \textrm{output space} ⊂ ℝ^t \]
-\[ M: P → T \]
-\[ Y_f = \textrm{distribution of field measurements} ⊂ T\]
-\[ y = M(x) \]
+\[ P = \textrm{parameter space} ⊂ ℝ^p \qquad
+ T = \textrm{output space} ⊂ ℝ^t \]
+\[ M: P → T  = \textrm{a model} \]
+\[ Y_f = \textrm{distribution of field measurements} ⊂ T \]
+\[ E[·] = \textrm{expectation value} \qquad Σ[·] = \textrm{covariance matrix} \]
+\[ ℒ_{M,Y_f}: P → ℝ^+. \qquad
+ ℒ_{M,Y_f}(x) = \textrm{likelihood of $x$, given $M$ and $Y_f$} \]
 \[
-ℒ ∝ \textrm{exp}\left({-\frac{1}{2}\big(E[Y]-E[Y_f]\big)^T \big(Σ[Y]+Σ[Y_f]\big)^{-1} \big(E[Y]-E[Y_f]\big)}\right)
+ℒ_M(x) ∝ \textrm{exp}\left({-\frac{1}{2}\big(E[M(x)]-E[Y_f]\big)^T \big(Σ[M(x)]+Σ[Y_f]\big)^{-1} \big(E[M(x)]-E[Y_f]\big)}\right)
 \]
-
-\end{itemize}
 
 \begin{center}
 \includegraphics[width=3in]{figures/MADAI_Stats_and_Vis.pdf}
 \end{center}
 
+
+\section{ So you want to effectivly explore the parameter space of your model?}
+
+This HOWTO is intended to be used by someone just about to start the
+process
+
+1) Step one: effectivly parametrarize your model. Choose parameters
+that vary in the same scale (this makes the numerical process
+easier). If a parameter $Q$ varies from 1.0e-4 to 1.0e4, consider
+defining $q := ln(Q/min)/ln(max/min)$.
+
+2) Decide which model outputs you want to use. These should be numbers
+which can be readily compared to your experimental / observational
+data.
+
+3) Choose a number of samples. One rule of thumb is that you need more
+than $10×$ the number of parameters. This is constrained by your
+processing power and the complexity of your model.
+
+4) Generate a Latin hypercube sample of the parameter space. 
+
+5) Evaluate your model at the sample points.
+
+6) Assemble the sample points together with the model outputs into a
+file suiatable for input into the MADAI Gaussian Process Model
+Emulator.
+
+7) Use the “Estimate Hyperparameters” function of the emulator to
+generate a Gaussian process model of your model. Check that it works
+well, then tweek the settings on the Hyperparameters Estimation. Ask
+for help if it doesn’t work well.
+
+8) Pass the GP model state into the Distribution Sampling tools.
 
 \subsubsection{Probability and statistics review}
 
@@ -71,7 +105,7 @@ Touch on terms.
 Probability, expectation, distribution, joint distribution, variance,
 covariance
 
-\subsubsection{Joint implausbility}
+\subsubsection{Joint implausbility and log-likelihood}
 
 \section{Gaussian process emulator}
 
