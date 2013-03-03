@@ -42,50 +42,65 @@ namespace madai {
  * replay it. */
 class Trace {
 public:
-  Trace() {};
-  Trace( const std::string info_dir,
-         const std::string configuration );
-  virtual ~Trace() {}
+  Trace();
+  virtual ~Trace();
 
-  unsigned int length() const;
-  void add( const std::vector< double > & parameterValues,
-            const std::vector< double > & OutputValues,
-            double LogLikelihood );
-  void add( const std::vector< double > & parameterValues,
-            const std::vector< double > & OutputValues );
-  void add( const std::vector< double > & parameterValues );
-  TraceElement & operator[]( unsigned int idx );
-  const TraceElement & operator[]( unsigned int idx ) const;
+  /** Add a TraceElement to the Trace. */
+  bool Add( const TraceElement & element );
 
-  void write( std::ostream & o ) const;
+  /** Add an entry from parameter, output values, and log-likelihood. */
+  bool Add( const std::vector< double > & parameterValues,
+            const std::vector< double > & outputValues,
+            double logLikelihood );
 
-  /*
-    Assert:
-      FOR ALL i < this->m_TraceElements.size():
-        this->m_TraceElements[i].m_ParameterValues.size() == params.size()
-        this->m_TraceElements[i].m_OutputValues.size() == outputs.size()
-  */
-  void writeHead( std::ostream & o,
-                  const std::vector< Parameter > & params ) const;
-  void writeHead( std::ostream & o,
-                  const std::vector< Parameter > & params,
-                  const std::vector< std::string > & outputs) const;
-  void PrintDataToFile( const std::vector< Parameter > & params );
-  void WriteOut( const std::vector< Parameter > & params );
-  void MakeTrace();
-  std::vector< std::string > GetParNames();
+  /** Add an entry from parameter and output values.
+   *
+   * Sets log-likelihood to 0.0. */
+  bool Add( const std::vector< double > & parameterValues,
+            const std::vector< double > & outputValues );
 
-  std::string  m_TraceDirectory;
-  int          m_Writeout;
-  int          m_MaxIterations;
-  int          m_WriteOutCounter;
-  int          m_CurrentIteration;
-  bool         m_AppendTrace;
-  parameterMap m_TraceParameterMap;
+  /** Add an entry from parameter values alone.
+   *
+   * \todo It seems like you should always have to record an output
+   * from a model. */
+  bool Add( const std::vector< double > & parameterValues );
+
+  /** Get the number of entries in the Trace. */
+  unsigned int GetSize() const;
+
+  /** Remove all elements from the Trace. */
+  void Clear();
+
+  TraceElement & operator[]( unsigned int index );
+  const TraceElement & operator[]( unsigned int index ) const;
+
+  /** Write the trace to a comma-separated value file.
+   *
+   * Parameters and output names are assumed to come from a
+   * Model. Returns true if writing succeeded, false otherwise. */
+  bool WriteCSVFile( const std::string & filename,
+		     const std::vector< Parameter > & parameters,
+		     const std::vector< std::string > & outputNames = std::vector< std::string >() ) const;
+
+  void WriteCSVOutput( std::ostream & os,
+                       const std::vector< Parameter > & parameters,
+                       const std::vector< std::string > & outputNames = std::vector< std::string >() ) const;
+
+  /** Import a trace from a comma-separated value file. You must tell
+      it how many of the first columns are parameters and how many are
+      outputs. */
+  bool ImportCSVFile( const std::string & filename,
+		      int numberOfParameters,
+		      int numberOfOutputs );
 
 protected:
   std::vector< TraceElement > m_TraceElements;
-  std::vector< std::string >  m_ParameterNames;
+
+  void WriteHead( std::ostream & o,
+                  const std::vector< Parameter > & params,
+                  const std::vector< std::string > & outputs = std::vector< std::string >() ) const;
+
+  void WriteData( std::ostream & out ) const;
 
 }; // class Trace
 

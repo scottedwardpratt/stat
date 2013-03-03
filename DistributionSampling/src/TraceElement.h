@@ -35,19 +35,25 @@ public:
   TraceElement(const std::vector< double > & parameterValues,
                const std::vector< double > & OutputValues,
                double LogLikelihood);
+
   TraceElement(const std::vector< double > & parameterValues,
                const std::vector< double > & OutputValues );
+
   TraceElement(const std::vector< double > & parameterValues);
+
   TraceElement();
+
+  /** Clear all the parameter values, output values, and comments, and
+   * set the log likelihood to 0.0. */
   void Reset();
-  void Print();
-  void VizTrace();
+
+  /** Returns true if there are any parameter values, output values,
+   * or comments. */
+  bool IsValid() const;
 
   std::vector< double > m_ParameterValues;
   std::vector< double > m_OutputValues;
   double                m_LogLikelihood;
-  bool                  m_InTrace;
-  bool                  m_Used;
 
   /** Comments may be used to store human-readable comments *or*
   record changes to state, such as changing an optimizer type,

@@ -20,16 +20,70 @@
 
 namespace madai {
 
-std::vector< std::string >
+
 Trace
-::GetParNames(){
-  return this->m_ParameterNames;
+::Trace()
+{
+  // Nothing to initialize
+}
+
+
+Trace
+::~Trace()
+{
+}
+
+
+bool
+Trace
+::Add( const TraceElement & element ) {
+  if ( this->GetSize() > 0 ) {
+    // Check for consistency with previous element in trace.
+    const TraceElement & previousElement = m_TraceElements.back();
+    if ( element.m_ParameterValues.size() != previousElement.m_ParameterValues.size() ) {
+      return false;
+    }
+    if ( element.m_OutputValues.size() != previousElement.m_OutputValues.size() ) {
+      return false;
+    }
+  }
+
+  m_TraceElements.push_back( element );
+
+  return true;
+}
+
+
+bool
+Trace
+::Add( const std::vector< double > & parameterValues,
+       const std::vector< double > & outputValues,
+       double logLikelihood )
+{
+  return this->Add( TraceElement( parameterValues, outputValues, logLikelihood ) );
+}
+
+
+bool
+Trace
+::Add( const std::vector< double > & parameterValues,
+       const std::vector< double > & outputValues )
+{
+  return this->Add( TraceElement( parameterValues, outputValues ) );
+}
+
+
+bool
+Trace
+::Add( const std::vector< double > & parameterValues )
+{
+  return this->Add( TraceElement( parameterValues ) );
 }
 
 
 unsigned int
 Trace
-::length() const
+::GetSize() const
 {
   return this->m_TraceElements.size();
 }
@@ -37,39 +91,9 @@ Trace
 
 void
 Trace
-::add( const std::vector< double > & parameterValues,
-       const std::vector< double > & OutputValues,
-       double LogLikelihood)
+::Clear()
 {
-  this->m_TraceElements.push_back(
-    TraceElement( parameterValues,OutputValues, LogLikelihood ) );
-}
-
-
-void
-Trace
-::add( const std::vector< double > & parameterValues,
-       const std::vector< double > & OutputValues)
-{
-  this->m_TraceElements.push_back(
-    TraceElement( parameterValues,OutputValues, 0.0 ) );
-}
-
-
-void
-Trace
-::add( const std::vector< double > & parameterValues )
-{
-  if ( m_CurrentIteration >= m_Writeout ) {
-    std::cerr << "Error: Trace class out of bounds (Greater than WRITEOUT).\n\n";
-    exit( 1 );
-  } else {
-    for ( int i = 0; i < parameterValues.size(); i++ ) {
-      m_TraceElements[m_CurrentIteration].m_ParameterValues.push_back( parameterValues[i] );
-    }
-  m_TraceElements[m_CurrentIteration].m_Used = true;
-  m_CurrentIteration++;
-  }
+  m_TraceElements.clear();
 }
 
 
@@ -89,57 +113,6 @@ Trace
 }
 
 
-Trace
-::Trace( const std::string info_dir, const std::string configuration )
-{
-  m_TraceDirectory = info_dir + "/trace/" + configuration;
-  std::string filename = info_dir + "/defaultpars/mcmc.param";
-
-  parameter::ReadParsFromFile( m_TraceParameterMap, filename.c_str() );
-  m_Writeout      = parameter::getI( m_TraceParameterMap, "WRITEOUT", 100 );
-  m_MaxIterations = parameter::getI( m_TraceParameterMap, "MAX_ITERATIONS", 200 );
-  m_AppendTrace   = parameter::getB( m_TraceParameterMap, "APPEND_TRACE", false );
-
-  if ( m_AppendTrace ) {
-    std::string addon = "";
-    bool Done = false;
-    int filecount = 0;
-    while ( !Done ) {
-      struct stat st;
-      std::stringstream ss;
-      std::string tempfile = m_TraceDirectory + addon;
-      if ( stat(tempfile.c_str(), &st) == 0 ) {
-        //directory exists.
-        std::cout << tempfile << " exists, trying next option..." << std::endl;
-        filecount++;
-        ss << "_" << filecount;
-        addon = ss.str();
-        ss.str(string());
-      } else {
-        //doesn't exist
-        Done = true;
-        m_TraceDirectory = tempfile;
-      }
-    }
-  } else {
-    std::cout << "Deleting prior trace data." << std::endl;
-    std::string cmd = "rm " + m_TraceDirectory + "/output*.dat " + m_TraceDirectory + "/trace.dat";
-    std::system( cmd.c_str() );
-  }
-
-  std::string command = "mkdir -p "+ m_TraceDirectory;
-
-  std::system( command.c_str() );
-
-  m_WriteOutCounter = 0;
-  m_CurrentIteration = 0;
-  m_TraceElements.reserve( m_Writeout + 1 );
-  for ( int i = 0; i < m_Writeout; i++ ) {
-    m_TraceElements.push_back( TraceElement() );
-  }
-}
-
-
 template <class T>
 void write_vector( std::ostream& o, std::vector< T > const & v, char delim ) {
   if ( !v.empty() ) {
@@ -152,24 +125,106 @@ void write_vector( std::ostream& o, std::vector< T > const & v, char delim ) {
 }
 
 
+bool
+Trace
+::WriteCSVFile( const std::string & filename,
+		const std::vector< Parameter > & parameters,
+		const std::vector< std::string > & outputNames ) const
+{
+  try {
+    std::ofstream file( filename.c_str() );
+    this->WriteCSVOutput( file, parameters, outputNames );
+    file.close();
+  } catch ( ... ) {
+    return false;
+  }
+
+  return true;
+}
+
+
 void
 Trace
-::write( std::ostream & out ) const {
-  unsigned int N = this->length();
-  for ( unsigned int i = 0; i < N; i++ ) {
-    write_vector( out, (*this)[i].m_ParameterValues, ',' );
-    out << ',';
-    write_vector( out, (*this)[i].m_OutputValues, ',' );
-    out << ',';
-    out << (*this)[i].m_LogLikelihood;
-    if ( (*this)[i].m_Comments.size() > 0 ) {
-      out << ",\"";
-      write_vector( out, (*this)[i].m_Comments, ';' );
-      out << '"';
+::WriteCSVOutput( std::ostream & os,
+                  const std::vector< Parameter > & parameters,
+                  const std::vector< std::string > & outputNames ) const
+{
+  this->WriteHead( os, parameters, outputNames );
+  this->WriteData( os );
+}
+
+
+bool
+Trace
+::ImportCSVFile( const std::string & filename,
+		 int numberOfParameters,
+		 int numberOfOutputs )
+{
+  try {
+    std::ifstream file( filename.c_str() );
+    // Read in header
+    for ( int i = 0; i < numberOfParameters; ++i ) {
+      std::string parameterName;
+      std::getline( file, parameterName, ',' );
+      parameterName = parameterName.substr( 1, parameterName.size() - 2 );
     }
-    out << '\n';
+
+    for ( int i = 0; i < numberOfOutputs; ++i ) {
+      std::string outputName;
+      std::getline( file, outputName, ',' );
+    }
+
+    // Likelihood output
+    std::string likelihoodName;
+    std::getline( file, likelihoodName );
+    likelihoodName = likelihoodName.substr( 1, likelihoodName.size() - 2 );
+
+    // Now read data
+    while ( !file.eof() ) {
+
+      std::vector< double > parameterValues;
+      for ( int i = 0; i < numberOfParameters; ++i ) {
+	std::string parameterString;
+	std::getline( file, parameterString, ',' );
+	if ( file.eof() ) {
+	  break;
+	}
+	double parameterValue = atof( parameterString.c_str() );
+
+	parameterValues.push_back( parameterValue );
+      }
+
+      std::vector< double > outputValues;
+      for ( int i = 0; i < numberOfOutputs; ++i ) {
+	std::string outputString;
+	std::getline( file, outputString, ',' );
+	if ( file.eof() ) {
+	  break;
+	}
+	double outputValue = atof( outputString.c_str() );
+	outputValues.push_back( outputValue );
+      }
+
+      std::string logLikelihoodString;
+      std::getline( file, logLikelihoodString );
+      if ( file.eof() ) {
+	break;
+      }
+      double logLikelihood = atof( logLikelihoodString.c_str() );
+
+      this->Add( parameterValues, outputValues, logLikelihood );
+
+
+    }
+
+    file.close();
+  } catch ( ... ) {
+    // Reading failed
+    return false;
   }
-  out.flush();
+
+  // Reading succeeded
+  return true;
 }
 
 
@@ -181,7 +236,7 @@ Trace
   */
 void
 Trace
-::writeHead( std::ostream & o,
+::WriteHead( std::ostream & o,
              const std::vector< Parameter > & params,
              const std::vector< std::string > & outputs) const
 {
@@ -197,6 +252,7 @@ Trace
   }
   if ( !outputs.empty() ) {
     std::vector<std::string>::const_iterator itr = outputs.begin();
+    std::cout << "Output name: " << *itr << std::endl;
     o << '"' << *itr << '"';
     for ( itr++; itr < outputs.end(); itr++ ) {
       o << ',' << '"' << *itr << '"';
@@ -208,101 +264,28 @@ Trace
 
 void
 Trace
-::writeHead( std::ostream & o,
-             const std::vector< Parameter > & params ) const
-{
-  if ( !params.empty() ) {
-    std::vector< Parameter >::const_iterator itr = params.begin();
-    o << '"' << itr->m_Name << '"';
-    for (itr++; itr < params.end(); itr++) {
-      o << ',' << '"' << itr->m_Name << '"';
+::WriteData( std::ostream & out ) const {
+  unsigned int n = this->GetSize();
+  for ( unsigned int i = 0; i < n; i++ ) {
+    const TraceElement & element = (*this)[i];
+    write_vector( out, element.m_ParameterValues, ',' );
+    out << ',';
+
+    if ( element.m_OutputValues.size() > 0 ) {
+      write_vector( out, element.m_OutputValues, ',' );
+      out << ',';
     }
-  }
-}
-
-
-void
-Trace
-::PrintDataToFile( const std::vector< Parameter > & params )
-{
-  std::cout << "Printing data to file." << std::endl;
-  std::ofstream outputfile;
-  std::stringstream ss;
-  ss << m_WriteOutCounter+1;
-  std::string out_file = m_TraceDirectory+"/output"+ss.str()+".dat";
-
-  if ( m_TraceElements[0].m_Used ) {
-    outputfile.open( out_file.c_str() );
-    std::cout << "Writing out to: " << out_file << std::endl;
-    if ( outputfile ) {
-      outputfile << "#ITERATION,";
-      if ( !params.empty() ) {
-        std::vector< Parameter >::const_iterator itr = params.begin();
-        for ( itr; itr < params.end(); itr++ ) {
-          outputfile << itr->m_Name << ',';
-        }
-      }
-      outputfile << std::endl;
-
-      for ( int i = 0; i < m_Writeout; i++ ) {
-        if ( m_TraceElements[i].m_Used ) {
-          outputfile << i+m_WriteOutCounter*m_Writeout << ",";
-          if ( !m_TraceElements[i].m_ParameterValues.empty() ) {
-            for ( int j = 0; j < m_TraceElements[i].m_ParameterValues.size(); j++ ) {
-              outputfile << m_TraceElements[i].m_ParameterValues[j];
-              if ( j != m_TraceElements[i].m_ParameterValues.size()-1 ) {
-                outputfile<< ",";
-              }
-            }
-          } else {
-            std::cout << "Error: Accessing empty element." << std::endl;
-            exit( 1 );
-          }
-        }
-        outputfile << std::endl;
-      }
-      outputfile.close();
-    } else {
-      std::cout << "Error: Couldn't open the output file" << std::endl;
-      exit( 1 );
+    out << element.m_LogLikelihood;
+    if ( element.m_Comments.size() > 0 ) {
+      out << ",\"";
+      write_vector( out, element.m_Comments, ';' );
+      out << '"';
     }
-  } else {
-    std::cerr << "The first element of the list is not used. ERROR\n\n";
-    exit( 1 );
+    out << '\n';
   }
+  out.flush();
 }
 
 
-void
-Trace
-::WriteOut( const std::vector< Parameter > & parameters )
-{
-  this->PrintDataToFile( parameters );
-  for ( int i = 0; i < m_Writeout; i++ ) {
-    m_TraceElements[i].Reset();
-  }
-  m_WriteOutCounter++;
-  m_CurrentIteration = 0;
-}
-
-
-void
-Trace
-::MakeTrace()
-{
-  std::stringstream ss;
-  ss << "cat ";
-
-  for ( int i = 1; i <= ceil( (double) (m_MaxIterations) / (double)(m_Writeout) ); i++ ) {
-    std::cout << "Parsing " << m_TraceDirectory << "/output" << i << ".dat" << std::endl;
-    ss << m_TraceDirectory << "/output" << i << ".dat ";
-  }
-  ss << "> " << m_TraceDirectory << "/trace.dat" << std::endl;
-
-  std::string command = ss.str();
-  std::system( command.c_str() );
-
-  ss.str( string() );
-}
 
 } // end namespace madai
