@@ -4,10 +4,12 @@
 % Hal Canaray and Cory Quammen
 \usepackage{graphicx}
 \usepackage{utfsymb}
+\usepackage{hyperref}
 \begin{document}
 
 \begin{center}
-\includegraphics{figures/MADAI_2013_Stats_Workshop.pdf}
+\includegraphics{figures/MADAI_2013_Stats_Workshop.pdf}\\
+\url{http://madai.us/}
 \end{center}
 
 \section{Statistics background}
@@ -57,7 +59,8 @@ explain some observed phenomena.
 \[ ℒ_{M,Y_f}: P → ℝ^+. \qquad
  ℒ_{M,Y_f}(x) = \textrm{likelihood of $x$, given $M$ and $Y_f$} \]
 \[
-ℒ_M(x) ∝ \textrm{exp}\left({-\frac{1}{2}\big(E[M(x)]-E[Y_f]\big)^T \big(Σ[M(x)]+Σ[Y_f]\big)^{-1} \big(E[M(x)]-E[Y_f]\big)}\right)
+ℒ_M(x) ∝ \textrm{exp}\left({-\frac{1}{2}\big(E[M(x)]-E[Y_f]\big)^T
+     \big(Σ[M(x)]+Σ[Y_f]\big)^{-1} \big(E[M(x)]-E[Y_f]\big)}\right)
 \]
 
 \begin{center}
@@ -92,7 +95,7 @@ process
 
 \item Assemble the sample points together with the model outputs into
   a file suiatable for input into the MADAI Gaussian Process Model
-  Emulator.
+  Emulator.  See the manpage of the emulator for more information.
 
 \item Use the “Estimate Hyperparameters” function of the emulator to
   generate a Gaussian process model of your model. Check that it works
@@ -204,20 +207,23 @@ Once the GP has been conditioned, and a best set of hyper parameters
 $Θ$ has been obtained, we have a posterior predictive distribution
 for the model output at a new location $x^*$:
 
-\[P(M(x^*) | Y_t, D, Θ) = \textrm{Multivariate-Normal}(\textrm{mean}(x^*), \textrm{cov}(x^*)), \]
+\[P(M(x^*) | Y_t, D, Θ)
+	= \textrm{Multivariate-Normal}(\textrm{mean}(x^*), \textrm{cov}(x^*)), \]
 
 where the posterior mean and covariance are (for a zero prior mean)
 
 \[ \textrm{mean}(x^*) = C_Θ(x^*,D)^T  C_Θ(D,D)^{-1} Y_t \]
-\[ \textrm{cov}(x^*) = C_Θ(x^*,x^*) - C_Θ(x^*,D)^T C_Θ(D,D)^{-1} C(x^*,D). \quad (??????) \]
+\[ \textrm{cov}(x^*) = C_Θ(x^*,x^*) - C_Θ(x^*,D)^T C_Θ(D,D)^{-1} C(x^*,D). \]
 
 Here $C_Θ(D,D)$ represents the matrix formed by evaluating the
 covariance function $C_Θ$ at each pair of locations in $D$, the vector
 $C_Θ(x^*,D)$ is the correlation between each location in the design
 set and the new point.
 
-\[ \textrm{matrix } C_Θ(D_Θ,D_Θ)_{i,j} = C_Θ(x_i,x_j) \qquad \textrm{for } x_i,x_j ∈ D \]
-\[ \textrm{vector } C_Θ(x^*,D_Θ)_{i} = C_Θ(x^*,x_i) \qquad \textrm{for } x_i ∈ D, x^* ∈ P \]
+\[ \textrm{matrix } C_Θ(D_Θ,D_Θ)_{i,j} = C_Θ(x_i,x_j)
+	 \qquad \textrm{for } x_i,x_j ∈ D \]
+\[ \textrm{vector } C_Θ(x^*,D_Θ)_{i} = C_Θ(x^*,x_i)
+	 \qquad \textrm{for } x_i ∈ D, x^* ∈ P \]
 
 These equations have a relatively straightforward interpretation. The
 prior mean (0) is modified by the covariance structure deduced from
@@ -237,8 +243,8 @@ It is important to note that unlike some other data
 interpolation/extrapolation methods we end up with a probability
 distribution for the value of our model at an untried location, as it
 is normal the mean and covariance are sufficient to describe the
-distribution. These can be obtained by the emulate\_at\_point or
-emulate\_at\_list functions.
+distribution. These can be obtained by the \texttt{emulate\_at\_point} or
+\texttt{emulate\_at\_list} functions.
 
 It is straightforward to draw samples from the predictive
 distribution, although care must be taken to expand the above
@@ -246,14 +252,79 @@ equations correctly for a set of m observation locations
 $X^* = {x^*_1, ... x^*_m}$.
 
 For more information see the documentation, the website
-http://www.gaussianprocess.org and the invaluable book "Gaussian
-processes for machine learning".
+\url{http://www.gaussianprocess.org/} and the invaluable book
+\emph{Gaussian Processes for Machine Learning}.
 
 \subsection{Training an emulator}
 
 \subsubsection{What is a nugget?}
 
 \subsubsection{Inputs}
+
+INPUT\_MODEL\_FILE format
+
+An input model is specified interms of the locations in the parameter
+(design) space where it was sampled and the values of the model
+produced at these locations.
+
+\begin{itemize}
+\item \texttt{number\_outputs} --- The dimension of the output vector we wish
+to emulate, $y_{out} = y_1 \ldots y_t$
+
+\item \texttt{number\_params} --- The dimension of the parameter space we are
+moving around in
+
+\item \texttt{number\_model\_points} --- The number of samples of the model
+($y_{out}$) we've taken through the \texttt{number\_params} dimensional
+\texttt{parameter\_space}.
+\end{itemize}
+
+In the following example we label the design data as X and the training
+data as Y.
+\begin{quote}
+\begin{verbatim}
+           VERSION 1
+           PARAMETERS
+           number_params
+           parameter_0_name
+           parameter_0_min
+           parameter_0_max
+           parameter_1_name
+           parameter_1_min
+           parameter_1_max
+           ...
+           parameter_[number_params-1]_name
+           parameter_[number_params-1]_min
+           parameter_[number_params-1]_max
+           OUTPUTS
+           number_outputs
+           output_0_name
+           output_1_name
+           ...
+           output_[number_params-1]_name
+           number_model_points
+           X[0,0]
+           ...
+           X[0,number_params-1]
+           X[1,0]
+           ...
+           X[number_model_points-1,number_params-1]
+           Y[0, 0]
+           Y[0, 1]
+           ...
+           Y[0, number_outputs-1]
+           ...
+           Y[1, 1]
+           ...
+           Y[number_model_points-1, number_outputs-1]
+\end{verbatim}
+\end{quote}
+
+\texttt{number\_outputs}, \texttt{number\_params} and
+\texttt{number\_model\_points} should be positive integers.  $X[i,j]$
+and $Y[i,j]$ will be read as double-precision floats.  Parameter names
+should contain no whitespace.  Ranges are floating-point numbers.
+
 
 \begin{itemize}
 
