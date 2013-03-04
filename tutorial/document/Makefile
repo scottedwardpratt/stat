@@ -4,6 +4,6 @@ all: StatisticsTutorial.pdf
 clean:
 	rm StatisticsTutorial.aux StatisticsTutorial.log
 
-%.pdf: %.tex
-	pdflatex $^
+%.pdf: %.tex utfsymb.sty
+	pdflatex $<
 
